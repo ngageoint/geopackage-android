@@ -11,12 +11,12 @@ CREATE TABLE gpkg_metadata_reference (
 );
 
 //(Informative)
-//INSERT INTO gpkg_metadata_reference VALUES (
-//  'table',
-//  'sample_rasters',
-//  NULL,
-//  NULL,
-//  '2012-08-17T14:49:32.932Z',
-//  98,
-//  99
-//)
+INSERT INTO gpkg_metadata_reference VALUES (
+  'table',
+  'sample_rasters',
+  NULL,
+  NULL,
+  '2012-08-17T14:49:32.932Z',
+  98,
+  99
+)
