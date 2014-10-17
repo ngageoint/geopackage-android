@@ -1,0 +1,26 @@
+CREATE TABLE gpkg_spatial_ref_sys (
+  srs_name TEXT NOT NULL,
+  srs_id INTEGER NOT NULL PRIMARY KEY,
+  organization TEXT NOT NULL,
+  organization_coordsys_id INTEGER NOT NULL,
+  definition  TEXT NOT NULL,
+  description TEXT
+);
+
+CREATE VIEW st_spatial_ref_sys AS
+  SELECT
+    srs_name,
+    srs_id,
+    organization,
+    organization_coordsys_id,
+    definition,
+    description
+  FROM gpkg_spatial_ref_sys;
+  
+CREATE VIEW spatial_ref_sys AS
+  SELECT
+    srs_id AS srid,
+    organization AS auth_name,
+    organization_coordsys_id AS auth_srid,
+    definition AS srtext
+  FROM gpkg_spatial_ref_sys;
