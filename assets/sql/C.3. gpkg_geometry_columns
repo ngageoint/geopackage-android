@@ -21,11 +21,24 @@ CREATE VIEW st_geometry_columns AS
   FROM gpkg_geometry_columns as g JOIN gpkg_spatial_ref_sys AS s
   WHERE g.srs_id = s.srs_id;
   
+/*
+The following query has a code4name sql function in it.  According to the spec, the code4name function is to be written by the spec-implementor.
+SQLite in android does not have a native way to implement custom sql methods at this time.  For now, we will omit the function call and handle
+the translation in code.  Please see: section C.3 of http://www.geopackage.org/spec/ for more details.
+#CREATE VIEW geometry_columns AS
+#  SELECT
+#    table_name AS f_table_name,
+#    column_name AS f_geometry_column,
+#    code4name (geometry_type_name) AS geometry_type,
+#    2 + (CASE z WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) + (CASE m WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) AS coord_dimension,
+#    srs_id AS srid
+#  FROM gpkg_geometry_columns
+*/ 
 CREATE VIEW geometry_columns AS
   SELECT
     table_name AS f_table_name,
     column_name AS f_geometry_column,
-    code4name (geometry_type_name) AS geometry_type,
+    geometry_type_name AS geometry_type,
     2 + (CASE z WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) + (CASE m WHEN 1 THEN 1 WHEN 2 THEN 1 ELSE 0 END) AS coord_dimension,
     srs_id AS srid
   FROM gpkg_geometry_columns;

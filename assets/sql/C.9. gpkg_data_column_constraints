@@ -1,10 +1,10 @@
 CREATE TABLE gpkg_data_column_constraints (
   constraint_name TEXT NOT NULL,
-  constraint_type TEXT NOT NULL, // 'range' | 'enum' | 'glob'
+  constraint_type TEXT NOT NULL, /* 'range' | 'enum' | 'glob' */
   value TEXT,
   min NUMERIC,
-  minIsInclusive BOOLEAN, // 0 = false, 1 = true
+  minIsInclusive BOOLEAN, /* 0 = false, 1 = true */
   max NUMERIC,
-  maxIsInclusive BOOLEAN, // 0 = false, 1 = true
+  maxIsInclusive BOOLEAN, /* 0 = false, 1 = true */
   CONSTRAINT gdcc_ntv UNIQUE (constraint_name, constraint_type, value)
-)
+);

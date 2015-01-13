@@ -10,15 +10,13 @@ CREATE TABLE gpkg_tile_matrix (
   CONSTRAINT pk_ttm PRIMARY KEY (table_name, zoom_level),
   CONSTRAINT fk_tmm_table_name FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name)
 );
-
-//(Informative)
-//INSERT INTO gpkg_tile_matrix VALUES (
-//  "sample_tile_pyramid",
-//  0,
-//  1,
-//  1,
-//  512,
-//  512,
-//  2.0,
-//  2.0
-//);
+INSERT INTO gpkg_tile_matrix VALUES (
+  "sample_tile_pyramid",
+  0,
+  1,
+  1,
+  512,
+  512,
+  2.0,
+  2.0
+);

@@ -10,7 +10,7 @@ CREATE TABLE gpkg_metadata_reference (
   CONSTRAINT crmr_mpi_fk FOREIGN KEY (md_parent_id) REFERENCES gpkg_metadata(id)
 );
 
-//(Informative)
+/*(Informative)*/
 INSERT INTO gpkg_metadata_reference VALUES (
   'table',
   'sample_rasters',

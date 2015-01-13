@@ -3,14 +3,14 @@ CREATE TABLE sample_tile_pyramid (
   zoom_level INTEGER NOT NULL,
   tile_column INTEGER NOT NULL,
   tile_row INTEGER NOT NULL,
-  tile_data BLOB NOT NULL),
+  tile_data BLOB NOT NULL,
   UNIQUE (zoom_level, tile_column, tile_row)
-)
+);
 
-INSERT INTO sample_matrix_pyramid VALUES (
+INSERT INTO sample_tile_pyramid VALUES (
   1,
   1,
   1,
   1,
   "BLOB VALUE"
-)
+);
