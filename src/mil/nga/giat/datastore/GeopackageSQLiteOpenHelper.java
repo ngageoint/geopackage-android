@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -53,7 +54,8 @@ public class GeopackageSQLiteOpenHelper extends SQLiteOpenHelper {
 					assetManager.open("sql" + File.separatorChar + initScripts[i], AssetManager.ACCESS_BUFFER);
 				
 				//execute all statements in file.
-				runScript(scriptStream, db);
+				int statements = runScript(scriptStream, db);
+				Log.i(TAG, "Executed " + statements + " in script file: " + initScripts[i]);
 				
 			}			
 			
@@ -82,20 +84,17 @@ public class GeopackageSQLiteOpenHelper extends SQLiteOpenHelper {
 	 * 
 	 * @param pScriptStream An InputStream (should represent a single file in the asset/sql directory).
 	 * @param pDb A handle for SQLiteDatabase interaction.
-	 * @return The number of scripts that were successfully run.
+	 * @return The number of sql statements that were successfully run.
 	 */
 	private int runScript(final InputStream pScriptStream, final SQLiteDatabase pDb) {
-		Scanner s = new java.util.Scanner(pScriptStream).useDelimiter("\\A");
-		String fileContents =  s.hasNext() ? s.next() : "";
-		
-		StringTokenizer scripts = new StringTokenizer(fileContents, ";");
-		int j = 0;
-		while(scripts.hasMoreElements()) {
-			String query = ((String)scripts.nextElement()).trim();
-			pDb.execSQL(query);			
-			j++;
+		int count = 0;
+		Scanner s = new java.util.Scanner(pScriptStream).useDelimiter(Pattern.compile("\\n\\s*\\n"));
+		while(s.hasNext()){
+			String statement = s.next().trim();
+			pDb.execSQL(statement);			
+			count++;
 		}
-		return j;
+		return count;
 	}
 	
 	/**
