@@ -1,4 +1,4 @@
-package mil.nga.giat.datastore;
+package mil.nga.giat.geopackage.datastore;
 
 import java.io.File;
 import java.io.IOException;
