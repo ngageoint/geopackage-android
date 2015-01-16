@@ -119,11 +119,12 @@ public class GeoPackageManager {
 		} else {
 			SQLiteDatabase db = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
+
+			// Create the minimum required tables
 			GeoPackageScriptExecutor scriptExecutor = new GeoPackageScriptExecutor(
 					context, db);
 			scriptExecutor.createSpatialReferenceSystem();
-			// TODO create a new GeoPackage database with at least minimal
-			// required tables gpkg_spatial_ref_sys and gpkg_contents
+			scriptExecutor.createContents();
 
 			db.close();
 			created = true;

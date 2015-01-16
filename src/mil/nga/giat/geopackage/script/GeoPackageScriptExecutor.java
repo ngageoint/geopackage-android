@@ -73,6 +73,26 @@ public class GeoPackageScriptExecutor {
 	}
 
 	/**
+	 * Create Contents table
+	 * 
+	 * @return
+	 */
+	public int createContents() {
+		int statements = 0;
+		try {
+
+			InputStream scriptStream = assetManager.open(context
+					.getString(R.string.sql_directory)
+					+ File.separatorChar
+					+ context.getString(R.string.sql_contents));
+			statements = runScript(scriptStream);
+		} catch (IOException e) {
+			Log.e(TAG, "Unable to create content tables.", e);
+		}
+		return statements;
+	}
+
+	/**
 	 * Run the script input stream
 	 * 
 	 * @param stream
