@@ -8,25 +8,73 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  * @author osbornb
  */
-@DatabaseTable(tableName = "gpkg_spatial_ref_sys")
+@DatabaseTable(tableName = "gpkg_spatial_ref_sys", daoClass = SpatialReferenceSystemDao.class)
 public class SpatialReferenceSystem {
 
-	@DatabaseField(columnName = "srs_name", canBeNull = false)
+	/**
+	 * srsName field name
+	 */
+	public static final String SRS_NAME = "srs_name";
+
+	/**
+	 * srsId field name
+	 */
+	public static final String SRS_ID = "srs_id";
+
+	/**
+	 * organization field name
+	 */
+	public static final String ORGANIZATION = "organization";
+
+	/**
+	 * organizationCoordsysId field name
+	 */
+	public static final String ORGANIZATION_COORDSYS_ID = "organization_coordsys_id";
+
+	/**
+	 * definition field name
+	 */
+	public static final String DEFINITION = "definition";
+
+	/**
+	 * description field name
+	 */
+	public static final String DESCRIPTION = "description";
+
+	/**
+	 * Human readable name of this SRS
+	 */
+	@DatabaseField(columnName = SRS_NAME, canBeNull = false)
 	private String srsName;
 
-	@DatabaseField(columnName = "srs_id", id = true, canBeNull = false)
+	/**
+	 * Unique identifier for each Spatial Reference System within a GeoPackage
+	 */
+	@DatabaseField(columnName = SRS_ID, id = true, canBeNull = false)
 	private int srsId;
 
-	@DatabaseField(columnName = "organization", canBeNull = false)
+	/**
+	 * Case-insensitive name of the defining organization e.g. EPSG or epsg
+	 */
+	@DatabaseField(columnName = ORGANIZATION, canBeNull = false)
 	private String organization;
 
-	@DatabaseField(columnName = "organization_coordsys_id", canBeNull = false)
+	/**
+	 * Numeric ID of the Spatial Reference System assigned by the organization
+	 */
+	@DatabaseField(columnName = ORGANIZATION_COORDSYS_ID, canBeNull = false)
 	private int organizationCoordsysId;
 
-	@DatabaseField(columnName = "definition", canBeNull = false)
+	/**
+	 * Well-known Text [32] Representation of the Spatial Reference System
+	 */
+	@DatabaseField(columnName = DEFINITION, canBeNull = false)
 	private String definition;
 
-	@DatabaseField(columnName = "description")
+	/**
+	 * Human readable description of this SRS
+	 */
+	@DatabaseField(columnName = DESCRIPTION)
 	private String description;
 
 	/**

@@ -12,7 +12,10 @@ import java.util.List;
 import java.util.Set;
 
 import mil.nga.giat.geopackage.script.GeoPackageScriptExecutor;
+import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
 import android.content.Context;
+import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -157,13 +160,35 @@ public class GeoPackageManager {
 
 		File file = new File(path);
 
-		String database = GeoPackageFileManager.getDatabaseName(file);
+		// Verify the file has the right extension
+		String extension = GeoPackageFileUtils.getFileExtension(file);
+		if (extension == null
+				|| (!extension.equalsIgnoreCase(context
+						.getString(R.string.geopackage_file_suffix)) && !extension
+						.equalsIgnoreCase(context
+								.getString(R.string.geopackage_extended_file_suffix)))) {
+			throw new GeoPackageException(
+					"GeoPackage database file '"
+							+ path
+							+ "' does not have a valid extension of '"
+							+ context
+									.getString(R.string.geopackage_file_suffix)
+							+ "' or '"
+							+ context
+									.getString(R.string.geopackage_extended_file_suffix)
+							+ "'");
+		}
+
+		// Use the base file name as the database name
+		final String database = GeoPackageFileUtils
+				.getFileNameWithoutExtension(file);
 
 		if (!override && exists(database)) {
 			throw new GeoPackageException(
-					"GeoPackage database already exists: '" + database);
+					"GeoPackage database already exists: " + database);
 		}
 
+		// Copy the geopackage file over as a database
 		try {
 			InputStream importFile = new FileInputStream(file);
 
@@ -183,6 +208,20 @@ public class GeoPackageManager {
 			throw new GeoPackageException(
 					"Failed read or write GeoPackage file '" + file
 							+ "' to database: '" + database, e);
+		}
+
+		// Verify that the database is valid
+		try {
+			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
+					Context.MODE_PRIVATE, null, new DatabaseErrorHandler() {
+						@Override
+						public void onCorruption(SQLiteDatabase dbObj) {
+						}
+					});
+			sqlite.close();
+		} catch (Exception e) {
+			delete(database);
+			throw new GeoPackageException("Invalid GeoPackage database file", e);
 		}
 
 		return exists(database);
@@ -214,7 +253,8 @@ public class GeoPackageManager {
 	 * @return
 	 */
 	private boolean isTemporary(String database) {
-		return database.endsWith(GeoPackageConstants.ROLLBACK_JOURNAL_SUFFIX);
+		return database.endsWith(context
+				.getString(R.string.geopackage_db_rollback_suffix));
 	}
 
 }

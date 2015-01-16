@@ -1,5 +1,12 @@
 <resources>
 
-    <string name="app_name">GeopackageSDK</string>
-
+    <string name="app_name">GeoPackageSDK</string>
+    
+    <string name="geopackage_file_suffix">gpkg</string>
+    <string name="geopackage_extended_file_suffix">gpkx</string>
+    <string name="geopackage_db_rollback_suffix">-journal</string>
+    
+    <string name="sql_directory">sql</string>
+    <string name="sql_spatial_reference_system">C.1. gpkg_spatial_ref_sys</string>
+    
 </resources>
