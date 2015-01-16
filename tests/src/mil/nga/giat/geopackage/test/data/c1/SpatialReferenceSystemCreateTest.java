@@ -93,6 +93,17 @@ public class SpatialReferenceSystemCreateTest extends
 	}
 
 	/**
+	 * Test reading using the SQL/MM view
+	 * 
+	 * @throws SQLException
+	 */
+	public void testSqlMmRead() throws GeoPackageException, SQLException {
+
+		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 0);
+
+	}
+
+	/**
 	 * Test reading using the SF/SQL view
 	 * 
 	 * @throws SQLException

@@ -6,6 +6,8 @@ import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystem;
+import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystemDao;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.AndroidConnectionSource;
@@ -75,6 +77,18 @@ public class GeoPackage {
 			throws SQLException {
 		return DaoManager.createDao(connectionSource,
 				SpatialReferenceSystem.class);
+	}
+
+	/**
+	 * Get a SQL/MM Spatial Reference System DAO
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	public SqlMmSpatialReferenceSystemDao sqlMmSpatialReferenceSystemDao()
+			throws SQLException {
+		return DaoManager.createDao(connectionSource,
+				SqlMmSpatialReferenceSystem.class);
 	}
 
 	/**

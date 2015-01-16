@@ -11,6 +11,8 @@ import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystem;
+import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystemDao;
 
 /**
  * Spatial Reference System Utility test methods
@@ -79,6 +81,82 @@ public class SpatialReferenceSystemUtils {
 			TestCase.assertTrue(querySrsList.size() >= 1);
 			found = false;
 			for (SpatialReferenceSystem querySrsValue : querySrsList) {
+				TestCase.assertEquals(srs.getDefinition(),
+						querySrsValue.getDefinition());
+				if (srs.getDescription() != null) {
+					TestCase.assertEquals(srs.getDescription(),
+							querySrsValue.getDescription());
+				}
+				if (!found) {
+					found = srs.getSrsId() == querySrsValue.getSrsId();
+				}
+			}
+			TestCase.assertTrue(found);
+		}
+	}
+
+	/**
+	 * Test SQL/MM read
+	 * 
+	 * @param geoPackage
+	 * @param expectedResults
+	 * @throws SQLException
+	 */
+	public static void testSqlMmRead(GeoPackage geoPackage, int expectedResults)
+			throws SQLException {
+
+		SqlMmSpatialReferenceSystemDao dao = geoPackage
+				.sqlMmSpatialReferenceSystemDao();
+		List<SqlMmSpatialReferenceSystem> results = dao.queryForAll();
+		TestCase.assertEquals(
+				"Unexpected number of spatial reference system rows",
+				expectedResults, results.size());
+
+		if (!results.isEmpty()) {
+
+			for (SqlMmSpatialReferenceSystem result : results) {
+				TestCase.assertNotNull(result.getSrsName());
+				TestCase.assertNotNull(result.getSrsId());
+				TestCase.assertNotNull(result.getOrganization());
+				TestCase.assertNotNull(result.getOrganizationCoordsysId());
+				TestCase.assertNotNull(result.getDefinition());
+			}
+
+			int random = (int) (Math.random() * results.size());
+			SqlMmSpatialReferenceSystem srs = results.get(random);
+
+			SqlMmSpatialReferenceSystem querySrs = dao.queryForId(srs
+					.getSrsId());
+			TestCase.assertNotNull(querySrs);
+			TestCase.assertEquals(srs.getSrsId(), querySrs.getSrsId());
+
+			List<SqlMmSpatialReferenceSystem> querySrsList = dao.queryForEq(
+					SpatialReferenceSystem.ORGANIZATION_COORDSYS_ID,
+					srs.getOrganizationCoordsysId());
+			TestCase.assertNotNull(querySrsList);
+			TestCase.assertTrue(querySrsList.size() >= 1);
+			boolean found = false;
+			for (SqlMmSpatialReferenceSystem querySrsValue : querySrsList) {
+				TestCase.assertEquals(srs.getOrganizationCoordsysId(),
+						querySrsValue.getOrganizationCoordsysId());
+				if (!found) {
+					found = srs.getSrsId() == querySrsValue.getSrsId();
+				}
+			}
+			TestCase.assertTrue(found);
+
+			Map<String, Object> fieldValues = new HashMap<String, Object>();
+			fieldValues.put(SpatialReferenceSystem.DEFINITION,
+					srs.getDefinition());
+			if (srs.getDescription() != null) {
+				fieldValues.put(SpatialReferenceSystem.DESCRIPTION,
+						srs.getDescription());
+			}
+			querySrsList = dao.queryForFieldValues(fieldValues);
+			TestCase.assertNotNull(querySrsList);
+			TestCase.assertTrue(querySrsList.size() >= 1);
+			found = false;
+			for (SqlMmSpatialReferenceSystem querySrsValue : querySrsList) {
 				TestCase.assertEquals(srs.getDefinition(),
 						querySrsValue.getDefinition());
 				if (srs.getDescription() != null) {
