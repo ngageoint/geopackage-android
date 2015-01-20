@@ -12,6 +12,11 @@ import com.j256.ormlite.table.DatabaseTable;
 public class SpatialReferenceSystem {
 
 	/**
+	 * Table name
+	 */
+	public static final String TABLE_NAME = "gpkg_spatial_ref_sys";
+	
+	/**
 	 * srsName field name
 	 */
 	public static final String SRS_NAME = "srs_name";

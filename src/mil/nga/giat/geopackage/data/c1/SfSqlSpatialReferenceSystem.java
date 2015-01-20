@@ -12,6 +12,11 @@ import com.j256.ormlite.table.DatabaseTable;
 public class SfSqlSpatialReferenceSystem {
 
 	/**
+	 * Table name
+	 */
+	public static final String TABLE_NAME = "spatial_ref_sys";
+
+	/**
 	 * srid field name
 	 */
 	public static final String SRID = "srid";

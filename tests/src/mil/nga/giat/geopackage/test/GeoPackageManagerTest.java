@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.GeoPackageFactory;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
@@ -78,7 +79,7 @@ public class GeoPackageManagerTest extends
 						Context.CONTEXT_IGNORE_SECURITY);
 
 		// Delete existing test databases
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 		manager.delete(TEST_DB_NAME);
 		manager.delete(IMPORT_DB_NAME);
 		manager.delete(IMPORT_CORRUPT_DB_NAME);
@@ -89,7 +90,7 @@ public class GeoPackageManagerTest extends
 	 */
 	public void testCreateOpenDelete() {
 
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
 		// Verify does not exist
 		assertFalse("Database already exists", manager.exists(TEST_DB_NAME));
@@ -122,7 +123,7 @@ public class GeoPackageManagerTest extends
 	 */
 	public void testImport() throws GeoPackageException {
 
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
 		// Verify does not exist
 		assertFalse("Database already exists", manager.exists(IMPORT_DB_NAME));
@@ -221,7 +222,7 @@ public class GeoPackageManagerTest extends
 	 */
 	public void testExport() throws GeoPackageException, SQLException {
 
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
 		// Verify does not exist
 		assertFalse("Database already exists", manager.exists(TEST_DB_NAME));
@@ -286,7 +287,7 @@ public class GeoPackageManagerTest extends
 		GeoPackage geoPackage = manager.open(IMPORT_DB_NAME);
 		assertNotNull("Failed to open database", geoPackage);
 		assertTrue("Failed to query from imported exported database",
-				geoPackage.spatialReferenceSystemDao().queryForAll().size() > 0);
+				geoPackage.getSpatialReferenceSystemDao().queryForAll().size() > 0);
 		geoPackage.close();
 
 		// Delete the test database

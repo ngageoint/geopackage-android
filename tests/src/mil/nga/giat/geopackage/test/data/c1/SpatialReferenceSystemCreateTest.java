@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.GeoPackageFactory;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
@@ -50,7 +51,7 @@ public class SpatialReferenceSystemCreateTest extends
 		// Set the activity
 		activity = getActivity();
 
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
 		// Delete
 		manager.delete(TEST_DB_NAME);
@@ -75,7 +76,7 @@ public class SpatialReferenceSystemCreateTest extends
 		}
 
 		// Delete
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 		manager.delete(TEST_DB_NAME);
 
 		super.tearDown();

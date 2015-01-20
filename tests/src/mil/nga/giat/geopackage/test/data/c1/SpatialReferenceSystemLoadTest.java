@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.GeoPackageFactory;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.test.TestConstants;
 import mil.nga.giat.geopackage.test.TestUtils;
@@ -68,7 +69,7 @@ public class SpatialReferenceSystemLoadTest extends
 				.createPackageContext("mil.nga.giat.geopackage.test",
 						Context.CONTEXT_IGNORE_SECURITY);
 
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
 		// Delete
 		manager.delete(IMPORT_DB_NAME);
@@ -99,7 +100,7 @@ public class SpatialReferenceSystemLoadTest extends
 		}
 
 		// Delete
-		GeoPackageManager manager = new GeoPackageManager(activity);
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 		manager.delete(IMPORT_DB_NAME);
 
 		super.tearDown();

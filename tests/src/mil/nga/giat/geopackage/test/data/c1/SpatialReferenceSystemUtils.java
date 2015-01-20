@@ -31,7 +31,7 @@ public class SpatialReferenceSystemUtils {
 	public static void testRead(GeoPackage geoPackage, int expectedResults)
 			throws SQLException {
 
-		SpatialReferenceSystemDao dao = geoPackage.spatialReferenceSystemDao();
+		SpatialReferenceSystemDao dao = geoPackage.getSpatialReferenceSystemDao();
 		List<SpatialReferenceSystem> results = dao.queryForAll();
 		TestCase.assertEquals(
 				"Unexpected number of spatial reference system rows",
@@ -106,7 +106,7 @@ public class SpatialReferenceSystemUtils {
 			throws SQLException {
 
 		SqlMmSpatialReferenceSystemDao dao = geoPackage
-				.sqlMmSpatialReferenceSystemDao();
+				.getSpatialReferenceSystemSqlMmDao();
 		List<SqlMmSpatialReferenceSystem> results = dao.queryForAll();
 		TestCase.assertEquals(
 				"Unexpected number of spatial reference system rows",
@@ -182,7 +182,7 @@ public class SpatialReferenceSystemUtils {
 			throws SQLException {
 
 		SfSqlSpatialReferenceSystemDao dao = geoPackage
-				.sfSqlSpatialReferenceSystemDao();
+				.getSpatialReferenceSystemSfSqlDao();
 		List<SfSqlSpatialReferenceSystem> results = dao.queryForAll();
 		TestCase.assertEquals(
 				"Unexpected number of spatial reference system rows",
