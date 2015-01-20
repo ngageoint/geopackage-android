@@ -19,67 +19,67 @@ public class SpatialReferenceSystem {
 	/**
 	 * srsName field name
 	 */
-	public static final String SRS_NAME = "srs_name";
+	public static final String COLUMN_SRS_NAME = "srs_name";
 
 	/**
 	 * srsId field name
 	 */
-	public static final String SRS_ID = "srs_id";
+	public static final String COLUMN_SRS_ID = "srs_id";
 
 	/**
 	 * organization field name
 	 */
-	public static final String ORGANIZATION = "organization";
+	public static final String COLUMN_ORGANIZATION = "organization";
 
 	/**
 	 * organizationCoordsysId field name
 	 */
-	public static final String ORGANIZATION_COORDSYS_ID = "organization_coordsys_id";
+	public static final String COLUMN_ORGANIZATION_COORDSYS_ID = "organization_coordsys_id";
 
 	/**
 	 * definition field name
 	 */
-	public static final String DEFINITION = "definition";
+	public static final String COLUMN_DEFINITION = "definition";
 
 	/**
 	 * description field name
 	 */
-	public static final String DESCRIPTION = "description";
+	public static final String COLUMN_DESCRIPTION = "description";
 
 	/**
 	 * Human readable name of this SRS
 	 */
-	@DatabaseField(columnName = SRS_NAME, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_SRS_NAME, canBeNull = false)
 	private String srsName;
 
 	/**
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 */
-	@DatabaseField(columnName = SRS_ID, id = true, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_SRS_ID, id = true, canBeNull = false)
 	private int srsId;
 
 	/**
 	 * Case-insensitive name of the defining organization e.g. EPSG or epsg
 	 */
-	@DatabaseField(columnName = ORGANIZATION, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_ORGANIZATION, canBeNull = false)
 	private String organization;
 
 	/**
 	 * Numeric ID of the Spatial Reference System assigned by the organization
 	 */
-	@DatabaseField(columnName = ORGANIZATION_COORDSYS_ID, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_ORGANIZATION_COORDSYS_ID, canBeNull = false)
 	private int organizationCoordsysId;
 
 	/**
 	 * Well-known Text [32] Representation of the Spatial Reference System
 	 */
-	@DatabaseField(columnName = DEFINITION, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_DEFINITION, canBeNull = false)
 	private String definition;
 
 	/**
 	 * Human readable description of this SRS
 	 */
-	@DatabaseField(columnName = DESCRIPTION)
+	@DatabaseField(columnName = COLUMN_DESCRIPTION)
 	private String description;
 
 	/**

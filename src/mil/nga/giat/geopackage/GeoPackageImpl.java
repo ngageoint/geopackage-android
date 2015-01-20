@@ -2,12 +2,14 @@ package mil.nga.giat.geopackage;
 
 import java.sql.SQLException;
 
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSql;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSql;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMm;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.data.c2.Contents;
+import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -101,6 +103,14 @@ class GeoPackageImpl implements GeoPackage {
 		verifyTableExists(dao);
 
 		return dao;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ContentsDao getContentsDao() throws GeoPackageException {
+		return createDao(Contents.class);
 	}
 
 	/**

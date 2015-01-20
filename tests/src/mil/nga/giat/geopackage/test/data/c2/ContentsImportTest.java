@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c1;
+package mil.nga.giat.geopackage.test.data.c2;
 
 import java.sql.SQLException;
 
@@ -7,21 +7,26 @@ import mil.nga.giat.geopackage.GeoPackageActivity;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
+import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Spatial Reference System from a created database (C.1.
- * gpkg_spatial_ref_sys)
+ * Test Contents from an imported database (C.2. gpkg_contents)
  * 
  * @author osbornb
  */
-public class SpatialReferenceSystemCreateTest extends
+public class ContentsImportTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
 	 * GeoPackage activity
 	 */
 	private Activity activity = null;
+
+	/**
+	 * GeoPackage test context
+	 */
+	private Context testContext = null;
 
 	/**
 	 * GeoPackage
@@ -31,7 +36,7 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Constructor
 	 */
-	public SpatialReferenceSystemCreateTest() {
+	public ContentsImportTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -42,11 +47,12 @@ public class SpatialReferenceSystemCreateTest extends
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		// Set the activity
+		// Set the activity and test context
 		activity = getActivity();
+		testContext = TestUtils.getTestContext(activity);
 
-		// Create the database
-		geoPackage = TestUtils.setUpCreate(activity);
+		// Import the database
+		geoPackage = TestUtils.setUpImport(activity, testContext);
 	}
 
 	/**
@@ -55,8 +61,8 @@ public class SpatialReferenceSystemCreateTest extends
 	@Override
 	protected void tearDown() throws Exception {
 
-		// Tear down the create database
-		TestUtils.tearDownCreate(activity, geoPackage);
+		// Tear down the import database
+		TestUtils.tearDownImport(activity, geoPackage);
 
 		super.tearDown();
 	}
@@ -69,31 +75,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testRead() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage, 0);
-
-	}
-
-	/**
-	 * Test reading using the SQL/MM view
-	 * 
-	 * @throws GeoPackageException
-	 * @throws SQLException
-	 */
-	public void testSqlMmRead() throws GeoPackageException, SQLException {
-
-		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 0);
-
-	}
-
-	/**
-	 * Test reading using the SF/SQL view
-	 * 
-	 * @throws GeoPackageException
-	 * @throws SQLException
-	 */
-	public void testSfSqlRead() throws GeoPackageException, SQLException {
-
-		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage, 0);
+		ContentsUtils.testRead(geoPackage, 16);
 
 	}
 

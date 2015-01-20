@@ -19,45 +19,45 @@ public class SpatialReferenceSystemSfSql {
 	/**
 	 * srid field name
 	 */
-	public static final String SRID = "srid";
+	public static final String COLUMN_SRID = "srid";
 
 	/**
 	 * authName field name
 	 */
-	public static final String AUTH_NAME = "auth_name";
+	public static final String COLUMN_AUTH_NAME = "auth_name";
 
 	/**
 	 * authSrid field name
 	 */
-	public static final String AUTH_SRID = "auth_srid";
+	public static final String COLUMN_AUTH_SRID = "auth_srid";
 
 	/**
 	 * srtext field name
 	 */
-	public static final String SRTEXT = "srtext";
+	public static final String COLUMN_SRTEXT = "srtext";
 
 	/**
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 */
-	@DatabaseField(columnName = SRID, id = true, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_SRID, id = true, canBeNull = false)
 	private int srid;
 
 	/**
 	 * Case-insensitive name of the defining organization e.g. EPSG or epsg
 	 */
-	@DatabaseField(columnName = AUTH_NAME, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_AUTH_NAME, canBeNull = false)
 	private String authName;
 
 	/**
 	 * Numeric ID of the Spatial Reference System assigned by the organization
 	 */
-	@DatabaseField(columnName = AUTH_SRID, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_AUTH_SRID, canBeNull = false)
 	private int authSrid;
 
 	/**
 	 * Well-known Text [32] Representation of the Spatial Reference System
 	 */
-	@DatabaseField(columnName = SRTEXT, canBeNull = false)
+	@DatabaseField(columnName = COLUMN_SRTEXT, canBeNull = false)
 	private String srtext;
 
 	/**

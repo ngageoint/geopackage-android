@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c1;
+package mil.nga.giat.geopackage.test.data.c2;
 
 import java.sql.SQLException;
 
@@ -10,12 +10,11 @@ import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Spatial Reference System from a created database (C.1.
- * gpkg_spatial_ref_sys)
+ * Test Contents from an created database (C.2. gpkg_contents)
  * 
  * @author osbornb
  */
-public class SpatialReferenceSystemCreateTest extends
+public class ContentsCreateTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
@@ -31,7 +30,7 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Constructor
 	 */
-	public SpatialReferenceSystemCreateTest() {
+	public ContentsCreateTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -69,31 +68,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testRead() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage, 0);
-
-	}
-
-	/**
-	 * Test reading using the SQL/MM view
-	 * 
-	 * @throws GeoPackageException
-	 * @throws SQLException
-	 */
-	public void testSqlMmRead() throws GeoPackageException, SQLException {
-
-		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 0);
-
-	}
-
-	/**
-	 * Test reading using the SF/SQL view
-	 * 
-	 * @throws GeoPackageException
-	 * @throws SQLException
-	 */
-	public void testSfSqlRead() throws GeoPackageException, SQLException {
-
-		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage, 0);
+		ContentsUtils.testRead(geoPackage, 0);
 
 	}
 

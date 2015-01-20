@@ -58,7 +58,7 @@ public class SpatialReferenceSystemUtils {
 			TestCase.assertEquals(srs.getSrsId(), querySrs.getSrsId());
 
 			List<SpatialReferenceSystem> querySrsList = dao.queryForEq(
-					SpatialReferenceSystem.ORGANIZATION_COORDSYS_ID,
+					SpatialReferenceSystem.COLUMN_ORGANIZATION_COORDSYS_ID,
 					srs.getOrganizationCoordsysId());
 			TestCase.assertNotNull(querySrsList);
 			TestCase.assertTrue(querySrsList.size() >= 1);
@@ -73,10 +73,10 @@ public class SpatialReferenceSystemUtils {
 			TestCase.assertTrue(found);
 
 			Map<String, Object> fieldValues = new HashMap<String, Object>();
-			fieldValues.put(SpatialReferenceSystem.DEFINITION,
+			fieldValues.put(SpatialReferenceSystem.COLUMN_DEFINITION,
 					srs.getDefinition());
 			if (srs.getDescription() != null) {
-				fieldValues.put(SpatialReferenceSystem.DESCRIPTION,
+				fieldValues.put(SpatialReferenceSystem.COLUMN_DESCRIPTION,
 						srs.getDescription());
 			}
 			querySrsList = dao.queryForFieldValues(fieldValues);
@@ -135,7 +135,7 @@ public class SpatialReferenceSystemUtils {
 			TestCase.assertEquals(srs.getSrsId(), querySrs.getSrsId());
 
 			List<SpatialReferenceSystemSqlMm> querySrsList = dao.queryForEq(
-					SpatialReferenceSystem.ORGANIZATION_COORDSYS_ID,
+					SpatialReferenceSystem.COLUMN_ORGANIZATION_COORDSYS_ID,
 					srs.getOrganizationCoordsysId());
 			TestCase.assertNotNull(querySrsList);
 			TestCase.assertTrue(querySrsList.size() >= 1);
@@ -150,10 +150,10 @@ public class SpatialReferenceSystemUtils {
 			TestCase.assertTrue(found);
 
 			Map<String, Object> fieldValues = new HashMap<String, Object>();
-			fieldValues.put(SpatialReferenceSystem.DEFINITION,
+			fieldValues.put(SpatialReferenceSystem.COLUMN_DEFINITION,
 					srs.getDefinition());
 			if (srs.getDescription() != null) {
-				fieldValues.put(SpatialReferenceSystem.DESCRIPTION,
+				fieldValues.put(SpatialReferenceSystem.COLUMN_DESCRIPTION,
 						srs.getDescription());
 			}
 			querySrsList = dao.queryForFieldValues(fieldValues);
@@ -210,7 +210,7 @@ public class SpatialReferenceSystemUtils {
 			TestCase.assertEquals(srs.getSrid(), querySrs.getSrid());
 
 			List<SpatialReferenceSystemSfSql> querySrsList = dao.queryForEq(
-					SpatialReferenceSystemSfSql.AUTH_NAME, srs.getAuthName());
+					SpatialReferenceSystemSfSql.COLUMN_AUTH_NAME, srs.getAuthName());
 			TestCase.assertNotNull(querySrsList);
 			TestCase.assertTrue(querySrsList.size() >= 1);
 			boolean found = false;

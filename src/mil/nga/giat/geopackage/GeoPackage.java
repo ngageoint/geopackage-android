@@ -1,8 +1,9 @@
 package mil.nga.giat.geopackage;
 
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -60,5 +61,13 @@ public interface GeoPackage {
 	 */
 	public SpatialReferenceSystemSfSqlDao getSpatialReferenceSystemSfSqlDao()
 			throws GeoPackageException;
+
+	/**
+	 * Get a Contents DAO
+	 * 
+	 * @return
+	 * @throws GeoPackageException
+	 */
+	public ContentsDao getContentsDao() throws GeoPackageException;
 
 }

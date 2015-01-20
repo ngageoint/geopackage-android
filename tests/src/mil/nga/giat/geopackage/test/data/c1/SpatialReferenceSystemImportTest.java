@@ -1,13 +1,9 @@
 package mil.nga.giat.geopackage.test.data.c1;
 
-import java.io.File;
 import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
-import mil.nga.giat.geopackage.GeoPackageFactory;
-import mil.nga.giat.geopackage.GeoPackageManager;
-import mil.nga.giat.geopackage.test.TestConstants;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
@@ -15,24 +11,13 @@ import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Spatial Reference System from a loaded database (C.1.
+ * Test Spatial Reference System from an imported database (C.1.
  * gpkg_spatial_ref_sys)
  * 
  * @author osbornb
  */
-public class SpatialReferenceSystemLoadTest extends
+public class SpatialReferenceSystemImportTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
-
-	/**
-	 * Import database name
-	 */
-	private static final String IMPORT_DB_NAME = "import_db";
-
-	/**
-	 * Import database file name, located in the test assets
-	 */
-	private static final String IMPORT_DB_FILE_NAME = IMPORT_DB_NAME + "."
-			+ TestConstants.GEO_PACKAGE_EXTENSION;
 
 	/**
 	 * GeoPackage activity
@@ -52,7 +37,7 @@ public class SpatialReferenceSystemLoadTest extends
 	/**
 	 * Constructor
 	 */
-	public SpatialReferenceSystemLoadTest() {
+	public SpatialReferenceSystemImportTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -65,27 +50,10 @@ public class SpatialReferenceSystemLoadTest extends
 
 		// Set the activity and test context
 		activity = getActivity();
-		testContext = activity
-				.createPackageContext("mil.nga.giat.geopackage.test",
-						Context.CONTEXT_IGNORE_SECURITY);
+		testContext = TestUtils.getTestContext(activity);
 
-		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
-
-		// Delete
-		manager.delete(IMPORT_DB_NAME);
-
-		// Copy the test db file from assets to the internal storage
-		TestUtils.copyAssetFileToInternalStorage(activity, testContext,
-				IMPORT_DB_FILE_NAME);
-
-		// Import
-		String importLocation = TestUtils.getAssetFileInternalStorageLocation(
-				activity, IMPORT_DB_FILE_NAME);
-		manager.importGeoPackage(new File(importLocation));
-
-		// Open
-		geoPackage = manager.open(IMPORT_DB_NAME);
-		assertNotNull("Failed to open database", geoPackage);
+		// Import the database
+		geoPackage = TestUtils.setUpImport(activity, testContext);
 	}
 
 	/**
@@ -94,14 +62,8 @@ public class SpatialReferenceSystemLoadTest extends
 	@Override
 	protected void tearDown() throws Exception {
 
-		// Close
-		if (geoPackage != null) {
-			geoPackage.close();
-		}
-
-		// Delete
-		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
-		manager.delete(IMPORT_DB_NAME);
+		// Tear down the import database
+		TestUtils.tearDownImport(activity, geoPackage);
 
 		super.tearDown();
 	}
