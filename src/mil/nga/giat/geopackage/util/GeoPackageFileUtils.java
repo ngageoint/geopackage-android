@@ -1,6 +1,11 @@
 package mil.nga.giat.geopackage.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.content.Context;
 
@@ -56,7 +61,13 @@ public class GeoPackageFileUtils {
 	 * @return
 	 */
 	public static File getInternalFile(Context context, String filePath) {
-		return new File(context.getFilesDir(), filePath);
+		File internalFile = null;
+		if (filePath != null) {
+			internalFile = new File(context.getFilesDir(), filePath);
+		} else {
+			internalFile = context.getFilesDir();
+		}
+		return internalFile;
 	}
 
 	/**
@@ -68,6 +79,29 @@ public class GeoPackageFileUtils {
 	 */
 	public static String getInternalFilePath(Context context, String filePath) {
 		return getInternalFile(context, filePath).getAbsolutePath();
+	}
+
+	/**
+	 * Copy a file to another location
+	 * 
+	 * @param copyFrom
+	 * @param copyTo
+	 * @throws IOException
+	 */
+	public static void copyFile(File copyFrom, File copyTo) throws IOException {
+
+		InputStream from = new FileInputStream(copyFrom);
+		OutputStream to = new FileOutputStream(copyTo);
+
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = from.read(buffer)) > 0) {
+			to.write(buffer, 0, length);
+		}
+
+		to.flush();
+		to.close();
+		from.close();
 	}
 
 }

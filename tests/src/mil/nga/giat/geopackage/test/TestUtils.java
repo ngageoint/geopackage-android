@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
 import android.content.Context;
 
@@ -20,16 +21,19 @@ public class TestUtils {
 	 * 
 	 * @param context
 	 * @param assetPath
+	 * @throws GeoPackageException
 	 */
 	public static void copyAssetFileToInternalStorage(Context context,
-			Context testContext, String assetPath) {
+			Context testContext, String assetPath) throws GeoPackageException {
 
 		String filePath = getAssetFileInternalStorageLocation(context,
 				assetPath);
 		try {
 			copyAssetFile(testContext, assetPath, filePath);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new GeoPackageException(
+					"Failed to copy asset file to internal storage: "
+							+ assetPath, e);
 		}
 	}
 

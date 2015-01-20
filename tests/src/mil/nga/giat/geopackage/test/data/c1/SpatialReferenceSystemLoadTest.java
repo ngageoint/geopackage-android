@@ -1,10 +1,12 @@
 package mil.nga.giat.geopackage.test.data.c1;
 
+import java.io.File;
 import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
 import mil.nga.giat.geopackage.GeoPackageManager;
+import mil.nga.giat.geopackage.test.TestConstants;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
@@ -21,14 +23,15 @@ public class SpatialReferenceSystemLoadTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
-	 * Load database name
+	 * Import database name
 	 */
-	private static final String LOAD_DB_NAME = "load_db";
+	private static final String IMPORT_DB_NAME = "import_db";
 
 	/**
-	 * Load database file name, located in the test assets
+	 * Import database file name, located in the test assets
 	 */
-	private static final String LOAD_DB_FILE_NAME = LOAD_DB_NAME + "." + "gpkg";
+	private static final String IMPORT_DB_FILE_NAME = IMPORT_DB_NAME + "."
+			+ TestConstants.GEO_PACKAGE_EXTENSION;
 
 	/**
 	 * GeoPackage activity
@@ -68,19 +71,19 @@ public class SpatialReferenceSystemLoadTest extends
 		GeoPackageManager manager = new GeoPackageManager(activity);
 
 		// Delete
-		manager.delete(LOAD_DB_NAME);
+		manager.delete(IMPORT_DB_NAME);
 
 		// Copy the test db file from assets to the internal storage
 		TestUtils.copyAssetFileToInternalStorage(activity, testContext,
-				LOAD_DB_FILE_NAME);
+				IMPORT_DB_FILE_NAME);
 
-		// Load
-		String loadFile = TestUtils.getAssetFileInternalStorageLocation(
-				activity, LOAD_DB_FILE_NAME);
-		manager.load(loadFile);
+		// Import
+		String importLocation = TestUtils.getAssetFileInternalStorageLocation(
+				activity, IMPORT_DB_FILE_NAME);
+		manager.importGeoPackage(new File(importLocation));
 
 		// Open
-		geoPackage = manager.open(LOAD_DB_NAME);
+		geoPackage = manager.open(IMPORT_DB_NAME);
 		assertNotNull("Failed to open database", geoPackage);
 	}
 
@@ -97,7 +100,7 @@ public class SpatialReferenceSystemLoadTest extends
 
 		// Delete
 		GeoPackageManager manager = new GeoPackageManager(activity);
-		manager.delete(LOAD_DB_NAME);
+		manager.delete(IMPORT_DB_NAME);
 
 		super.tearDown();
 	}

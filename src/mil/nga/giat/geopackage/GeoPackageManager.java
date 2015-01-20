@@ -1,11 +1,7 @@
 package mil.nga.giat.geopackage;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -134,21 +130,25 @@ public class GeoPackageManager {
 	}
 
 	/**
-	 * Load and import a GeoPackage file
+	 * Import a GeoPackage file
 	 * 
-	 * @param path
+	 * @param file
+	 *            GeoPackage file to import
 	 * @return true if loaded
 	 * @throws GeoPackageException
 	 *             on failure to load file or if database already exists
 	 */
-	public boolean load(String path) throws GeoPackageException {
-		return load(path, false);
+	public boolean importGeoPackage(File file) throws GeoPackageException {
+		return importGeoPackage(null, file, false);
 	}
 
 	/**
-	 * Load and import a GeoPackage file
+	 * Import a GeoPackage file
 	 * 
-	 * @param path
+	 * @param name
+	 *            database name to save as
+	 * @param file
+	 *            GeoPackage file to import
 	 * @param override
 	 *            true to override existing
 	 * @return true if created successfully
@@ -156,21 +156,50 @@ public class GeoPackageManager {
 	 *             on failure to load file or if no overriding & database
 	 *             already exists
 	 */
-	public boolean load(String path, boolean override)
+	public boolean importGeoPackage(File file, boolean override)
+			throws GeoPackageException {
+		return importGeoPackage(null, file, override);
+	}
+
+	/**
+	 * Import a GeoPackage file
+	 * 
+	 * @param name
+	 *            database name to save as
+	 * @param file
+	 *            GeoPackage file to import
+	 * @return true if created successfully
+	 * @throws GeoPackageException
+	 *             on failure to load file or if no overriding & database
+	 *             already exists
+	 */
+	public boolean importGeoPackage(String name, File file)
+			throws GeoPackageException {
+		return importGeoPackage(name, file, false);
+	}
+
+	/**
+	 * Import a GeoPackage file
+	 * 
+	 * @param name
+	 *            database name to save the imported file as
+	 * @param file
+	 *            GeoPackage file to import
+	 * @param override
+	 *            true to override existing
+	 * @return true if created successfully
+	 * @throws GeoPackageException
+	 *             on failure to load file or if no overriding & database
+	 *             already exists
+	 */
+	public boolean importGeoPackage(String name, File file, boolean override)
 			throws GeoPackageException {
 
-		File file = new File(path);
-
 		// Verify the file has the right extension
-		String extension = GeoPackageFileUtils.getFileExtension(file);
-		if (extension == null
-				|| (!extension.equalsIgnoreCase(context
-						.getString(R.string.geopackage_file_suffix)) && !extension
-						.equalsIgnoreCase(context
-								.getString(R.string.geopackage_extended_file_suffix)))) {
+		if (!hasGeoPackageExtension(file)) {
 			throw new GeoPackageException(
 					"GeoPackage database file '"
-							+ path
+							+ file
 							+ "' does not have a valid extension of '"
 							+ context
 									.getString(R.string.geopackage_file_suffix)
@@ -180,9 +209,13 @@ public class GeoPackageManager {
 							+ "'");
 		}
 
-		// Use the base file name as the database name
-		final String database = GeoPackageFileUtils
-				.getFileNameWithoutExtension(file);
+		// Use the provided name or the base file name as the database name
+		String database;
+		if (name != null) {
+			database = name;
+		} else {
+			database = GeoPackageFileUtils.getFileNameWithoutExtension(file);
+		}
 
 		if (!override && exists(database)) {
 			throw new GeoPackageException(
@@ -190,21 +223,9 @@ public class GeoPackageManager {
 		}
 
 		// Copy the geopackage file over as a database
+		File newDbFile = context.getDatabasePath(database);
 		try {
-			InputStream importFile = new FileInputStream(file);
-
-			File newDbFile = context.getDatabasePath(database);
-			OutputStream newDb = new FileOutputStream(newDbFile);
-
-			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = importFile.read(buffer)) > 0) {
-				newDb.write(buffer, 0, length);
-			}
-
-			newDb.flush();
-			newDb.close();
-			importFile.close();
+			GeoPackageFileUtils.copyFile(file, newDbFile);
 		} catch (IOException e) {
 			throw new GeoPackageException(
 					"Failed read or write GeoPackage file '" + file
@@ -226,6 +247,48 @@ public class GeoPackageManager {
 		}
 
 		return exists(database);
+	}
+
+	/**
+	 * Export a GeoPackage database to a file
+	 * 
+	 * @param database
+	 * @param directory
+	 * @throws GeoPackageException
+	 */
+	public void exportGeoPackage(String database, File directory)
+			throws GeoPackageException {
+		exportGeoPackage(database, database, directory);
+	}
+
+	/**
+	 * Export a GeoPackage database to a file
+	 * 
+	 * @param database
+	 * @param name
+	 * @param directory
+	 * @throws GeoPackageException
+	 */
+	public void exportGeoPackage(String database, String name, File directory)
+			throws GeoPackageException {
+
+		File file = new File(directory, name);
+
+		// Add the extension if not on the name
+		if (!hasGeoPackageExtension(file)) {
+			name += "." + context.getString(R.string.geopackage_file_suffix);
+			file = new File(directory, name);
+		}
+
+		// Copy the geopackage database to the new file location
+		File dbFile = context.getDatabasePath(database);
+		try {
+			GeoPackageFileUtils.copyFile(dbFile, file);
+		} catch (IOException e) {
+			throw new GeoPackageException(
+					"Failed read or write GeoPackage database '" + database
+							+ "' to file: '" + file, e);
+		}
 	}
 
 	/**
@@ -256,6 +319,22 @@ public class GeoPackageManager {
 	private boolean isTemporary(String database) {
 		return database.endsWith(context
 				.getString(R.string.geopackage_db_rollback_suffix));
+	}
+
+	/**
+	 * Check the file extension to see if it is a GeoPackage
+	 * 
+	 * @param file
+	 * @return true if GeoPackage extension
+	 */
+	private boolean hasGeoPackageExtension(File file) {
+		String extension = GeoPackageFileUtils.getFileExtension(file);
+		boolean isGeoPackage = extension != null
+				&& (extension.equalsIgnoreCase(context
+						.getString(R.string.geopackage_file_suffix)) || extension
+						.equalsIgnoreCase(context
+								.getString(R.string.geopackage_extended_file_suffix)));
+		return isGeoPackage;
 	}
 
 }
