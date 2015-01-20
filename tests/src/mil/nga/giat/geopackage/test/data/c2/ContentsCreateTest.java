@@ -68,7 +68,7 @@ public class ContentsCreateTest extends
 	 */
 	public void testRead() throws GeoPackageException, SQLException {
 
-		ContentsUtils.testRead(geoPackage, 0);
+		ContentsUtils.testRead(geoPackage, 1);
 
 	}
 

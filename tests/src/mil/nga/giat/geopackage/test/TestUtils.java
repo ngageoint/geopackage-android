@@ -5,10 +5,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.SQLException;
+import java.util.Date;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageFactory;
 import mil.nga.giat.geopackage.GeoPackageManager;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c2.Contents;
+import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
 import android.app.Activity;
@@ -41,9 +47,10 @@ public class TestUtils {
 	 * @param activity
 	 * @return
 	 * @throws GeoPackageException
+	 * @throws SQLException 
 	 */
 	public static GeoPackage setUpCreate(Activity activity)
-			throws GeoPackageException {
+			throws GeoPackageException, SQLException {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
@@ -59,6 +66,41 @@ public class TestUtils {
 			throw new GeoPackageException("Failed to open database");
 		}
 
+		SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
+		
+		SpatialReferenceSystem srs = new SpatialReferenceSystem();
+		srs.setSrsName("Undefined geographic SRS");
+		srs.setSrsId(0);
+		srs.setOrganization("NONE");
+		srs.setOrganizationCoordsysId(0);
+		srs.setDefinition("undefined");
+		srs.setDescription("undefined geographic coordinate reference system");
+		srsDao.create(srs);
+		
+		SpatialReferenceSystem srs2 = new SpatialReferenceSystem();
+		srs2.setSrsName("WGS 84 geodetic");
+		srs2.setSrsId(4326);
+		srs2.setOrganization("EPSG");
+		srs2.setOrganizationCoordsysId(4326);
+		srs2.setDefinition("GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326”]]");
+		srs2.setDescription("longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid");
+		srsDao.create(srs2);
+		
+		ContentsDao contentsDao = geoPackage.getContentsDao();
+		
+		Contents contents = new Contents();
+		contents.setTableName("linestring2d");
+		contents.setDataType("features");
+		contents.setIdentifier("linestring2d");
+		//contents.setDescription("");
+		contents.setLastChange(new Date());
+		contents.setMinX(-180.0);
+		contents.setMinY(-90.0);
+		contents.setMaxX(180.0);
+		contents.setMaxY(90.0);
+		contents.setSrs(srs2);
+		contentsDao.create(contents);
+		
 		return geoPackage;
 	}
 
