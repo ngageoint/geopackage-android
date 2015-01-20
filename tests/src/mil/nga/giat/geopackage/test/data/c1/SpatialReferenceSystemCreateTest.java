@@ -85,6 +85,7 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test reading
 	 * 
+	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public void testRead() throws GeoPackageException, SQLException {
@@ -96,6 +97,7 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test reading using the SQL/MM view
 	 * 
+	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public void testSqlMmRead() throws GeoPackageException, SQLException {
@@ -107,6 +109,7 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test reading using the SF/SQL view
 	 * 
+	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public void testSfSqlRead() throws GeoPackageException, SQLException {

@@ -10,8 +10,8 @@ import com.j256.ormlite.support.ConnectionSource;
  * 
  * @author osbornb
  */
-public class SfSqlSpatialReferenceSystemDao extends
-		BaseDaoImpl<SfSqlSpatialReferenceSystem, Integer> {
+public class SpatialReferenceSystemSfSqlDao extends
+		BaseDaoImpl<SpatialReferenceSystemSfSql, Integer> {
 
 	/**
 	 * Constructor, required by ORMLite
@@ -20,8 +20,8 @@ public class SfSqlSpatialReferenceSystemDao extends
 	 * @param dataClass
 	 * @throws SQLException
 	 */
-	public SfSqlSpatialReferenceSystemDao(ConnectionSource connectionSource,
-			Class<SfSqlSpatialReferenceSystem> dataClass) throws SQLException {
+	public SpatialReferenceSystemSfSqlDao(ConnectionSource connectionSource,
+			Class<SpatialReferenceSystemSfSql> dataClass) throws SQLException {
 		super(connectionSource, dataClass);
 	}
 

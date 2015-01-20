@@ -2,15 +2,17 @@ package mil.nga.giat.geopackage;
 
 import java.sql.SQLException;
 
-import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSql;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMm;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.AndroidConnectionSource;
+import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -71,29 +73,74 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public SpatialReferenceSystemDao getSpatialReferenceSystemDao()
-			throws SQLException {
-		return DaoManager.createDao(connectionSource,
-				SpatialReferenceSystem.class);
+			throws GeoPackageException {
+		return createDao(SpatialReferenceSystem.class);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SqlMmSpatialReferenceSystemDao getSpatialReferenceSystemSqlMmDao()
-			throws SQLException {
-		return DaoManager.createDao(connectionSource,
-				SqlMmSpatialReferenceSystem.class);
+	public SpatialReferenceSystemSqlMmDao getSpatialReferenceSystemSqlMmDao()
+			throws GeoPackageException {
+
+		SpatialReferenceSystemSqlMmDao dao = createDao(SpatialReferenceSystemSqlMm.class);
+		verifyTableExists(dao);
+
+		return dao;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SfSqlSpatialReferenceSystemDao getSpatialReferenceSystemSfSqlDao()
-			throws SQLException {
-		return DaoManager.createDao(connectionSource,
-				SfSqlSpatialReferenceSystem.class);
+	public SpatialReferenceSystemSfSqlDao getSpatialReferenceSystemSfSqlDao()
+			throws GeoPackageException {
+
+		SpatialReferenceSystemSfSqlDao dao = createDao(SpatialReferenceSystemSfSql.class);
+		verifyTableExists(dao);
+
+		return dao;
+	}
+
+	/**
+	 * Create a dao
+	 * 
+	 * @param type
+	 * @return
+	 * @throws GeoPackageException
+	 */
+	private <T, S extends BaseDaoImpl<T, ?>> S createDao(Class<T> type)
+			throws GeoPackageException {
+		S dao;
+		try {
+			dao = DaoManager.createDao(connectionSource, type);
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to create "
+					+ type.getSimpleName() + " dao", e);
+		}
+		return dao;
+	}
+
+	/**
+	 * Verify table or view exists
+	 * 
+	 * @param dao
+	 * @throws GeoPackageException
+	 */
+	private void verifyTableExists(BaseDaoImpl<?, ?> dao)
+			throws GeoPackageException {
+		try {
+			if (!dao.isTableExists()) {
+				throw new GeoPackageException(
+						"Table or view does not exist for: "
+								+ dao.getDataClass().getSimpleName());
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException(
+					"Failed to detect if table or view exists for dao: "
+							+ dao.getDataClass().getSimpleName(), e);
+		}
 	}
 
 }

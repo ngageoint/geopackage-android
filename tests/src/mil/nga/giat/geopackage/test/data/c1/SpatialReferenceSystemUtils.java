@@ -7,12 +7,13 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSql;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMm;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.util.GeoPackageException;
 
 /**
  * Spatial Reference System Utility test methods
@@ -26,12 +27,14 @@ public class SpatialReferenceSystemUtils {
 	 * 
 	 * @param geoPackage
 	 * @param expectedResults
+	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testRead(GeoPackage geoPackage, int expectedResults)
-			throws SQLException {
+			throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemDao dao = geoPackage.getSpatialReferenceSystemDao();
+		SpatialReferenceSystemDao dao = geoPackage
+				.getSpatialReferenceSystemDao();
 		List<SpatialReferenceSystem> results = dao.queryForAll();
 		TestCase.assertEquals(
 				"Unexpected number of spatial reference system rows",
@@ -101,20 +104,21 @@ public class SpatialReferenceSystemUtils {
 	 * @param geoPackage
 	 * @param expectedResults
 	 * @throws SQLException
+	 * @throws GeoPackageException
 	 */
 	public static void testSqlMmRead(GeoPackage geoPackage, int expectedResults)
-			throws SQLException {
+			throws GeoPackageException, SQLException {
 
-		SqlMmSpatialReferenceSystemDao dao = geoPackage
+		SpatialReferenceSystemSqlMmDao dao = geoPackage
 				.getSpatialReferenceSystemSqlMmDao();
-		List<SqlMmSpatialReferenceSystem> results = dao.queryForAll();
+		List<SpatialReferenceSystemSqlMm> results = dao.queryForAll();
 		TestCase.assertEquals(
 				"Unexpected number of spatial reference system rows",
 				expectedResults, results.size());
 
 		if (!results.isEmpty()) {
 
-			for (SqlMmSpatialReferenceSystem result : results) {
+			for (SpatialReferenceSystemSqlMm result : results) {
 				TestCase.assertNotNull(result.getSrsName());
 				TestCase.assertNotNull(result.getSrsId());
 				TestCase.assertNotNull(result.getOrganization());
@@ -123,20 +127,20 @@ public class SpatialReferenceSystemUtils {
 			}
 
 			int random = (int) (Math.random() * results.size());
-			SqlMmSpatialReferenceSystem srs = results.get(random);
+			SpatialReferenceSystemSqlMm srs = results.get(random);
 
-			SqlMmSpatialReferenceSystem querySrs = dao.queryForId(srs
+			SpatialReferenceSystemSqlMm querySrs = dao.queryForId(srs
 					.getSrsId());
 			TestCase.assertNotNull(querySrs);
 			TestCase.assertEquals(srs.getSrsId(), querySrs.getSrsId());
 
-			List<SqlMmSpatialReferenceSystem> querySrsList = dao.queryForEq(
+			List<SpatialReferenceSystemSqlMm> querySrsList = dao.queryForEq(
 					SpatialReferenceSystem.ORGANIZATION_COORDSYS_ID,
 					srs.getOrganizationCoordsysId());
 			TestCase.assertNotNull(querySrsList);
 			TestCase.assertTrue(querySrsList.size() >= 1);
 			boolean found = false;
-			for (SqlMmSpatialReferenceSystem querySrsValue : querySrsList) {
+			for (SpatialReferenceSystemSqlMm querySrsValue : querySrsList) {
 				TestCase.assertEquals(srs.getOrganizationCoordsysId(),
 						querySrsValue.getOrganizationCoordsysId());
 				if (!found) {
@@ -156,7 +160,7 @@ public class SpatialReferenceSystemUtils {
 			TestCase.assertNotNull(querySrsList);
 			TestCase.assertTrue(querySrsList.size() >= 1);
 			found = false;
-			for (SqlMmSpatialReferenceSystem querySrsValue : querySrsList) {
+			for (SpatialReferenceSystemSqlMm querySrsValue : querySrsList) {
 				TestCase.assertEquals(srs.getDefinition(),
 						querySrsValue.getDefinition());
 				if (srs.getDescription() != null) {
@@ -176,40 +180,41 @@ public class SpatialReferenceSystemUtils {
 	 * 
 	 * @param geoPackage
 	 * @param expectedResults
+	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testSfSqlRead(GeoPackage geoPackage, int expectedResults)
-			throws SQLException {
+			throws GeoPackageException, SQLException {
 
-		SfSqlSpatialReferenceSystemDao dao = geoPackage
+		SpatialReferenceSystemSfSqlDao dao = geoPackage
 				.getSpatialReferenceSystemSfSqlDao();
-		List<SfSqlSpatialReferenceSystem> results = dao.queryForAll();
+		List<SpatialReferenceSystemSfSql> results = dao.queryForAll();
 		TestCase.assertEquals(
 				"Unexpected number of spatial reference system rows",
 				expectedResults, results.size());
 
 		if (!results.isEmpty()) {
 
-			for (SfSqlSpatialReferenceSystem result : results) {
+			for (SpatialReferenceSystemSfSql result : results) {
 				TestCase.assertNotNull(result.getSrid());
 				TestCase.assertNotNull(result.getAuthName());
 				TestCase.assertNotNull(result.getAuthSrid());
 			}
 
 			int random = (int) (Math.random() * results.size());
-			SfSqlSpatialReferenceSystem srs = results.get(random);
+			SpatialReferenceSystemSfSql srs = results.get(random);
 
-			SfSqlSpatialReferenceSystem querySrs = dao
+			SpatialReferenceSystemSfSql querySrs = dao
 					.queryForId(srs.getSrid());
 			TestCase.assertNotNull(querySrs);
 			TestCase.assertEquals(srs.getSrid(), querySrs.getSrid());
 
-			List<SfSqlSpatialReferenceSystem> querySrsList = dao.queryForEq(
-					SfSqlSpatialReferenceSystem.AUTH_NAME, srs.getAuthName());
+			List<SpatialReferenceSystemSfSql> querySrsList = dao.queryForEq(
+					SpatialReferenceSystemSfSql.AUTH_NAME, srs.getAuthName());
 			TestCase.assertNotNull(querySrsList);
 			TestCase.assertTrue(querySrsList.size() >= 1);
 			boolean found = false;
-			for (SfSqlSpatialReferenceSystem querySrsValue : querySrsList) {
+			for (SpatialReferenceSystemSfSql querySrsValue : querySrsList) {
 				TestCase.assertEquals(srs.getAuthName(),
 						querySrsValue.getAuthName());
 				if (!found) {

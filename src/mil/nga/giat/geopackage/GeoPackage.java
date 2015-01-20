@@ -1,10 +1,9 @@
 package mil.nga.giat.geopackage;
 
-import java.sql.SQLException;
-
-import mil.nga.giat.geopackage.data.c1.SfSqlSpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.data.c1.SqlMmSpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.support.ConnectionSource;
@@ -39,27 +38,27 @@ public interface GeoPackage {
 	 * Get a Spatial Reference System DAO
 	 * 
 	 * @return
-	 * @throws SQLException
+	 * @throws GeoPackageException
 	 */
 	public SpatialReferenceSystemDao getSpatialReferenceSystemDao()
-			throws SQLException;
+			throws GeoPackageException;
 
 	/**
 	 * Get a SQL/MM Spatial Reference System DAO
 	 * 
 	 * @return
-	 * @throws SQLException
+	 * @throws GeoPackageException
 	 */
-	public SqlMmSpatialReferenceSystemDao getSpatialReferenceSystemSqlMmDao()
-			throws SQLException;
+	public SpatialReferenceSystemSqlMmDao getSpatialReferenceSystemSqlMmDao()
+			throws GeoPackageException;
 
 	/**
 	 * Get a SF/SQL Spatial Reference System DAO
 	 * 
 	 * @return
-	 * @throws SQLException
+	 * @throws GeoPackageException
 	 */
-	public SfSqlSpatialReferenceSystemDao getSpatialReferenceSystemSfSqlDao()
-			throws SQLException;
+	public SpatialReferenceSystemSfSqlDao getSpatialReferenceSystemSfSqlDao()
+			throws GeoPackageException;
 
 }

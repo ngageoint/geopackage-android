@@ -8,14 +8,14 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  * @author osbornb
  */
-@DatabaseTable(tableName = "st_spatial_ref_sys", daoClass = SqlMmSpatialReferenceSystemDao.class)
-public class SqlMmSpatialReferenceSystem {
+@DatabaseTable(tableName = "st_spatial_ref_sys", daoClass = SpatialReferenceSystemSqlMmDao.class)
+public class SpatialReferenceSystemSqlMm {
 
 	/**
 	 * Table name
 	 */
 	public static final String TABLE_NAME = "st_spatial_ref_sys";
-	
+
 	/**
 	 * srsName field name
 	 */
@@ -85,7 +85,7 @@ public class SqlMmSpatialReferenceSystem {
 	/**
 	 * Default Constructor
 	 */
-	public SqlMmSpatialReferenceSystem() {
+	public SpatialReferenceSystemSqlMm() {
 
 	}
 

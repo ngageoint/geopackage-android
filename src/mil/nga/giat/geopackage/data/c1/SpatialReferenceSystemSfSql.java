@@ -8,8 +8,8 @@ import com.j256.ormlite.table.DatabaseTable;
  * 
  * @author osbornb
  */
-@DatabaseTable(tableName = "spatial_ref_sys", daoClass = SfSqlSpatialReferenceSystemDao.class)
-public class SfSqlSpatialReferenceSystem {
+@DatabaseTable(tableName = "spatial_ref_sys", daoClass = SpatialReferenceSystemSfSqlDao.class)
+public class SpatialReferenceSystemSfSql {
 
 	/**
 	 * Table name
@@ -63,7 +63,7 @@ public class SfSqlSpatialReferenceSystem {
 	/**
 	 * Default Constructor
 	 */
-	public SfSqlSpatialReferenceSystem() {
+	public SpatialReferenceSystemSfSql() {
 
 	}
 
