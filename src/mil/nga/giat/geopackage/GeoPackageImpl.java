@@ -10,6 +10,9 @@ import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMm;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
+import mil.nga.giat.geopackage.data.c3.GeometryColumns;
+import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import mil.nga.giat.geopackage.script.GeoPackageScriptExecutor;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -36,13 +39,21 @@ class GeoPackageImpl implements GeoPackage {
 	private final ConnectionSource connectionSource;
 
 	/**
+	 * Script executor
+	 */
+	private final GeoPackageScriptExecutor scriptExecutor;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param database
+	 * @param scriptExecutor
 	 */
-	GeoPackageImpl(SQLiteDatabase database) {
+	GeoPackageImpl(SQLiteDatabase database,
+			GeoPackageScriptExecutor scriptExecutor) {
 		this.database = database;
 		connectionSource = new AndroidConnectionSource(database);
+		this.scriptExecutor = scriptExecutor;
 	}
 
 	/**
@@ -111,6 +122,34 @@ class GeoPackageImpl implements GeoPackage {
 	@Override
 	public ContentsDao getContentsDao() throws GeoPackageException {
 		return createDao(Contents.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GeometryColumnsDao getGeometryColumnsDao()
+			throws GeoPackageException {
+		return createDao(GeometryColumns.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createGeometryColumnsTable() throws GeoPackageException {
+		boolean created = false;
+		GeometryColumnsDao dao = getGeometryColumnsDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = scriptExecutor.createGeometryColumns() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException(
+					"Failed to check if Geometry Columns table exists and create it",
+					e);
+		}
+		return created;
 	}
 
 	/**

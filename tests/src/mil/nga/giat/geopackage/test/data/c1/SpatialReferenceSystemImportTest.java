@@ -108,4 +108,52 @@ public class SpatialReferenceSystemImportTest extends
 
 	}
 
+	/**
+	 * Test updating
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testUpdate() throws GeoPackageException, SQLException {
+
+		SpatialReferenceSystemUtils.testUpdate(geoPackage);
+
+	}
+
+	/**
+	 * Test creating
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testCreate() throws GeoPackageException, SQLException {
+
+		SpatialReferenceSystemUtils.testCreate(geoPackage);
+
+	}
+
+	/**
+	 * Test deleting
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testDelete() throws GeoPackageException, SQLException {
+
+		SpatialReferenceSystemUtils.testDelete(geoPackage);
+
+	}
+
+	/**
+	 * Test cascade deleting
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testDeleteCascade() throws GeoPackageException, SQLException {
+
+		SpatialReferenceSystemUtils.testDeleteCascade(geoPackage);
+
+	}
+
 }

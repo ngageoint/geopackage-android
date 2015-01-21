@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c1;
+package mil.nga.giat.geopackage.test.data.c3;
 
 import java.sql.SQLException;
 
@@ -7,21 +7,26 @@ import mil.nga.giat.geopackage.GeoPackageActivity;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
+import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Spatial Reference System from a created database (C.1.
- * gpkg_spatial_ref_sys)
+ * Test Geometry Columns from an imported database (C.3. gpkg_geometry_columns)
  * 
  * @author osbornb
  */
-public class SpatialReferenceSystemCreateTest extends
+public class GeometryColumnsImportTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
 	 * GeoPackage activity
 	 */
 	private Activity activity = null;
+
+	/**
+	 * GeoPackage test context
+	 */
+	private Context testContext = null;
 
 	/**
 	 * GeoPackage
@@ -31,7 +36,7 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Constructor
 	 */
-	public SpatialReferenceSystemCreateTest() {
+	public GeometryColumnsImportTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -42,11 +47,12 @@ public class SpatialReferenceSystemCreateTest extends
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		// Set the activity
+		// Set the activity and test context
 		activity = getActivity();
+		testContext = TestUtils.getTestContext(activity);
 
-		// Create the database
-		geoPackage = TestUtils.setUpCreate(activity);
+		// Import the database
+		geoPackage = TestUtils.setUpImport(activity, testContext);
 	}
 
 	/**
@@ -55,8 +61,8 @@ public class SpatialReferenceSystemCreateTest extends
 	@Override
 	protected void tearDown() throws Exception {
 
-		// Tear down the create database
-		TestUtils.tearDownCreate(activity, geoPackage);
+		// Tear down the import database
+		TestUtils.tearDownImport(activity, geoPackage);
 
 		super.tearDown();
 	}
@@ -69,31 +75,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testRead() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage, 2);
-
-	}
-
-	/**
-	 * Test reading using the SQL/MM view
-	 * 
-	 * @throws GeoPackageException
-	 * @throws SQLException
-	 */
-	public void testSqlMmRead() throws GeoPackageException, SQLException {
-
-		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 2);
-
-	}
-
-	/**
-	 * Test reading using the SF/SQL view
-	 * 
-	 * @throws GeoPackageException
-	 * @throws SQLException
-	 */
-	public void testSfSqlRead() throws GeoPackageException, SQLException {
-
-		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage, 2);
+		GeometryColumnsUtils.testRead(geoPackage, 16);
 
 	}
 
@@ -105,7 +87,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testUpdate() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testUpdate(geoPackage);
+		GeometryColumnsUtils.testUpdate(geoPackage);
 
 	}
 
@@ -117,7 +99,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testCreate() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testCreate(geoPackage);
+		GeometryColumnsUtils.testCreate(geoPackage);
 
 	}
 
@@ -129,7 +111,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testDelete() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testDelete(geoPackage);
+		GeometryColumnsUtils.testDelete(geoPackage);
 
 	}
 
@@ -141,7 +123,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testDeleteCascade() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testDeleteCascade(geoPackage);
+		GeometryColumnsUtils.testDeleteCascade(geoPackage);
 
 	}
 

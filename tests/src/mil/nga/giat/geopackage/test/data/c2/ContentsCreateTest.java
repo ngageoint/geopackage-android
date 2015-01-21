@@ -10,7 +10,7 @@ import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Contents from an created database (C.2. gpkg_contents)
+ * Test Contents from a created database (C.2. gpkg_contents)
  * 
  * @author osbornb
  */
@@ -68,7 +68,55 @@ public class ContentsCreateTest extends
 	 */
 	public void testRead() throws GeoPackageException, SQLException {
 
-		ContentsUtils.testRead(geoPackage, 1);
+		ContentsUtils.testRead(geoPackage, 2);
+
+	}
+
+	/**
+	 * Test updating
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testUpdate() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testUpdate(geoPackage);
+
+	}
+
+	/**
+	 * Test creating
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testCreate() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testCreate(geoPackage);
+
+	}
+
+	/**
+	 * Test deleting
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testDelete() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testDelete(geoPackage);
+
+	}
+
+	/**
+	 * Test cascade deleting
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testDeleteCascade() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testDeleteCascade(geoPackage);
 
 	}
 

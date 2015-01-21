@@ -4,6 +4,7 @@ import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
+import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -69,5 +70,22 @@ public interface GeoPackage {
 	 * @throws GeoPackageException
 	 */
 	public ContentsDao getContentsDao() throws GeoPackageException;
+
+	/**
+	 * Get a Geometry Columns DAO
+	 * 
+	 * @return
+	 * @throws GeoPackageException
+	 */
+	public GeometryColumnsDao getGeometryColumnsDao()
+			throws GeoPackageException;
+
+	/**
+	 * Create the Geometry Columns table if it does not already exist
+	 * 
+	 * @return true if created
+	 * @throws GeoPackageException
+	 */
+	public boolean createGeometryColumnsTable() throws GeoPackageException;
 
 }

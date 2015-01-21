@@ -4,7 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * SF/SQL Spatial Reference System View object
+ * SF/SQL {@link SpatialReferenceSystem} View object
  * 
  * @author osbornb
  */
@@ -20,6 +20,11 @@ public class SpatialReferenceSystemSfSql {
 	 * srid field name
 	 */
 	public static final String COLUMN_SRID = "srid";
+
+	/**
+	 * id field name, srid
+	 */
+	public static final String COLUMN_ID = COLUMN_SRID;
 
 	/**
 	 * authName field name
@@ -65,6 +70,14 @@ public class SpatialReferenceSystemSfSql {
 	 */
 	public SpatialReferenceSystemSfSql() {
 
+	}
+
+	public int getId() {
+		return srid;
+	}
+
+	public void setId(int id) {
+		this.srid = id;
 	}
 
 	public int getSrid() {

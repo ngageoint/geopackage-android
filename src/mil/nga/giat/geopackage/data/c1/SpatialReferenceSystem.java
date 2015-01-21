@@ -1,10 +1,18 @@
 package mil.nga.giat.geopackage.data.c1;
 
+import mil.nga.giat.geopackage.data.c2.Contents;
+import mil.nga.giat.geopackage.data.c3.GeometryColumns;
+
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Spatial Reference System object
+ * Spatial Reference System object. The coordinate reference system definitions
+ * it contains are referenced by the GeoPackage {@link Contents} and
+ * {@link GeometryColumns} objects to relate the vector and tile data in user
+ * tables to locations on the earth.
  * 
  * @author osbornb
  */
@@ -15,7 +23,7 @@ public class SpatialReferenceSystem {
 	 * Table name
 	 */
 	public static final String TABLE_NAME = "gpkg_spatial_ref_sys";
-	
+
 	/**
 	 * srsName field name
 	 */
@@ -25,6 +33,11 @@ public class SpatialReferenceSystem {
 	 * srsId field name
 	 */
 	public static final String COLUMN_SRS_ID = "srs_id";
+
+	/**
+	 * id field name, srsId
+	 */
+	public static final String COLUMN_ID = COLUMN_SRS_ID;
 
 	/**
 	 * organization field name
@@ -83,10 +96,30 @@ public class SpatialReferenceSystem {
 	private String description;
 
 	/**
+	 * Contents
+	 */
+	@ForeignCollectionField(eager = false)
+	private ForeignCollection<Contents> contents;
+
+	/**
+	 * Geometry Columns
+	 */
+	@ForeignCollectionField(eager = false)
+	private ForeignCollection<GeometryColumns> geometryColumns;
+
+	/**
 	 * Default Constructor
 	 */
 	public SpatialReferenceSystem() {
 
+	}
+
+	public int getId() {
+		return srsId;
+	}
+
+	public void setId(int id) {
+		this.srsId = id;
 	}
 
 	public String getSrsName() {
@@ -135,6 +168,23 @@ public class SpatialReferenceSystem {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public ForeignCollection<Contents> getContents() {
+		return contents;
+	}
+
+	public void setContents(ForeignCollection<Contents> contents) {
+		this.contents = contents;
+	}
+
+	public ForeignCollection<GeometryColumns> getGeometryColumns() {
+		return geometryColumns;
+	}
+
+	public void setGeometryColumns(
+			ForeignCollection<GeometryColumns> geometryColumns) {
+		this.geometryColumns = geometryColumns;
 	}
 
 }

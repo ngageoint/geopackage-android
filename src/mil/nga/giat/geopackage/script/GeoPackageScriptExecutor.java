@@ -93,6 +93,26 @@ public class GeoPackageScriptExecutor {
 	}
 
 	/**
+	 * Create Geometry Columns table
+	 * 
+	 * @return
+	 */
+	public int createGeometryColumns() {
+		int statements = 0;
+		try {
+
+			InputStream scriptStream = assetManager.open(context
+					.getString(R.string.sql_directory)
+					+ File.separatorChar
+					+ context.getString(R.string.sql_geometry_columns));
+			statements = runScript(scriptStream);
+		} catch (IOException e) {
+			Log.e(TAG, "Unable to create geometry columns tables.", e);
+		}
+		return statements;
+	}
+
+	/**
 	 * Run the script input stream
 	 * 
 	 * @param stream

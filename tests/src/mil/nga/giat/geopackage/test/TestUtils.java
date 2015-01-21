@@ -15,6 +15,7 @@ import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
+import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
 import android.app.Activity;
@@ -47,7 +48,7 @@ public class TestUtils {
 	 * @param activity
 	 * @return
 	 * @throws GeoPackageException
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public static GeoPackage setUpCreate(Activity activity)
 			throws GeoPackageException, SQLException {
@@ -66,8 +67,9 @@ public class TestUtils {
 			throw new GeoPackageException("Failed to open database");
 		}
 
-		SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
-		
+		SpatialReferenceSystemDao srsDao = geoPackage
+				.getSpatialReferenceSystemDao();
+
 		SpatialReferenceSystem srs = new SpatialReferenceSystem();
 		srs.setSrsName("Undefined geographic SRS");
 		srs.setSrsId(0);
@@ -76,7 +78,7 @@ public class TestUtils {
 		srs.setDefinition("undefined");
 		srs.setDescription("undefined geographic coordinate reference system");
 		srsDao.create(srs);
-		
+
 		SpatialReferenceSystem srs2 = new SpatialReferenceSystem();
 		srs2.setSrsName("WGS 84 geodetic");
 		srs2.setSrsId(4326);
@@ -85,14 +87,14 @@ public class TestUtils {
 		srs2.setDefinition("GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326”]]");
 		srs2.setDescription("longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid");
 		srsDao.create(srs2);
-		
+
 		ContentsDao contentsDao = geoPackage.getContentsDao();
-		
+
 		Contents contents = new Contents();
 		contents.setTableName("linestring2d");
 		contents.setDataType("features");
 		contents.setIdentifier("linestring2d");
-		//contents.setDescription("");
+		// contents.setDescription("");
 		contents.setLastChange(new Date());
 		contents.setMinX(-180.0);
 		contents.setMinY(-90.0);
@@ -100,7 +102,25 @@ public class TestUtils {
 		contents.setMaxY(90.0);
 		contents.setSrs(srs2);
 		contentsDao.create(contents);
-		
+
+		Contents contents2 = new Contents();
+		contents2.setTableName("test_table_name");
+		contents2.setDataType("features");
+		contents2.setIdentifier("test_table_name");
+		// contents2.setDescription("");
+		contents2.setLastChange(new Date());
+		contents2.setMinX(0.0);
+		contents2.setMinY(0.0);
+		contents2.setMaxX(10.0);
+		contents2.setMaxY(10.0);
+		contents2.setSrs(srs);
+		contentsDao.create(contents2);
+
+		geoPackage.createGeometryColumnsTable();
+		GeometryColumnsDao geometryColumnsDao = geoPackage
+				.getGeometryColumnsDao();
+		// TODO
+
 		return geoPackage;
 	}
 

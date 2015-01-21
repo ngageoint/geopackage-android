@@ -3,13 +3,18 @@ package mil.nga.giat.geopackage.data.c2;
 import java.util.Date;
 
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Contents object
+ * Contents object. Provides identifying and descriptive information that an
+ * application can display to a user in a menu of geospatial data that is
+ * available for access and/or update.
  * 
  * @author osbornb
  */
@@ -25,6 +30,11 @@ public class Contents {
 	 * tableName field name
 	 */
 	public static final String COLUMN_TABLE_NAME = "table_name";
+
+	/**
+	 * id field name, tableName
+	 */
+	public static final String COLUMN_ID = COLUMN_TABLE_NAME;
 
 	/**
 	 * dataType field name
@@ -129,18 +139,36 @@ public class Contents {
 	private Double maxY;
 
 	/**
-	 * Spatial Reference System ID: gpkg_spatial_ref_sys.srs_id; when data_type
-	 * is features, SHALL also match gpkg_geometry_columns.srs_id; When
-	 * data_type is tiles, SHALL also match gpkg_tile_matrix_set.srs.id
+	 * Spatial Reference System ID
 	 */
 	@DatabaseField(columnName = COLUMN_SRS_ID, foreign = true, foreignAutoRefresh = true)
 	private SpatialReferenceSystem srs;
+
+	/**
+	 * Unique identifier for each Spatial Reference System within a GeoPackage
+	 */
+	@DatabaseField(columnName = COLUMN_SRS_ID)
+	private int srsId;
+
+	/**
+	 * Geometry Columns
+	 */
+	@ForeignCollectionField(eager = false)
+	private ForeignCollection<GeometryColumns> geometryColumns;
 
 	/**
 	 * Default Constructor
 	 */
 	public Contents() {
 
+	}
+
+	public String getId() {
+		return tableName;
+	}
+
+	public void setId(String id) {
+		this.tableName = id;
 	}
 
 	public String getTableName() {
@@ -221,6 +249,23 @@ public class Contents {
 
 	public void setSrs(SpatialReferenceSystem srs) {
 		this.srs = srs;
+	}
+
+	public int getSrsId() {
+		return srsId;
+	}
+
+	public void setSrsId(int srsId) {
+		this.srsId = srsId;
+	}
+
+	public ForeignCollection<GeometryColumns> getGeometryColumns() {
+		return geometryColumns;
+	}
+
+	public void setGeometryColumns(
+			ForeignCollection<GeometryColumns> geometryColumns) {
+		this.geometryColumns = geometryColumns;
 	}
 
 }

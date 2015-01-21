@@ -79,4 +79,52 @@ public class ContentsImportTest extends
 
 	}
 
+	/**
+	 * Test updating
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testUpdate() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testUpdate(geoPackage);
+
+	}
+
+	/**
+	 * Test creating
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testCreate() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testCreate(geoPackage);
+
+	}
+
+	/**
+	 * Test deleting
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testDelete() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testDelete(geoPackage);
+
+	}
+
+	/**
+	 * Test cascade deleting
+	 * 
+	 * @throws GeoPackageException
+	 * @throws SQLException
+	 */
+	public void testDeleteCascade() throws GeoPackageException, SQLException {
+
+		ContentsUtils.testDeleteCascade(geoPackage);
+
+	}
+
 }

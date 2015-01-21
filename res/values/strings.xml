@@ -9,5 +9,7 @@
     <string name="sql_directory">sql</string>
     <string name="sql_spatial_reference_system">C.1. gpkg_spatial_ref_sys</string>
     <string name="sql_contents">C.2. gpkg_contents</string>
+    <string name="sql_geometry_columns">C.3. gpkg_geometry_columns</string>
+    
     
 </resources>

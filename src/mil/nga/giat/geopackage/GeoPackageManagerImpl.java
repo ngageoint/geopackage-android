@@ -255,7 +255,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		if (exists(database)) {
 			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
-			db = new GeoPackageImpl(sqlite);
+			GeoPackageScriptExecutor scriptExecutor = new GeoPackageScriptExecutor(
+					context, sqlite);
+			db = new GeoPackageImpl(sqlite, scriptExecutor);
 		}
 
 		return db;
