@@ -84,8 +84,7 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SpatialReferenceSystemDao getSpatialReferenceSystemDao()
-			throws GeoPackageException {
+	public SpatialReferenceSystemDao getSpatialReferenceSystemDao() {
 		return createDao(SpatialReferenceSystem.class);
 	}
 
@@ -93,8 +92,7 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SpatialReferenceSystemSqlMmDao getSpatialReferenceSystemSqlMmDao()
-			throws GeoPackageException {
+	public SpatialReferenceSystemSqlMmDao getSpatialReferenceSystemSqlMmDao() {
 
 		SpatialReferenceSystemSqlMmDao dao = createDao(SpatialReferenceSystemSqlMm.class);
 		verifyTableExists(dao);
@@ -106,8 +104,7 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SpatialReferenceSystemSfSqlDao getSpatialReferenceSystemSfSqlDao()
-			throws GeoPackageException {
+	public SpatialReferenceSystemSfSqlDao getSpatialReferenceSystemSfSqlDao() {
 
 		SpatialReferenceSystemSfSqlDao dao = createDao(SpatialReferenceSystemSfSql.class);
 		verifyTableExists(dao);
@@ -119,7 +116,7 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ContentsDao getContentsDao() throws GeoPackageException {
+	public ContentsDao getContentsDao() {
 		return createDao(Contents.class);
 	}
 
@@ -127,8 +124,7 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GeometryColumnsDao getGeometryColumnsDao()
-			throws GeoPackageException {
+	public GeometryColumnsDao getGeometryColumnsDao() {
 		return createDao(GeometryColumns.class);
 	}
 
@@ -136,7 +132,7 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean createGeometryColumnsTable() throws GeoPackageException {
+	public boolean createGeometryColumnsTable() {
 		boolean created = false;
 		GeometryColumnsDao dao = getGeometryColumnsDao();
 		try {
@@ -156,10 +152,8 @@ class GeoPackageImpl implements GeoPackage {
 	 * 
 	 * @param type
 	 * @return
-	 * @throws GeoPackageException
 	 */
-	private <T, S extends BaseDaoImpl<T, ?>> S createDao(Class<T> type)
-			throws GeoPackageException {
+	private <T, S extends BaseDaoImpl<T, ?>> S createDao(Class<T> type) {
 		S dao;
 		try {
 			dao = DaoManager.createDao(connectionSource, type);
@@ -174,10 +168,8 @@ class GeoPackageImpl implements GeoPackage {
 	 * Verify table or view exists
 	 * 
 	 * @param dao
-	 * @throws GeoPackageException
 	 */
-	private void verifyTableExists(BaseDaoImpl<?, ?> dao)
-			throws GeoPackageException {
+	private void verifyTableExists(BaseDaoImpl<?, ?> dao) {
 		try {
 			if (!dao.isTableExists()) {
 				throw new GeoPackageException(

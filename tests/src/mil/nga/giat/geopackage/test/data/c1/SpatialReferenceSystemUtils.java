@@ -19,7 +19,6 @@ import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
-import mil.nga.giat.geopackage.util.GeoPackageException;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
@@ -40,11 +39,10 @@ public class SpatialReferenceSystemUtils {
 	 * 
 	 * @param geoPackage
 	 * @param expectedResults
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testRead(GeoPackage geoPackage, int expectedResults)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		SpatialReferenceSystemDao dao = geoPackage
 				.getSpatialReferenceSystemDao();
@@ -122,10 +120,9 @@ public class SpatialReferenceSystemUtils {
 	 * @param geoPackage
 	 * @param expectedResults
 	 * @throws SQLException
-	 * @throws GeoPackageException
 	 */
 	public static void testSqlMmRead(GeoPackage geoPackage, int expectedResults)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		SpatialReferenceSystemSqlMmDao dao = geoPackage
 				.getSpatialReferenceSystemSqlMmDao();
@@ -203,11 +200,10 @@ public class SpatialReferenceSystemUtils {
 	 * 
 	 * @param geoPackage
 	 * @param expectedResults
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testSfSqlRead(GeoPackage geoPackage, int expectedResults)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		SpatialReferenceSystemSfSqlDao dao = geoPackage
 				.getSpatialReferenceSystemSfSqlDao();
@@ -258,11 +254,9 @@ public class SpatialReferenceSystemUtils {
 	 * Test update
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public static void testUpdate(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+	public static void testUpdate(GeoPackage geoPackage) throws SQLException {
 
 		SpatialReferenceSystemDao dao = geoPackage
 				.getSpatialReferenceSystemDao();
@@ -314,11 +308,9 @@ public class SpatialReferenceSystemUtils {
 	 * Test create
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public static void testCreate(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+	public static void testCreate(GeoPackage geoPackage) throws SQLException {
 
 		SpatialReferenceSystemDao dao = geoPackage
 				.getSpatialReferenceSystemDao();
@@ -363,11 +355,9 @@ public class SpatialReferenceSystemUtils {
 	 * Test delete
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public static void testDelete(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+	public static void testDelete(GeoPackage geoPackage) throws SQLException {
 
 		testDeleteHelper(geoPackage, false);
 
@@ -377,11 +367,10 @@ public class SpatialReferenceSystemUtils {
 	 * Test delete cascade
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testDeleteCascade(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		testDeleteHelper(geoPackage, true);
 
@@ -392,11 +381,10 @@ public class SpatialReferenceSystemUtils {
 	 * 
 	 * @param geoPackage
 	 * @param cascade
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	private static void testDeleteHelper(GeoPackage geoPackage, boolean cascade)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		SpatialReferenceSystemDao dao = geoPackage
 				.getSpatialReferenceSystemDao();

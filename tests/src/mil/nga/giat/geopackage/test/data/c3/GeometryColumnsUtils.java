@@ -12,7 +12,6 @@ import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
-import mil.nga.giat.geopackage.util.GeoPackageException;
 
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -29,11 +28,10 @@ public class GeometryColumnsUtils {
 	 * 
 	 * @param geoPackage
 	 * @param expectedResults
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testRead(GeoPackage geoPackage, int expectedResults)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		GeometryColumnsDao dao = geoPackage.getGeometryColumnsDao();
 		List<GeometryColumns> results = dao.queryForAll();
@@ -140,11 +138,10 @@ public class GeometryColumnsUtils {
 	 * Test update
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testUpdate(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 //TODO
 //		ContentsDao dao = geoPackage.getContentsDao();
 //		List<Contents> results = dao.queryForAll();
@@ -201,11 +198,10 @@ public class GeometryColumnsUtils {
 	 * Test create
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testCreate(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 //TODO
 //		SpatialReferenceSystemDao srsDao = geoPackage
 //				.getSpatialReferenceSystemDao();
@@ -272,11 +268,10 @@ public class GeometryColumnsUtils {
 	 * Test delete
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testDelete(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		testDeleteHelper(geoPackage, false);
 
@@ -286,11 +281,10 @@ public class GeometryColumnsUtils {
 	 * Test delete cascade
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testDeleteCascade(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		testDeleteHelper(geoPackage, true);
 
@@ -301,11 +295,10 @@ public class GeometryColumnsUtils {
 	 * 
 	 * @param geoPackage
 	 * @param cascade
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	private static void testDeleteHelper(GeoPackage geoPackage, boolean cascade)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 //TODO
 //		ContentsDao dao = geoPackage.getContentsDao();
 //		List<Contents> results = dao.queryForAll();

@@ -71,10 +71,9 @@ public class SpatialReferenceSystemImportTest extends
 	/**
 	 * Test reading
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testRead() throws GeoPackageException, SQLException {
+	public void testRead() throws SQLException {
 
 		SpatialReferenceSystemUtils.testRead(geoPackage, 4);
 
@@ -111,10 +110,9 @@ public class SpatialReferenceSystemImportTest extends
 	/**
 	 * Test updating
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testUpdate() throws GeoPackageException, SQLException {
+	public void testUpdate() throws SQLException {
 
 		SpatialReferenceSystemUtils.testUpdate(geoPackage);
 
@@ -123,10 +121,9 @@ public class SpatialReferenceSystemImportTest extends
 	/**
 	 * Test creating
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testCreate() throws GeoPackageException, SQLException {
+	public void testCreate() throws SQLException {
 
 		SpatialReferenceSystemUtils.testCreate(geoPackage);
 
@@ -135,10 +132,9 @@ public class SpatialReferenceSystemImportTest extends
 	/**
 	 * Test deleting
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testDelete() throws GeoPackageException, SQLException {
+	public void testDelete() throws SQLException {
 
 		SpatialReferenceSystemUtils.testDelete(geoPackage);
 
@@ -147,10 +143,9 @@ public class SpatialReferenceSystemImportTest extends
 	/**
 	 * Test cascade deleting
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testDeleteCascade() throws GeoPackageException, SQLException {
+	public void testDeleteCascade() throws SQLException {
 
 		SpatialReferenceSystemUtils.testDeleteCascade(geoPackage);
 

@@ -179,12 +179,12 @@ public class Contents {
 		this.tableName = tableName;
 	}
 
-	public String getDataType() {
-		return dataType;
+	public ContentsDataType getDataType() {
+		return ContentsDataType.fromName(dataType);
 	}
 
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
+	public void setDataType(ContentsDataType dataType) {
+		this.dataType = dataType.getName();
 	}
 
 	public String getIdentifier() {
@@ -249,14 +249,13 @@ public class Contents {
 
 	public void setSrs(SpatialReferenceSystem srs) {
 		this.srs = srs;
+		if(srs != null){
+			srsId = srs.getId();
+		}
 	}
 
 	public int getSrsId() {
 		return srsId;
-	}
-
-	public void setSrsId(int srsId) {
-		this.srsId = srsId;
 	}
 
 	public ForeignCollection<GeometryColumns> getGeometryColumns() {

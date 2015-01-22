@@ -38,6 +38,40 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 * Verify optional tables have been created
+	 */
+	@Override
+	public int create(Contents contents) throws SQLException {
+		verifyCreate(contents);
+		return super.create(contents);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Verify optional tables have been created
+	 */
+	@Override
+	public Contents createIfNotExists(Contents contents) throws SQLException {
+		verifyCreate(contents);
+		return super.createIfNotExists(contents);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Verify optional tables have been created
+	 */
+	@Override
+	public CreateOrUpdateStatus createOrUpdate(Contents contents)
+			throws SQLException {
+		verifyCreate(contents);
+		return super.createOrUpdate(contents);
+	}
+
+	/**
 	 * Delete the Contents, cascading to TODO
 	 * 
 	 * @param contents
@@ -133,6 +167,40 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 			}
 		}
 		return count;
+	}
+
+	/**
+	 * Verify the tables are in the expected state for the Contents create
+	 * 
+	 * @param contents
+	 * @throws SQLException
+	 */
+	private void verifyCreate(Contents contents) throws SQLException {
+		ContentsDataType dataType = contents.getDataType();
+		if (dataType != null) {
+			switch (dataType) {
+			case FEATURES:
+				// Features require Geometry Columns table (Spec Requirement 21)
+				GeometryColumnsDao dao = getGeometryColumnsDao();
+				if (!dao.isTableExists()) {
+					throw new SQLException(
+							"A data type of "
+									+ dataType.getName()
+									+ " requires the "
+									+ GeometryColumns.class.getSimpleName()
+									+ " table to first be created using the GeoPackage.");
+				}
+				break;
+
+			case TILES:
+				// TODO
+				break;
+
+			default:
+				throw new SQLException("Unsupported data type: " + dataType);
+			}
+		}
+
 	}
 
 	/**

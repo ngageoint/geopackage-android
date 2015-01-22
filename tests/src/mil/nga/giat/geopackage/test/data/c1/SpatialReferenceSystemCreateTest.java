@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
 import mil.nga.giat.geopackage.test.TestUtils;
-import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -64,10 +63,9 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test reading
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testRead() throws GeoPackageException, SQLException {
+	public void testRead() throws SQLException {
 
 		SpatialReferenceSystemUtils.testRead(geoPackage, 3);
 
@@ -76,10 +74,9 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test reading using the SQL/MM view
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testSqlMmRead() throws GeoPackageException, SQLException {
+	public void testSqlMmRead() throws SQLException {
 
 		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 3);
 
@@ -88,10 +85,9 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test reading using the SF/SQL view
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testSfSqlRead() throws GeoPackageException, SQLException {
+	public void testSfSqlRead() throws SQLException {
 
 		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage, 3);
 
@@ -100,10 +96,9 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test updating
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testUpdate() throws GeoPackageException, SQLException {
+	public void testUpdate() throws SQLException {
 
 		SpatialReferenceSystemUtils.testUpdate(geoPackage);
 
@@ -112,10 +107,9 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test creating
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testCreate() throws GeoPackageException, SQLException {
+	public void testCreate() throws SQLException {
 
 		SpatialReferenceSystemUtils.testCreate(geoPackage);
 
@@ -124,10 +118,9 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test deleting
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testDelete() throws GeoPackageException, SQLException {
+	public void testDelete() throws SQLException {
 
 		SpatialReferenceSystemUtils.testDelete(geoPackage);
 
@@ -136,10 +129,9 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Test cascade deleting
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testDeleteCascade() throws GeoPackageException, SQLException {
+	public void testDeleteCascade() throws SQLException {
 
 		SpatialReferenceSystemUtils.testDeleteCascade(geoPackage);
 

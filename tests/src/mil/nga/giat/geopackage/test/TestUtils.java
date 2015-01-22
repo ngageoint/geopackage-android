@@ -16,6 +16,7 @@ import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
+import mil.nga.giat.geopackage.data.c2.ContentsDataType;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
@@ -48,11 +49,9 @@ public class TestUtils {
 	 * 
 	 * @param activity
 	 * @return
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public static GeoPackage setUpCreate(Activity activity)
-			throws GeoPackageException, SQLException {
+	public static GeoPackage setUpCreate(Activity activity) throws SQLException {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
@@ -78,12 +77,15 @@ public class TestUtils {
 		TestCase.assertNotNull(undefinedGeographicSrs);
 		TestCase.assertNotNull(epsgSrs);
 
+		// Create the Geometry Columns table
+		geoPackage.createGeometryColumnsTable();
+
 		// Create new Contents
 		ContentsDao contentsDao = geoPackage.getContentsDao();
 
 		Contents contents = new Contents();
 		contents.setTableName("linestring2d");
-		contents.setDataType("features");
+		contents.setDataType(ContentsDataType.FEATURES);
 		contents.setIdentifier("linestring2d");
 		// contents.setDescription("");
 		contents.setLastChange(new Date());
@@ -96,7 +98,7 @@ public class TestUtils {
 
 		Contents contents2 = new Contents();
 		contents2.setTableName("test_table_name");
-		contents2.setDataType("features");
+		contents2.setDataType(ContentsDataType.FEATURES);
 		contents2.setIdentifier("test_table_name");
 		// contents2.setDescription("");
 		contents2.setLastChange(new Date());
@@ -108,7 +110,6 @@ public class TestUtils {
 		contentsDao.create(contents2);
 
 		// Create new Geometry Columns
-		geoPackage.createGeometryColumnsTable();
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();
 		// TODO
@@ -140,10 +141,8 @@ public class TestUtils {
 	 * @param activity
 	 * @param testContext
 	 * @return
-	 * @throws GeoPackageException
 	 */
-	public static GeoPackage setUpImport(Activity activity, Context testContext)
-			throws GeoPackageException {
+	public static GeoPackage setUpImport(Activity activity, Context testContext) {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
@@ -191,10 +190,9 @@ public class TestUtils {
 	 * 
 	 * @param context
 	 * @param assetPath
-	 * @throws GeoPackageException
 	 */
 	public static void copyAssetFileToInternalStorage(Context context,
-			Context testContext, String assetPath) throws GeoPackageException {
+			Context testContext, String assetPath) {
 
 		String filePath = getAssetFileInternalStorageLocation(context,
 				assetPath);

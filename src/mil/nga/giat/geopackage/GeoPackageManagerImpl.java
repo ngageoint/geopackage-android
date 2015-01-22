@@ -105,7 +105,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean create(String database) throws GeoPackageException {
+	public boolean create(String database) {
 
 		boolean created = false;
 
@@ -152,7 +152,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean importGeoPackage(File file) throws GeoPackageException {
+	public boolean importGeoPackage(File file) {
 		return importGeoPackage(null, file, false);
 	}
 
@@ -160,8 +160,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean importGeoPackage(File file, boolean override)
-			throws GeoPackageException {
+	public boolean importGeoPackage(File file, boolean override) {
 		return importGeoPackage(null, file, override);
 	}
 
@@ -169,8 +168,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean importGeoPackage(String name, File file)
-			throws GeoPackageException {
+	public boolean importGeoPackage(String name, File file) {
 		return importGeoPackage(name, file, false);
 	}
 
@@ -178,8 +176,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean importGeoPackage(String name, File file, boolean override)
-			throws GeoPackageException {
+	public boolean importGeoPackage(String name, File file, boolean override) {
 
 		// Verify the file has the right extension
 		if (!hasGeoPackageExtension(file)) {
@@ -239,8 +236,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void exportGeoPackage(String database, File directory)
-			throws GeoPackageException {
+	public void exportGeoPackage(String database, File directory) {
 		exportGeoPackage(database, database, directory);
 	}
 
@@ -248,8 +244,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void exportGeoPackage(String database, String name, File directory)
-			throws GeoPackageException {
+	public void exportGeoPackage(String database, String name, File directory) {
 
 		File file = new File(directory, name);
 

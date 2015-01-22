@@ -2,6 +2,8 @@ package mil.nga.giat.geopackage.data.c3;
 
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c2.Contents;
+import mil.nga.giat.geopackage.data.c2.ContentsDataType;
+import mil.nga.giat.geopackage.util.GeoPackageException;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -59,7 +61,7 @@ public class GeometryColumns {
 	/**
 	 * Name of the table containing the geometry column
 	 */
-	@DatabaseField(columnName = COLUMN_TABLE_NAME, id=true, canBeNull = false, uniqueCombo = true)
+	@DatabaseField(columnName = COLUMN_TABLE_NAME, id = true, canBeNull = false, uniqueCombo = true)
 	private String tableName;
 
 	/**
@@ -110,25 +112,33 @@ public class GeometryColumns {
 		return new GeometryColumnsKey(tableName, columnName);
 	}
 
-	public void setId(GeometryColumnsKey id){
+	public void setId(GeometryColumnsKey id) {
 		tableName = id.getTableName();
 		columnName = id.getColumnName();
 	}
-	
+
 	public Contents getContents() {
 		return contents;
 	}
 
 	public void setContents(Contents contents) {
 		this.contents = contents;
+		if (contents != null) {
+			// Verify the Contents have a features data type (Spec Requirement 23)
+			ContentsDataType dataType = contents.getDataType();
+			if (dataType == null || dataType != ContentsDataType.FEATURES) {
+				throw new GeoPackageException("The "
+						+ Contents.class.getSimpleName() + " of a "
+						+ GeometryColumns.class.getSimpleName()
+						+ " must have a data type of "
+						+ ContentsDataType.FEATURES.getName());
+			}
+			tableName = contents.getId();
+		}
 	}
 
 	public String getTableName() {
 		return tableName;
-	}
-
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
 	}
 
 	public String getColumnName() {
@@ -153,14 +163,13 @@ public class GeometryColumns {
 
 	public void setSrs(SpatialReferenceSystem srs) {
 		this.srs = srs;
+		if (srs != null) {
+			srsId = srs.getId();
+		}
 	}
 
 	public int getSrsId() {
 		return srsId;
-	}
-
-	public void setSrsId(int srsId) {
-		this.srsId = srsId;
 	}
 
 	public Integer getZ() {

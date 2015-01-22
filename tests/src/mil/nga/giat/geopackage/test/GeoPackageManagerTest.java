@@ -69,9 +69,8 @@ public class GeoPackageManagerTest extends
 
 	/**
 	 * Test creating and deleting a database
-	 * @throws GeoPackageException 
 	 */
-	public void testCreateOpenDelete() throws GeoPackageException {
+	public void testCreateOpenDelete() {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
@@ -105,10 +104,8 @@ public class GeoPackageManagerTest extends
 
 	/**
 	 * Test importing a database from a GeoPackage file
-	 * 
-	 * @throws GeoPackageException
 	 */
-	public void testImport() throws GeoPackageException {
+	public void testImport() {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
@@ -207,10 +204,9 @@ public class GeoPackageManagerTest extends
 	/**
 	 * Test exporting a GeoPackage database to a file
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testExport() throws GeoPackageException, SQLException {
+	public void testExport() throws SQLException {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 

@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
-import mil.nga.giat.geopackage.util.GeoPackageException;
-
 /**
  * GeoPackage Database management
  * 
@@ -48,9 +46,8 @@ public interface GeoPackageManager {
 	 * 
 	 * @param database
 	 * @return
-	 * @throws GeoPackageException
 	 */
-	public boolean create(String database) throws GeoPackageException;
+	public boolean create(String database);
 
 	/**
 	 * Import a GeoPackage file
@@ -58,10 +55,8 @@ public interface GeoPackageManager {
 	 * @param file
 	 *            GeoPackage file to import
 	 * @return true if loaded
-	 * @throws GeoPackageException
-	 *             on failure to load file or if database already exists
 	 */
-	public boolean importGeoPackage(File file) throws GeoPackageException;
+	public boolean importGeoPackage(File file);
 
 	/**
 	 * Import a GeoPackage file
@@ -73,12 +68,8 @@ public interface GeoPackageManager {
 	 * @param override
 	 *            true to override existing
 	 * @return true if created successfully
-	 * @throws GeoPackageException
-	 *             on failure to load file or if no overriding & database
-	 *             already exists
 	 */
-	public boolean importGeoPackage(File file, boolean override)
-			throws GeoPackageException;
+	public boolean importGeoPackage(File file, boolean override);
 
 	/**
 	 * Import a GeoPackage file
@@ -88,12 +79,8 @@ public interface GeoPackageManager {
 	 * @param file
 	 *            GeoPackage file to import
 	 * @return true if created successfully
-	 * @throws GeoPackageException
-	 *             on failure to load file or if no overriding & database
-	 *             already exists
 	 */
-	public boolean importGeoPackage(String name, File file)
-			throws GeoPackageException;
+	public boolean importGeoPackage(String name, File file);
 
 	/**
 	 * Import a GeoPackage file
@@ -105,22 +92,16 @@ public interface GeoPackageManager {
 	 * @param override
 	 *            true to override existing
 	 * @return true if created successfully
-	 * @throws GeoPackageException
-	 *             on failure to load file or if no overriding & database
-	 *             already exists
 	 */
-	public boolean importGeoPackage(String name, File file, boolean override)
-			throws GeoPackageException;
+	public boolean importGeoPackage(String name, File file, boolean override);
 
 	/**
 	 * Export a GeoPackage database to a file
 	 * 
 	 * @param database
 	 * @param directory
-	 * @throws GeoPackageException
 	 */
-	public void exportGeoPackage(String database, File directory)
-			throws GeoPackageException;
+	public void exportGeoPackage(String database, File directory);
 
 	/**
 	 * Export a GeoPackage database to a file
@@ -128,10 +109,8 @@ public interface GeoPackageManager {
 	 * @param database
 	 * @param name
 	 * @param directory
-	 * @throws GeoPackageException
 	 */
-	public void exportGeoPackage(String database, String name, File directory)
-			throws GeoPackageException;
+	public void exportGeoPackage(String database, String name, File directory);
 
 	/**
 	 * Open the database

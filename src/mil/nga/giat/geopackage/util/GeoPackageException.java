@@ -5,7 +5,7 @@ package mil.nga.giat.geopackage.util;
  * 
  * @author osbornb
  */
-public class GeoPackageException extends Exception {
+public class GeoPackageException extends RuntimeException {
 
 	/**
 	 * Serial version id

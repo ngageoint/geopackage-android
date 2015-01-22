@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
 import mil.nga.giat.geopackage.test.TestUtils;
-import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
@@ -70,10 +69,9 @@ public class GeometryColumnsImportTest extends
 	/**
 	 * Test reading
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testRead() throws GeoPackageException, SQLException {
+	public void testRead() throws SQLException {
 
 		GeometryColumnsUtils.testRead(geoPackage, 16);
 
@@ -82,10 +80,9 @@ public class GeometryColumnsImportTest extends
 	/**
 	 * Test updating
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testUpdate() throws GeoPackageException, SQLException {
+	public void testUpdate() throws SQLException {
 
 		GeometryColumnsUtils.testUpdate(geoPackage);
 
@@ -94,10 +91,9 @@ public class GeometryColumnsImportTest extends
 	/**
 	 * Test creating
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testCreate() throws GeoPackageException, SQLException {
+	public void testCreate() throws SQLException {
 
 		GeometryColumnsUtils.testCreate(geoPackage);
 
@@ -106,10 +102,9 @@ public class GeometryColumnsImportTest extends
 	/**
 	 * Test deleting
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testDelete() throws GeoPackageException, SQLException {
+	public void testDelete() throws SQLException {
 
 		GeometryColumnsUtils.testDelete(geoPackage);
 
@@ -118,10 +113,9 @@ public class GeometryColumnsImportTest extends
 	/**
 	 * Test cascade deleting
 	 * 
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public void testDeleteCascade() throws GeoPackageException, SQLException {
+	public void testDeleteCascade() throws SQLException {
 
 		GeometryColumnsUtils.testDeleteCascade(geoPackage);
 

@@ -13,10 +13,10 @@ import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
+import mil.nga.giat.geopackage.data.c2.ContentsDataType;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
-import mil.nga.giat.geopackage.util.GeoPackageException;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
@@ -37,11 +37,10 @@ public class ContentsUtils {
 	 * 
 	 * @param geoPackage
 	 * @param expectedResults
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testRead(GeoPackage geoPackage, int expectedResults)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		ContentsDao dao = geoPackage.getContentsDao();
 		List<Contents> results = dao.queryForAll();
@@ -87,7 +86,8 @@ public class ContentsUtils {
 
 			// Query for field values
 			Map<String, Object> fieldValues = new HashMap<String, Object>();
-			fieldValues.put(Contents.COLUMN_DATA_TYPE, contents.getDataType());
+			fieldValues.put(Contents.COLUMN_DATA_TYPE, contents.getDataType()
+					.getName());
 			if (contents.getSrs() != null) {
 				fieldValues.put(Contents.COLUMN_SRS_ID, contents.getSrs()
 						.getSrsId());
@@ -156,11 +156,9 @@ public class ContentsUtils {
 	 * Test update
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public static void testUpdate(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+	public static void testUpdate(GeoPackage geoPackage) throws SQLException {
 
 		ContentsDao dao = geoPackage.getContentsDao();
 		List<Contents> results = dao.queryForAll();
@@ -217,11 +215,9 @@ public class ContentsUtils {
 	 * Test create
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public static void testCreate(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+	public static void testCreate(GeoPackage geoPackage) throws SQLException {
 
 		SpatialReferenceSystemDao srsDao = geoPackage
 				.getSpatialReferenceSystemDao();
@@ -239,7 +235,7 @@ public class ContentsUtils {
 		}
 
 		String tableName = "TEST_TABLE_NAME";
-		String dataType = "features";
+		ContentsDataType dataType = ContentsDataType.FEATURES;
 		String identifier = "TEST_IDENTIFIER";
 		String description = "TEST_DESCRIPTION";
 		Date lastChange = new Date();
@@ -288,11 +284,9 @@ public class ContentsUtils {
 	 * Test delete
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
-	public static void testDelete(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+	public static void testDelete(GeoPackage geoPackage) throws SQLException {
 
 		testDeleteHelper(geoPackage, false);
 
@@ -302,11 +296,10 @@ public class ContentsUtils {
 	 * Test delete cascade
 	 * 
 	 * @param geoPackage
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	public static void testDeleteCascade(GeoPackage geoPackage)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		testDeleteHelper(geoPackage, true);
 
@@ -317,11 +310,10 @@ public class ContentsUtils {
 	 * 
 	 * @param geoPackage
 	 * @param cascade
-	 * @throws GeoPackageException
 	 * @throws SQLException
 	 */
 	private static void testDeleteHelper(GeoPackage geoPackage, boolean cascade)
-			throws GeoPackageException, SQLException {
+			throws SQLException {
 
 		ContentsDao dao = geoPackage.getContentsDao();
 		List<Contents> results = dao.queryForAll();
@@ -375,8 +367,8 @@ public class ContentsUtils {
 
 				// Find which contents to delete and the geometry columns
 				QueryBuilder<Contents, String> qb = dao.queryBuilder();
-				qb.where()
-						.eq(Contents.COLUMN_DATA_TYPE, contents.getDataType());
+				qb.where().eq(Contents.COLUMN_DATA_TYPE,
+						contents.getDataType().getName());
 				PreparedQuery<Contents> query = qb.prepare();
 				List<Contents> queryResults = dao.query(query);
 				int count = queryResults.size();
@@ -397,7 +389,7 @@ public class ContentsUtils {
 				} else {
 					DeleteBuilder<Contents, String> db = dao.deleteBuilder();
 					db.where().eq(Contents.COLUMN_DATA_TYPE,
-							contents.getDataType());
+							contents.getDataType().getName());
 					PreparedDelete<Contents> deleteQuery = db.prepare();
 					deleted = dao.delete(deleteQuery);
 				}
