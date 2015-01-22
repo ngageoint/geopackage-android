@@ -124,7 +124,8 @@ public class GeometryColumns {
 	public void setContents(Contents contents) {
 		this.contents = contents;
 		if (contents != null) {
-			// Verify the Contents have a features data type (Spec Requirement 23)
+			// Verify the Contents have a features data type (Spec Requirement
+			// 23)
 			ContentsDataType dataType = contents.getDataType();
 			if (dataType == null || dataType != ContentsDataType.FEATURES) {
 				throw new GeoPackageException("The "
@@ -149,12 +150,12 @@ public class GeometryColumns {
 		this.columnName = columnName;
 	}
 
-	public String getGeometryTypeName() {
-		return geometryTypeName;
+	public GeometryType getGeometryType() {
+		return GeometryType.valueOf(geometryTypeName);
 	}
 
-	public void setGeometryTypeName(String geometryTypeName) {
-		this.geometryTypeName = geometryTypeName;
+	public void setGeometryType(GeometryType geometryType) {
+		this.geometryTypeName = geometryType.name();
 	}
 
 	public SpatialReferenceSystem getSrs() {
@@ -177,6 +178,7 @@ public class GeometryColumns {
 	}
 
 	public void setZ(Integer z) {
+		validateIntegerValues(COLUMN_Z, z);
 		this.z = z;
 	}
 
@@ -185,7 +187,25 @@ public class GeometryColumns {
 	}
 
 	public void setM(Integer m) {
+		validateIntegerValues(COLUMN_M, m);
 		this.m = m;
+	}
+
+	/**
+	 * Validate the z and m integer values. They must be 0 for prohibited, 1 for
+	 * mandatory, or 2 for optional. (Spec Requirement 27 & 28)
+	 * 
+	 * @param column
+	 * @param value
+	 */
+	private void validateIntegerValues(String column, Integer value) {
+		if (value != null) {
+			if (value < 0 || value > 2) {
+				throw new GeoPackageException(
+						column
+								+ " value must be 0 for prohibited, 1 for mandatory, or 2 for optional");
+			}
+		}
 	}
 
 }

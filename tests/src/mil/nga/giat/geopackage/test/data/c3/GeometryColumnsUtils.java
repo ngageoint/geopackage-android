@@ -44,7 +44,7 @@ public class GeometryColumnsUtils {
 			for (GeometryColumns result : results) {
 				TestCase.assertNotNull(result.getTableName());
 				TestCase.assertNotNull(result.getColumnName());
-				TestCase.assertNotNull(result.getGeometryTypeName());
+				TestCase.assertNotNull(result.getGeometryType());
 				TestCase.assertNotNull(result.getSrsId());
 				TestCase.assertNotNull(result.getZ());
 				TestCase.assertNotNull(result.getM());
@@ -78,13 +78,13 @@ public class GeometryColumnsUtils {
 			// Query for equal
 			List<GeometryColumns> queryGeometryColumnsList = dao.queryForEq(
 					GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
-					geometryColumns.getGeometryTypeName());
+					geometryColumns.getGeometryType().name());
 			TestCase.assertNotNull(queryGeometryColumnsList);
 			TestCase.assertTrue(queryGeometryColumnsList.size() >= 1);
 			boolean found = false;
 			for (GeometryColumns queryGeometryColumnsValue : queryGeometryColumnsList) {
-				TestCase.assertEquals(geometryColumns.getGeometryTypeName(),
-						queryGeometryColumnsValue.getGeometryTypeName());
+				TestCase.assertEquals(geometryColumns.getGeometryType(),
+						queryGeometryColumnsValue.getGeometryType());
 				if (!found) {
 					found = geometryColumns.getId().equals(
 							queryGeometryColumnsValue.getId());
