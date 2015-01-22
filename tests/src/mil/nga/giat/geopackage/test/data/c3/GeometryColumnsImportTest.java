@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.test.TestSetupTeardown;
 import mil.nga.giat.geopackage.test.TestUtils;
 import android.app.Activity;
 import android.content.Context;
@@ -51,7 +52,7 @@ public class GeometryColumnsImportTest extends
 		testContext = TestUtils.getTestContext(activity);
 
 		// Import the database
-		geoPackage = TestUtils.setUpImport(activity, testContext);
+		geoPackage = TestSetupTeardown.setUpImport(activity, testContext);
 	}
 
 	/**
@@ -61,7 +62,7 @@ public class GeometryColumnsImportTest extends
 	protected void tearDown() throws Exception {
 
 		// Tear down the import database
-		TestUtils.tearDownImport(activity, geoPackage);
+		TestSetupTeardown.tearDownImport(activity, geoPackage);
 
 		super.tearDown();
 	}

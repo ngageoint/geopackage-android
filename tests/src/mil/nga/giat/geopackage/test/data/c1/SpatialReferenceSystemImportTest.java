@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.test.TestSetupTeardown;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
@@ -53,7 +54,7 @@ public class SpatialReferenceSystemImportTest extends
 		testContext = TestUtils.getTestContext(activity);
 
 		// Import the database
-		geoPackage = TestUtils.setUpImport(activity, testContext);
+		geoPackage = TestSetupTeardown.setUpImport(activity, testContext);
 	}
 
 	/**
@@ -63,7 +64,7 @@ public class SpatialReferenceSystemImportTest extends
 	protected void tearDown() throws Exception {
 
 		// Tear down the import database
-		TestUtils.tearDownImport(activity, geoPackage);
+		TestSetupTeardown.tearDownImport(activity, geoPackage);
 
 		super.tearDown();
 	}

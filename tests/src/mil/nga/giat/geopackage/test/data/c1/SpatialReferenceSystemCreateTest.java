@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
-import mil.nga.giat.geopackage.test.TestUtils;
+import mil.nga.giat.geopackage.test.TestSetupTeardown;
 import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 
@@ -45,7 +45,7 @@ public class SpatialReferenceSystemCreateTest extends
 		activity = getActivity();
 
 		// Create the database
-		geoPackage = TestUtils.setUpCreate(activity);
+		geoPackage = TestSetupTeardown.setUpCreate(activity, true, false);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class SpatialReferenceSystemCreateTest extends
 	protected void tearDown() throws Exception {
 
 		// Tear down the create database
-		TestUtils.tearDownCreate(activity, geoPackage);
+		TestSetupTeardown.tearDownCreate(activity, geoPackage);
 
 		super.tearDown();
 	}
@@ -67,7 +67,8 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage, 3);
+		SpatialReferenceSystemUtils.testRead(geoPackage,
+				TestSetupTeardown.CREATE_SRS_COUNT);
 
 	}
 
@@ -78,7 +79,8 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testSqlMmRead() throws SQLException {
 
-		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 3);
+		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage,
+				TestSetupTeardown.CREATE_SRS_COUNT);
 
 	}
 
@@ -89,7 +91,8 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testSfSqlRead() throws SQLException {
 
-		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage, 3);
+		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage,
+				TestSetupTeardown.CREATE_SRS_COUNT);
 
 	}
 
