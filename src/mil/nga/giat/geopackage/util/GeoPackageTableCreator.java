@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.script;
+package mil.nga.giat.geopackage.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +17,12 @@ import android.util.Log;
  * 
  * @author osbornb
  */
-public class GeoPackageScriptExecutor {
+public class GeoPackageTableCreator {
 
 	/**
 	 * Log tag
 	 */
-	private static final String TAG = GeoPackageScriptExecutor.class
+	private static final String TAG = GeoPackageTableCreator.class
 			.getSimpleName();
 
 	/**
@@ -46,7 +46,7 @@ public class GeoPackageScriptExecutor {
 	 * @param context
 	 * @param db
 	 */
-	public GeoPackageScriptExecutor(Context context, SQLiteDatabase db) {
+	public GeoPackageTableCreator(Context context, SQLiteDatabase db) {
 		this.context = context;
 		this.assetManager = context.getAssets();
 		this.db = db;

@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.Date;
 
+import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageFactory;
 import mil.nga.giat.geopackage.GeoPackageManager;
@@ -67,27 +68,17 @@ public class TestUtils {
 			throw new GeoPackageException("Failed to open database");
 		}
 
+		// Get existing SRS objects
 		SpatialReferenceSystemDao srsDao = geoPackage
 				.getSpatialReferenceSystemDao();
 
-		SpatialReferenceSystem srs = new SpatialReferenceSystem();
-		srs.setSrsName("Undefined geographic SRS");
-		srs.setSrsId(0);
-		srs.setOrganization("NONE");
-		srs.setOrganizationCoordsysId(0);
-		srs.setDefinition("undefined");
-		srs.setDescription("undefined geographic coordinate reference system");
-		srsDao.create(srs);
+		SpatialReferenceSystem undefinedGeographicSrs = srsDao.queryForId(0);
+		SpatialReferenceSystem epsgSrs = srsDao.queryForId(4326);
 
-		SpatialReferenceSystem srs2 = new SpatialReferenceSystem();
-		srs2.setSrsName("WGS 84 geodetic");
-		srs2.setSrsId(4326);
-		srs2.setOrganization("EPSG");
-		srs2.setOrganizationCoordsysId(4326);
-		srs2.setDefinition("GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326”]]");
-		srs2.setDescription("longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid");
-		srsDao.create(srs2);
+		TestCase.assertNotNull(undefinedGeographicSrs);
+		TestCase.assertNotNull(epsgSrs);
 
+		// Create new Contents
 		ContentsDao contentsDao = geoPackage.getContentsDao();
 
 		Contents contents = new Contents();
@@ -100,7 +91,7 @@ public class TestUtils {
 		contents.setMinY(-90.0);
 		contents.setMaxX(180.0);
 		contents.setMaxY(90.0);
-		contents.setSrs(srs2);
+		contents.setSrs(epsgSrs);
 		contentsDao.create(contents);
 
 		Contents contents2 = new Contents();
@@ -113,9 +104,10 @@ public class TestUtils {
 		contents2.setMinY(0.0);
 		contents2.setMaxX(10.0);
 		contents2.setMaxY(10.0);
-		contents2.setSrs(srs);
+		contents2.setSrs(undefinedGeographicSrs);
 		contentsDao.create(contents2);
 
+		// Create new Geometry Columns
 		geoPackage.createGeometryColumnsTable();
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();

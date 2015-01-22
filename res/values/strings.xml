@@ -11,5 +11,25 @@
     <string name="sql_contents">C.2. gpkg_contents</string>
     <string name="sql_geometry_columns">C.3. gpkg_geometry_columns</string>
     
+    <string name="geopackage_srs_epsg_srs_name">WGS 84 geodetic</string>
+    <integer name="geopackage_srs_epsg_srs_id">4326</integer>
+    <string name="geopackage_srs_epsg_organization">EPSG</string>
+    <integer name="geopackage_srs_epsg_organization_coordsys_id">4326</integer>
+    <string name="geopackage_srs_epsg_definition">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326”]]</string>
+    <string name="geopackage_srs_epsg_description">longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid</string>
+  
+    <string name="geopackage_srs_undefined_cartesian_srs_name">Undefined cartesian SRS</string>
+    <integer name="geopackage_srs_undefined_cartesian_srs_id">-1</integer>
+    <string name="geopackage_srs_undefined_cartesian_organization">NONE</string>
+    <integer name="geopackage_srs_undefined_cartesian_organization_coordsys_id">-1</integer>
+    <string name="geopackage_srs_undefined_cartesian_definition">undefined</string>
+    <string name="geopackage_srs_undefined_cartesian_description">undefined cartesian coordinate reference system</string>
+
+    <string name="geopackage_srs_undefined_geographic_srs_name">Undefined geographic SRS</string>
+    <integer name="geopackage_srs_undefined_geographic_srs_id">0</integer>
+    <string name="geopackage_srs_undefined_geographic_organization">NONE</string>
+    <integer name="geopackage_srs_undefined_geographic_organization_coordsys_id">0</integer>
+    <string name="geopackage_srs_undefined_geographic_definition">undefined</string>
+    <string name="geopackage_srs_undefined_geographic_description">undefined geographic coordinate reference system</string>
     
 </resources>

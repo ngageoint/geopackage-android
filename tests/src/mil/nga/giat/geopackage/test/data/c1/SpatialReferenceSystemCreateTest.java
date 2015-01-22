@@ -69,7 +69,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testRead() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage, 2);
+		SpatialReferenceSystemUtils.testRead(geoPackage, 3);
 
 	}
 
@@ -81,7 +81,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testSqlMmRead() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 2);
+		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage, 3);
 
 	}
 
@@ -93,7 +93,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testSfSqlRead() throws GeoPackageException, SQLException {
 
-		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage, 2);
+		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage, 3);
 
 	}
 

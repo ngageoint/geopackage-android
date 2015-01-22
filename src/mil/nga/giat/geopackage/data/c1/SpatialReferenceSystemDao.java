@@ -4,10 +4,13 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import android.content.Context;
+import android.content.res.Resources;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
@@ -46,6 +49,79 @@ public class SpatialReferenceSystemDao extends
 	}
 
 	/**
+	 * Creates the required EPSG Spatial Reference System (spec Requirement 11)
+	 * 
+	 * @throws SQLException
+	 */
+	public void createEpsg(Context context) throws SQLException {
+
+		Resources resources = context.getResources();
+		SpatialReferenceSystem srs = new SpatialReferenceSystem();
+		srs.setSrsName(resources
+				.getString(R.string.geopackage_srs_epsg_srs_name));
+		srs.setSrsId(resources.getInteger(R.integer.geopackage_srs_epsg_srs_id));
+		srs.setOrganization(resources
+				.getString(R.string.geopackage_srs_epsg_organization));
+		srs.setOrganizationCoordsysId(resources
+				.getInteger(R.integer.geopackage_srs_epsg_organization_coordsys_id));
+		srs.setDefinition(resources
+				.getString(R.string.geopackage_srs_epsg_definition));
+		srs.setDescription(resources
+				.getString(R.string.geopackage_srs_epsg_description));
+		create(srs);
+	}
+
+	/**
+	 * Creates the required Undefined Cartesian Spatial Reference System (spec
+	 * Requirement 11)
+	 * 
+	 * @throws SQLException
+	 */
+	public void createUndefinedCartesian(Context context) throws SQLException {
+
+		Resources resources = context.getResources();
+		SpatialReferenceSystem srs = new SpatialReferenceSystem();
+		srs.setSrsName(resources
+				.getString(R.string.geopackage_srs_undefined_cartesian_srs_name));
+		srs.setSrsId(resources
+				.getInteger(R.integer.geopackage_srs_undefined_cartesian_srs_id));
+		srs.setOrganization(resources
+				.getString(R.string.geopackage_srs_undefined_cartesian_organization));
+		srs.setOrganizationCoordsysId(resources
+				.getInteger(R.integer.geopackage_srs_undefined_cartesian_organization_coordsys_id));
+		srs.setDefinition(resources
+				.getString(R.string.geopackage_srs_undefined_cartesian_definition));
+		srs.setDescription(resources
+				.getString(R.string.geopackage_srs_undefined_cartesian_description));
+		create(srs);
+	}
+
+	/**
+	 * Creates the required Undefined Geographic Spatial Reference System (spec
+	 * Requirement 11)
+	 * 
+	 * @throws SQLException
+	 */
+	public void createUndefinedGeographic(Context context) throws SQLException {
+
+		Resources resources = context.getResources();
+		SpatialReferenceSystem srs = new SpatialReferenceSystem();
+		srs.setSrsName(resources
+				.getString(R.string.geopackage_srs_undefined_geographic_srs_name));
+		srs.setSrsId(resources
+				.getInteger(R.integer.geopackage_srs_undefined_geographic_srs_id));
+		srs.setOrganization(resources
+				.getString(R.string.geopackage_srs_undefined_geographic_organization));
+		srs.setOrganizationCoordsysId(resources
+				.getInteger(R.integer.geopackage_srs_undefined_geographic_organization_coordsys_id));
+		srs.setDefinition(resources
+				.getString(R.string.geopackage_srs_undefined_geographic_definition));
+		srs.setDescription(resources
+				.getString(R.string.geopackage_srs_undefined_geographic_description));
+		create(srs);
+	}
+
+	/**
 	 * Delete the Spatial Reference System, cascading to Contents
 	 * 
 	 * @param srs
@@ -66,7 +142,7 @@ public class SpatialReferenceSystemDao extends
 
 			// Delete Geometry Columns
 			GeometryColumnsDao dao = getGeometryColumnsDao();
-			if(dao.isTableExists()){
+			if (dao.isTableExists()) {
 				ForeignCollection<GeometryColumns> geometryColumnsCollection = srs
 						.getGeometryColumns();
 				if (!geometryColumnsCollection.isEmpty()) {

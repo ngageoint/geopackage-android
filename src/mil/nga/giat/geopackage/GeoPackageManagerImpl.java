@@ -2,18 +2,25 @@ package mil.nga.giat.geopackage;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import mil.nga.giat.geopackage.script.GeoPackageScriptExecutor;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.util.GeoPackageTableCreator;
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.j256.ormlite.android.AndroidConnectionSource;
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.support.ConnectionSource;
 
 /**
  * GeoPackage Database management implementation
@@ -98,7 +105,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean create(String database) {
+	public boolean create(String database) throws GeoPackageException {
 
 		boolean created = false;
 
@@ -110,10 +117,29 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 					Context.MODE_PRIVATE, null);
 
 			// Create the minimum required tables
-			GeoPackageScriptExecutor scriptExecutor = new GeoPackageScriptExecutor(
+			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(
 					context, db);
-			scriptExecutor.createSpatialReferenceSystem();
-			scriptExecutor.createContents();
+
+			// Create the Spatial Reference System table (spec Requirement 10)
+			tableCreator.createSpatialReferenceSystem();
+
+			// Create the Contents table
+			tableCreator.createContents();
+
+			// Create the required Spatial Reference Systems (spec Requirement
+			// 11)
+			ConnectionSource connectionSource = new AndroidConnectionSource(db);
+			try {
+				SpatialReferenceSystemDao dao = DaoManager.createDao(
+						connectionSource, SpatialReferenceSystem.class);
+				dao.createEpsg(context);
+				dao.createUndefinedCartesian(context);
+				dao.createUndefinedGeographic(context);
+			} catch (SQLException e) {
+				throw new GeoPackageException(
+						"Error creating default required Spatial Reference Systems",
+						e);
+			}
 
 			db.close();
 			created = true;
@@ -255,9 +281,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		if (exists(database)) {
 			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
-			GeoPackageScriptExecutor scriptExecutor = new GeoPackageScriptExecutor(
+			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(
 					context, sqlite);
-			db = new GeoPackageImpl(sqlite, scriptExecutor);
+			db = new GeoPackageImpl(sqlite, tableCreator);
 		}
 
 		return db;

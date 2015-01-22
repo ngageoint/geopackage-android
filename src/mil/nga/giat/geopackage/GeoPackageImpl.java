@@ -12,8 +12,8 @@ import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.script.GeoPackageScriptExecutor;
 import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.util.GeoPackageTableCreator;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.AndroidConnectionSource;
@@ -39,9 +39,9 @@ class GeoPackageImpl implements GeoPackage {
 	private final ConnectionSource connectionSource;
 
 	/**
-	 * Script executor
+	 * Table creator
 	 */
-	private final GeoPackageScriptExecutor scriptExecutor;
+	private final GeoPackageTableCreator tableCreator;
 
 	/**
 	 * Constructor
@@ -49,11 +49,10 @@ class GeoPackageImpl implements GeoPackage {
 	 * @param database
 	 * @param scriptExecutor
 	 */
-	GeoPackageImpl(SQLiteDatabase database,
-			GeoPackageScriptExecutor scriptExecutor) {
+	GeoPackageImpl(SQLiteDatabase database, GeoPackageTableCreator tableCreator) {
 		this.database = database;
 		connectionSource = new AndroidConnectionSource(database);
-		this.scriptExecutor = scriptExecutor;
+		this.tableCreator = tableCreator;
 	}
 
 	/**
@@ -142,7 +141,7 @@ class GeoPackageImpl implements GeoPackage {
 		GeometryColumnsDao dao = getGeometryColumnsDao();
 		try {
 			if (!dao.isTableExists()) {
-				created = scriptExecutor.createGeometryColumns() > 0;
+				created = tableCreator.createGeometryColumns() > 0;
 			}
 		} catch (SQLException e) {
 			throw new GeoPackageException(

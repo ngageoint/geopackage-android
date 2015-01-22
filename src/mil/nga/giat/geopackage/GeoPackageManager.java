@@ -48,8 +48,9 @@ public interface GeoPackageManager {
 	 * 
 	 * @param database
 	 * @return
+	 * @throws GeoPackageException
 	 */
-	public boolean create(String database);
+	public boolean create(String database) throws GeoPackageException;
 
 	/**
 	 * Import a GeoPackage file
