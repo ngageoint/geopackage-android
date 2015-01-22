@@ -155,7 +155,7 @@ public class GeometryColumns {
 	}
 
 	public void setGeometryType(GeometryType geometryType) {
-		this.geometryTypeName = geometryType.name();
+		this.geometryTypeName = geometryType.getName();
 	}
 
 	public SpatialReferenceSystem getSrs() {

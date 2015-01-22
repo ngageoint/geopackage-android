@@ -104,15 +104,4 @@ public class GeometryColumnsCreateTest extends
 
 	}
 
-	/**
-	 * Test cascade deleting
-	 * 
-	 * @throws SQLException
-	 */
-	public void testDeleteCascade() throws SQLException {
-
-		GeometryColumnsUtils.testDeleteCascade(geoPackage);
-
-	}
-
 }

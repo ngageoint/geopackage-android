@@ -1,7 +1,7 @@
 package mil.nga.giat.geopackage.data.c3;
 
 /**
- * Geometry Type enumeration
+ * Geometry Type enumeration (Spec Requirement 25)
  * 
  * @author osbornb
  */
@@ -107,6 +107,15 @@ public enum GeometryType {
 	 */
 	private GeometryType(int code) {
 		this.code = code;
+	}
+
+	/**
+	 * Get the name, just use the enum name since they are the same
+	 * 
+	 * @return
+	 */
+	public String getName() {
+		return name();
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.test.data.c3;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,21 @@ import java.util.Map;
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c2.Contents;
+import mil.nga.giat.geopackage.data.c2.ContentsDao;
+import mil.nga.giat.geopackage.data.c2.ContentsDataType;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
+import mil.nga.giat.geopackage.data.c3.GeometryType;
 
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.PreparedUpdate;
 import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.UpdateBuilder;
 
 /**
  * Geometry Columns Utility test methods
@@ -77,8 +86,8 @@ public class GeometryColumnsUtils {
 
 			// Query for equal
 			List<GeometryColumns> queryGeometryColumnsList = dao.queryForEq(
-					GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
-					geometryColumns.getGeometryType().name());
+					GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME, geometryColumns
+							.getGeometryType().getName());
 			TestCase.assertNotNull(queryGeometryColumnsList);
 			TestCase.assertTrue(queryGeometryColumnsList.size() >= 1);
 			boolean found = false;
@@ -140,57 +149,59 @@ public class GeometryColumnsUtils {
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
-	public static void testUpdate(GeoPackage geoPackage)
-			throws SQLException {
-//TODO
-//		ContentsDao dao = geoPackage.getContentsDao();
-//		List<Contents> results = dao.queryForAll();
-//
-//		if (!results.isEmpty()) {
-//
-//			// Choose random contents
-//			int random = (int) (Math.random() * results.size());
-//			Contents contents = results.get(random);
-//
-//			// Update
-//			Date updatedLastChange = new Date();
-//			contents.setLastChange(updatedLastChange);
-//			dao.update(contents);
-//
-//			// Verify update
-//			dao = geoPackage.getContentsDao();
-//			Contents updatedContents = dao.queryForId(contents.getId());
-//			TestCase.assertEquals(updatedLastChange,
-//					updatedContents.getLastChange());
-//
-//			// Find expected results for prepared update
-//			double updatedMinimum = -90.0;
-//			QueryBuilder<Contents, String> qb = dao.queryBuilder();
-//			qb.where().ge(Contents.COLUMN_MIN_X, 0).or()
-//					.ge(Contents.COLUMN_MIN_Y, 0);
-//			PreparedQuery<Contents> preparedQuery = qb.prepare();
-//			List<Contents> queryContents = dao.query(preparedQuery);
-//
-//			// Prepared update
-//			UpdateBuilder<Contents, String> ub = dao.updateBuilder();
-//			ub.updateColumnValue(Contents.COLUMN_MIN_X, updatedMinimum);
-//			ub.updateColumnValue(Contents.COLUMN_MIN_Y, updatedMinimum);
-//			ub.where().ge(Contents.COLUMN_MIN_X, 0).or()
-//					.ge(Contents.COLUMN_MIN_Y, 0);
-//			PreparedUpdate<Contents> update = ub.prepare();
-//			int updated = dao.update(update);
-//			TestCase.assertEquals(queryContents.size(), updated);
-//
-//			for (Contents updatedContent : queryContents) {
-//				Contents reloadedContents = dao.queryForId(updatedContent
-//						.getId());
-//				TestCase.assertEquals(updatedMinimum,
-//						reloadedContents.getMinX(), 0.0);
-//				TestCase.assertEquals(updatedMinimum,
-//						reloadedContents.getMinY(), 0.0);
-//			}
-//
-//		}
+	public static void testUpdate(GeoPackage geoPackage) throws SQLException {
+
+		GeometryColumnsDao dao = geoPackage.getGeometryColumnsDao();
+		List<GeometryColumns> results = dao.queryForAll();
+
+		if (!results.isEmpty()) {
+
+			// Choose random geometry columns
+			int random = (int) (Math.random() * results.size());
+			GeometryColumns geometryColumns = results.get(random);
+
+			// Update
+			int updatedM = 2;
+			geometryColumns.setM(updatedM);
+			dao.update(geometryColumns);
+
+			// Verify update
+			dao = geoPackage.getGeometryColumnsDao();
+			GeometryColumns updatedContents = dao.queryForId(geometryColumns
+					.getId());
+			TestCase.assertEquals(updatedM, updatedContents.getM().intValue());
+
+			// Find expected results for prepared update
+			String updatedColumnName = "new_geom";
+			QueryBuilder<GeometryColumns, GeometryColumnsKey> qb = dao
+					.queryBuilder();
+			qb.where().eq(GeometryColumns.COLUMN_Z, 0).or()
+					.eq(GeometryColumns.COLUMN_Z, 2);
+			PreparedQuery<GeometryColumns> preparedQuery = qb.prepare();
+			List<GeometryColumns> queryGeometryColumns = dao
+					.query(preparedQuery);
+
+			// Prepared update
+			UpdateBuilder<GeometryColumns, GeometryColumnsKey> ub = dao
+					.updateBuilder();
+			ub.updateColumnValue(GeometryColumns.COLUMN_COLUMN_NAME,
+					updatedColumnName);
+			ub.where().eq(GeometryColumns.COLUMN_Z, 0).or()
+					.eq(GeometryColumns.COLUMN_Z, 2);
+			PreparedUpdate<GeometryColumns> update = ub.prepare();
+			int updated = dao.update(update);
+			TestCase.assertEquals(queryGeometryColumns.size(), updated);
+
+			for (GeometryColumns updatedGeometryColumns : queryGeometryColumns) {
+				updatedGeometryColumns.setColumnName(updatedColumnName);
+				GeometryColumns reloadedGeometryColumns = dao
+						.queryForId(updatedGeometryColumns.getId());
+				TestCase.assertNotNull(reloadedGeometryColumns);
+				TestCase.assertEquals(updatedColumnName,
+						reloadedGeometryColumns.getColumnName());
+			}
+
+		}
 
 	}
 
@@ -200,68 +211,74 @@ public class GeometryColumnsUtils {
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
-	public static void testCreate(GeoPackage geoPackage)
-			throws SQLException {
-//TODO
-//		SpatialReferenceSystemDao srsDao = geoPackage
-//				.getSpatialReferenceSystemDao();
-//		ContentsDao dao = geoPackage.getContentsDao();
-//
-//		// Get current count
-//		long count = dao.countOf();
-//
-//		// Retrieve a random srs
-//		List<SpatialReferenceSystem> results = srsDao.queryForAll();
-//		SpatialReferenceSystem srs = null;
-//		if (!results.isEmpty()) {
-//			int random = (int) (Math.random() * results.size());
-//			srs = results.get(random);
-//		}
-//
-//		String tableName = "TEST_TABLE_NAME";
-//		String dataType = "features";
-//		String identifier = "TEST_IDENTIFIER";
-//		String description = "TEST_DESCRIPTION";
-//		Date lastChange = new Date();
-//		double minX = -180.0;
-//		double minY = -90.0;
-//		double maxX = 180.0;
-//		double maxY = 90.0;
-//
-//		// Create new contents
-//		Contents contents = new Contents();
-//		contents.setTableName(tableName);
-//		contents.setDataType(dataType);
-//		contents.setIdentifier(identifier);
-//		contents.setDescription(description);
-//		contents.setLastChange(lastChange);
-//		contents.setMinX(minX);
-//		contents.setMinY(minY);
-//		contents.setMaxX(maxX);
-//		contents.setMaxY(maxY);
-//		contents.setSrs(srs);
-//		dao.create(contents);
-//
-//		// Verify count
-//		long newCount = dao.countOf();
-//		TestCase.assertEquals(count + 1, newCount);
-//
-//		// Verify saved contents
-//		Contents queryContents = dao.queryForId(tableName);
-//		TestCase.assertEquals(tableName, queryContents.getTableName());
-//		TestCase.assertEquals(dataType, queryContents.getDataType());
-//		TestCase.assertEquals(identifier, queryContents.getIdentifier());
-//		TestCase.assertEquals(description, queryContents.getDescription());
-//		TestCase.assertEquals(lastChange, queryContents.getLastChange());
-//		TestCase.assertEquals(minX, queryContents.getMinX());
-//		TestCase.assertEquals(minY, queryContents.getMinY());
-//		TestCase.assertEquals(maxX, queryContents.getMaxX());
-//		TestCase.assertEquals(maxY, queryContents.getMaxY());
-//		if (srs != null) {
-//			TestCase.assertEquals(srs.getId(), queryContents.getSrs().getId());
-//		} else {
-//			TestCase.assertNull(queryContents.getSrs());
-//		}
+	public static void testCreate(GeoPackage geoPackage) throws SQLException {
+
+		SpatialReferenceSystemDao srsDao = geoPackage
+				.getSpatialReferenceSystemDao();
+		ContentsDao contentsDao = geoPackage.getContentsDao();
+		GeometryColumnsDao dao = geoPackage.getGeometryColumnsDao();
+
+		// Get current count
+		long count = dao.countOf();
+
+		// Retrieve a random srs
+		List<SpatialReferenceSystem> results = srsDao.queryForAll();
+		SpatialReferenceSystem srs = null;
+		if (!results.isEmpty()) {
+			int random = (int) (Math.random() * results.size());
+			srs = results.get(random);
+		}
+
+		// Create a new contents
+		Contents contents = new Contents();
+		contents.setTableName("test_contents");
+		contents.setDataType(ContentsDataType.FEATURES);
+		contents.setIdentifier("test_contents");
+		contents.setDescription("");
+		contents.setLastChange(new Date());
+		contents.setMinX(-180.0);
+		contents.setMinY(-90.0);
+		contents.setMaxX(180.0);
+		contents.setMaxY(90.0);
+		contents.setSrs(srs);
+		contentsDao.create(contents);
+
+		String columnName = "TEST_COLUMN_NAME";
+		GeometryType geometryType = GeometryType.POINT;
+		int z = 2;
+		int m = 2;
+
+		// Create new geometry columns
+		GeometryColumns geometryColumns = new GeometryColumns();
+		geometryColumns.setContents(contents);
+		geometryColumns.setColumnName(columnName);
+		geometryColumns.setGeometryType(geometryType);
+		geometryColumns.setSrs(contents.getSrs());
+		geometryColumns.setZ(z);
+		geometryColumns.setM(m);
+		dao.create(geometryColumns);
+
+		// Verify count
+		long newCount = dao.countOf();
+		TestCase.assertEquals(count + 1, newCount);
+
+		// Verify saved geometry columns
+		GeometryColumns queryGeometryColumns = dao.queryForId(geometryColumns
+				.getId());
+		TestCase.assertEquals(contents.getId(),
+				queryGeometryColumns.getTableName());
+		TestCase.assertEquals(columnName, queryGeometryColumns.getColumnName());
+		TestCase.assertEquals(geometryType,
+				queryGeometryColumns.getGeometryType());
+		TestCase.assertEquals(contents.getSrsId(),
+				queryGeometryColumns.getSrsId());
+		TestCase.assertEquals(z, queryGeometryColumns.getZ().intValue());
+		TestCase.assertEquals(m, queryGeometryColumns.getM().intValue());
+		TestCase.assertEquals(contents.getId(), queryGeometryColumns
+				.getContents().getId());
+		TestCase.assertEquals(contents.getSrsId(), queryGeometryColumns
+				.getSrs().getId());
+
 	}
 
 	/**
@@ -270,128 +287,54 @@ public class GeometryColumnsUtils {
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
-	public static void testDelete(GeoPackage geoPackage)
-			throws SQLException {
+	public static void testDelete(GeoPackage geoPackage) throws SQLException {
 
-		testDeleteHelper(geoPackage, false);
+		GeometryColumnsDao dao = geoPackage.getGeometryColumnsDao();
+		List<GeometryColumns> results = dao.queryForAll();
 
-	}
+		if (!results.isEmpty()) {
 
-	/**
-	 * Test delete cascade
-	 * 
-	 * @param geoPackage
-	 * @throws SQLException
-	 */
-	public static void testDeleteCascade(GeoPackage geoPackage)
-			throws SQLException {
+			// Choose random geometry columns
+			int random = (int) (Math.random() * results.size());
+			GeometryColumns geometryColumns = results.get(random);
 
-		testDeleteHelper(geoPackage, true);
+			// Delete the geometry columns
+			dao.delete(geometryColumns);
 
-	}
+			// Verify deleted
+			GeometryColumns queryGeometryColumns = dao
+					.queryForId(geometryColumns.getId());
+			TestCase.assertNull(queryGeometryColumns);
 
-	/**
-	 * Test delete helper
-	 * 
-	 * @param geoPackage
-	 * @param cascade
-	 * @throws SQLException
-	 */
-	private static void testDeleteHelper(GeoPackage geoPackage, boolean cascade)
-			throws SQLException {
-//TODO
-//		ContentsDao dao = geoPackage.getContentsDao();
-//		List<Contents> results = dao.queryForAll();
-//
-//		if (!results.isEmpty()) {
-//
-//			// Choose random contents
-//			int random = (int) (Math.random() * results.size());
-//			Contents contents = results.get(random);
-//
-//			// Save the ids of geometry columns
-//			List<GeometryColumnsKey> geometryColumnsIds = new ArrayList<GeometryColumnsKey>();
-//			GeometryColumnsDao geometryColumnsDao = geoPackage
-//					.getGeometryColumnsDao();
-//			if (geometryColumnsDao.isTableExists()) {
-//				for (GeometryColumns geometryColumns : contents
-//						.getGeometryColumns()) {
-//					geometryColumnsIds.add(geometryColumns.getId());
-//				}
-//			}
-//
-//			// Delete the contents
-//			if (cascade) {
-//				dao.deleteCascade(contents);
-//			} else {
-//				dao.delete(contents);
-//			}
-//
-//			// Verify deleted
-//			Contents queryContents = dao.queryForId(contents.getId());
-//			TestCase.assertNull(queryContents);
-//
-//			// Verify that geometry columns or foreign keys were deleted
-//			for (GeometryColumnsKey geometryColumnsId : geometryColumnsIds) {
-//				GeometryColumns queryGeometryColumns = geometryColumnsDao
-//						.queryForId(geometryColumnsId);
-//				if (cascade) {
-//					TestCase.assertNull(queryGeometryColumns);
-//				} else {
-//					TestCase.assertNull(queryGeometryColumns.getContents());
-//				}
-//			}
-//
-//			// Choose prepared deleted
-//			results = dao.queryForAll();
-//			if (!results.isEmpty()) {
-//
-//				// Choose random contents
-//				random = (int) (Math.random() * results.size());
-//				contents = results.get(random);
-//
-//				// Find which contents to delete and the geometry columns
-//				QueryBuilder<Contents, String> qb = dao.queryBuilder();
-//				qb.where()
-//						.eq(Contents.COLUMN_DATA_TYPE, contents.getDataType());
-//				PreparedQuery<Contents> query = qb.prepare();
-//				List<Contents> queryResults = dao.query(query);
-//				int count = queryResults.size();
-//				geometryColumnsIds = new ArrayList<GeometryColumnsKey>();
-//				for (Contents queryResultsContents : queryResults) {
-//					if (geometryColumnsDao.isTableExists()) {
-//						for (GeometryColumns geometryColumns : queryResultsContents
-//								.getGeometryColumns()) {
-//							geometryColumnsIds.add(geometryColumns.getId());
-//						}
-//					}
-//				}
-//
-//				// Delete
-//				int deleted;
-//				if (cascade) {
-//					deleted = dao.deleteCascade(query);
-//				} else {
-//					DeleteBuilder<Contents, String> db = dao.deleteBuilder();
-//					db.where().eq(Contents.COLUMN_DATA_TYPE,
-//							contents.getDataType());
-//					PreparedDelete<Contents> deleteQuery = db.prepare();
-//					deleted = dao.delete(deleteQuery);
-//				}
-//				TestCase.assertEquals(count, deleted);
-//
-//				// Verify that geometry columns or foreign keys were deleted
-//				for (GeometryColumnsKey geometryColumnsId : geometryColumnsIds) {
-//					GeometryColumns queryGeometryColumns = geometryColumnsDao
-//							.queryForId(geometryColumnsId);
-//					if (cascade) {
-//						TestCase.assertNull(queryGeometryColumns);
-//					} else {
-//						TestCase.assertNull(queryGeometryColumns.getContents());
-//					}
-//				}
-//			}
-//		}
+			// Prepared deleted
+			results = dao.queryForAll();
+			if (!results.isEmpty()) {
+
+				// Choose random geometry columns
+				random = (int) (Math.random() * results.size());
+				geometryColumns = results.get(random);
+
+				// Find which geometry columns to delete
+				QueryBuilder<GeometryColumns, GeometryColumnsKey> qb = dao
+						.queryBuilder();
+				qb.where().eq(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
+						geometryColumns.getGeometryType().getName());
+				PreparedQuery<GeometryColumns> query = qb.prepare();
+				List<GeometryColumns> queryResults = dao.query(query);
+				int count = queryResults.size();
+
+				// Delete
+				DeleteBuilder<GeometryColumns, GeometryColumnsKey> db = dao
+						.deleteBuilder();
+				db.where().eq(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
+						geometryColumns.getGeometryType().getName());
+				PreparedDelete<GeometryColumns> deleteQuery = db.prepare();
+				int deleted = dao.delete(deleteQuery);
+
+				TestCase.assertEquals(count, deleted);
+
+			}
+		}
 	}
 
 }
