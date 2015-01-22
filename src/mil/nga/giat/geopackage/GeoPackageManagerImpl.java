@@ -123,7 +123,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			// Create the Spatial Reference System table (spec Requirement 10)
 			tableCreator.createSpatialReferenceSystem();
 
-			// Create the Contents table
+			// Create the Contents table (spec Requirement 13)
 			tableCreator.createContents();
 
 			// Create the required Spatial Reference Systems (spec Requirement
