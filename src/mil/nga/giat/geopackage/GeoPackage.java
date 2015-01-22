@@ -1,10 +1,15 @@
 package mil.nga.giat.geopackage;
 
+import java.sql.SQLException;
+
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
+import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import mil.nga.giat.geopackage.data.c4.FeatureDao;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.support.ConnectionSource;
@@ -76,5 +81,30 @@ public interface GeoPackage {
 	 * @return true if created
 	 */
 	public boolean createGeometryColumnsTable();
+
+	/**
+	 * Get a Feature DAO from Geometry Columns
+	 * 
+	 * @param geometryColumns
+	 * @return
+	 */
+	public FeatureDao getFeatureDao(GeometryColumns geometryColumns);
+
+	/**
+	 * Get a Feature DAO from Contents
+	 * 
+	 * @param contents
+	 * @return
+	 */
+	public FeatureDao getFeatureDao(Contents contents);
+
+	/**
+	 * Get a Feature DAO from a table name
+	 * 
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+	public FeatureDao getFeatureDao(String tableName) throws SQLException;
 
 }

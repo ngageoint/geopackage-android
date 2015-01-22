@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
@@ -12,6 +13,7 @@ import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import mil.nga.giat.geopackage.data.c4.FeatureDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageTableCreator;
 import android.database.sqlite.SQLiteDatabase;
@@ -145,6 +147,67 @@ class GeoPackageImpl implements GeoPackage {
 					e);
 		}
 		return created;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FeatureDao getFeatureDao(GeometryColumns geometryColumns) {
+
+		if (geometryColumns == null) {
+			throw new GeoPackageException("Non null "
+					+ GeometryColumns.class.getSimpleName()
+					+ " is required to create "
+					+ FeatureDao.class.getSimpleName());
+		}
+
+		return new FeatureDao(database, geometryColumns);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FeatureDao getFeatureDao(Contents contents) {
+
+		if (contents == null) {
+			throw new GeoPackageException("Non null "
+					+ Contents.class.getSimpleName()
+					+ " is required to create "
+					+ FeatureDao.class.getSimpleName());
+		}
+
+		GeometryColumns geometryColumns = contents.getGeometryColumns();
+		if (geometryColumns == null) {
+			throw new GeoPackageException("No "
+					+ GeometryColumns.class.getSimpleName() + " exists for "
+					+ Contents.class.getSimpleName() + " " + contents.getId());
+		}
+
+		return getFeatureDao(geometryColumns);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FeatureDao getFeatureDao(String tableName) throws SQLException {
+		GeometryColumnsDao dao = getGeometryColumnsDao();
+		List<GeometryColumns> geometryColumnsList = dao.queryForEq(
+				GeometryColumns.COLUMN_TABLE_NAME, tableName);
+		if (geometryColumnsList.isEmpty()) {
+			throw new GeoPackageException(
+					"No Feature Table exists for table name: " + tableName);
+		} else if (geometryColumnsList.size() > 1) {
+			// This shouldn't happen with the table name unique constraint on
+			// geometry columns
+			throw new GeoPackageException(
+					"Unexpected state. More than one Geometry Column matched for table name: "
+							+ tableName + ", count: "
+							+ geometryColumnsList.size());
+		}
+		return getFeatureDao(geometryColumnsList.get(0));
 	}
 
 	/**

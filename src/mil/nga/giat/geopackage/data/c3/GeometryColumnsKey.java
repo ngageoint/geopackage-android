@@ -1,11 +1,28 @@
 package mil.nga.giat.geopackage.data.c3;
 
+/**
+ * Geometry Columns complex primary key
+ * 
+ * @author osbornb
+ */
 public class GeometryColumnsKey {
 
+	/**
+	 * Table name
+	 */
 	private String tableName;
 
+	/**
+	 * Column name
+	 */
 	private String columnName;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param tableName
+	 * @param columnName
+	 */
 	public GeometryColumnsKey(String tableName, String columnName) {
 		this.tableName = tableName;
 		this.columnName = columnName;
@@ -27,6 +44,17 @@ public class GeometryColumnsKey {
 		this.columnName = columnName;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return tableName + ":" + columnName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -38,6 +66,9 @@ public class GeometryColumnsKey {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 

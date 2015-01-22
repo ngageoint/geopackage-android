@@ -174,17 +174,8 @@ public class SpatialReferenceSystem {
 		return contents;
 	}
 
-	public void setContents(ForeignCollection<Contents> contents) {
-		this.contents = contents;
-	}
-
 	public ForeignCollection<GeometryColumns> getGeometryColumns() {
 		return geometryColumns;
-	}
-
-	public void setGeometryColumns(
-			ForeignCollection<GeometryColumns> geometryColumns) {
-		this.geometryColumns = geometryColumns;
 	}
 
 }

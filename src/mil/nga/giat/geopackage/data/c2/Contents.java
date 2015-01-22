@@ -4,6 +4,7 @@ import java.util.Date;
 
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
+import mil.nga.giat.geopackage.util.GeoPackageException;
 
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DataType;
@@ -249,7 +250,7 @@ public class Contents {
 
 	public void setSrs(SpatialReferenceSystem srs) {
 		this.srs = srs;
-		if(srs != null){
+		if (srs != null) {
 			srsId = srs.getId();
 		}
 	}
@@ -258,13 +259,23 @@ public class Contents {
 		return srsId;
 	}
 
-	public ForeignCollection<GeometryColumns> getGeometryColumns() {
-		return geometryColumns;
-	}
-
-	public void setGeometryColumns(
-			ForeignCollection<GeometryColumns> geometryColumns) {
-		this.geometryColumns = geometryColumns;
+	/**
+	 * Get the Geometry Columns, should only return one or no value
+	 * 
+	 * @return
+	 */
+	public GeometryColumns getGeometryColumns() {
+		GeometryColumns result = null;
+		if (geometryColumns.size() > 1) {
+			// This shouldn't happen with the unique table name constraint on
+			// geometry columns
+			throw new GeoPackageException(
+					"Unexpected state. More than one GeometryColumn has a foreign key to the Contents. Count: "
+							+ geometryColumns.size());
+		} else if (geometryColumns.size() == 1) {
+			result = geometryColumns.iterator().next();
+		}
+		return result;
 	}
 
 }

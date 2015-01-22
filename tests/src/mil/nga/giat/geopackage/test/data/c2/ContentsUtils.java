@@ -329,8 +329,8 @@ public class ContentsUtils {
 			GeometryColumnsDao geometryColumnsDao = geoPackage
 					.getGeometryColumnsDao();
 			if (geometryColumnsDao.isTableExists()) {
-				for (GeometryColumns geometryColumns : contents
-						.getGeometryColumns()) {
+				GeometryColumns geometryColumns = contents.getGeometryColumns();
+				if (geometryColumns != null) {
 					geometryColumnsIds.add(geometryColumns.getId());
 				}
 			}
@@ -375,8 +375,9 @@ public class ContentsUtils {
 				geometryColumnsIds = new ArrayList<GeometryColumnsKey>();
 				for (Contents queryResultsContents : queryResults) {
 					if (geometryColumnsDao.isTableExists()) {
-						for (GeometryColumns geometryColumns : queryResultsContents
-								.getGeometryColumns()) {
+						GeometryColumns geometryColumns = queryResultsContents
+								.getGeometryColumns();
+						if (geometryColumns != null) {
 							geometryColumnsIds.add(geometryColumns.getId());
 						}
 					}

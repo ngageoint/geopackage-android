@@ -9,7 +9,6 @@ import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -86,10 +85,9 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 			// Delete Geometry Columns
 			GeometryColumnsDao dao = getGeometryColumnsDao();
 			if (dao.isTableExists()) {
-				ForeignCollection<GeometryColumns> geometryColumnsCollection = contents
-						.getGeometryColumns();
-				if (!geometryColumnsCollection.isEmpty()) {
-					dao.delete(geometryColumnsCollection);
+				GeometryColumns geometryColumns = contents.getGeometryColumns();
+				if (geometryColumns != null) {
+					dao.delete(geometryColumns);
 				}
 			}
 
