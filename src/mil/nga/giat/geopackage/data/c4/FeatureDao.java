@@ -6,6 +6,7 @@ import java.util.List;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
+import mil.nga.giat.geopackage.data.c3.GeometryType;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -120,6 +121,15 @@ public class FeatureDao {
 	}
 
 	/**
+	 * Get the Geometry Type
+	 * 
+	 * @return
+	 */
+	public GeometryType getGeometryType() {
+		return geometryColumns.getGeometryType();
+	}
+
+	/**
 	 * Get the columns
 	 * 
 	 * @return
@@ -135,6 +145,16 @@ public class FeatureDao {
 	 */
 	public int getGeometryColumnIndex() {
 		return geometryColumnIndex;
+	}
+
+	/**
+	 * Query for all rows
+	 * 
+	 * @return
+	 */
+	public FeatureCursor queryForAll() {
+		return (FeatureCursor) db.query(getTableName(), columns, null, null,
+				null, null, null);
 	}
 
 }

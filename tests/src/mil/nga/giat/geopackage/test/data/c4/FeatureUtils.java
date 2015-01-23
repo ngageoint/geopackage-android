@@ -7,7 +7,12 @@ import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import mil.nga.giat.geopackage.data.c3.GeometryType;
+import mil.nga.giat.geopackage.data.c4.FeatureCursor;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.GeoPackagePoint;
 
 /**
  * Features Utility test methods
@@ -52,6 +57,44 @@ public class FeatureUtils {
 			TestCase.assertEquals(geometryColumns.getColumnName(),
 					columns[geomIndex]);
 
+			FeatureCursor cursor = dao.queryForAll();
+			int count = cursor.getCount();
+			int manualCount = 0;
+			while (cursor.moveToNext()) {
+				GeoPackageGeometryData geoPackageGeometryData = cursor
+						.getGeometry();
+				if (cursor.getBlob(dao.getGeometryColumnIndex()) != null) {
+					TestCase.assertNotNull(geoPackageGeometryData);
+					GeoPackageGeometry geometry = geoPackageGeometryData
+							.getGeometry();
+					GeometryType geometryType = geometryColumns
+							.getGeometryType();
+					switch (geometryType) {
+					case POINT:
+						TestCase.assertTrue(geometry instanceof GeoPackagePoint);
+						GeoPackagePoint point = (GeoPackagePoint) geometry;
+						break;
+
+					default:
+
+					}
+				}
+				manualCount++;
+			}
+			TestCase.assertEquals(count, manualCount);
+
+			cursor = (FeatureCursor) dao.getDb().query(dao.getTableName(),
+					null, null, null, null, null, null);
+			count = cursor.getCount();
+			manualCount = 0;
+			while (cursor.moveToNext()) {
+				GeoPackageGeometryData geometry = cursor.getGeometry();
+				if (cursor.getBlob(dao.getGeometryColumnIndex()) != null) {
+					TestCase.assertNotNull(geometry);
+				}
+				manualCount++;
+			}
+			TestCase.assertEquals(count, manualCount);
 			// TODO
 		}
 

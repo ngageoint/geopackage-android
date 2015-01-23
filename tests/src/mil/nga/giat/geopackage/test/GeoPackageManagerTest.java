@@ -5,8 +5,8 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
-import mil.nga.giat.geopackage.GeoPackageFactory;
 import mil.nga.giat.geopackage.GeoPackageManager;
+import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
 import android.app.Activity;

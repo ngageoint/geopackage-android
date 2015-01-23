@@ -1,8 +1,9 @@
-package mil.nga.giat.geopackage;
+package mil.nga.giat.geopackage.factory;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSql;
@@ -13,9 +14,11 @@ import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import mil.nga.giat.geopackage.data.c4.FeatureCursor;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageTableCreator;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.AndroidConnectionSource;
@@ -36,6 +39,11 @@ class GeoPackageImpl implements GeoPackage {
 	private final SQLiteDatabase database;
 
 	/**
+	 * Cursor factory
+	 */
+	private final GeoPackageCursorFactory cursorFactory;
+
+	/**
 	 * Connection source for creating data access objects
 	 */
 	private final ConnectionSource connectionSource;
@@ -49,11 +57,15 @@ class GeoPackageImpl implements GeoPackage {
 	 * Constructor
 	 * 
 	 * @param database
-	 * @param scriptExecutor
+	 * @param cursorFactory
+	 * @param tableCreator
 	 */
-	GeoPackageImpl(SQLiteDatabase database, GeoPackageTableCreator tableCreator) {
+	GeoPackageImpl(SQLiteDatabase database,
+			GeoPackageCursorFactory cursorFactory,
+			GeoPackageTableCreator tableCreator) {
 		this.database = database;
-		connectionSource = new AndroidConnectionSource(database);
+		this.cursorFactory = cursorFactory;
+		this.connectionSource = new AndroidConnectionSource(database);
 		this.tableCreator = tableCreator;
 	}
 
@@ -162,7 +174,20 @@ class GeoPackageImpl implements GeoPackage {
 					+ FeatureDao.class.getSimpleName());
 		}
 
-		return new FeatureDao(database, geometryColumns);
+		// Create the dao
+		final FeatureDao dao = new FeatureDao(database, geometryColumns);
+
+		// Register the table to wrap cursors with the feature cursor
+		cursorFactory.registerTable(geometryColumns.getTableName(),
+				new GeoPackageCursorWrapper() {
+
+					@Override
+					public Cursor wrapCursor(Cursor cursor) {
+						return new FeatureCursor(dao, cursor);
+					}
+				});
+
+		return dao;
 	}
 
 	/**

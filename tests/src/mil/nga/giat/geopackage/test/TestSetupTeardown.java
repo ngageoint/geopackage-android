@@ -6,7 +6,6 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.GeoPackageFactory;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
@@ -16,6 +15,7 @@ import mil.nga.giat.geopackage.data.c2.ContentsDataType;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryType;
+import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
 import android.content.Context;

@@ -1,16 +1,17 @@
-package mil.nga.giat.geopackage;
+package mil.nga.giat.geopackage.factory;
 
+import mil.nga.giat.geopackage.GeoPackageManager;
 import android.content.Context;
 
 /**
- * GeoPackage factory for retrieving a manager
+ * GeoPackage Factory to get a GeoPackage Manager
  * 
  * @author osbornb
  */
 public class GeoPackageFactory {
 
 	/**
-	 * Get a GeoPackage manager
+	 * Get a GeoPackage Manager
 	 * 
 	 * @param context
 	 * @return

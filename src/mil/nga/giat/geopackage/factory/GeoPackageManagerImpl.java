@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage;
+package mil.nga.giat.geopackage.factory;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageManager;
+import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.util.GeoPackageException;
@@ -274,11 +277,12 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		GeoPackage db = null;
 
 		if (exists(database)) {
+			GeoPackageCursorFactory cursorFactory = new GeoPackageCursorFactory();
 			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
-					Context.MODE_PRIVATE, null);
+					Context.MODE_PRIVATE, cursorFactory);
 			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(
 					context, sqlite);
-			db = new GeoPackageImpl(sqlite, tableCreator);
+			db = new GeoPackageImpl(sqlite, cursorFactory, tableCreator);
 		}
 
 		return db;
