@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.test.data.c4;
 
+import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -19,6 +20,8 @@ import mil.nga.giat.geopackage.geom.GeoPackageMultiPolygon;
 import mil.nga.giat.geopackage.geom.GeoPackagePoint;
 import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
+import mil.nga.giat.geopackage.util.ByteReader;
 
 /**
  * Features Utility test methods
@@ -75,8 +78,35 @@ public class FeatureUtils {
 							.getGeometry();
 					GeometryType geometryType = geometryColumns
 							.getGeometryType();
-
 					validateGeometry(geometryType, geometry);
+
+					byte[] wkbBytes = geoPackageGeometryData.getWkbBytes();
+					int byteLenth = wkbBytes.length;
+					TestCase.assertTrue(byteLenth > 0);
+					ByteReader wkbReader = new ByteReader(wkbBytes);
+					wkbReader.setByteOrder(geoPackageGeometryData
+							.getByteOrder());
+					GeoPackageGeometry geometryFromBytes = WkbGeometryReader
+							.readGeometry(wkbReader);
+					TestCase.assertNotNull(geometryFromBytes);
+					TestCase.assertEquals(geometry.getGeometryType(),
+							geometryFromBytes.getGeometryType());
+					validateGeometry(geometryType, geometryFromBytes);
+
+					ByteBuffer wkbByteBuffer = geoPackageGeometryData
+							.getWkbByteBuffer();
+					TestCase.assertEquals(byteLenth, wkbByteBuffer.remaining());
+					byte[] wkbBytes2 = new byte[wkbByteBuffer.remaining()];
+					wkbByteBuffer.get(wkbBytes2);
+					ByteReader wkbReader2 = new ByteReader(wkbBytes2);
+					wkbReader2.setByteOrder(geoPackageGeometryData
+							.getByteOrder());
+					GeoPackageGeometry geometryFromBytes2 = WkbGeometryReader
+							.readGeometry(wkbReader2);
+					TestCase.assertNotNull(geometryFromBytes2);
+					TestCase.assertEquals(geometry.getGeometryType(),
+							geometryFromBytes2.getGeometryType());
+					validateGeometry(geometryType, geometryFromBytes2);
 				}
 				manualCount++;
 			}

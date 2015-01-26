@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.geom;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
@@ -24,6 +25,11 @@ public class GeoPackageGeometryData {
 	 * Expected version 1 value
 	 */
 	private static final byte VERSION_1 = 0;
+
+	/**
+	 * Bytes
+	 */
+	private byte[] bytes;
 
 	/**
 	 * True if an extended geometry, false if standard
@@ -51,6 +57,11 @@ public class GeoPackageGeometryData {
 	private GeoPackageGeometryEnvelope envelope;
 
 	/**
+	 * Well-Known Binary Geometry index of where the bytes start
+	 */
+	private int wkbGeometryIndex;
+
+	/**
 	 * Geometry
 	 */
 	private GeoPackageGeometry geometry;
@@ -61,6 +72,8 @@ public class GeoPackageGeometryData {
 	 * @param bytes
 	 */
 	public GeoPackageGeometryData(byte[] bytes) {
+
+		this.bytes = bytes;
 
 		ByteReader reader = new ByteReader(bytes);
 
@@ -97,6 +110,9 @@ public class GeoPackageGeometryData {
 
 		// Read the envelope
 		envelope = readEnvelope(envelopeIndicator, reader);
+
+		// Save off where the WKB bytes start
+		wkbGeometryIndex = reader.getNextByte();
 
 		// Read the Well-Known Binary Geometry
 		geometry = WkbGeometryReader.readGeometry(reader);
@@ -212,6 +228,28 @@ public class GeoPackageGeometryData {
 
 	public GeoPackageGeometry getGeometry() {
 		return geometry;
+	}
+
+	/**
+	 * Get the Well-Known Binary Geometry bytes
+	 * 
+	 * @return
+	 */
+	public byte[] getWkbBytes() {
+		int wkbByteCount = bytes.length - wkbGeometryIndex;
+		byte[] wkbBytes = new byte[wkbByteCount];
+		System.arraycopy(bytes, wkbGeometryIndex, wkbBytes, 0, wkbByteCount);
+		return wkbBytes;
+	}
+
+	/**
+	 * Get the Well-Known Binary Geometry bytes already ordered in a Byte Buffer
+	 * 
+	 * @return
+	 */
+	public ByteBuffer getWkbByteBuffer() {
+		return ByteBuffer.wrap(bytes, wkbGeometryIndex,
+				bytes.length - wkbGeometryIndex).order(byteOrder);
 	}
 
 }
