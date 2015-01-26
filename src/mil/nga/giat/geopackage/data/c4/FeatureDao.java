@@ -6,7 +6,7 @@ import java.util.List;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c3.GeometryType;
+import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

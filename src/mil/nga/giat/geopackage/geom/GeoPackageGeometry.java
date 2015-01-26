@@ -5,38 +5,47 @@ package mil.nga.giat.geopackage.geom;
  * 
  * @author osbornb
  */
-public class GeoPackageGeometry {
+public abstract class GeoPackageGeometry {
 
 	/**
-	 * Z coordinate
+	 * Geometry type
 	 */
-	private Double z;
+	private final GeometryType geometryType;
 
 	/**
-	 * M value
+	 * Has z coordinates
 	 */
-	private Double m;
+	private final boolean hasZ;
+
+	/**
+	 * Has m values
+	 */
+	private final boolean hasM;
 
 	/**
 	 * Constructor
+	 * 
+	 * @param geometryType
+	 * @param hasZ
+	 * @param hasM
 	 */
-	public GeoPackageGeometry() {
+	protected GeoPackageGeometry(GeometryType geometryType, boolean hasZ,
+			boolean hasM) {
+		this.geometryType = geometryType;
+		this.hasZ = hasZ;
+		this.hasM = hasM;
 	}
 
-	public Double getZ() {
-		return z;
+	public GeometryType getGeometryType() {
+		return geometryType;
 	}
 
-	public void setZ(Double z) {
-		this.z = z;
+	public boolean hasZ() {
+		return hasZ;
 	}
 
-	public Double getM() {
-		return m;
-	}
-
-	public void setM(Double m) {
-		this.m = m;
+	public boolean hasM() {
+		return hasM;
 	}
 
 }

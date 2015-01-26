@@ -3,6 +3,7 @@ package mil.nga.giat.geopackage.geom;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteOrder;
 
+import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
 import mil.nga.giat.geopackage.util.ByteReader;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 

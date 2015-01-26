@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.data.c3;
+package mil.nga.giat.geopackage.geom;
 
 /**
  * Geometry Type enumeration (Spec Requirement 25)
@@ -93,7 +93,23 @@ public enum GeometryType {
 	 * The base type for all 2-dimensional geometry types. A 2-dimensional
 	 * geometry is a geometry that has an area.
 	 */
-	SURFACE(14);
+	SURFACE(14),
+
+	/**
+	 * Contiguous collection of polygons which share common boundary segments.
+	 */
+	POLYHEDRALSURFACE(15),
+
+	/**
+	 * A tetrahedron (4 triangular faces), corner at the origin and each unit
+	 * coordinate digit.
+	 */
+	TIN(16),
+
+	/**
+	 * Triangle
+	 */
+	TRIANGLE(17);
 
 	/**
 	 * Geometry type code
@@ -181,6 +197,15 @@ public enum GeometryType {
 			break;
 		case 14:
 			geometryType = SURFACE;
+			break;
+		case 15:
+			geometryType = POLYHEDRALSURFACE;
+			break;
+		case 16:
+			geometryType = TIN;
+			break;
+		case 17:
+			geometryType = TRIANGLE;
 			break;
 		}
 
