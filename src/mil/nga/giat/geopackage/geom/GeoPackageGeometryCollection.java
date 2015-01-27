@@ -38,6 +38,10 @@ public class GeoPackageGeometryCollection<T extends GeoPackageGeometry> extends
 		super(type, hasZ, hasM);
 	}
 
+	public int count() {
+		return geometries.size();
+	}
+
 	public List<T> get() {
 		return geometries;
 	}

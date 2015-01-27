@@ -72,7 +72,15 @@ public class GeoPackageGeometryData {
 	 * @param bytes
 	 */
 	public GeoPackageGeometryData(byte[] bytes) {
+		fromBytes(bytes);
+	}
 
+	/**
+	 * Populate the geometry data from the bytes
+	 * 
+	 * @param bytes
+	 */
+	public void fromBytes(byte[] bytes) {
 		this.bytes = bytes;
 
 		ByteReader reader = new ByteReader(bytes);
@@ -117,6 +125,16 @@ public class GeoPackageGeometryData {
 		// Read the Well-Known Binary Geometry
 		geometry = WkbGeometryReader.readGeometry(reader);
 
+	}
+
+	/**
+	 * Write the geometry to bytes
+	 * 
+	 * @return
+	 */
+	public byte[] toBytes() {
+		// TODO Need to write the GeoPackage Data to bytes
+		return bytes;
 	}
 
 	/**
@@ -228,6 +246,16 @@ public class GeoPackageGeometryData {
 
 	public GeoPackageGeometry getGeometry() {
 		return geometry;
+	}
+
+	/**
+	 * Get the bytes of the entire GeoPackage geometry including GeoPackage
+	 * header and WKB bytes
+	 * 
+	 * @return
+	 */
+	public byte[] getBytes() {
+		return bytes;
 	}
 
 	/**

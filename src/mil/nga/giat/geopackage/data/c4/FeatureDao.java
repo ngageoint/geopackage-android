@@ -7,7 +7,9 @@ import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.util.GeoPackageDatabaseUtils;
 import mil.nga.giat.geopackage.util.GeoPackageException;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -29,14 +31,9 @@ public class FeatureDao {
 	private final GeometryColumns geometryColumns;
 
 	/**
-	 * List of columns
+	 * Feature columns
 	 */
-	private final String[] columns;
-
-	/**
-	 * Column index of the geometry column
-	 */
-	private final int geometryColumnIndex;
+	private final FeatureColumns columns;
 
 	/**
 	 * Constructor
@@ -59,29 +56,43 @@ public class FeatureDao {
 					+ SpatialReferenceSystem.class.getSimpleName());
 		}
 
-		// Query for the table columns
-		Cursor cursor = db.query(geometryColumns.getTableName(), null, null,
-				null, null, null, null);
-		List<String> columnList = new ArrayList<String>();
-		columns = cursor.getColumnNames();
+		// Build the table column metadata
+		columns = buildColumns();
 
-		// Find the index of the geometry column
-		int geomIndex = -1;
-		for (int i = 0; i < columns.length; i++) {
-			String columnName = columns[i];
-			columnList.add(columnName);
-			if (columnName.equals(geometryColumns.getColumnName())) {
-				geomIndex = i;
-				break;
-			}
+	}
+
+	/**
+	 * Set the table column values from the database schema
+	 * 
+	 * @return
+	 */
+	private FeatureColumns buildColumns() {
+
+		List<FeatureColumn> columnList = new ArrayList<FeatureColumn>();
+
+		Cursor cursor = db.rawQuery(
+				"PRAGMA table_info(" + getTableName() + ")", null);
+		while (cursor.moveToNext()) {
+			int index = cursor.getInt(cursor.getColumnIndex("cid"));
+			String name = cursor.getString(cursor.getColumnIndex("name"));
+			String type = cursor.getString(cursor.getColumnIndex("type"));
+			boolean notNull = cursor.getInt(cursor.getColumnIndex("notnull")) == 1;
+			int defaultValueIndex = cursor.getColumnIndex("dflt_value");
+			Object defaultValue = GeoPackageDatabaseUtils.getValue(cursor,
+					defaultValueIndex);
+			boolean primaryKey = cursor.getInt(cursor.getColumnIndex("pk")) == 1;
+			boolean geometry = name.equals(geometryColumns.getColumnName());
+
+			FeatureColumn column = new FeatureColumn(index, name, type,
+					notNull, defaultValue, primaryKey, geometry);
+			columnList.add(column);
 		}
-		if (geomIndex == -1) {
-			throw new GeoPackageException("Geometry column '"
-					+ geometryColumns.getColumnName()
-					+ "' was not found in table '"
-					+ geometryColumns.getTableName() + "'. Columns: " + columns);
+		if (columnList.isEmpty()) {
+			throw new GeoPackageException("Feature Table does not exist: "
+					+ getTableName());
 		}
-		geometryColumnIndex = geomIndex;
+
+		return new FeatureColumns(getTableName(), columnList);
 	}
 
 	/**
@@ -134,17 +145,8 @@ public class FeatureDao {
 	 * 
 	 * @return
 	 */
-	public String[] getColumns() {
+	public FeatureColumns getColumns() {
 		return columns;
-	}
-
-	/**
-	 * The the Geometry Column index within the columns
-	 * 
-	 * @return
-	 */
-	public int getGeometryColumnIndex() {
-		return geometryColumnIndex;
 	}
 
 	/**
@@ -153,8 +155,80 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureCursor queryForAll() {
-		return (FeatureCursor) db.query(getTableName(), columns, null, null,
+		return (FeatureCursor) db.query(getTableName(),
+				columns.getColumnNames(), null, null, null, null, null);
+	}
+
+	/**
+	 * Query for the row with the provided id
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public FeatureCursor queryForId(int id) {
+		return (FeatureCursor) db.query(getTableName(),
+				columns.getColumnNames(), getPkWhere(), getPkWhereArgs(id),
 				null, null, null);
 	}
 
+	/**
+	 * Query for the feature row with the provided id
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public FeatureRow queryForIdRow(int id) {
+		FeatureRow row = null;
+		FeatureCursor readCursor = queryForId(id);
+		if (readCursor.moveToNext()) {
+			row = readCursor.getRow();
+		}
+		readCursor.close();
+		return row;
+	}
+
+	/**
+	 * Update the feature row
+	 * 
+	 * @param row
+	 * @return number of rows affected, should be 0 or 1
+	 */
+	public int update(FeatureRow row) {
+		ContentValues contentValues = row.toContentValues();
+		int updated = 0;
+		if (contentValues.size() > 0) {
+			updated = db.update(getTableName(), contentValues, getPkWhere(),
+					getPkWhereArgs(row.getId()));
+		}
+		return updated;
+	}
+
+	/**
+	 * Delete the feature row
+	 * 
+	 * @param row
+	 * @return number of rows affected, should be 0 or 1
+	 */
+	public int delete(FeatureRow row) {
+		return db.delete(getTableName(), getPkWhere(),
+				getPkWhereArgs(row.getId()));
+	}
+
+	/**
+	 * Get the primary key where clause
+	 * 
+	 * @return
+	 */
+	private String getPkWhere() {
+		return columns.getPkColumn().getName() + " = ?";
+	}
+
+	/**
+	 * Get the primary key where args
+	 * 
+	 * @return
+	 */
+	private String[] getPkWhereArgs(int id) {
+		return new String[] { String.valueOf(id) };
+	}
 }

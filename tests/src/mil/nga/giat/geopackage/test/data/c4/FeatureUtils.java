@@ -8,8 +8,11 @@ import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import mil.nga.giat.geopackage.data.c4.FeatureColumn;
+import mil.nga.giat.geopackage.data.c4.FeatureColumns;
 import mil.nga.giat.geopackage.data.c4.FeatureCursor;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
+import mil.nga.giat.geopackage.data.c4.FeatureRow;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryCollection;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
@@ -22,6 +25,9 @@ import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
 import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
 import mil.nga.giat.geopackage.util.ByteReader;
+import mil.nga.giat.geopackage.util.GeoPackageException;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 
 /**
  * Features Utility test methods
@@ -29,6 +35,11 @@ import mil.nga.giat.geopackage.util.ByteReader;
  * @author osbornb
  */
 public class FeatureUtils {
+
+	private static final double POINT_UPDATED_X = 45.11111;
+	private static final double POINT_UPDATED_Y = 89.99999;
+	private static final double POINT_UPDATED_Z = 10.55555;
+	private static final double POINT_UPDATED_M = 2.87878;
 
 	/**
 	 * Test read
@@ -60,8 +71,9 @@ public class FeatureUtils {
 			TestCase.assertEquals(geometryColumns.getColumnName(),
 					dao.getGeometryColumnName());
 
-			String[] columns = dao.getColumns();
-			int geomIndex = dao.getGeometryColumnIndex();
+			FeatureColumns featureColumns = dao.getColumns();
+			String[] columns = featureColumns.getColumnNames();
+			int geomIndex = featureColumns.getGeometryIndex();
 			TestCase.assertTrue(geomIndex >= 0 && geomIndex < columns.length);
 			TestCase.assertEquals(geometryColumns.getColumnName(),
 					columns[geomIndex]);
@@ -72,7 +84,7 @@ public class FeatureUtils {
 			while (cursor.moveToNext()) {
 				GeoPackageGeometryData geoPackageGeometryData = cursor
 						.getGeometry();
-				if (cursor.getBlob(dao.getGeometryColumnIndex()) != null) {
+				if (cursor.getBlob(featureColumns.getGeometryIndex()) != null) {
 					TestCase.assertNotNull(geoPackageGeometryData);
 					GeoPackageGeometry geometry = geoPackageGeometryData
 							.getGeometry();
@@ -108,9 +120,14 @@ public class FeatureUtils {
 							geometryFromBytes2.getGeometryType());
 					validateGeometry(geometryType, geometryFromBytes2);
 				}
+
+				FeatureRow featureRow = cursor.getRow();
+				validateFeatureRow(columns, featureRow);
+
 				manualCount++;
 			}
 			TestCase.assertEquals(count, manualCount);
+			cursor.close();
 
 			cursor = (FeatureCursor) dao.getDb().query(dao.getTableName(),
 					null, null, null, null, null, null);
@@ -118,15 +135,62 @@ public class FeatureUtils {
 			manualCount = 0;
 			while (cursor.moveToNext()) {
 				GeoPackageGeometryData geometry = cursor.getGeometry();
-				if (cursor.getBlob(dao.getGeometryColumnIndex()) != null) {
+				if (cursor.getBlob(featureColumns.getGeometryIndex()) != null) {
 					TestCase.assertNotNull(geometry);
 				}
 				manualCount++;
 			}
 			TestCase.assertEquals(count, manualCount);
+			cursor.close();
 			// TODO
 		}
 
+	}
+
+	/**
+	 * Validate a feature row
+	 * 
+	 * @param columns
+	 * @param featureRow
+	 */
+	private static void validateFeatureRow(String[] columns,
+			FeatureRow featureRow) {
+		TestCase.assertEquals(columns.length, featureRow.count());
+
+		for (int i = 0; i < featureRow.count(); i++) {
+			TestCase.assertEquals(columns[i], featureRow.getName(i));
+			TestCase.assertEquals(i, featureRow.getIndex(columns[i]));
+			int rowType = featureRow.getRowColumnType(i);
+			Object value = featureRow.getValue(i);
+
+			switch (rowType) {
+
+			case Cursor.FIELD_TYPE_INTEGER:
+				TestCase.assertTrue(value instanceof Long);
+				break;
+
+			case Cursor.FIELD_TYPE_FLOAT:
+				TestCase.assertTrue(value instanceof Double);
+				break;
+
+			case Cursor.FIELD_TYPE_STRING:
+				TestCase.assertTrue(value instanceof String);
+				break;
+
+			case Cursor.FIELD_TYPE_BLOB:
+				if (featureRow.getGeometryIndex() == i) {
+					TestCase.assertTrue(value instanceof GeoPackageGeometryData);
+				} else {
+					TestCase.assertTrue(value instanceof byte[]);
+				}
+				break;
+
+			case Cursor.FIELD_TYPE_NULL:
+				TestCase.assertNull(value);
+				break;
+
+			}
+		}
 	}
 
 	/**
@@ -342,8 +406,184 @@ public class FeatureUtils {
 	 */
 	public static void testUpdate(GeoPackage geoPackage) throws SQLException {
 
-		// TODO
+		GeometryColumnsDao geometryColumnsDao = geoPackage
+				.getGeometryColumnsDao();
+		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
+		for (GeometryColumns geometryColumns : results) {
+
+			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+			TestCase.assertNotNull(dao);
+
+			FeatureCursor cursor = dao.queryForAll();
+			int count = cursor.getCount();
+			if (count > 0) {
+
+				// // Choose random feature
+				// int random = (int) (Math.random() * count);
+				// cursor.moveToPosition(random);
+				cursor.moveToFirst();
+
+				GeoPackageGeometryData geometryData = cursor.getGeometry();
+				while (geometryData == null && cursor.moveToNext()) {
+					geometryData = cursor.getGeometry();
+				}
+				if (geometryData != null) {
+					String UPDATED_STRING = "updated string";
+
+					GeoPackageGeometry geometry = geometryData.getGeometry();
+					FeatureRow originalRow = cursor.getRow();
+					FeatureRow featureRow = cursor.getRow();
+
+					try {
+						featureRow.setValue(featureRow.getPkIndex(), 9);
+						TestCase.fail("Updated the primary key value");
+					} catch (GeoPackageException e) {
+						// expected
+					}
+
+					for (FeatureColumn featureColumn : dao.getColumns()
+							.getColumns()) {
+						if (!featureColumn.isPrimaryKey()) {
+
+							if (featureColumn.isGeometry()) {
+
+								GeoPackageGeometryData updatedGeometryData = geometryData;
+
+								switch (geometry.getGeometryType()) {
+
+								case POINT:
+									GeoPackagePoint point = (GeoPackagePoint) geometry;
+									updatePoint(point);
+									break;
+								case MULTIPOINT:
+									GeoPackageMultiPoint multiPoint = (GeoPackageMultiPoint) geometry;
+									if (multiPoint.count() > 1) {
+										multiPoint.get().remove(0);
+									}
+									for (GeoPackagePoint multiPointPoint : multiPoint
+											.get()) {
+										updatePoint(multiPointPoint);
+									}
+									break;
+
+								default:
+									updatedGeometryData = null;
+								}
+								if (updatedGeometryData != null) {
+									featureRow.setValue(
+											featureColumn.getIndex(),
+											updatedGeometryData);
+								}
+
+							} else {
+								switch (featureRow
+										.getRowColumnType(featureColumn
+												.getIndex())) {
+
+								case Cursor.FIELD_TYPE_STRING:
+									featureRow.setValue(
+											featureColumn.getIndex(),
+											UPDATED_STRING);
+									break;
+
+								default:
+								}
+							}
+
+						}
+					}
+
+					cursor.close();
+					try {
+						TestCase.assertEquals(1, dao.update(featureRow));
+					} catch (SQLiteException e) {
+						// Example files using sqlite geopackage functions from
+						// 4.2.0 will not support updates, lollipop uses 3.8.4.3
+						if (e.getMessage().contains(
+								"no such function: ST_IsEmpty")) {
+							continue;
+						} else {
+							throw e;
+						}
+					}
+
+					int id = featureRow.getId();
+					FeatureRow readRow = dao.queryForIdRow(id);
+					TestCase.assertNotNull(readRow);
+					TestCase.assertEquals(originalRow.getId(), readRow.getId());
+					GeoPackageGeometryData readGeometryData = readRow
+							.getGeometry();
+					GeoPackageGeometry readGeometry = readGeometryData
+							.getGeometry();
+
+					for (String readColumnName : readRow.getNames()) {
+
+						FeatureColumn readFeatureColumn = readRow
+								.getColumn(readColumnName);
+						if (!readFeatureColumn.isPrimaryKey()
+								&& !readFeatureColumn.isGeometry()) {
+							switch (readRow.getRowColumnType(readColumnName)) {
+							case Cursor.FIELD_TYPE_STRING:
+								TestCase.assertEquals(UPDATED_STRING, readRow
+										.getValue(readFeatureColumn.getIndex()));
+								break;
+
+							default:
+							}
+						}
+
+					}
+
+					switch (geometry.getGeometryType()) {
+
+					case POINT:
+						GeoPackagePoint point = (GeoPackagePoint) readGeometry;
+						validateUpdatedPoint(point);
+						break;
+
+					case MULTIPOINT:
+						GeoPackageMultiPoint originalMultiPoint = (GeoPackageMultiPoint) geometry;
+						GeoPackageMultiPoint multiPoint = (GeoPackageMultiPoint) readGeometry;
+						TestCase.assertEquals(originalMultiPoint.count(),
+								multiPoint.count());
+						for (GeoPackagePoint multiPointPoint : multiPoint.get()) {
+							validateUpdatedPoint(multiPointPoint);
+						}
+						break;
+
+					default:
+						geometry.getGeometryType();
+					}
+
+				}
+
+			}
+			cursor.close();
+		}
+
+	}
+
+	private static void updatePoint(GeoPackagePoint point) {
+		point.setX(POINT_UPDATED_X);
+		point.setY(POINT_UPDATED_Y);
+		if (point.hasZ()) {
+			point.setZ(POINT_UPDATED_Z);
+		}
+		if (point.hasM()) {
+			point.setM(POINT_UPDATED_M);
+		}
+	}
+
+	private static void validateUpdatedPoint(GeoPackagePoint point) {
+		TestCase.assertEquals(POINT_UPDATED_X, point.getX());
+		TestCase.assertEquals(POINT_UPDATED_Y, point.getY());
+		if (point.hasZ()) {
+			TestCase.assertEquals(POINT_UPDATED_Z, point.getZ());
+		}
+		if (point.hasM()) {
+			TestCase.assertEquals(POINT_UPDATED_M, point.getM());
+		}
 	}
 
 	/**
