@@ -2,7 +2,9 @@ package mil.nga.giat.geopackage.test.data.c4;
 
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
@@ -78,6 +80,7 @@ public class FeatureUtils {
 			TestCase.assertEquals(geometryColumns.getColumnName(),
 					columns[geomIndex]);
 
+			// Query for all
 			FeatureCursor cursor = dao.queryForAll();
 			int count = cursor.getCount();
 			int manualCount = 0;
@@ -129,6 +132,7 @@ public class FeatureUtils {
 			TestCase.assertEquals(count, manualCount);
 			cursor.close();
 
+			// Manually query for all and compare
 			cursor = (FeatureCursor) dao.getDb().query(dao.getTableName(),
 					null, null, null, null, null, null);
 			count = cursor.getCount();
@@ -141,8 +145,77 @@ public class FeatureUtils {
 				manualCount++;
 			}
 			TestCase.assertEquals(count, manualCount);
+
+			// Choose random feature
+			int random = (int) (Math.random() * count);
+			cursor.moveToPosition(random);
+			FeatureRow featureRow = cursor.getRow();
+
 			cursor.close();
-			// TODO
+
+			// Query by id
+			FeatureRow queryFeatureRow = dao.queryForIdRow(featureRow.getId());
+			TestCase.assertNotNull(queryFeatureRow);
+			TestCase.assertEquals(featureRow.getId(), queryFeatureRow.getId());
+
+			// Find two non id non geom columns
+			String column1 = null;
+			String column2 = null;
+			for (FeatureColumn column : featureRow.getColumns().getColumns()) {
+				if (!column.isPrimaryKey() && !column.isGeometry()) {
+					if (column1 == null) {
+						column1 = column.getName();
+					} else {
+						column2 = column.getName();
+						break;
+					}
+				}
+			}
+
+			// Query for equal
+			if (column1 != null) {
+
+				Object column1Value = featureRow.getValue(column1);
+				cursor = dao.queryForEq(column1, column1Value);
+				TestCase.assertTrue(cursor.getCount() > 0);
+				boolean found = false;
+				while (cursor.moveToNext()) {
+					queryFeatureRow = cursor.getRow();
+					TestCase.assertEquals(column1Value,
+							queryFeatureRow.getValue(column1));
+					if (!found) {
+						found = featureRow.getId() == queryFeatureRow.getId();
+					}
+				}
+				TestCase.assertTrue(found);
+				cursor.close();
+
+				// Query for field values
+				Map<String, Object> fieldValues = new HashMap<String, Object>();
+				fieldValues.put(column1, column1Value);
+				Object column2Value = null;
+				if (column2 != null) {
+					column2Value = featureRow.getValue(column2);
+					fieldValues.put(column2, column2Value);
+				}
+				cursor = dao.queryForFieldValues(fieldValues);
+				TestCase.assertTrue(cursor.getCount() > 0);
+				found = false;
+				while (cursor.moveToNext()) {
+					queryFeatureRow = cursor.getRow();
+					TestCase.assertEquals(column1Value,
+							queryFeatureRow.getValue(column1));
+					if (column2 != null) {
+						TestCase.assertEquals(column2Value,
+								queryFeatureRow.getValue(column2));
+					}
+					if (!found) {
+						found = featureRow.getId() == queryFeatureRow.getId();
+					}
+				}
+				TestCase.assertTrue(found);
+				cursor.close();
+			}
 		}
 
 	}
@@ -498,17 +571,14 @@ public class FeatureUtils {
 					try {
 						TestCase.assertEquals(1, dao.update(featureRow));
 					} catch (SQLiteException e) {
-						// Example files using sqlite geopackage functions from
-						// 4.2.0 will not support updates, lollipop uses 3.8.4.3
-						if (e.getMessage().contains(
-								"no such function: ST_IsEmpty")) {
+						if (isFutureSQLiteException(e)) {
 							continue;
 						} else {
 							throw e;
 						}
 					}
 
-					int id = featureRow.getId();
+					long id = featureRow.getId();
 					FeatureRow readRow = dao.queryForIdRow(id);
 					TestCase.assertNotNull(readRow);
 					TestCase.assertEquals(originalRow.getId(), readRow.getId());
@@ -564,6 +634,11 @@ public class FeatureUtils {
 
 	}
 
+	/**
+	 * Update a point
+	 * 
+	 * @param point
+	 */
 	private static void updatePoint(GeoPackagePoint point) {
 		point.setX(POINT_UPDATED_X);
 		point.setY(POINT_UPDATED_Y);
@@ -575,6 +650,11 @@ public class FeatureUtils {
 		}
 	}
 
+	/**
+	 * Validate an updated point
+	 * 
+	 * @param point
+	 */
 	private static void validateUpdatedPoint(GeoPackagePoint point) {
 		TestCase.assertEquals(POINT_UPDATED_X, point.getX());
 		TestCase.assertEquals(POINT_UPDATED_Y, point.getY());
@@ -594,7 +674,86 @@ public class FeatureUtils {
 	 */
 	public static void testCreate(GeoPackage geoPackage) throws SQLException {
 
-		// TODO
+		GeometryColumnsDao geometryColumnsDao = geoPackage
+				.getGeometryColumnsDao();
+		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
+
+		for (GeometryColumns geometryColumns : results) {
+
+			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+			TestCase.assertNotNull(dao);
+
+			FeatureCursor cursor = dao.queryForAll();
+			int count = cursor.getCount();
+			if (count > 0) {
+
+				// Choose random feature
+				int random = (int) (Math.random() * count);
+				cursor.moveToPosition(random);
+
+				FeatureRow featureRow = cursor.getRow();
+				cursor.close();
+
+				// Create new row from existing
+				long id = featureRow.getId();
+				featureRow.resetId();
+				long newRowId;
+				try {
+					newRowId = dao.create(featureRow);
+				} catch (SQLiteException e) {
+					if (isFutureSQLiteException(e)) {
+						continue;
+					} else {
+						throw e;
+					}
+				}
+
+				// Verify original still exists and new was created
+				featureRow = dao.queryForIdRow(id);
+				TestCase.assertNotNull(featureRow);
+				FeatureRow queryFeatureRow = dao.queryForIdRow(newRowId);
+				TestCase.assertNotNull(queryFeatureRow);
+				cursor = dao.queryForAll();
+				TestCase.assertEquals(count + 1, cursor.getCount());
+				cursor.close();
+
+				// Create new row with copied values from another
+				FeatureRow newRow = dao.newRow();
+				for (FeatureColumn column : dao.getColumns().getColumns()) {
+
+					if (column.isPrimaryKey()) {
+						try {
+							newRow.setValue(column.getName(), 10);
+							TestCase.fail("Set primary key on new row");
+						} catch (GeoPackageException e) {
+							// Expected
+						}
+					} else {
+						newRow.setValue(column.getName(),
+								featureRow.getValue(column.getName()));
+					}
+				}
+
+				long newRowId2;
+				try {
+					newRowId2 = dao.create(newRow);
+				} catch (SQLiteException e) {
+					if (isFutureSQLiteException(e)) {
+						continue;
+					} else {
+						throw e;
+					}
+				}
+
+				// Verify new was created
+				FeatureRow queryFeatureRow2 = dao.queryForIdRow(newRowId2);
+				TestCase.assertNotNull(queryFeatureRow2);
+				cursor = dao.queryForAll();
+				TestCase.assertEquals(count + 2, cursor.getCount());
+				cursor.close();
+			}
+			cursor.close();
+		}
 
 	}
 
@@ -606,8 +765,62 @@ public class FeatureUtils {
 	 */
 	public static void testDelete(GeoPackage geoPackage) throws SQLException {
 
-		// TODO
+		GeometryColumnsDao geometryColumnsDao = geoPackage
+				.getGeometryColumnsDao();
+		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
+		for (GeometryColumns geometryColumns : results) {
+
+			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+			TestCase.assertNotNull(dao);
+
+			FeatureCursor cursor = dao.queryForAll();
+			int count = cursor.getCount();
+			if (count > 0) {
+
+				// Choose random feature
+				int random = (int) (Math.random() * count);
+				cursor.moveToPosition(random);
+
+				FeatureRow featureRow = cursor.getRow();
+				cursor.close();
+
+				// Delete row
+				try {
+					TestCase.assertEquals(1, dao.delete(featureRow));
+				} catch (SQLiteException e) {
+					if (isFutureSQLiteException(e)) {
+						continue;
+					} else {
+						throw e;
+					}
+				}
+
+				// Verify deleted
+				FeatureRow queryFeatureRow = dao.queryForIdRow(featureRow
+						.getId());
+				TestCase.assertNull(queryFeatureRow);
+				cursor = dao.queryForAll();
+				TestCase.assertEquals(count - 1, cursor.getCount());
+				cursor.close();
+			}
+			cursor.close();
+		}
+
+	}
+
+	/**
+	 * Determine if the exception is caused from a missing function or module in
+	 * SQLite versions 4.2.0 and later. Lollipop uses version 3.8.4.3 so these
+	 * are not supported in Android.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	private static boolean isFutureSQLiteException(SQLiteException e) {
+		String message = e.getMessage();
+		return message.contains("no such function: ST_IsEmpty")
+				|| message.contains("no such module: rtree");
 	}
 
 }

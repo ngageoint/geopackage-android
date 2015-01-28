@@ -41,6 +41,19 @@ public class FeatureRow {
 	}
 
 	/**
+	 * Constructor to create an empty row
+	 * 
+	 * @param columns
+	 */
+	FeatureRow(FeatureColumns columns) {
+		this.columns = columns;
+		// Default column types will all be 0 which is null
+		// (Cursor.FIELD_TYPE_NULL)
+		this.columnTypes = new int[columns.count()];
+		this.values = new Object[columns.count()];
+	}
+
+	/**
 	 * Get the column count
 	 * 
 	 * @return
@@ -185,8 +198,8 @@ public class FeatureRow {
 	 * 
 	 * @return
 	 */
-	public int getId() {
-		int id;
+	public long getId() {
+		long id;
 		Object objectValue = getValue(getPkIndex());
 		if (objectValue == null) {
 			throw new GeoPackageException("Feature Row Id was null. Table: "
@@ -195,7 +208,7 @@ public class FeatureRow {
 					+ getPkColumn().getName());
 		}
 		if (objectValue instanceof Number) {
-			id = ((Number) objectValue).intValue();
+			id = ((Number) objectValue).longValue();
 		} else {
 			throw new GeoPackageException(
 					"Feature Row Id was not a number. Table: "
@@ -271,6 +284,23 @@ public class FeatureRow {
 							+ ", Name: " + columns.getPkColumn().getName());
 		}
 		values[index] = value;
+	}
+
+	/**
+	 * Set the column value of the column name
+	 * 
+	 * @param columnName
+	 * @param value
+	 */
+	public void setValue(String columnName, Object value) {
+		setValue(getIndex(columnName), value);
+	}
+
+	/**
+	 * Clears the id so the row can be used as part of an insert or create
+	 */
+	public void resetId() {
+		values[getPkIndex()] = null;
 	}
 
 	/**

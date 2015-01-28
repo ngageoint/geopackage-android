@@ -122,7 +122,7 @@ public class SpatialReferenceSystemDao extends
 	}
 
 	/**
-	 * Delete the Spatial Reference System, cascading to Contents
+	 * Delete the Spatial Reference System, cascading
 	 * 
 	 * @param srs
 	 * @return
@@ -157,7 +157,7 @@ public class SpatialReferenceSystemDao extends
 	}
 
 	/**
-	 * Delete the collection of Spatial Reference Systems, cascading to Contents
+	 * Delete the collection of Spatial Reference Systems, cascading
 	 * 
 	 * @param srsCollection
 	 * @return
@@ -176,7 +176,7 @@ public class SpatialReferenceSystemDao extends
 
 	/**
 	 * Delete the Spatial Reference Systems matching the prepared query,
-	 * cascading to Contents
+	 * cascading
 	 * 
 	 * @param preparedDelete
 	 * @return
@@ -194,7 +194,7 @@ public class SpatialReferenceSystemDao extends
 	}
 
 	/**
-	 * Delete a Spatial Reference System by id, cascading to Contents
+	 * Delete a Spatial Reference System by id, cascading
 	 * 
 	 * @param id
 	 * @return
@@ -212,8 +212,7 @@ public class SpatialReferenceSystemDao extends
 	}
 
 	/**
-	 * Delete the Spatial Reference Systems with the provided ids, cascading to
-	 * Contents
+	 * Delete the Spatial Reference Systems with the provided ids, cascading
 	 * 
 	 * @param idCollection
 	 * @return

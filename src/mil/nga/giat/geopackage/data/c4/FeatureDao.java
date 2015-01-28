@@ -1,7 +1,10 @@
 package mil.nga.giat.geopackage.data.c4;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c2.Contents;
@@ -160,14 +163,38 @@ public class FeatureDao {
 	}
 
 	/**
+	 * Query for the row where the field equals the value
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public FeatureCursor queryForEq(String fieldName, Object value) {
+		return (FeatureCursor) db.query(getTableName(),
+				columns.getColumnNames(), buildWhere(fieldName, value),
+				buildWhereArgs(value), null, null, null);
+	}
+
+	/**
+	 * Query for the row where all fields match their values
+	 * 
+	 * @param fieldValues
+	 * @return
+	 */
+	public FeatureCursor queryForFieldValues(Map<String, Object> fieldValues) {
+		return (FeatureCursor) db.query(getTableName(),
+				columns.getColumnNames(), buildWhere(fieldValues.entrySet()),
+				buildWhereArgs(fieldValues.values()), null, null, null);
+	}
+
+	/**
 	 * Query for the row with the provided id
 	 * 
 	 * @param id
 	 * @return
 	 */
-	public FeatureCursor queryForId(int id) {
+	public FeatureCursor queryForId(long id) {
 		return (FeatureCursor) db.query(getTableName(),
-				columns.getColumnNames(), getPkWhere(), getPkWhereArgs(id),
+				columns.getColumnNames(), getPkWhere(id), getPkWhereArgs(id),
 				null, null, null);
 	}
 
@@ -177,7 +204,7 @@ public class FeatureDao {
 	 * @param id
 	 * @return
 	 */
-	public FeatureRow queryForIdRow(int id) {
+	public FeatureRow queryForIdRow(long id) {
 		FeatureRow row = null;
 		FeatureCursor readCursor = queryForId(id);
 		if (readCursor.moveToNext()) {
@@ -185,6 +212,41 @@ public class FeatureDao {
 		}
 		readCursor.close();
 		return row;
+	}
+
+	/**
+	 * Query for rows
+	 * 
+	 * @param where
+	 * @param whereArgs
+	 * @param groupBy
+	 * @param having
+	 * @param orderBy
+	 * @return
+	 */
+	public FeatureCursor query(String where, String[] whereArgs,
+			String groupBy, String having, String orderBy) {
+		return (FeatureCursor) db.query(getTableName(),
+				columns.getColumnNames(), where, whereArgs, groupBy, having,
+				orderBy);
+	}
+
+	/**
+	 * Query for rows
+	 * 
+	 * @param where
+	 * @param whereArgs
+	 * @param groupBy
+	 * @param having
+	 * @param orderBy
+	 * @param limit
+	 * @return
+	 */
+	public FeatureCursor query(String where, String[] whereArgs,
+			String groupBy, String having, String orderBy, String limit) {
+		return (FeatureCursor) db.query(getTableName(),
+				columns.getColumnNames(), where, whereArgs, groupBy, having,
+				orderBy, limit);
 	}
 
 	/**
@@ -197,10 +259,23 @@ public class FeatureDao {
 		ContentValues contentValues = row.toContentValues();
 		int updated = 0;
 		if (contentValues.size() > 0) {
-			updated = db.update(getTableName(), contentValues, getPkWhere(),
-					getPkWhereArgs(row.getId()));
+			updated = db.update(getTableName(), contentValues,
+					getPkWhere(row.getId()), getPkWhereArgs(row.getId()));
 		}
 		return updated;
+	}
+
+	/**
+	 * Update all rows matching the where clause with the provided values
+	 * 
+	 * @param values
+	 * @param whereClause
+	 * @param whereArgs
+	 * @return
+	 */
+	public int update(ContentValues values, String whereClause,
+			String[] whereArgs) {
+		return db.update(getTableName(), values, whereClause, whereArgs);
 	}
 
 	/**
@@ -210,17 +285,87 @@ public class FeatureDao {
 	 * @return number of rows affected, should be 0 or 1
 	 */
 	public int delete(FeatureRow row) {
-		return db.delete(getTableName(), getPkWhere(),
-				getPkWhereArgs(row.getId()));
+		return deleteById(row.getId());
+	}
+
+	/**
+	 * Delete a row by id
+	 * 
+	 * @param row
+	 * @return number of rows affected, should be 0 or 1
+	 */
+	public int deleteById(long id) {
+		return db.delete(getTableName(), getPkWhere(id), getPkWhereArgs(id));
+	}
+
+	/**
+	 * Delete rows matching the where clause
+	 * 
+	 * @param whereClause
+	 * @param whereArgs
+	 * @return
+	 */
+	public int delete(String whereClause, String[] whereArgs) {
+		return db.delete(getTableName(), whereClause, whereArgs);
+	}
+
+	/**
+	 * Get a new empty feature row
+	 * 
+	 * @return
+	 */
+	public FeatureRow newRow() {
+		return new FeatureRow(columns);
+	}
+
+	/**
+	 * Creates a new feature, same as calling {@link #insert(FeatureRow)}
+	 * 
+	 * @param row
+	 * @return row id
+	 */
+	public long create(FeatureRow row) {
+		return insert(row);
+	}
+
+	/**
+	 * Inserts a new feature row
+	 * 
+	 * @param row
+	 * @return row id
+	 */
+	public long insert(FeatureRow row) {
+		return db.insertOrThrow(getTableName(), null, row.toContentValues());
+	}
+
+	/**
+	 * Inserts a new row
+	 * 
+	 * @param values
+	 * @return row id, -1 on error
+	 */
+	public long insert(ContentValues values) {
+		return db.insert(getTableName(), null, values);
+	}
+
+	/**
+	 * Inserts a new row
+	 * 
+	 * @param values
+	 * @return row id
+	 */
+	public long insertOrThrow(ContentValues values) {
+		return db.insertOrThrow(getTableName(), null, values);
 	}
 
 	/**
 	 * Get the primary key where clause
 	 * 
+	 * @param id
 	 * @return
 	 */
-	private String getPkWhere() {
-		return columns.getPkColumn().getName() + " = ?";
+	private String getPkWhere(long id) {
+		return buildWhere(columns.getPkColumn().getName(), id);
 	}
 
 	/**
@@ -228,7 +373,67 @@ public class FeatureDao {
 	 * 
 	 * @return
 	 */
-	private String[] getPkWhereArgs(int id) {
-		return new String[] { String.valueOf(id) };
+	private String[] getPkWhereArgs(long id) {
+		return buildWhereArgs(id);
 	}
+
+	/**
+	 * Build where (or selection) statement from the fields
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	public String buildWhere(Set<Map.Entry<String, Object>> fields) {
+		StringBuilder selection = new StringBuilder();
+		for (Map.Entry<String, Object> field : fields) {
+			if (selection.length() > 0) {
+				selection.append(" AND ");
+			}
+			selection.append(buildWhere(field.getKey(), field.getValue()));
+		}
+		return selection.toString();
+	}
+
+	/**
+	 * Build where (or selection) statement for a single field
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public String buildWhere(String field, Object value) {
+		return field + " " + (value != null ? "= ?" : "IS NULL");
+	}
+
+	/**
+	 * Build where (or selection) args for the values
+	 * 
+	 * @param values
+	 * @return
+	 */
+	public String[] buildWhereArgs(Collection<Object> values) {
+		List<String> selectionArgs = new ArrayList<String>();
+		for (Object value : values) {
+			if (value != null) {
+				selectionArgs.add(value.toString());
+			}
+		}
+		return selectionArgs.isEmpty() ? null : selectionArgs
+				.toArray(new String[] {});
+	}
+
+	/**
+	 * Build where (or selection) args for the value
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public String[] buildWhereArgs(Object value) {
+		String[] args = null;
+		if (value != null) {
+			args = new String[] { value.toString() };
+		}
+		return args;
+	}
+
 }

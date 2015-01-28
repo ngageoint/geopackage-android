@@ -71,7 +71,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
-	 * Delete the Contents, cascading to TODO
+	 * Delete the Contents, cascading
 	 * 
 	 * @param contents
 	 * @return
@@ -97,7 +97,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
-	 * Delete the collection of Contents, cascading to TODO
+	 * Delete the collection of Contents, cascading
 	 * 
 	 * @param contentsCollection
 	 * @return
@@ -115,7 +115,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
-	 * Delete the Contents matching the prepared query, cascading to TODO
+	 * Delete the Contents matching the prepared query, cascading
 	 * 
 	 * @param preparedDelete
 	 * @return
@@ -132,7 +132,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
-	 * Delete a Contents by id, cascading to TODO
+	 * Delete a Contents by id, cascading
 	 * 
 	 * @param id
 	 * @return
@@ -150,7 +150,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
-	 * Delete the Contents with the provided ids, cascading to TODO
+	 * Delete the Contents with the provided ids, cascading
 	 * 
 	 * @param idCollection
 	 * @return
