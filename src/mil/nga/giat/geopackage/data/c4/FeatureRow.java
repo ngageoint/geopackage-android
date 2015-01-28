@@ -1,5 +1,7 @@
 package mil.nga.giat.geopackage.data.c4;
 
+import java.io.IOException;
+
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.content.ContentValues;
@@ -297,6 +299,15 @@ public class FeatureRow {
 	}
 
 	/**
+	 * Set the id, package access only for the DAO
+	 * 
+	 * @param id
+	 */
+	void setId(long id) {
+		values[getPkIndex()] = id;
+	}
+
+	/**
 	 * Clears the id so the row can be used as part of an insert or create
 	 */
 	public void resetId() {
@@ -323,7 +334,14 @@ public class FeatureRow {
 				} else if (column.isGeometry()) {
 					if (value instanceof GeoPackageGeometryData) {
 						GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
-						contentValues.put(columnName, geometryData.toBytes());
+						try {
+							contentValues.put(columnName,
+									geometryData.toBytes());
+						} catch (IOException e) {
+							throw new GeoPackageException(
+									"Failed to write Geometry Data bytes. column: "
+											+ columnName, e);
+						}
 					} else if (value instanceof byte[]) {
 						contentValues.put(columnName, (byte[]) value);
 					} else {

@@ -1,11 +1,14 @@
 package mil.nga.giat.geopackage.geom;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
+import mil.nga.giat.geopackage.geom.wkb.WkbGeometryWriter;
 import mil.nga.giat.geopackage.util.ByteReader;
+import mil.nga.giat.geopackage.util.ByteWriter;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 
 /**
@@ -122,8 +125,10 @@ public class GeoPackageGeometryData {
 		// Save off where the WKB bytes start
 		wkbGeometryIndex = reader.getNextByte();
 
-		// Read the Well-Known Binary Geometry
-		geometry = WkbGeometryReader.readGeometry(reader);
+		// Read the Well-Known Binary Geometry if not marked as empty
+		if (!empty) {
+			geometry = WkbGeometryReader.readGeometry(reader);
+		}
 
 	}
 
@@ -131,9 +136,43 @@ public class GeoPackageGeometryData {
 	 * Write the geometry to bytes
 	 * 
 	 * @return
+	 * @throws IOException
 	 */
-	public byte[] toBytes() {
-		// TODO Need to write the GeoPackage Data to bytes
+	public byte[] toBytes() throws IOException {
+
+		ByteWriter writer = new ByteWriter();
+
+		// Write GP as the 2 byte magic number
+		writer.writeString(MAGIC);
+
+		// Write a byte as the version, value of 0 = version 1
+		writer.writeByte(VERSION_1);
+
+		// Build and write a flags byte
+		byte flags = buildFlagsByte();
+		writer.writeByte(flags);
+		writer.setByteOrder(byteOrder);
+
+		// Write the 4 byte srs id int
+		writer.writeInt(srsId);
+
+		// Write the envelope
+		writeEnvelope(writer);
+
+		// Save off where the WKB bytes start
+		wkbGeometryIndex = writer.size();
+
+		// Write the Well-Known Binary Geometry if not marked as empty
+		if (!empty) {
+			WkbGeometryWriter.writeGeometry(writer, geometry);
+		}
+
+		// Get the bytes
+		bytes = writer.getBytes();
+
+		// Close the writer
+		writer.close();
+
 		return bytes;
 	}
 
@@ -182,9 +221,41 @@ public class GeoPackageGeometryData {
 	}
 
 	/**
+	 * Build the flags byte from the flag values
+	 * 
+	 * @return envelope indicator
+	 */
+	private byte buildFlagsByte() {
+
+		byte flag = 0;
+
+		// Add the binary type to bit 5, 0 for standard and 1 for extended
+		int binaryType = extended ? 1 : 0;
+		flag += (binaryType << 5);
+
+		// Add the empty geometry flag to bit 4, 0 for non-empty and 1 for
+		// empty
+		int emptyValue = empty ? 1 : 0;
+		flag += (emptyValue << 4);
+
+		// Add the envelope contents indicator code (3-bit unsigned integer to
+		// bits 3, 2, and 1)
+		int envelopeIndicator = envelope == null ? 0 : envelope.getIndicator();
+		flag += (envelopeIndicator << 1);
+
+		// Add the byte order to bit 0, 0 for Big Endian and 1 for Little
+		// Endian
+		int byteOrderValue = (byteOrder == ByteOrder.BIG_ENDIAN) ? 0 : 1;
+		flag += byteOrderValue;
+
+		return flag;
+	}
+
+	/**
 	 * Read the envelope based upon the indicator value
 	 * 
 	 * @param envelopeIndicator
+	 * @param reader
 	 * @return
 	 */
 	private GeoPackageGeometryEnvelope readEnvelope(int envelopeIndicator,
@@ -200,28 +271,77 @@ public class GeoPackageGeometryData {
 			double minY = reader.readDouble();
 			double maxY = reader.readDouble();
 
-			envelope = new GeoPackageGeometryEnvelope(minX, maxX, minY, maxY);
+			boolean hasZ = false;
+			Double minZ = null;
+			Double maxZ = null;
 
-			// Read and set z values
+			boolean hasM = false;
+			Double minM = null;
+			Double maxM = null;
+
+			// Read z values
 			if (envelopeIndicator == 2 || envelopeIndicator == 4) {
-				double minZ = reader.readDouble();
-				double maxZ = reader.readDouble();
+				hasZ = true;
+				minZ = reader.readDouble();
+				maxZ = reader.readDouble();
+			}
 
+			// Read m values
+			if (envelopeIndicator == 3 || envelopeIndicator == 4) {
+				hasM = true;
+				minM = reader.readDouble();
+				maxM = reader.readDouble();
+			}
+
+			envelope = new GeoPackageGeometryEnvelope(hasZ, hasM);
+
+			envelope.setMinX(minX);
+			envelope.setMaxX(maxX);
+			envelope.setMinY(minY);
+			envelope.setMaxY(maxY);
+
+			if (hasZ) {
 				envelope.setMinZ(minZ);
 				envelope.setMaxZ(maxZ);
 			}
 
-			// Read and set m values
-			if (envelopeIndicator == 3 || envelopeIndicator == 4) {
-				double minM = reader.readDouble();
-				double maxM = reader.readDouble();
-
+			if (hasM) {
 				envelope.setMinM(minM);
 				envelope.setMaxM(maxM);
 			}
 		}
 
 		return envelope;
+	}
+
+	/**
+	 * Write the envelope bytes
+	 * 
+	 * @param writer
+	 * @throws IOException
+	 */
+	private void writeEnvelope(ByteWriter writer) throws IOException {
+
+		if (envelope != null) {
+
+			// Write x and y values
+			writer.writeDouble(envelope.getMinX());
+			writer.writeDouble(envelope.getMaxX());
+			writer.writeDouble(envelope.getMinY());
+			writer.writeDouble(envelope.getMaxY());
+
+			// Write z values
+			if (envelope.hasZ()) {
+				writer.writeDouble(envelope.getMinZ());
+				writer.writeDouble(envelope.getMaxZ());
+			}
+
+			// Write m values
+			if (envelope.hasM()) {
+				writer.writeDouble(envelope.getMinM());
+				writer.writeDouble(envelope.getMaxM());
+			}
+		}
 	}
 
 	public boolean isExtended() {
@@ -248,6 +368,30 @@ public class GeoPackageGeometryData {
 		return geometry;
 	}
 
+	public void setExtended(boolean extended) {
+		this.extended = extended;
+	}
+
+	public void setEmpty(boolean empty) {
+		this.empty = empty;
+	}
+
+	public void setByteOrder(ByteOrder byteOrder) {
+		this.byteOrder = byteOrder;
+	}
+
+	public void setSrsId(int srsId) {
+		this.srsId = srsId;
+	}
+
+	public void setEnvelope(GeoPackageGeometryEnvelope envelope) {
+		this.envelope = envelope;
+	}
+
+	public void setGeometry(GeoPackageGeometry geometry) {
+		this.geometry = geometry;
+	}
+
 	/**
 	 * Get the bytes of the entire GeoPackage geometry including GeoPackage
 	 * header and WKB bytes
@@ -256,6 +400,26 @@ public class GeoPackageGeometryData {
 	 */
 	public byte[] getBytes() {
 		return bytes;
+	}
+
+	/**
+	 * Get the GeoPackage header bytes
+	 * 
+	 * @return
+	 */
+	public byte[] getHeaderBytes() {
+		byte[] headerBytes = new byte[wkbGeometryIndex];
+		System.arraycopy(bytes, 0, headerBytes, 0, wkbGeometryIndex);
+		return headerBytes;
+	}
+
+	/**
+	 * Get the GeoPackage header bytes already ordered in a Byte Buffer
+	 * 
+	 * @return
+	 */
+	public ByteBuffer getHeaderByteBuffer() {
+		return ByteBuffer.wrap(bytes, 0, wkbGeometryIndex).order(byteOrder);
 	}
 
 	/**
@@ -278,6 +442,15 @@ public class GeoPackageGeometryData {
 	public ByteBuffer getWkbByteBuffer() {
 		return ByteBuffer.wrap(bytes, wkbGeometryIndex,
 				bytes.length - wkbGeometryIndex).order(byteOrder);
+	}
+
+	/**
+	 * Return the byte index where the Well-Known Binary bytes start
+	 * 
+	 * @return
+	 */
+	public int getWkbGeometryIndex() {
+		return wkbGeometryIndex;
 	}
 
 }

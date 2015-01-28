@@ -707,6 +707,7 @@ public class FeatureUtils {
 						throw e;
 					}
 				}
+				TestCase.assertEquals(newRowId, featureRow.getId());
 
 				// Verify original still exists and new was created
 				featureRow = dao.queryForIdRow(id);
@@ -744,6 +745,7 @@ public class FeatureUtils {
 						throw e;
 					}
 				}
+				TestCase.assertEquals(newRowId2, newRow.getId());
 
 				// Verify new was created
 				FeatureRow queryFeatureRow2 = dao.queryForIdRow(newRowId2);

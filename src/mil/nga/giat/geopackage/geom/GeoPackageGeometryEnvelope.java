@@ -28,6 +28,11 @@ public class GeoPackageGeometryEnvelope {
 	private double maxY;
 
 	/**
+	 * True if has z coordinates
+	 */
+	private final boolean hasZ;
+
+	/**
 	 * Min Z
 	 */
 	private Double minZ;
@@ -36,6 +41,11 @@ public class GeoPackageGeometryEnvelope {
 	 * Max Z
 	 */
 	private Double maxZ;
+
+	/**
+	 * True if has M measurements
+	 */
+	private final boolean hasM;
 
 	/**
 	 * Min M
@@ -50,21 +60,52 @@ public class GeoPackageGeometryEnvelope {
 	/**
 	 * Constructor
 	 * 
-	 * @param minX
-	 * @param maxX
-	 * @param minY
-	 * @param maxY
+	 * @param hasZ
+	 * @param hasM
 	 */
-	public GeoPackageGeometryEnvelope(double minX, double maxX, double minY,
-			double maxY) {
-		this.minX = minX;
-		this.maxX = maxX;
-		this.minY = minY;
-		this.maxY = maxY;
+	public GeoPackageGeometryEnvelope(boolean hasZ, boolean hasM) {
+		this.hasZ = hasZ;
+		this.hasM = hasM;
+	}
+
+	/**
+	 * True if has Z coordinates
+	 * 
+	 * @return
+	 */
+	public boolean hasZ() {
+		return hasZ;
+	}
+
+	/**
+	 * True if has M measurements
+	 * 
+	 * @return
+	 */
+	public boolean hasM() {
+		return hasM;
 	}
 
 	public double getMinX() {
 		return minX;
+	}
+
+	/**
+	 * Get the envelope flag indicator
+	 * 
+	 * 1 for xy, 2 for xyz, 3 for xym, 4 for xyzm (null would be 0)
+	 * 
+	 * @return
+	 */
+	public int getIndicator() {
+		int indicator = 1;
+		if (hasZ()) {
+			indicator++;
+		}
+		if (hasM()) {
+			indicator += 2;
+		}
+		return indicator;
 	}
 
 	public void setMinX(double minX) {

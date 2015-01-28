@@ -335,7 +335,9 @@ public class FeatureDao {
 	 * @return row id
 	 */
 	public long insert(FeatureRow row) {
-		return db.insertOrThrow(getTableName(), null, row.toContentValues());
+		long id = db.insertOrThrow(getTableName(), null, row.toContentValues());
+		row.setId(id);
+		return id;
 	}
 
 	/**
