@@ -10,6 +10,7 @@ import mil.nga.giat.geopackage.data.c2.ContentsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
+import mil.nga.giat.geopackage.data.c4.FeatureTable;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.support.ConnectionSource;
@@ -106,5 +107,12 @@ public interface GeoPackage {
 	 * @throws SQLException
 	 */
 	public FeatureDao getFeatureDao(String tableName) throws SQLException;
+
+	/**
+	 * Create a new feature table
+	 * 
+	 * @param table
+	 */
+	public void createTable(FeatureTable table);
 
 }

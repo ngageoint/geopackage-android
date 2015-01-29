@@ -43,6 +43,50 @@ public class FeatureColumn {
 	private final boolean geometry;
 
 	/**
+	 * Create a new primary key column
+	 * 
+	 * @param index
+	 * @param name
+	 * @return
+	 */
+	public static FeatureColumn createPrimaryKeyColumn(int index, String name) {
+		return new FeatureColumn(index, name, "INTEGER", true, null, true,
+				false);
+	}
+
+	/**
+	 * Create a new geometry column
+	 * 
+	 * @param index
+	 * @param name
+	 * @param type
+	 * @param notNull
+	 * @param defaultValue
+	 * @return
+	 */
+	public static FeatureColumn createGeometryColumn(int index, String name,
+			String type, boolean notNull, Object defaultValue) {
+		return new FeatureColumn(index, name, type, notNull, defaultValue,
+				false, true);
+	}
+
+	/**
+	 * Create a new column
+	 * 
+	 * @param index
+	 * @param name
+	 * @param type
+	 * @param notNull
+	 * @param defaultValue
+	 * @return
+	 */
+	public static FeatureColumn createColumn(int index, String name,
+			String type, boolean notNull, Object defaultValue) {
+		return new FeatureColumn(index, name, type, notNull, defaultValue,
+				false, false);
+	}
+
+	/**
 	 * Constructor
 	 * 
 	 * @param index

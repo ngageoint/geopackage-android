@@ -34,9 +34,9 @@ public class FeatureDao {
 	private final GeometryColumns geometryColumns;
 
 	/**
-	 * Feature columns
+	 * Feature table
 	 */
-	private final FeatureColumns columns;
+	private final FeatureTable table;
 
 	/**
 	 * Constructor
@@ -60,16 +60,16 @@ public class FeatureDao {
 		}
 
 		// Build the table column metadata
-		columns = buildColumns();
+		table = buildTable();
 
 	}
 
 	/**
-	 * Set the table column values from the database schema
+	 * Build the table from the database schema
 	 * 
 	 * @return
 	 */
-	private FeatureColumns buildColumns() {
+	private FeatureTable buildTable() {
 
 		List<FeatureColumn> columnList = new ArrayList<FeatureColumn>();
 
@@ -95,7 +95,7 @@ public class FeatureDao {
 					+ getTableName());
 		}
 
-		return new FeatureColumns(getTableName(), columnList);
+		return new FeatureTable(getTableName(), columnList);
 	}
 
 	/**
@@ -144,12 +144,12 @@ public class FeatureDao {
 	}
 
 	/**
-	 * Get the columns
+	 * Get the table
 	 * 
 	 * @return
 	 */
-	public FeatureColumns getColumns() {
-		return columns;
+	public FeatureTable getTable() {
+		return table;
 	}
 
 	/**
@@ -158,8 +158,8 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureCursor queryForAll() {
-		return (FeatureCursor) db.query(getTableName(),
-				columns.getColumnNames(), null, null, null, null, null);
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				null, null, null, null, null);
 	}
 
 	/**
@@ -169,9 +169,9 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureCursor queryForEq(String fieldName, Object value) {
-		return (FeatureCursor) db.query(getTableName(),
-				columns.getColumnNames(), buildWhere(fieldName, value),
-				buildWhereArgs(value), null, null, null);
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				buildWhere(fieldName, value), buildWhereArgs(value), null,
+				null, null);
 	}
 
 	/**
@@ -181,8 +181,8 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureCursor queryForFieldValues(Map<String, Object> fieldValues) {
-		return (FeatureCursor) db.query(getTableName(),
-				columns.getColumnNames(), buildWhere(fieldValues.entrySet()),
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				buildWhere(fieldValues.entrySet()),
 				buildWhereArgs(fieldValues.values()), null, null, null);
 	}
 
@@ -193,9 +193,8 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureCursor queryForId(long id) {
-		return (FeatureCursor) db.query(getTableName(),
-				columns.getColumnNames(), getPkWhere(id), getPkWhereArgs(id),
-				null, null, null);
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				getPkWhere(id), getPkWhereArgs(id), null, null, null);
 	}
 
 	/**
@@ -226,9 +225,8 @@ public class FeatureDao {
 	 */
 	public FeatureCursor query(String where, String[] whereArgs,
 			String groupBy, String having, String orderBy) {
-		return (FeatureCursor) db.query(getTableName(),
-				columns.getColumnNames(), where, whereArgs, groupBy, having,
-				orderBy);
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				where, whereArgs, groupBy, having, orderBy);
 	}
 
 	/**
@@ -244,9 +242,8 @@ public class FeatureDao {
 	 */
 	public FeatureCursor query(String where, String[] whereArgs,
 			String groupBy, String having, String orderBy, String limit) {
-		return (FeatureCursor) db.query(getTableName(),
-				columns.getColumnNames(), where, whereArgs, groupBy, having,
-				orderBy, limit);
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				where, whereArgs, groupBy, having, orderBy, limit);
 	}
 
 	/**
@@ -315,7 +312,7 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureRow newRow() {
-		return new FeatureRow(columns);
+		return new FeatureRow(table);
 	}
 
 	/**
@@ -367,7 +364,7 @@ public class FeatureDao {
 	 * @return
 	 */
 	private String getPkWhere(long id) {
-		return buildWhere(columns.getPkColumn().getName(), id);
+		return buildWhere(table.getPkColumn().getName(), id);
 	}
 
 	/**

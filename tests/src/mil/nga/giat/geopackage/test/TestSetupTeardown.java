@@ -104,7 +104,6 @@ public class TestSetupTeardown {
 		point2dContents.setMaxX(180.0);
 		point2dContents.setMaxY(90.0);
 		point2dContents.setSrs(epsgSrs);
-		contentsDao.create(point2dContents);
 
 		Contents polygon2dContents = new Contents();
 		polygon2dContents.setTableName("polygon2d");
@@ -117,7 +116,6 @@ public class TestSetupTeardown {
 		polygon2dContents.setMaxX(10.0);
 		polygon2dContents.setMaxY(10.0);
 		polygon2dContents.setSrs(undefinedGeographicSrs);
-		contentsDao.create(polygon2dContents);
 
 		Contents point3dContents = new Contents();
 		point3dContents.setTableName("point3d");
@@ -130,6 +128,23 @@ public class TestSetupTeardown {
 		point3dContents.setMaxX(180.0);
 		point3dContents.setMaxY(90.0);
 		point3dContents.setSrs(undefinedCartesianSrs);
+
+		String geometryColumn = "geometry";
+		String geometryType = "GEOMETRY";
+
+		// Create the feature tables
+		geoPackage.createTable(TestUtils.buildTable(
+				point2dContents.getTableName(), geometryColumn, geometryType));
+		geoPackage
+				.createTable(TestUtils.buildTable(
+						polygon2dContents.getTableName(), geometryColumn,
+						geometryType));
+		geoPackage.createTable(TestUtils.buildTable(
+				point3dContents.getTableName(), geometryColumn, geometryType));
+
+		// Create the contents
+		contentsDao.create(point2dContents);
+		contentsDao.create(polygon2dContents);
 		contentsDao.create(point3dContents);
 
 		// Create new Geometry Columns
@@ -138,7 +153,7 @@ public class TestSetupTeardown {
 
 		GeometryColumns point2dGeometryColumns = new GeometryColumns();
 		point2dGeometryColumns.setContents(point2dContents);
-		point2dGeometryColumns.setColumnName("geom");
+		point2dGeometryColumns.setColumnName(geometryColumn);
 		point2dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point2dGeometryColumns.setSrs(point2dContents.getSrs());
 		point2dGeometryColumns.setZ(0);
@@ -147,7 +162,7 @@ public class TestSetupTeardown {
 
 		GeometryColumns polygon2dGeometryColumns = new GeometryColumns();
 		polygon2dGeometryColumns.setContents(polygon2dContents);
-		polygon2dGeometryColumns.setColumnName("geom");
+		polygon2dGeometryColumns.setColumnName(geometryColumn);
 		polygon2dGeometryColumns.setGeometryType(GeometryType.POLYGON);
 		polygon2dGeometryColumns.setSrs(polygon2dContents.getSrs());
 		polygon2dGeometryColumns.setZ(0);
@@ -156,7 +171,7 @@ public class TestSetupTeardown {
 
 		GeometryColumns point3dGeometryColumns = new GeometryColumns();
 		point3dGeometryColumns.setContents(point3dContents);
-		point3dGeometryColumns.setColumnName("geom");
+		point3dGeometryColumns.setColumnName(geometryColumn);
 		point3dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point3dGeometryColumns.setSrs(point3dContents.getSrs());
 		point3dGeometryColumns.setZ(1);

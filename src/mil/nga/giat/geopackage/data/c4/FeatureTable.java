@@ -1,17 +1,19 @@
 package mil.nga.giat.geopackage.data.c4;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import mil.nga.giat.geopackage.util.GeoPackageException;
 
 /**
- * Represents the columns in a feature data table
+ * Represents a feature data table
  * 
  * @author osbornb
  */
-public class FeatureColumns {
+public class FeatureTable {
 
 	/**
 	 * Table name
@@ -31,7 +33,7 @@ public class FeatureColumns {
 	/**
 	 * Mapping between column names and their index
 	 */
-	private Map<String, Integer> nameToIndex = new HashMap<String, Integer>();
+	private final Map<String, Integer> nameToIndex = new HashMap<String, Integer>();
 
 	/**
 	 * Primary key column index
@@ -49,12 +51,14 @@ public class FeatureColumns {
 	 * @param tableName
 	 * @param columns
 	 */
-	FeatureColumns(String tableName, List<FeatureColumn> columns) {
+	public FeatureTable(String tableName, List<FeatureColumn> columns) {
 		this.tableName = tableName;
 		this.columns = columns;
 
 		Integer pk = null;
 		Integer geometry = null;
+
+		Set<Integer> indices = new HashSet<Integer>();
 
 		// Build the column name array for queries, find the primary key and
 		// geometry
@@ -84,6 +88,13 @@ public class FeatureColumns {
 				}
 				geometry = i;
 			}
+
+			// Check for duplicate indices
+			if (indices.contains(column.getIndex())) {
+				throw new GeoPackageException("Duplicate index: "
+						+ column.getIndex() + ", Table Name: " + tableName);
+			}
+			indices.add(column.getIndex());
 		}
 
 		if (pk == null) {
@@ -100,6 +111,13 @@ public class FeatureColumns {
 		}
 		geometryIndex = geometry;
 
+		// Verify the columns have ordered indices without gaps
+		for (int i = 0; i < columns.size(); i++) {
+			if (!indices.contains(i)) {
+				throw new GeoPackageException("No column found at index: " + i
+						+ ", Table Name: " + tableName);
+			}
+		}
 	}
 
 	/**
@@ -170,7 +188,7 @@ public class FeatureColumns {
 	 * 
 	 * @return
 	 */
-	public int count() {
+	public int columnCount() {
 		return columns.size();
 	}
 
@@ -188,7 +206,7 @@ public class FeatureColumns {
 	 * 
 	 * @return
 	 */
-	public int getPkIndex() {
+	public int getPkColumnIndex() {
 		return pkIndex;
 	}
 
@@ -206,7 +224,7 @@ public class FeatureColumns {
 	 * 
 	 * @return
 	 */
-	public int getGeometryIndex() {
+	public int getGeometryColumnIndex() {
 		return geometryIndex;
 	}
 

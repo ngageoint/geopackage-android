@@ -16,6 +16,7 @@ import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c4.FeatureCursor;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
+import mil.nga.giat.geopackage.data.c4.FeatureTable;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageTableCreator;
 import android.database.Cursor;
@@ -131,7 +132,9 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public ContentsDao getContentsDao() {
-		return createDao(Contents.class);
+		ContentsDao dao = createDao(Contents.class);
+		dao.setDatabase(database);
+		return dao;
 	}
 
 	/**
@@ -233,6 +236,14 @@ class GeoPackageImpl implements GeoPackage {
 							+ geometryColumnsList.size());
 		}
 		return getFeatureDao(geometryColumnsList.get(0));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void createTable(FeatureTable table) {
+		// TODO create new feature table
 	}
 
 	/**

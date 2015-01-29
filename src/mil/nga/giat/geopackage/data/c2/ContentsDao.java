@@ -6,6 +6,9 @@ import java.util.List;
 
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
+import mil.nga.giat.geopackage.util.GeoPackageDatabaseUtils;
+import mil.nga.giat.geopackage.util.GeoPackageException;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
@@ -18,6 +21,11 @@ import com.j256.ormlite.support.ConnectionSource;
  * @author osbornb
  */
 public class ContentsDao extends BaseDaoImpl<Contents, String> {
+
+	/**
+	 * Database connection
+	 */
+	private SQLiteDatabase db;
 
 	/**
 	 * Geometry Columns DAO
@@ -34,6 +42,15 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	public ContentsDao(ConnectionSource connectionSource,
 			Class<Contents> dataClass) throws SQLException {
 		super(connectionSource, dataClass);
+	}
+
+	/**
+	 * Set the database
+	 * 
+	 * @param db
+	 */
+	public void setDatabase(SQLiteDatabase db) {
+		this.db = db;
 	}
 
 	/**
@@ -181,7 +198,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 				// Features require Geometry Columns table (Spec Requirement 21)
 				GeometryColumnsDao dao = getGeometryColumnsDao();
 				if (!dao.isTableExists()) {
-					throw new SQLException(
+					throw new GeoPackageException(
 							"A data type of "
 									+ dataType.getName()
 									+ " requires the "
@@ -195,10 +212,18 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 				break;
 
 			default:
-				throw new SQLException("Unsupported data type: " + dataType);
+				throw new GeoPackageException("Unsupported data type: "
+						+ dataType);
 			}
 		}
 
+		// Verify the feature or tile table exists
+		if (!GeoPackageDatabaseUtils.tableExists(db, contents.getTableName())) {
+			throw new GeoPackageException(
+					"No table exists for Content Table Name: "
+							+ contents.getTableName()
+							+ ". Table must first be created.");
+		}
 	}
 
 	/**

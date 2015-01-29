@@ -15,9 +15,9 @@ import android.database.Cursor;
 public class FeatureRow {
 
 	/**
-	 * Feature columns of the table
+	 * Feature table
 	 */
-	private final FeatureColumns columns;
+	private final FeatureTable table;
 
 	/**
 	 * Cursor column types of this row, based upon the data values
@@ -32,12 +32,12 @@ public class FeatureRow {
 	/**
 	 * Constructor
 	 * 
-	 * @param columns
+	 * @param table
 	 * @param columnTypes
 	 * @param values
 	 */
-	FeatureRow(FeatureColumns columns, int[] columnTypes, Object[] values) {
-		this.columns = columns;
+	FeatureRow(FeatureTable table, int[] columnTypes, Object[] values) {
+		this.table = table;
 		this.columnTypes = columnTypes;
 		this.values = values;
 	}
@@ -47,12 +47,12 @@ public class FeatureRow {
 	 * 
 	 * @param columns
 	 */
-	FeatureRow(FeatureColumns columns) {
-		this.columns = columns;
+	FeatureRow(FeatureTable table) {
+		this.table = table;
 		// Default column types will all be 0 which is null
 		// (Cursor.FIELD_TYPE_NULL)
-		this.columnTypes = new int[columns.count()];
-		this.values = new Object[columns.count()];
+		this.columnTypes = new int[table.columnCount()];
+		this.values = new Object[table.columnCount()];
 	}
 
 	/**
@@ -60,8 +60,8 @@ public class FeatureRow {
 	 * 
 	 * @return
 	 */
-	public int count() {
-		return columns.count();
+	public int columnCount() {
+		return table.columnCount();
 	}
 
 	/**
@@ -69,8 +69,8 @@ public class FeatureRow {
 	 * 
 	 * @return
 	 */
-	public String[] getNames() {
-		return columns.getColumnNames();
+	public String[] getColumnNames() {
+		return table.getColumnNames();
 	}
 
 	/**
@@ -79,8 +79,8 @@ public class FeatureRow {
 	 * @param index
 	 * @return
 	 */
-	public String getName(int index) {
-		return columns.getColumnName(index);
+	public String getColumnName(int index) {
+		return table.getColumnName(index);
 	}
 
 	/**
@@ -89,8 +89,8 @@ public class FeatureRow {
 	 * @param columnName
 	 * @return
 	 */
-	public int getIndex(String columnName) {
-		return columns.getColumnIndex(columnName);
+	public int getColumnIndex(String columnName) {
+		return table.getColumnIndex(columnName);
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class FeatureRow {
 	 * @return
 	 */
 	public Object getValue(String columnName) {
-		return values[columns.getColumnIndex(columnName)];
+		return values[table.getColumnIndex(columnName)];
 	}
 
 	/**
@@ -163,16 +163,16 @@ public class FeatureRow {
 	 * @see Cursor#FIELD_TYPE_NULL
 	 */
 	public int getRowColumnType(String columnName) {
-		return columnTypes[columns.getColumnIndex(columnName)];
+		return columnTypes[table.getColumnIndex(columnName)];
 	}
 
 	/**
-	 * Get the feature columns
+	 * Get the feature table
 	 * 
 	 * @return
 	 */
-	public FeatureColumns getColumns() {
-		return columns;
+	public FeatureTable getTable() {
+		return table;
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class FeatureRow {
 	 * @return
 	 */
 	public FeatureColumn getColumn(int index) {
-		return columns.getColumn(index);
+		return table.getColumn(index);
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class FeatureRow {
 	 * @return
 	 */
 	public FeatureColumn getColumn(String columnName) {
-		return columns.getColumn(columnName);
+		return table.getColumn(columnName);
 	}
 
 	/**
@@ -202,20 +202,19 @@ public class FeatureRow {
 	 */
 	public long getId() {
 		long id;
-		Object objectValue = getValue(getPkIndex());
+		Object objectValue = getValue(getPkColumnIndex());
 		if (objectValue == null) {
 			throw new GeoPackageException("Feature Row Id was null. Table: "
-					+ columns.getTableName() + ", Column Index: "
-					+ getPkIndex() + ", Column Name: "
-					+ getPkColumn().getName());
+					+ table.getTableName() + ", Column Index: " + getPkColumnIndex()
+					+ ", Column Name: " + getPkColumn().getName());
 		}
 		if (objectValue instanceof Number) {
 			id = ((Number) objectValue).longValue();
 		} else {
 			throw new GeoPackageException(
 					"Feature Row Id was not a number. Table: "
-							+ columns.getTableName() + ", Column Index: "
-							+ getPkIndex() + ", Column Name: "
+							+ table.getTableName() + ", Column Index: "
+							+ getPkColumnIndex() + ", Column Name: "
 							+ getPkColumn().getName());
 		}
 
@@ -227,8 +226,8 @@ public class FeatureRow {
 	 * 
 	 * @return
 	 */
-	public int getPkIndex() {
-		return columns.getPkIndex();
+	public int getPkColumnIndex() {
+		return table.getPkColumnIndex();
 	}
 
 	/**
@@ -237,7 +236,7 @@ public class FeatureRow {
 	 * @return
 	 */
 	public FeatureColumn getPkColumn() {
-		return columns.getPkColumn();
+		return table.getPkColumn();
 	}
 
 	/**
@@ -245,8 +244,8 @@ public class FeatureRow {
 	 * 
 	 * @return
 	 */
-	public int getGeometryIndex() {
-		return columns.getGeometryIndex();
+	public int getGeometryColumnIndex() {
+		return table.getGeometryColumnIndex();
 	}
 
 	/**
@@ -255,7 +254,7 @@ public class FeatureRow {
 	 * @return
 	 */
 	public FeatureColumn getGeometryColumn() {
-		return columns.getGeometryColumn();
+		return table.getGeometryColumn();
 	}
 
 	/**
@@ -265,7 +264,7 @@ public class FeatureRow {
 	 */
 	public GeoPackageGeometryData getGeometry() {
 		GeoPackageGeometryData geometryData = null;
-		Object value = getValue(getGeometryIndex());
+		Object value = getValue(getGeometryColumnIndex());
 		if (value != null) {
 			geometryData = (GeoPackageGeometryData) value;
 		}
@@ -279,11 +278,11 @@ public class FeatureRow {
 	 * @param value
 	 */
 	public void setValue(int index, Object value) {
-		if (index == columns.getPkIndex()) {
+		if (index == table.getPkColumnIndex()) {
 			throw new GeoPackageException(
 					"Can not update the primary key of the feature row. Table Name: "
-							+ columns.getTableName() + ", Index: " + index
-							+ ", Name: " + columns.getPkColumn().getName());
+							+ table.getTableName() + ", Index: " + index
+							+ ", Name: " + table.getPkColumn().getName());
 		}
 		values[index] = value;
 	}
@@ -295,7 +294,7 @@ public class FeatureRow {
 	 * @param value
 	 */
 	public void setValue(String columnName, Object value) {
-		setValue(getIndex(columnName), value);
+		setValue(getColumnIndex(columnName), value);
 	}
 
 	/**
@@ -304,14 +303,14 @@ public class FeatureRow {
 	 * @param id
 	 */
 	void setId(long id) {
-		values[getPkIndex()] = id;
+		values[getPkColumnIndex()] = id;
 	}
 
 	/**
 	 * Clears the id so the row can be used as part of an insert or create
 	 */
 	public void resetId() {
-		values[getPkIndex()] = null;
+		values[getPkColumnIndex()] = null;
 	}
 
 	/**
@@ -322,7 +321,7 @@ public class FeatureRow {
 	public ContentValues toContentValues() {
 
 		ContentValues contentValues = new ContentValues();
-		for (FeatureColumn column : columns.getColumns()) {
+		for (FeatureColumn column : table.getColumns()) {
 
 			if (!column.isPrimaryKey()) {
 

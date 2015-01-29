@@ -30,7 +30,7 @@ public class FeatureCursor extends CursorWrapper {
 
 	public GeoPackageGeometryData getGeometry() {
 
-		byte[] geometryBytes = getBlob(dao.getColumns().getGeometryIndex());
+		byte[] geometryBytes = getBlob(dao.getTable().getGeometryColumnIndex());
 
 		GeoPackageGeometryData geometry = null;
 		if (geometryBytes != null) {
@@ -47,15 +47,15 @@ public class FeatureCursor extends CursorWrapper {
 	 */
 	public FeatureRow getRow() {
 
-		FeatureColumns columns = dao.getColumns();
-		int[] columnTypes = new int[columns.count()];
-		Object[] values = new Object[columns.count()];
+		FeatureTable table = dao.getTable();
+		int[] columnTypes = new int[table.columnCount()];
+		Object[] values = new Object[table.columnCount()];
 
-		for (int i = 0; i < columns.count(); i++) {
+		for (int i = 0; i < table.columnCount(); i++) {
 
 			columnTypes[i] = getType(i);
-			
-			if (i == columns.getGeometryIndex()) {
+
+			if (i == table.getGeometryColumnIndex()) {
 				values[i] = getGeometry();
 			} else {
 				values[i] = GeoPackageDatabaseUtils.getValue(this, i);
@@ -63,7 +63,7 @@ public class FeatureCursor extends CursorWrapper {
 
 		}
 
-		FeatureRow row = new FeatureRow(columns, columnTypes, values);
+		FeatureRow row = new FeatureRow(table, columnTypes, values);
 
 		return row;
 	}

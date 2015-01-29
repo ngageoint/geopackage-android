@@ -4,7 +4,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import mil.nga.giat.geopackage.data.c4.FeatureColumn;
+import mil.nga.giat.geopackage.data.c4.FeatureTable;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
 import android.app.Activity;
@@ -88,6 +92,36 @@ public class TestUtils {
 		newFile.flush();
 		newFile.close();
 		assetFile.close();
+	}
+
+	/**
+	 * Build an example feature table
+	 * 
+	 * @param tableName
+	 * @param geometryColumn
+	 * @param geometryType
+	 * @return
+	 */
+	public static FeatureTable buildTable(String tableName,
+			String geometryColumn, String geometryType) {
+
+		List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
+
+		columns.add(FeatureColumn.createPrimaryKeyColumn(0, "id"));
+		columns.add(FeatureColumn.createGeometryColumn(1, geometryColumn,
+				geometryType, false, null));
+		columns.add(FeatureColumn.createColumn(2, "test_text", "TEXT", false,
+				""));
+		columns.add(FeatureColumn.createColumn(3, "test_real", "REAL", false,
+				null));
+		columns.add(FeatureColumn.createColumn(4, "test_boolean", "BOOLEAN",
+				false, null));
+		columns.add(FeatureColumn.createColumn(5, "test_blob", "BLOB", false,
+				null));
+
+		FeatureTable table = new FeatureTable(tableName, columns);
+
+		return table;
 	}
 
 }

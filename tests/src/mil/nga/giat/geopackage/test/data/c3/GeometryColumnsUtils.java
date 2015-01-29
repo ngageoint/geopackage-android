@@ -17,6 +17,7 @@ import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.test.TestUtils;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
@@ -241,6 +242,11 @@ public class GeometryColumnsUtils {
 		contents.setMaxX(180.0);
 		contents.setMaxY(90.0);
 		contents.setSrs(srs);
+
+		// Create the feature table
+		geoPackage.createTable(TestUtils.buildTable(contents.getTableName(),
+				"geom", "GEOMETRY"));
+
 		contentsDao.create(contents);
 
 		String columnName = "TEST_COLUMN_NAME";

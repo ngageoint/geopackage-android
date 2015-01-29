@@ -11,10 +11,10 @@ import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c4.FeatureColumn;
-import mil.nga.giat.geopackage.data.c4.FeatureColumns;
 import mil.nga.giat.geopackage.data.c4.FeatureCursor;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
 import mil.nga.giat.geopackage.data.c4.FeatureRow;
+import mil.nga.giat.geopackage.data.c4.FeatureTable;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryCollection;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
@@ -74,9 +74,9 @@ public class FeatureUtils {
 			TestCase.assertEquals(geometryColumns.getColumnName(),
 					dao.getGeometryColumnName());
 
-			FeatureColumns featureColumns = dao.getColumns();
-			String[] columns = featureColumns.getColumnNames();
-			int geomIndex = featureColumns.getGeometryIndex();
+			FeatureTable featureTable = dao.getTable();
+			String[] columns = featureTable.getColumnNames();
+			int geomIndex = featureTable.getGeometryColumnIndex();
 			TestCase.assertTrue(geomIndex >= 0 && geomIndex < columns.length);
 			TestCase.assertEquals(geometryColumns.getColumnName(),
 					columns[geomIndex]);
@@ -88,7 +88,7 @@ public class FeatureUtils {
 			while (cursor.moveToNext()) {
 				GeoPackageGeometryData geoPackageGeometryData = cursor
 						.getGeometry();
-				if (cursor.getBlob(featureColumns.getGeometryIndex()) != null) {
+				if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
 					TestCase.assertNotNull(geoPackageGeometryData);
 					GeoPackageGeometry geometry = geoPackageGeometryData
 							.getGeometry();
@@ -140,7 +140,7 @@ public class FeatureUtils {
 			manualCount = 0;
 			while (cursor.moveToNext()) {
 				GeoPackageGeometryData geometry = cursor.getGeometry();
-				if (cursor.getBlob(featureColumns.getGeometryIndex()) != null) {
+				if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
 					TestCase.assertNotNull(geometry);
 				}
 				manualCount++;
@@ -162,7 +162,7 @@ public class FeatureUtils {
 			// Find two non id non geom columns
 			String column1 = null;
 			String column2 = null;
-			for (FeatureColumn column : featureRow.getColumns().getColumns()) {
+			for (FeatureColumn column : featureRow.getTable().getColumns()) {
 				if (!column.isPrimaryKey() && !column.isGeometry()) {
 					if (column1 == null) {
 						column1 = column.getName();
@@ -229,11 +229,11 @@ public class FeatureUtils {
 	 */
 	private static void validateFeatureRow(String[] columns,
 			FeatureRow featureRow) {
-		TestCase.assertEquals(columns.length, featureRow.count());
+		TestCase.assertEquals(columns.length, featureRow.columnCount());
 
-		for (int i = 0; i < featureRow.count(); i++) {
-			TestCase.assertEquals(columns[i], featureRow.getName(i));
-			TestCase.assertEquals(i, featureRow.getIndex(columns[i]));
+		for (int i = 0; i < featureRow.columnCount(); i++) {
+			TestCase.assertEquals(columns[i], featureRow.getColumnName(i));
+			TestCase.assertEquals(i, featureRow.getColumnIndex(columns[i]));
 			int rowType = featureRow.getRowColumnType(i);
 			Object value = featureRow.getValue(i);
 
@@ -252,7 +252,7 @@ public class FeatureUtils {
 				break;
 
 			case Cursor.FIELD_TYPE_BLOB:
-				if (featureRow.getGeometryIndex() == i) {
+				if (featureRow.getGeometryColumnIndex() == i) {
 					TestCase.assertTrue(value instanceof GeoPackageGeometryData);
 				} else {
 					TestCase.assertTrue(value instanceof byte[]);
@@ -510,13 +510,13 @@ public class FeatureUtils {
 					FeatureRow featureRow = cursor.getRow();
 
 					try {
-						featureRow.setValue(featureRow.getPkIndex(), 9);
+						featureRow.setValue(featureRow.getPkColumnIndex(), 9);
 						TestCase.fail("Updated the primary key value");
 					} catch (GeoPackageException e) {
 						// expected
 					}
 
-					for (FeatureColumn featureColumn : dao.getColumns()
+					for (FeatureColumn featureColumn : dao.getTable()
 							.getColumns()) {
 						if (!featureColumn.isPrimaryKey()) {
 
@@ -588,7 +588,7 @@ public class FeatureUtils {
 					GeoPackageGeometry readGeometry = readGeometryData
 							.getGeometry();
 
-					for (String readColumnName : readRow.getNames()) {
+					for (String readColumnName : readRow.getColumnNames()) {
 
 						FeatureColumn readFeatureColumn = readRow
 								.getColumn(readColumnName);
@@ -733,7 +733,7 @@ public class FeatureUtils {
 
 				// Create new row with copied values from another
 				FeatureRow newRow = dao.newRow();
-				for (FeatureColumn column : dao.getColumns().getColumns()) {
+				for (FeatureColumn column : dao.getTable().getColumns()) {
 
 					if (column.isPrimaryKey()) {
 						try {
