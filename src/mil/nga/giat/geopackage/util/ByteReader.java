@@ -65,6 +65,7 @@ public class ByteReader {
 	 * @throws UnsupportedEncodingException
 	 */
 	public String readString(int num) throws UnsupportedEncodingException {
+		verifyRemainingBytes(num);
 		String value = new String(bytes, nextByte, num, CHAR_SET);
 		nextByte += num;
 		return value;
@@ -76,6 +77,7 @@ public class ByteReader {
 	 * @return
 	 */
 	public byte readByte() {
+		verifyRemainingBytes(1);
 		byte value = bytes[nextByte];
 		nextByte++;
 		return value;
@@ -87,6 +89,7 @@ public class ByteReader {
 	 * @return
 	 */
 	public int readInt() {
+		verifyRemainingBytes(4);
 		int value = ByteBuffer.wrap(bytes, nextByte, 4).order(byteOrder)
 				.getInt();
 		nextByte += 4;
@@ -99,10 +102,26 @@ public class ByteReader {
 	 * @return
 	 */
 	public double readDouble() {
+		verifyRemainingBytes(8);
 		double value = ByteBuffer.wrap(bytes, nextByte, 8).order(byteOrder)
 				.getDouble();
 		nextByte += 8;
 		return value;
+	}
+
+	/**
+	 * Verify with the remaining bytes that there are enough remaining to read
+	 * the provided amount
+	 * 
+	 * @param bytesToRead
+	 */
+	private void verifyRemainingBytes(int bytesToRead) {
+		if (nextByte + bytesToRead > bytes.length) {
+			throw new GeoPackageException(
+					"No more remaining bytes to read. Total Bytes: "
+							+ bytes.length + ", Bytes already read: "
+							+ nextByte + ", Attempted to read: " + bytesToRead);
+		}
 	}
 
 }

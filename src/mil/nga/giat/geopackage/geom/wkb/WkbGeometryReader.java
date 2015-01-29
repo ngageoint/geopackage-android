@@ -54,6 +54,8 @@ public class WkbGeometryReader {
 		byte byteOrderValue = reader.readByte();
 		ByteOrder byteOrder = byteOrderValue == 0 ? ByteOrder.BIG_ENDIAN
 				: ByteOrder.LITTLE_ENDIAN;
+		ByteOrder originalByteOrder = reader.getByteOrder();
+		reader.setByteOrder(byteOrder);
 
 		// Read the geometry type integer
 		int geometryTypeWkbCode = reader.readInt();
@@ -161,6 +163,9 @@ public class WkbGeometryReader {
 							+ geometry.getClass().getSimpleName());
 		}
 
+		// Restore the byte order
+		reader.setByteOrder(originalByteOrder);
+
 		return (T) geometry;
 	}
 
@@ -258,7 +263,7 @@ public class WkbGeometryReader {
 
 		for (int i = 0; i < numPoints; i++) {
 			GeoPackagePoint point = readGeometry(reader, GeoPackagePoint.class);
-			multiPoint.add(point);
+			multiPoint.addPoint(point);
 
 		}
 
@@ -284,7 +289,7 @@ public class WkbGeometryReader {
 		for (int i = 0; i < numLineStrings; i++) {
 			GeoPackageLineString lineString = readGeometry(reader,
 					GeoPackageLineString.class);
-			multiLineString.add(lineString);
+			multiLineString.addLineString(lineString);
 
 		}
 
@@ -310,7 +315,7 @@ public class WkbGeometryReader {
 		for (int i = 0; i < numPolygons; i++) {
 			GeoPackagePolygon polygon = readGeometry(reader,
 					GeoPackagePolygon.class);
-			multiPolygon.add(polygon);
+			multiPolygon.addPolygon(polygon);
 
 		}
 
@@ -336,7 +341,7 @@ public class WkbGeometryReader {
 		for (int i = 0; i < numGeometries; i++) {
 			GeoPackageGeometry geometry = readGeometry(reader,
 					GeoPackageGeometry.class);
-			geometryCollection.add(geometry);
+			geometryCollection.addGeometry(geometry);
 
 		}
 

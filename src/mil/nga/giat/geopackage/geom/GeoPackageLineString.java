@@ -48,4 +48,13 @@ public class GeoPackageLineString extends GeoPackageCurve {
 		points.add(point);
 	}
 
+	/**
+	 * Get the number of points
+	 * 
+	 * @return
+	 */
+	public int numPoints() {
+		return points.size();
+	}
+
 }

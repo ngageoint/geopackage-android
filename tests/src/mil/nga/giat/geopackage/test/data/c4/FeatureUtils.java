@@ -26,6 +26,7 @@ import mil.nga.giat.geopackage.geom.GeoPackagePoint;
 import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
 import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
+import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.giat.geopackage.util.ByteReader;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.Cursor;
@@ -308,7 +309,7 @@ public class FeatureUtils {
 			break;
 		case GEOMETRYCOLLECTION:
 			TestCase.assertTrue(geometry instanceof GeoPackageGeometryCollection);
-			GeoPackageGeometryCollection<GeoPackageGeometry> geometryCollection = (GeoPackageGeometryCollection<GeoPackageGeometry>) geometry;
+			GeoPackageGeometryCollection<?> geometryCollection = (GeoPackageGeometryCollection<?>) geometry;
 			validateGeometryCollection(geometryCollection, geometryCollection);
 			break;
 		default:
@@ -407,7 +408,7 @@ public class FeatureUtils {
 
 		validateZAndM(topGeometry, multiPoint);
 
-		for (GeoPackagePoint point : multiPoint.get()) {
+		for (GeoPackagePoint point : multiPoint.getPoints()) {
 			validatePoint(topGeometry, point);
 		}
 
@@ -427,7 +428,7 @@ public class FeatureUtils {
 
 		validateZAndM(topGeometry, multiLineString);
 
-		for (GeoPackageLineString lineString : multiLineString.get()) {
+		for (GeoPackageLineString lineString : multiLineString.getLineStrings()) {
 			validateLineString(topGeometry, lineString);
 		}
 
@@ -447,7 +448,7 @@ public class FeatureUtils {
 
 		validateZAndM(topGeometry, multiPolygon);
 
-		for (GeoPackagePolygon polygon : multiPolygon.get()) {
+		for (GeoPackagePolygon polygon : multiPolygon.getPolygons()) {
 			validatePolygon(topGeometry, polygon);
 		}
 
@@ -461,11 +462,11 @@ public class FeatureUtils {
 	 */
 	private static void validateGeometryCollection(
 			GeoPackageGeometry topGeometry,
-			GeoPackageGeometryCollection<GeoPackageGeometry> geometryCollection) {
+			GeoPackageGeometryCollection<?> geometryCollection) {
 
 		validateZAndM(topGeometry, geometryCollection);
 
-		for (GeoPackageGeometry geometry : geometryCollection.get()) {
+		for (GeoPackageGeometry geometry : geometryCollection.getGeometries()) {
 			validateGeometry(geometry.getGeometryType(), geometry);
 		}
 
@@ -521,7 +522,7 @@ public class FeatureUtils {
 
 							if (featureColumn.isGeometry()) {
 
-								GeoPackageGeometryData updatedGeometryData = geometryData;
+								boolean updateGeometry = true;
 
 								switch (geometry.getGeometryType()) {
 
@@ -531,22 +532,22 @@ public class FeatureUtils {
 									break;
 								case MULTIPOINT:
 									GeoPackageMultiPoint multiPoint = (GeoPackageMultiPoint) geometry;
-									if (multiPoint.count() > 1) {
-										multiPoint.get().remove(0);
+									if (multiPoint.numPoints() > 1) {
+										multiPoint.getPoints().remove(0);
 									}
 									for (GeoPackagePoint multiPointPoint : multiPoint
-											.get()) {
+											.getPoints()) {
 										updatePoint(multiPointPoint);
 									}
 									break;
 
 								default:
-									updatedGeometryData = null;
+									updateGeometry = false;
 								}
-								if (updatedGeometryData != null) {
+								if (updateGeometry) {
 									featureRow.setValue(
 											featureColumn.getIndex(),
-											updatedGeometryData);
+											geometryData);
 								}
 
 							} else {
@@ -615,9 +616,10 @@ public class FeatureUtils {
 					case MULTIPOINT:
 						GeoPackageMultiPoint originalMultiPoint = (GeoPackageMultiPoint) geometry;
 						GeoPackageMultiPoint multiPoint = (GeoPackageMultiPoint) readGeometry;
-						TestCase.assertEquals(originalMultiPoint.count(),
-								multiPoint.count());
-						for (GeoPackagePoint multiPointPoint : multiPoint.get()) {
+						TestCase.assertEquals(originalMultiPoint.numPoints(),
+								multiPoint.numPoints());
+						for (GeoPackagePoint multiPointPoint : multiPoint
+								.getPoints()) {
 							validateUpdatedPoint(multiPointPoint);
 						}
 						break;
@@ -625,6 +627,17 @@ public class FeatureUtils {
 					default:
 						geometry.getGeometryType();
 					}
+
+					// Compare the modified geometry with the updated geometry
+					// from the database
+					GeoPackageGeometryDataUtils.compareGeometries(geometry,
+							readGeometry);
+
+					// Compare the geo package headers since nothing in the
+					// header was changed
+					GeoPackageGeometryDataUtils.compareByteArrays(
+							geometryData.getHeaderBytes(),
+							readGeometryData.getHeaderBytes());
 
 				}
 

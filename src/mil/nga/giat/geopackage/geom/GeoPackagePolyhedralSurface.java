@@ -49,4 +49,13 @@ public class GeoPackagePolyhedralSurface extends GeoPackageSurface {
 		polygons.add(polygon);
 	}
 
+	/**
+	 * Get the number of polygons
+	 * 
+	 * @return
+	 */
+	public int numPolygons() {
+		return polygons.size();
+	}
+
 }

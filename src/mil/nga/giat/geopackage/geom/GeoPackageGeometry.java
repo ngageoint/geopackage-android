@@ -48,4 +48,20 @@ public abstract class GeoPackageGeometry {
 		return hasM;
 	}
 
+	/**
+	 * Get the Well-Known Binary code
+	 * 
+	 * @return
+	 */
+	public int getWkbCode() {
+		int code = geometryType.getCode();
+		if (hasZ) {
+			code += 1000;
+		}
+		if (hasM) {
+			code += 2000;
+		}
+		return code;
+	}
+
 }

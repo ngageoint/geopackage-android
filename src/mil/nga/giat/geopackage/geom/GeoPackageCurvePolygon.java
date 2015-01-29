@@ -50,4 +50,13 @@ public class GeoPackageCurvePolygon<T extends GeoPackageCurve> extends
 		rings.add(ring);
 	}
 
+	/**
+	 * Get the number of rings
+	 * 
+	 * @return
+	 */
+	public int numRings() {
+		return rings.size();
+	}
+
 }

@@ -38,20 +38,40 @@ public class GeoPackageGeometryCollection<T extends GeoPackageGeometry> extends
 		super(type, hasZ, hasM);
 	}
 
-	public int count() {
-		return geometries.size();
-	}
-
-	public List<T> get() {
+	/**
+	 * Get the list of geometries
+	 * 
+	 * @return
+	 */
+	public List<T> getGeometries() {
 		return geometries;
 	}
 
-	public void set(List<T> geometries) {
+	/**
+	 * Set the geometries
+	 * 
+	 * @param geometries
+	 */
+	public void setGeometries(List<T> geometries) {
 		this.geometries = geometries;
 	}
 
-	public void add(T geometry) {
+	/**
+	 * Add a geometry
+	 * 
+	 * @param geometry
+	 */
+	public void addGeometry(T geometry) {
 		geometries.add(geometry);
+	}
+
+	/**
+	 * Get the number of geometries in the collection
+	 * 
+	 * @return
+	 */
+	public int numGeometries() {
+		return geometries.size();
 	}
 
 }

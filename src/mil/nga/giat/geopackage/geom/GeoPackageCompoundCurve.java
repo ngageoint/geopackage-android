@@ -37,4 +37,13 @@ public class GeoPackageCompoundCurve extends GeoPackageCurve {
 		lineStrings.add(lineString);
 	}
 
+	/**
+	 * Get the number of line strings
+	 * 
+	 * @return
+	 */
+	public int numLineStrings() {
+		return lineStrings.size();
+	}
+
 }

@@ -1,5 +1,7 @@
 package mil.nga.giat.geopackage.geom;
 
+import java.util.List;
+
 /**
  * GeoPackage Multi Point
  * 
@@ -16,6 +18,42 @@ public class GeoPackageMultiPoint extends
 	 */
 	public GeoPackageMultiPoint(boolean hasZ, boolean hasM) {
 		super(GeometryType.MULTIPOINT, hasZ, hasM);
+	}
+
+	/**
+	 * Get the points
+	 * 
+	 * @return
+	 */
+	public List<GeoPackagePoint> getPoints() {
+		return getGeometries();
+	}
+
+	/**
+	 * Set the points
+	 * 
+	 * @param points
+	 */
+	public void setPoints(List<GeoPackagePoint> points) {
+		setGeometries(points);
+	}
+
+	/**
+	 * Add a point
+	 * 
+	 * @param point
+	 */
+	public void addPoint(GeoPackagePoint point) {
+		addGeometry(point);
+	}
+
+	/**
+	 * Get the number of points
+	 * 
+	 * @return
+	 */
+	public int numPoints() {
+		return numGeometries();
 	}
 
 }
