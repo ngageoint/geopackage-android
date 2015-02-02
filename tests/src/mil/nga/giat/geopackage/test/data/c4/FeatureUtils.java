@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
@@ -593,7 +594,17 @@ public class FeatureUtils {
 					geometryData = cursor.getGeometry();
 				}
 				if (geometryData != null) {
-					String UPDATED_STRING = "updated string";
+					String updatedString = null;
+					String updatedLimitedString = null;
+					Boolean updatedBoolean = null;
+					Byte updatedByte = null;
+					Short updatedShort = null;
+					Integer updatedInteger = null;
+					Long updatedLong = null;
+					Float updatedFloat = null;
+					Double updatedDouble = null;
+					byte[] updatedBytes = null;
+					byte[] updatedLimitedBytes = null;
 
 					GeoPackageGeometry geometry = geometryData.getGeometry();
 					FeatureRow originalRow = cursor.getRow();
@@ -646,11 +657,149 @@ public class FeatureUtils {
 												.getIndex())) {
 
 								case Cursor.FIELD_TYPE_STRING:
-									featureRow.setValue(
-											featureColumn.getIndex(),
-											UPDATED_STRING);
+									if (updatedString == null) {
+										updatedString = UUID.randomUUID()
+												.toString();
+									}
+									if (featureColumn.getTypeMax() != null) {
+										if (updatedLimitedString != null) {
+											if (updatedString.length() > featureColumn
+													.getTypeMax()) {
+												updatedLimitedString = updatedString
+														.substring(
+																0,
+																featureColumn
+																		.getTypeMax()
+																		.intValue());
+											} else {
+												updatedLimitedString = updatedString;
+											}
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedLimitedString);
+									} else {
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedString);
+									}
 									break;
-
+								case Cursor.FIELD_TYPE_INTEGER:
+									switch (featureColumn.getDataType()) {
+									case BOOLEAN:
+										if (updatedBoolean == null) {
+											updatedBoolean = !((Boolean) featureRow
+													.getValue(featureColumn
+															.getIndex()));
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedBoolean);
+										break;
+									case TINYINT:
+										if (updatedByte != null) {
+											updatedByte = (byte) (((int) (Math
+													.random() * (Byte.MAX_VALUE + 1))) * (Math
+													.random() < .5 ? 1 : -1));
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedByte);
+										break;
+									case SMALLINT:
+										if (updatedShort != null) {
+											updatedShort = (short) (((int) (Math
+													.random() * (Short.MAX_VALUE + 1))) * (Math
+													.random() < .5 ? 1 : -1));
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedShort);
+										break;
+									case MEDIUMINT:
+										if (updatedInteger != null) {
+											updatedInteger = (int) (((int) (Math
+													.random() * (Integer.MAX_VALUE + 1))) * (Math
+													.random() < .5 ? 1 : -1));
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedInteger);
+										break;
+									case INT:
+									case INTEGER:
+										if (updatedLong != null) {
+											updatedLong = (long) (((int) (Math
+													.random() * (Long.MAX_VALUE + 1))) * (Math
+													.random() < .5 ? 1 : -1));
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedLong);
+										break;
+									default:
+										TestCase.fail("Unexpected integer type: "
+												+ featureColumn.getDataType());
+									}
+									break;
+								case Cursor.FIELD_TYPE_FLOAT:
+									switch (featureColumn.getDataType()) {
+									case FLOAT:
+										if (updatedFloat != null) {
+											updatedFloat = (float) Math
+													.random() * Float.MAX_VALUE;
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedFloat);
+										break;
+									case DOUBLE:
+									case REAL:
+										if (updatedDouble != null) {
+											updatedDouble = Math.random()
+													* Double.MAX_VALUE;
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedDouble);
+										break;
+									default:
+										TestCase.fail("Unexpected float type: "
+												+ featureColumn.getDataType());
+									}
+									break;
+								case Cursor.FIELD_TYPE_BLOB:
+									if (updatedBytes == null) {
+										updatedBytes = UUID.randomUUID()
+												.toString().getBytes();
+									}
+									if (featureColumn.getTypeMax() != null) {
+										if (updatedLimitedBytes != null) {
+											if (updatedBytes.length > featureColumn
+													.getTypeMax()) {
+												updatedLimitedBytes = new byte[featureColumn
+														.getTypeMax()
+														.intValue()];
+												ByteBuffer
+														.wrap(updatedBytes,
+																0,
+																featureColumn
+																		.getTypeMax()
+																		.intValue())
+														.get(updatedLimitedBytes);
+											} else {
+												updatedLimitedBytes = updatedBytes;
+											}
+										}
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedLimitedBytes);
+									} else {
+										featureRow.setValue(
+												featureColumn.getIndex(),
+												updatedBytes);
+									}
+									break;
 								default:
 								}
 							}
@@ -686,10 +835,84 @@ public class FeatureUtils {
 								&& !readFeatureColumn.isGeometry()) {
 							switch (readRow.getRowColumnType(readColumnName)) {
 							case Cursor.FIELD_TYPE_STRING:
-								TestCase.assertEquals(UPDATED_STRING, readRow
-										.getValue(readFeatureColumn.getIndex()));
+								if (readFeatureColumn.getTypeMax() != null) {
+									TestCase.assertEquals(updatedLimitedString,
+											readRow.getValue(readFeatureColumn
+													.getIndex()));
+								} else {
+									TestCase.assertEquals(updatedString,
+											readRow.getValue(readFeatureColumn
+													.getIndex()));
+								}
 								break;
-
+							case Cursor.FIELD_TYPE_INTEGER:
+								switch (readFeatureColumn.getDataType()) {
+								case BOOLEAN:
+									TestCase.assertEquals(updatedBoolean,
+											readRow.getValue(readFeatureColumn
+													.getIndex()));
+									break;
+								case TINYINT:
+									TestCase.assertEquals(updatedByte, readRow
+											.getValue(readFeatureColumn
+													.getIndex()));
+									break;
+								case SMALLINT:
+									TestCase.assertEquals(updatedShort, readRow
+											.getValue(readFeatureColumn
+													.getIndex()));
+									break;
+								case MEDIUMINT:
+									TestCase.assertEquals(updatedInteger,
+											readRow.getValue(readFeatureColumn
+													.getIndex()));
+									break;
+								case INT:
+								case INTEGER:
+									TestCase.assertEquals(updatedLong, readRow
+											.getValue(readFeatureColumn
+													.getIndex()));
+									break;
+								default:
+									TestCase.fail("Unexpected integer type: "
+											+ readFeatureColumn.getDataType());
+								}
+								break;
+							case Cursor.FIELD_TYPE_FLOAT:
+								switch (readFeatureColumn.getDataType()) {
+								case FLOAT:
+									TestCase.assertEquals(updatedFloat, readRow
+											.getValue(readFeatureColumn
+													.getIndex()));
+									break;
+								case DOUBLE:
+								case REAL:
+									TestCase.assertEquals(updatedDouble,
+											readRow.getValue(readFeatureColumn
+													.getIndex()));
+									break;
+								default:
+									TestCase.fail("Unexpected integer type: "
+											+ readFeatureColumn.getDataType());
+								}
+								break;
+							case Cursor.FIELD_TYPE_BLOB:
+								if (readFeatureColumn.getTypeMax() != null) {
+									GeoPackageGeometryDataUtils
+											.compareByteArrays(
+													updatedLimitedBytes,
+													(byte[]) readRow
+															.getValue(readFeatureColumn
+																	.getIndex()));
+								} else {
+									GeoPackageGeometryDataUtils
+											.compareByteArrays(
+													updatedBytes,
+													(byte[]) readRow
+															.getValue(readFeatureColumn
+																	.getIndex()));
+								}
+								break;
 							default:
 							}
 						}

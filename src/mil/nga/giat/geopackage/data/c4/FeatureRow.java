@@ -2,6 +2,7 @@ package mil.nga.giat.geopackage.data.c4;
 
 import java.io.IOException;
 
+import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.content.ContentValues;
@@ -362,24 +363,59 @@ public class FeatureRow {
 				} else {
 
 					if (value instanceof Number) {
-						if (value instanceof Integer) {
-							contentValues.put(columnName, (Integer) value);
-						} else if (value instanceof Float) {
+						if (value instanceof Byte) {
+							validateValue(column, value, Byte.class,
+									Short.class, Integer.class, Long.class);
+							contentValues.put(columnName, (Byte) value);
+						} else if (value instanceof Short) {
+							validateValue(column, value, Short.class,
+									Integer.class, Long.class);
+							contentValues.put(columnName, (Short) value);
+						} else if (value instanceof Integer) {
+							validateValue(column, value, Integer.class,
+									Long.class);
 							contentValues.put(columnName, (Integer) value);
 						} else if (value instanceof Long) {
+							validateValue(column, value, Long.class,
+									Double.class);
 							contentValues.put(columnName, (Long) value);
+						} else if (value instanceof Float) {
+							validateValue(column, value, Float.class);
+							contentValues.put(columnName, (Float) value);
 						} else if (value instanceof Double) {
+							validateValue(column, value, Double.class);
 							contentValues.put(columnName, (Double) value);
-						} else if (value instanceof Short) {
-							contentValues.put(columnName, (Short) value);
-						} else if (value instanceof Byte) {
-							contentValues.put(columnName, (Byte) value);
+						} else {
+							throw new GeoPackageException(
+									"Unsupported Number type: "
+											+ value.getClass().getSimpleName());
 						}
 					} else if (value instanceof String) {
-						contentValues.put(columnName, (String) value);
+						validateValue(column, value, String.class);
+						String stringValue = (String) value;
+						if (column.getTypeMax() != null
+								&& stringValue.length() > column.getTypeMax()) {
+							throw new GeoPackageException(
+									"String is larger than the column max. Size: "
+											+ stringValue.length() + ", Max: "
+											+ column.getTypeMax()
+											+ ", Column: " + columnName);
+						}
+						contentValues.put(columnName, stringValue);
 					} else if (value instanceof byte[]) {
-						contentValues.put(columnName, (byte[]) value);
+						validateValue(column, value, byte[].class);
+						byte[] byteValue = (byte[]) value;
+						if (column.getTypeMax() != null
+								&& byteValue.length > column.getTypeMax()) {
+							throw new GeoPackageException(
+									"Byte array is larger than the column max. Size: "
+											+ byteValue.length + ", Max: "
+											+ column.getTypeMax()
+											+ ", Column: " + columnName);
+						}
+						contentValues.put(columnName, byteValue);
 					} else if (value instanceof Boolean) {
+						validateValue(column, value, Boolean.class);
 						Boolean booleanValue = (Boolean) value;
 						short shortBoolean = booleanValue ? (short) 1
 								: (short) 0;
@@ -396,6 +432,37 @@ public class FeatureRow {
 		}
 
 		return contentValues;
+	}
+
+	/**
+	 * Validate the value and its actual value types against the column data
+	 * type class
+	 * 
+	 * @param column
+	 * @param value
+	 * @param valueTypes
+	 */
+	private void validateValue(FeatureColumn column, Object value,
+			Class<?>... valueTypes) {
+
+		GeoPackageDataType dataType = column.getDataType();
+		Class<?> dataTypeClass = dataType.getClassType();
+
+		boolean valid = false;
+		for (Class<?> valueType : valueTypes) {
+			if (valueType.equals(dataTypeClass)) {
+				valid = true;
+				break;
+			}
+		}
+
+		if (!valid) {
+			throw new GeoPackageException("Illegal value. Column: "
+					+ column.getName() + ", Value: " + value
+					+ ", Expected Type: " + dataTypeClass.getSimpleName()
+					+ ", Actual Type: " + valueTypes[0].getSimpleName());
+		}
+
 	}
 
 }
