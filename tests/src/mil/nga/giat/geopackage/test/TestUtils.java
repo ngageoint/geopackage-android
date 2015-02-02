@@ -4,11 +4,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c4.FeatureColumn;
+import mil.nga.giat.geopackage.data.c4.FeatureDao;
+import mil.nga.giat.geopackage.data.c4.FeatureRow;
 import mil.nga.giat.geopackage.data.c4.FeatureTable;
+import mil.nga.giat.geopackage.db.GeoPackageDataType;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
+import mil.nga.giat.geopackage.geom.GeoPackageLineString;
+import mil.nga.giat.geopackage.geom.GeoPackagePoint;
+import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
 import android.app.Activity;
@@ -103,25 +117,216 @@ public class TestUtils {
 	 * @return
 	 */
 	public static FeatureTable buildTable(String tableName,
-			String geometryColumn, String geometryType) {
+			String geometryColumn, GeoPackageGeometryType geometryType) {
 
 		List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
 
 		columns.add(FeatureColumn.createPrimaryKeyColumn(0, "id"));
+		columns.add(FeatureColumn.createTextColumn(7, "test_text_limited", 5L,
+				false, null));
+		columns.add(FeatureColumn.createBlobColumn(8, "test_blob_limited", 7L,
+				false, null));
 		columns.add(FeatureColumn.createGeometryColumn(1, geometryColumn,
 				geometryType, false, null));
-		columns.add(FeatureColumn.createColumn(2, "test_text", "TEXT", false,
-				""));
-		columns.add(FeatureColumn.createColumn(3, "test_real", "REAL", false,
-				null));
-		columns.add(FeatureColumn.createColumn(4, "test_boolean", "BOOLEAN",
-				false, null));
-		columns.add(FeatureColumn.createColumn(5, "test_blob", "BLOB", false,
-				null));
+		columns.add(FeatureColumn.createColumn(2, "test_text",
+				GeoPackageDataType.TEXT, false, ""));
+		columns.add(FeatureColumn.createColumn(3, "test_real",
+				GeoPackageDataType.REAL, false, null));
+		columns.add(FeatureColumn.createColumn(4, "test_boolean",
+				GeoPackageDataType.BOOLEAN, false, null));
+		columns.add(FeatureColumn.createColumn(5, "test_blob",
+				GeoPackageDataType.BLOB, false, null));
+		columns.add(FeatureColumn.createColumn(6, "test_integer",
+				GeoPackageDataType.INTEGER, false, null));
 
 		FeatureTable table = new FeatureTable(tableName, columns);
 
 		return table;
+	}
+
+	/**
+	 * Add rows to the feature table
+	 * 
+	 * @param geoPackage
+	 * @param geometryColumns
+	 * @param table
+	 * @param numRows
+	 * @param hasZ
+	 * @param hasM
+	 * @throws SQLException
+	 */
+	public static void addRowsToTable(GeoPackage geoPackage,
+			GeometryColumns geometryColumns, FeatureTable table, int numRows,
+			boolean hasZ, boolean hasM) throws SQLException {
+
+		FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+
+		for (int i = 0; i < numRows; i++) {
+
+			FeatureRow newRow = dao.newRow();
+
+			for (FeatureColumn column : table.getColumns()) {
+				if (!column.isPrimaryKey()) {
+
+					// Leave nullable columns null 20% of the time
+					if (!column.isNotNull()) {
+						if (Math.random() < .2) {
+							continue;
+						}
+					}
+
+					if (column.isGeometry()) {
+
+						GeoPackageGeometry geometry = null;
+
+						switch (column.getGeometryType()) {
+						case POINT:
+							geometry = createPoint(hasZ, hasM);
+							break;
+						case LINESTRING:
+							geometry = createLineString(hasZ, hasM, false);
+							break;
+						case POLYGON:
+							geometry = createPolygon(hasZ, hasM);
+							break;
+						default:
+							throw new UnsupportedOperationException(
+									"Not implemented for geometry type: "
+											+ column.getGeometryType());
+						}
+
+						GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
+								geometryColumns.getSrsId());
+						geometryData.setGeometry(geometry);
+
+						newRow.setGeometry(geometryData);
+
+					} else {
+
+						Object value = null;
+
+						switch (column.getDataType()) {
+
+						case TEXT:
+							String text = UUID.randomUUID().toString();
+							if (column.getTypeMax() != null
+									&& text.length() > column.getTypeMax()) {
+								text = text.substring(0, column.getTypeMax()
+										.intValue());
+							}
+							value = text;
+							break;
+						case REAL:
+						case DOUBLE:
+							value = Math.random() * 5000.0;
+							break;
+						case BOOLEAN:
+							value = Math.random() < .5 ? false : true;
+							break;
+						case INTEGER:
+						case INT:
+							value = (int) (Math.random() * 500);
+							break;
+						case BLOB:
+							byte[] blob = UUID.randomUUID().toString()
+									.getBytes();
+							if (column.getTypeMax() != null
+									&& blob.length > column.getTypeMax()) {
+								byte[] blobLimited = new byte[column
+										.getTypeMax().intValue()];
+								ByteBuffer.wrap(blob, 0,
+										column.getTypeMax().intValue()).get(
+										blobLimited);
+								blob = blobLimited;
+							}
+							value = blob;
+							break;
+						default:
+							throw new UnsupportedOperationException(
+									"Not implemented for data type: "
+											+ column.getDataType());
+						}
+
+						newRow.setValue(column.getName(), value);
+					}
+
+				}
+			}
+			dao.create(newRow);
+		}
+	}
+
+	/**
+	 * Create a random point
+	 * 
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public static GeoPackagePoint createPoint(boolean hasZ, boolean hasM) {
+
+		double x = Math.random() * 180.0 * (Math.random() < .5 ? 1 : -1);
+		double y = Math.random() * 90.0 * (Math.random() < .5 ? 1 : -1);
+
+		GeoPackagePoint point = new GeoPackagePoint(hasZ, hasM, x, y);
+
+		if (hasZ) {
+			double z = Math.random() * 1000.0;
+			point.setZ(z);
+		}
+
+		if (hasM) {
+			double m = Math.random() * 1000.0;
+			point.setM(m);
+		}
+
+		return point;
+	}
+
+	/**
+	 * Create a random line string
+	 * 
+	 * @param hasZ
+	 * @param hasM
+	 * @param ring
+	 * @return
+	 */
+	public static GeoPackageLineString createLineString(boolean hasZ,
+			boolean hasM, boolean ring) {
+
+		GeoPackageLineString lineString = new GeoPackageLineString(hasZ, hasM);
+
+		int numPoints = 2 + ((int) (Math.random() * 9));
+
+		for (int i = 0; i < numPoints; i++) {
+			lineString.addPoint(createPoint(hasZ, hasM));
+		}
+
+		if (ring) {
+			lineString.addPoint(lineString.getPoints().get(0));
+		}
+
+		return lineString;
+	}
+
+	/**
+	 * Create a random polygon
+	 * 
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public static GeoPackagePolygon createPolygon(boolean hasZ, boolean hasM) {
+
+		GeoPackagePolygon polygon = new GeoPackagePolygon(hasZ, hasM);
+
+		int numLineStrings = 1 + ((int) (Math.random() * 5));
+
+		for (int i = 0; i < numLineStrings; i++) {
+			polygon.addRing(createLineString(hasZ, hasM, true));
+		}
+
+		return polygon;
 	}
 
 }

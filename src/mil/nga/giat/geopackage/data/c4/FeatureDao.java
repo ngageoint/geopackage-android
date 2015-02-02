@@ -9,12 +9,14 @@ import java.util.Set;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.geom.GeometryType;
-import mil.nga.giat.geopackage.util.GeoPackageDatabaseUtils;
+import mil.nga.giat.geopackage.db.GeoPackageDataType;
+import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 /**
  * Feature DAO for reading feature user data tables
@@ -80,14 +82,43 @@ public class FeatureDao {
 			String name = cursor.getString(cursor.getColumnIndex("name"));
 			String type = cursor.getString(cursor.getColumnIndex("type"));
 			boolean notNull = cursor.getInt(cursor.getColumnIndex("notnull")) == 1;
-			int defaultValueIndex = cursor.getColumnIndex("dflt_value");
-			Object defaultValue = GeoPackageDatabaseUtils.getValue(cursor,
-					defaultValueIndex);
 			boolean primaryKey = cursor.getInt(cursor.getColumnIndex("pk")) == 1;
 			boolean geometry = name.equals(geometryColumns.getColumnName());
 
-			FeatureColumn column = new FeatureColumn(index, name, type,
-					notNull, defaultValue, primaryKey, geometry);
+			// If the type has a max limit on it, pull it off
+			Long typeMax = null;
+			if (type != null && type.endsWith(")")) {
+				int maxStart = type.indexOf("(");
+				if (maxStart > -1) {
+					String maxString = type.substring(maxStart + 1,
+							type.length() - 1);
+					if (!maxString.isEmpty()) {
+						try {
+							typeMax = Long.valueOf(maxString);
+							type = type.substring(0, maxStart);
+						} catch (NumberFormatException e) {
+							Log.w(FeatureDao.class.getSimpleName(),
+									"Failed to parse type max from type: "
+											+ type, e);
+						}
+					}
+				}
+			}
+
+			// Get the geometry or data type and default value
+			int defaultValueIndex = cursor.getColumnIndex("dflt_value");
+			GeoPackageGeometryType geometryType = null;
+			GeoPackageDataType dataType = null;
+			if (geometry) {
+				geometryType = GeoPackageGeometryType.valueOf(type);
+			} else {
+				dataType = GeoPackageDataType.valueOf(type);
+			}
+			Object defaultValue = GeoPackageDatabaseUtils.getValue(cursor,
+					defaultValueIndex, dataType);
+
+			FeatureColumn column = new FeatureColumn(index, name, typeMax,
+					notNull, defaultValue, primaryKey, geometryType, dataType);
 			columnList.add(column);
 		}
 		if (columnList.isEmpty()) {
@@ -139,7 +170,7 @@ public class FeatureDao {
 	 * 
 	 * @return
 	 */
-	public GeometryType getGeometryType() {
+	public GeoPackageGeometryType getGeometryType() {
 		return geometryColumns.getGeometryType();
 	}
 
@@ -165,13 +196,29 @@ public class FeatureDao {
 	/**
 	 * Query for the row where the field equals the value
 	 * 
-	 * @param id
+	 * @param fieldName
+	 * @param value
 	 * @return
 	 */
 	public FeatureCursor queryForEq(String fieldName, Object value) {
+		String where = buildWhere(fieldName, value);
+		String[] whereArgs = buildWhereArgs(value);
 		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
-				buildWhere(fieldName, value), buildWhereArgs(value), null,
-				null, null);
+				where, whereArgs, null, null, null);
+	}
+
+	/**
+	 * Query for the row where the field equals the value
+	 * 
+	 * @param fieldName
+	 * @param value
+	 * @return
+	 */
+	public FeatureCursor queryForFeatureEq(String fieldName, FeatureValue value) {
+		String where = buildFeatureWhere(fieldName, value);
+		String[] whereArgs = buildFeatureWhereArgs(value);
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				where, whereArgs, null, null, null);
 	}
 
 	/**
@@ -181,9 +228,24 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureCursor queryForFieldValues(Map<String, Object> fieldValues) {
+		String where = buildWhere(fieldValues.entrySet());
+		String[] whereArgs = buildWhereArgs(fieldValues.values());
 		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
-				buildWhere(fieldValues.entrySet()),
-				buildWhereArgs(fieldValues.values()), null, null, null);
+				where, whereArgs, null, null, null);
+	}
+
+	/**
+	 * Query for the row where all fields match their values
+	 * 
+	 * @param fieldValues
+	 * @return
+	 */
+	public FeatureCursor queryForFieldFeatureValues(
+			Map<String, FeatureValue> fieldValues) {
+		String where = buildFeatureWhere(fieldValues.entrySet());
+		String[] whereArgs = buildFeatureWhereArgs(fieldValues.values());
+		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
+				where, whereArgs, null, null, null);
 	}
 
 	/**
@@ -193,8 +255,10 @@ public class FeatureDao {
 	 * @return
 	 */
 	public FeatureCursor queryForId(long id) {
+		String where = getPkWhere(id);
+		String[] whereArgs = getPkWhereArgs(id);
 		return (FeatureCursor) db.query(getTableName(), table.getColumnNames(),
-				getPkWhere(id), getPkWhereArgs(id), null, null, null);
+				where, whereArgs, null, null, null);
 	}
 
 	/**
@@ -394,6 +458,24 @@ public class FeatureDao {
 	}
 
 	/**
+	 * Build where (or selection) statement from the fields
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	public String buildFeatureWhere(Set<Map.Entry<String, FeatureValue>> fields) {
+		StringBuilder selection = new StringBuilder();
+		for (Map.Entry<String, FeatureValue> field : fields) {
+			if (selection.length() > 0) {
+				selection.append(" AND ");
+			}
+			selection
+					.append(buildFeatureWhere(field.getKey(), field.getValue()));
+		}
+		return selection.toString();
+	}
+
+	/**
 	 * Build where (or selection) statement for a single field
 	 * 
 	 * @param field
@@ -402,6 +484,32 @@ public class FeatureDao {
 	 */
 	public String buildWhere(String field, Object value) {
 		return field + " " + (value != null ? "= ?" : "IS NULL");
+	}
+
+	/**
+	 * Build where (or selection) statement for a single field
+	 * 
+	 * @param field
+	 * @param value
+	 * @return
+	 */
+	public String buildFeatureWhere(String field, FeatureValue value) {
+		String where;
+		if (value != null) {
+			if (value.getValue() != null && value.getTolerance() != null) {
+				if (!(value.getValue() instanceof Number)) {
+					throw new GeoPackageException(
+							"Field value is not a number and can not use a tolerance, Field: "
+									+ field + ", Value: " + value);
+				}
+				where = field + " >= ? AND " + field + " <= ?";
+			} else {
+				where = buildWhere(field, value.getValue());
+			}
+		} else {
+			where = buildWhere(field, null);
+		}
+		return where;
 	}
 
 	/**
@@ -422,6 +530,29 @@ public class FeatureDao {
 	}
 
 	/**
+	 * Build where (or selection) args for the values
+	 * 
+	 * @param values
+	 * @return
+	 */
+	public String[] buildFeatureWhereArgs(Collection<FeatureValue> values) {
+		List<String> selectionArgs = new ArrayList<String>();
+		for (FeatureValue value : values) {
+			if (value != null && value.getValue() != null) {
+				if (value.getTolerance() != null) {
+					String[] toleranceArgs = getFeatureValueToleranceRange(value);
+					selectionArgs.add(toleranceArgs[0]);
+					selectionArgs.add(toleranceArgs[1]);
+				} else {
+					selectionArgs.add(value.getValue().toString());
+				}
+			}
+		}
+		return selectionArgs.isEmpty() ? null : selectionArgs
+				.toArray(new String[] {});
+	}
+
+	/**
 	 * Build where (or selection) args for the value
 	 * 
 	 * @param value
@@ -433,6 +564,37 @@ public class FeatureDao {
 			args = new String[] { value.toString() };
 		}
 		return args;
+	}
+
+	/**
+	 * Build where (or selection) args for the value
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public String[] buildFeatureWhereArgs(FeatureValue value) {
+		String[] args = null;
+		if (value != null) {
+			if (value.getValue() != null && value.getTolerance() != null) {
+				args = getFeatureValueToleranceRange(value);
+			} else {
+				args = buildWhereArgs(value.getValue());
+			}
+		}
+		return args;
+	}
+
+	/**
+	 * Get the feature value tolerance range min and max values
+	 * 
+	 * @param value
+	 * @return
+	 */
+	private String[] getFeatureValueToleranceRange(FeatureValue value) {
+		double doubleValue = ((Number) value.getValue()).doubleValue();
+		double tolerance = value.getTolerance();
+		return new String[] { Double.toString(doubleValue - tolerance),
+				Double.toString(doubleValue + tolerance) };
 	}
 
 }

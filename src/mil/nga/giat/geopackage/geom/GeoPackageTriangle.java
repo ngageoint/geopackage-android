@@ -14,7 +14,7 @@ public class GeoPackageTriangle extends GeoPackagePolygon {
 	 * @param hasM
 	 */
 	public GeoPackageTriangle(boolean hasZ, boolean hasM) {
-		super(GeometryType.TRIANGLE, hasZ, hasM);
+		super(GeoPackageGeometryType.TRIANGLE, hasZ, hasM);
 	}
 
 }

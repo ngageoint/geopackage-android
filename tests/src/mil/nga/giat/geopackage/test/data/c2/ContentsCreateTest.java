@@ -66,7 +66,8 @@ public class ContentsCreateTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		ContentsUtils.testRead(geoPackage, TestSetupTeardown.CREATE_GEOMETRY_COLUMNS_COUNT);
+		ContentsUtils.testRead(geoPackage,
+				TestSetupTeardown.CREATE_CONTENTS_COUNT);
 
 	}
 

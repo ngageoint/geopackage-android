@@ -6,7 +6,7 @@ import java.util.List;
 
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.util.GeoPackageDatabaseUtils;
+import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.sqlite.SQLiteDatabase;
 

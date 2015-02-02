@@ -17,7 +17,7 @@ public class GeoPackageMultiLineString extends
 	 * @param hasM
 	 */
 	public GeoPackageMultiLineString(boolean hasZ, boolean hasM) {
-		super(GeometryType.MULTILINESTRING, hasZ, hasM);
+		super(GeoPackageGeometryType.MULTILINESTRING, hasZ, hasM);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 package mil.nga.giat.geopackage.data.c4;
 
+import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.giat.geopackage.util.GeoPackageDatabaseUtils;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
@@ -28,6 +28,11 @@ public class FeatureCursor extends CursorWrapper {
 		this.dao = dao;
 	}
 
+	/**
+	 * Get the geometry
+	 * 
+	 * @return
+	 */
 	public GeoPackageGeometryData getGeometry() {
 
 		byte[] geometryBytes = getBlob(dao.getTable().getGeometryColumnIndex());
@@ -51,14 +56,17 @@ public class FeatureCursor extends CursorWrapper {
 		int[] columnTypes = new int[table.columnCount()];
 		Object[] values = new Object[table.columnCount()];
 
-		for (int i = 0; i < table.columnCount(); i++) {
+		for (FeatureColumn column : table.getColumns()) {
 
-			columnTypes[i] = getType(i);
+			int index = column.getIndex();
 
-			if (i == table.getGeometryColumnIndex()) {
-				values[i] = getGeometry();
+			columnTypes[index] = getType(index);
+
+			if (column.isGeometry()) {
+				values[index] = getGeometry();
 			} else {
-				values[i] = GeoPackageDatabaseUtils.getValue(this, i);
+				values[index] = GeoPackageDatabaseUtils.getValue(this, index,
+						column.getDataType());
 			}
 
 		}

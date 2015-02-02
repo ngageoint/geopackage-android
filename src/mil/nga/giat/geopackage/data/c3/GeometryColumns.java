@@ -3,9 +3,7 @@ package mil.nga.giat.geopackage.data.c3;
 import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.data.c2.Contents;
 import mil.nga.giat.geopackage.data.c2.ContentsDataType;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
-import mil.nga.giat.geopackage.geom.GeoPackagePoint;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 
 import com.j256.ormlite.field.DatabaseField;
@@ -153,11 +151,11 @@ public class GeometryColumns {
 		this.columnName = columnName;
 	}
 
-	public GeometryType getGeometryType() {
-		return GeometryType.valueOf(geometryTypeName);
+	public GeoPackageGeometryType getGeometryType() {
+		return GeoPackageGeometryType.valueOf(geometryTypeName);
 	}
 
-	public void setGeometryType(GeometryType geometryType) {
+	public void setGeometryType(GeoPackageGeometryType geometryType) {
 		this.geometryTypeName = geometryType.getName();
 	}
 

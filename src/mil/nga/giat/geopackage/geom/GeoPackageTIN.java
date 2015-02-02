@@ -14,7 +14,7 @@ public class GeoPackageTIN extends GeoPackagePolyhedralSurface {
 	 * @param hasM
 	 */
 	public GeoPackageTIN(boolean hasZ, boolean hasM) {
-		super(GeometryType.TIN, hasZ, hasM);
+		super(GeoPackageGeometryType.TIN, hasZ, hasM);
 	}
 
 }

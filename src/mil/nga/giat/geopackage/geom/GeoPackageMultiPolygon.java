@@ -17,7 +17,7 @@ public class GeoPackageMultiPolygon extends
 	 * @param hasM
 	 */
 	public GeoPackageMultiPolygon(boolean hasZ, boolean hasM) {
-		super(GeometryType.MULTIPOLYGON, hasZ, hasM);
+		super(GeoPackageGeometryType.MULTIPOLYGON, hasZ, hasM);
 	}
 
 	/**

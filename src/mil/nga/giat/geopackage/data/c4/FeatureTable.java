@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.data.c4;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -63,19 +64,18 @@ public class FeatureTable {
 		// Build the column name array for queries, find the primary key and
 		// geometry
 		this.columnNames = new String[columns.size()];
-		for (int i = 0; i < columns.size(); i++) {
-			FeatureColumn column = columns.get(i);
-			columnNames[i] = column.getName();
-			nameToIndex.put(column.getName(), i);
+		for (FeatureColumn column : columns) {
+
+			int index = column.getIndex();
 
 			if (column.isPrimaryKey()) {
 				if (pk != null) {
 					throw new GeoPackageException(
 							"More than one primary key column was found for feature table '"
 									+ tableName + "'. Index " + pk + " and "
-									+ i);
+									+ index);
 				}
-				pk = i;
+				pk = index;
 			}
 
 			if (column.isGeometry()) {
@@ -83,18 +83,21 @@ public class FeatureTable {
 					throw new GeoPackageException(
 							"More than one geometry column was found for feature table '"
 									+ tableName + "'. Index " + geometry
-									+ " and " + i);
+									+ " and " + index);
 
 				}
-				geometry = i;
+				geometry = index;
 			}
 
 			// Check for duplicate indices
-			if (indices.contains(column.getIndex())) {
-				throw new GeoPackageException("Duplicate index: "
-						+ column.getIndex() + ", Table Name: " + tableName);
+			if (indices.contains(index)) {
+				throw new GeoPackageException("Duplicate index: " + index
+						+ ", Table Name: " + tableName);
 			}
-			indices.add(column.getIndex());
+			indices.add(index);
+
+			columnNames[index] = column.getName();
+			nameToIndex.put(column.getName(), index);
 		}
 
 		if (pk == null) {
@@ -118,6 +121,9 @@ public class FeatureTable {
 						+ ", Table Name: " + tableName);
 			}
 		}
+
+		// Sort the features by index
+		Collections.sort(columns);
 	}
 
 	/**

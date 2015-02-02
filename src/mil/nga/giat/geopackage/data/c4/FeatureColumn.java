@@ -1,11 +1,14 @@
 package mil.nga.giat.geopackage.data.c4;
 
+import mil.nga.giat.geopackage.db.GeoPackageDataType;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
+
 /**
  * Metadata about a single column from a feature table
  * 
  * @author osbornb
  */
-public class FeatureColumn {
+public class FeatureColumn implements Comparable<FeatureColumn> {
 
 	/**
 	 * Column index
@@ -18,9 +21,9 @@ public class FeatureColumn {
 	private final String name;
 
 	/**
-	 * Column database type
+	 * Max count or size
 	 */
-	private final String type;
+	private final Long typeMax;
 
 	/**
 	 * True if a not null column
@@ -38,9 +41,14 @@ public class FeatureColumn {
 	private final boolean primaryKey;
 
 	/**
-	 * True if a geometry column
+	 * Geometry type if a geometry column
 	 */
-	private final boolean geometry;
+	private final GeoPackageGeometryType geometryType;
+
+	/**
+	 * Data type if not a geometry column
+	 */
+	private final GeoPackageDataType dataType;
 
 	/**
 	 * Create a new primary key column
@@ -50,8 +58,8 @@ public class FeatureColumn {
 	 * @return
 	 */
 	public static FeatureColumn createPrimaryKeyColumn(int index, String name) {
-		return new FeatureColumn(index, name, "INTEGER", true, null, true,
-				false);
+		return new FeatureColumn(index, name, null, true, null, true, null,
+				GeoPackageDataType.INTEGER);
 	}
 
 	/**
@@ -65,9 +73,9 @@ public class FeatureColumn {
 	 * @return
 	 */
 	public static FeatureColumn createGeometryColumn(int index, String name,
-			String type, boolean notNull, Object defaultValue) {
-		return new FeatureColumn(index, name, type, notNull, defaultValue,
-				false, true);
+			GeoPackageGeometryType type, boolean notNull, Object defaultValue) {
+		return new FeatureColumn(index, name, null, notNull, defaultValue,
+				false, type, null);
 	}
 
 	/**
@@ -81,9 +89,41 @@ public class FeatureColumn {
 	 * @return
 	 */
 	public static FeatureColumn createColumn(int index, String name,
-			String type, boolean notNull, Object defaultValue) {
-		return new FeatureColumn(index, name, type, notNull, defaultValue,
-				false, false);
+			GeoPackageDataType type, boolean notNull, Object defaultValue) {
+		return new FeatureColumn(index, name, null, notNull, defaultValue,
+				false, null, type);
+	}
+
+	/**
+	 * Create a new text column with optional max character count
+	 * 
+	 * @param index
+	 * @param name
+	 * @param maxCharCount
+	 * @param notNull
+	 * @param defaultValue
+	 * @return
+	 */
+	public static FeatureColumn createTextColumn(int index, String name,
+			Long maxCharCount, boolean notNull, Object defaultValue) {
+		return new FeatureColumn(index, name, maxCharCount, notNull,
+				defaultValue, false, null, GeoPackageDataType.TEXT);
+	}
+
+	/**
+	 * Create a new column
+	 * 
+	 * @param index
+	 * @param name
+	 * @param maxSize
+	 * @param notNull
+	 * @param defaultValue
+	 * @return
+	 */
+	public static FeatureColumn createBlobColumn(int index, String name,
+			Long maxSize, boolean notNull, Object defaultValue) {
+		return new FeatureColumn(index, name, maxSize, notNull, defaultValue,
+				false, null, GeoPackageDataType.BLOB);
 	}
 
 	/**
@@ -91,21 +131,24 @@ public class FeatureColumn {
 	 * 
 	 * @param index
 	 * @param name
-	 * @param type
+	 * @param typeMax
 	 * @param notNull
 	 * @param defaultValue
 	 * @param primaryKey
-	 * @param geometry
+	 * @param geometryType
+	 * @param dataType
 	 */
-	FeatureColumn(int index, String name, String type, boolean notNull,
-			Object defaultValue, boolean primaryKey, boolean geometry) {
+	FeatureColumn(int index, String name, Long typeMax, boolean notNull,
+			Object defaultValue, boolean primaryKey,
+			GeoPackageGeometryType geometryType, GeoPackageDataType dataType) {
 		this.index = index;
 		this.name = name;
-		this.type = type;
+		this.typeMax = typeMax;
 		this.notNull = notNull;
 		this.defaultValue = defaultValue;
 		this.primaryKey = primaryKey;
-		this.geometry = geometry;
+		this.geometryType = geometryType;
+		this.dataType = dataType;
 	}
 
 	public int getIndex() {
@@ -116,8 +159,8 @@ public class FeatureColumn {
 		return name;
 	}
 
-	public String getType() {
-		return type;
+	public Long getTypeMax() {
+		return typeMax;
 	}
 
 	public boolean isNotNull() {
@@ -132,8 +175,56 @@ public class FeatureColumn {
 		return primaryKey;
 	}
 
+	/**
+	 * Determine if this column is a geometry
+	 * 
+	 * @return
+	 */
 	public boolean isGeometry() {
-		return geometry;
+		return geometryType != null;
+	}
+
+	/**
+	 * When a geometry column, gets the geometry type
+	 * 
+	 * @return
+	 */
+	public GeoPackageGeometryType getGeometryType() {
+		return geometryType;
+	}
+
+	/**
+	 * When not a geometry column, gets the data type
+	 * 
+	 * @return
+	 */
+	public GeoPackageDataType getDataType() {
+		return dataType;
+	}
+
+	/**
+	 * Get the database type, either the geometry or data type
+	 * 
+	 * @return
+	 */
+	public String getTypeName() {
+		String type;
+		if (isGeometry()) {
+			type = geometryType.name();
+		} else {
+			type = dataType.name();
+		}
+		return type;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Sort by index
+	 */
+	@Override
+	public int compareTo(FeatureColumn another) {
+		return index - another.index;
 	}
 
 }

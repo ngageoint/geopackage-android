@@ -14,7 +14,7 @@ public class GeoPackageCircularString extends GeoPackageLineString {
 	 * @param hasM
 	 */
 	public GeoPackageCircularString(boolean hasZ, boolean hasM) {
-		super(GeometryType.CIRCULARSTRING, hasZ, hasM);
+		super(GeoPackageGeometryType.CIRCULARSTRING, hasZ, hasM);
 	}
 
 }

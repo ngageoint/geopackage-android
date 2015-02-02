@@ -17,7 +17,7 @@ import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
 import mil.nga.giat.geopackage.geom.GeoPackagePolyhedralSurface;
 import mil.nga.giat.geopackage.geom.GeoPackageTIN;
 import mil.nga.giat.geopackage.geom.GeoPackageTriangle;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
 import mil.nga.giat.geopackage.util.ByteReader;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 
@@ -89,7 +89,7 @@ public class WkbGeometryReader {
 			break;
 		}
 
-		GeometryType geometryType = GeometryType.fromCode(geometryTypeCode);
+		GeoPackageGeometryType geometryType = GeoPackageGeometryType.fromCode(geometryTypeCode);
 
 		GeoPackageGeometry geometry = null;
 

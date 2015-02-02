@@ -36,7 +36,7 @@ public class GeoPackagePoint extends GeoPackageGeometry {
 	 * @param y
 	 */
 	public GeoPackagePoint(boolean hasZ, boolean hasM, double x, double y) {
-		super(GeometryType.POINT, hasZ, hasM);
+		super(GeoPackageGeometryType.POINT, hasZ, hasM);
 		this.x = x;
 		this.y = y;
 	}

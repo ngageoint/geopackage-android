@@ -15,16 +15,18 @@ import mil.nga.giat.geopackage.data.c4.FeatureCursor;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
 import mil.nga.giat.geopackage.data.c4.FeatureRow;
 import mil.nga.giat.geopackage.data.c4.FeatureTable;
+import mil.nga.giat.geopackage.data.c4.FeatureValue;
+import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryCollection;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
 import mil.nga.giat.geopackage.geom.GeoPackageLineString;
 import mil.nga.giat.geopackage.geom.GeoPackageMultiLineString;
 import mil.nga.giat.geopackage.geom.GeoPackageMultiPoint;
 import mil.nga.giat.geopackage.geom.GeoPackageMultiPolygon;
 import mil.nga.giat.geopackage.geom.GeoPackagePoint;
 import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
-import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.giat.geopackage.util.ByteReader;
@@ -92,7 +94,7 @@ public class FeatureUtils {
 					TestCase.assertNotNull(geoPackageGeometryData);
 					GeoPackageGeometry geometry = geoPackageGeometryData
 							.getGeometry();
-					GeometryType geometryType = geometryColumns
+					GeoPackageGeometryType geometryType = geometryColumns
 							.getGeometryType();
 					validateGeometry(geometryType, geometry);
 
@@ -147,6 +149,8 @@ public class FeatureUtils {
 			}
 			TestCase.assertEquals(count, manualCount);
 
+			TestCase.assertTrue("No features to test", count > 0);
+
 			// Choose random feature
 			int random = (int) (Math.random() * count);
 			cursor.moveToPosition(random);
@@ -160,14 +164,14 @@ public class FeatureUtils {
 			TestCase.assertEquals(featureRow.getId(), queryFeatureRow.getId());
 
 			// Find two non id non geom columns
-			String column1 = null;
-			String column2 = null;
+			FeatureColumn column1 = null;
+			FeatureColumn column2 = null;
 			for (FeatureColumn column : featureRow.getTable().getColumns()) {
 				if (!column.isPrimaryKey() && !column.isGeometry()) {
 					if (column1 == null) {
-						column1 = column.getName();
+						column1 = column;
 					} else {
-						column2 = column.getName();
+						column2 = column;
 						break;
 					}
 				}
@@ -176,14 +180,26 @@ public class FeatureUtils {
 			// Query for equal
 			if (column1 != null) {
 
-				Object column1Value = featureRow.getValue(column1);
-				cursor = dao.queryForEq(column1, column1Value);
+				Object column1Value = featureRow.getValue(column1.getName());
+				Class<?> column1ClassType = column1.getDataType()
+						.getClassType();
+				boolean column1Decimal = column1ClassType == Double.class
+						|| column1ClassType == Float.class;
+				FeatureValue column1FeatureValue;
+				if (column1Decimal) {
+					column1FeatureValue = new FeatureValue(column1Value,
+							.000001);
+				} else {
+					column1FeatureValue = new FeatureValue(column1Value);
+				}
+				cursor = dao.queryForFeatureEq(column1.getName(),
+						column1FeatureValue);
 				TestCase.assertTrue(cursor.getCount() > 0);
 				boolean found = false;
 				while (cursor.moveToNext()) {
 					queryFeatureRow = cursor.getRow();
 					TestCase.assertEquals(column1Value,
-							queryFeatureRow.getValue(column1));
+							queryFeatureRow.getValue(column1.getName()));
 					if (!found) {
 						found = featureRow.getId() == queryFeatureRow.getId();
 					}
@@ -192,23 +208,34 @@ public class FeatureUtils {
 				cursor.close();
 
 				// Query for field values
-				Map<String, Object> fieldValues = new HashMap<String, Object>();
-				fieldValues.put(column1, column1Value);
+				Map<String, FeatureValue> fieldValues = new HashMap<String, FeatureValue>();
+				fieldValues.put(column1.getName(), column1FeatureValue);
 				Object column2Value = null;
+				FeatureValue column2FeatureValue;
 				if (column2 != null) {
-					column2Value = featureRow.getValue(column2);
-					fieldValues.put(column2, column2Value);
+					column2Value = featureRow.getValue(column2.getName());
+					Class<?> column2ClassType = column2.getDataType()
+							.getClassType();
+					boolean column2Decimal = column2ClassType == Double.class
+							|| column2ClassType == Float.class;
+					if (column2Decimal) {
+						column2FeatureValue = new FeatureValue(column2Value,
+								.000001);
+					} else {
+						column2FeatureValue = new FeatureValue(column2Value);
+					}
+					fieldValues.put(column2.getName(), column2FeatureValue);
 				}
-				cursor = dao.queryForFieldValues(fieldValues);
+				cursor = dao.queryForFieldFeatureValues(fieldValues);
 				TestCase.assertTrue(cursor.getCount() > 0);
 				found = false;
 				while (cursor.moveToNext()) {
 					queryFeatureRow = cursor.getRow();
 					TestCase.assertEquals(column1Value,
-							queryFeatureRow.getValue(column1));
+							queryFeatureRow.getValue(column1.getName()));
 					if (column2 != null) {
 						TestCase.assertEquals(column2Value,
-								queryFeatureRow.getValue(column2));
+								queryFeatureRow.getValue(column2.getName()));
 					}
 					if (!found) {
 						found = featureRow.getId() == queryFeatureRow.getId();
@@ -232,6 +259,8 @@ public class FeatureUtils {
 		TestCase.assertEquals(columns.length, featureRow.columnCount());
 
 		for (int i = 0; i < featureRow.columnCount(); i++) {
+			FeatureColumn column = featureRow.getTable().getColumns().get(i);
+			TestCase.assertEquals(i, column.getIndex());
 			TestCase.assertEquals(columns[i], featureRow.getColumnName(i));
 			TestCase.assertEquals(i, featureRow.getColumnIndex(columns[i]));
 			int rowType = featureRow.getRowColumnType(i);
@@ -240,11 +269,11 @@ public class FeatureUtils {
 			switch (rowType) {
 
 			case Cursor.FIELD_TYPE_INTEGER:
-				TestCase.assertTrue(value instanceof Long);
+				validateIntegerValue(value, column.getDataType());
 				break;
 
 			case Cursor.FIELD_TYPE_FLOAT:
-				TestCase.assertTrue(value instanceof Double);
+				validateFloatValue(value, column.getDataType());
 				break;
 
 			case Cursor.FIELD_TYPE_STRING:
@@ -268,12 +297,71 @@ public class FeatureUtils {
 	}
 
 	/**
+	 * Validate the integer value with the data type
+	 * 
+	 * @param value
+	 * @param dataType
+	 * @return
+	 */
+	public static void validateIntegerValue(Object value,
+			GeoPackageDataType dataType) {
+
+		switch (dataType) {
+
+		case BOOLEAN:
+			TestCase.assertTrue(value instanceof Boolean);
+			break;
+		case TINYINT:
+			TestCase.assertTrue(value instanceof Byte);
+			break;
+		case SMALLINT:
+			TestCase.assertTrue(value instanceof Short);
+			break;
+		case MEDIUMINT:
+			TestCase.assertTrue(value instanceof Integer);
+			break;
+		case INT:
+		case INTEGER:
+			TestCase.assertTrue(value instanceof Long);
+			break;
+		default:
+			throw new GeoPackageException("Data Type " + dataType
+					+ " is not an integer type");
+		}
+	}
+
+	/**
+	 * Validate the float value with the data type
+	 * 
+	 * @param value
+	 * @param dataType
+	 * @return
+	 */
+	public static void validateFloatValue(Object value,
+			GeoPackageDataType dataType) {
+
+		switch (dataType) {
+
+		case FLOAT:
+			TestCase.assertTrue(value instanceof Float);
+			break;
+		case DOUBLE:
+		case REAL:
+			TestCase.assertTrue(value instanceof Double);
+			break;
+		default:
+			throw new GeoPackageException("Data Type " + dataType
+					+ " is not a float type");
+		}
+	}
+
+	/**
 	 * Validate the geometry
 	 * 
 	 * @param geometryType
 	 * @param geometry
 	 */
-	private static void validateGeometry(GeometryType geometryType,
+	private static void validateGeometry(GeoPackageGeometryType geometryType,
 			GeoPackageGeometry geometry) {
 
 		switch (geometryType) {
@@ -338,7 +426,8 @@ public class FeatureUtils {
 	private static void validatePoint(GeoPackageGeometry topGeometry,
 			GeoPackagePoint point) {
 
-		TestCase.assertEquals(GeometryType.POINT, point.getGeometryType());
+		TestCase.assertEquals(GeoPackageGeometryType.POINT,
+				point.getGeometryType());
 
 		validateZAndM(topGeometry, point);
 
@@ -364,7 +453,7 @@ public class FeatureUtils {
 	private static void validateLineString(GeoPackageGeometry topGeometry,
 			GeoPackageLineString lineString) {
 
-		TestCase.assertEquals(GeometryType.LINESTRING,
+		TestCase.assertEquals(GeoPackageGeometryType.LINESTRING,
 				lineString.getGeometryType());
 
 		validateZAndM(topGeometry, lineString);
@@ -384,7 +473,8 @@ public class FeatureUtils {
 	private static void validatePolygon(GeoPackageGeometry topGeometry,
 			GeoPackagePolygon polygon) {
 
-		TestCase.assertEquals(GeometryType.POLYGON, polygon.getGeometryType());
+		TestCase.assertEquals(GeoPackageGeometryType.POLYGON,
+				polygon.getGeometryType());
 
 		validateZAndM(topGeometry, polygon);
 
@@ -403,7 +493,7 @@ public class FeatureUtils {
 	private static void validateMultiPoint(GeoPackageGeometry topGeometry,
 			GeoPackageMultiPoint multiPoint) {
 
-		TestCase.assertEquals(GeometryType.MULTIPOINT,
+		TestCase.assertEquals(GeoPackageGeometryType.MULTIPOINT,
 				multiPoint.getGeometryType());
 
 		validateZAndM(topGeometry, multiPoint);
@@ -423,7 +513,7 @@ public class FeatureUtils {
 	private static void validateMultiLineString(GeoPackageGeometry topGeometry,
 			GeoPackageMultiLineString multiLineString) {
 
-		TestCase.assertEquals(GeometryType.MULTILINESTRING,
+		TestCase.assertEquals(GeoPackageGeometryType.MULTILINESTRING,
 				multiLineString.getGeometryType());
 
 		validateZAndM(topGeometry, multiLineString);
@@ -443,7 +533,7 @@ public class FeatureUtils {
 	private static void validateMultiPolygon(GeoPackageGeometry topGeometry,
 			GeoPackageMultiPolygon multiPolygon) {
 
-		TestCase.assertEquals(GeometryType.MULTIPOLYGON,
+		TestCase.assertEquals(GeoPackageGeometryType.MULTIPOLYGON,
 				multiPolygon.getGeometryType());
 
 		validateZAndM(topGeometry, multiPolygon);

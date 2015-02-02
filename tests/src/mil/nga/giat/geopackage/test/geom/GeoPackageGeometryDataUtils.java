@@ -27,7 +27,7 @@ import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
 import mil.nga.giat.geopackage.geom.GeoPackagePolyhedralSurface;
 import mil.nga.giat.geopackage.geom.GeoPackageTIN;
 import mil.nga.giat.geopackage.geom.GeoPackageTriangle;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 
 /**
@@ -199,7 +199,7 @@ public class GeoPackageGeometryDataUtils {
 		} else {
 			TestCase.assertNotNull(actual);
 
-			GeometryType geometryType = expected.getGeometryType();
+			GeoPackageGeometryType geometryType = expected.getGeometryType();
 			switch (geometryType) {
 
 			case GEOMETRY:

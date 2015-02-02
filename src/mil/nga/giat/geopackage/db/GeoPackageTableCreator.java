@@ -1,12 +1,16 @@
-package mil.nga.giat.geopackage.util;
+package mil.nga.giat.geopackage.db;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import mil.nga.giat.geopackage.R;
+import mil.nga.giat.geopackage.data.c4.FeatureColumn;
+import mil.nga.giat.geopackage.data.c4.FeatureTable;
+import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,7 +35,7 @@ public class GeoPackageTableCreator {
 	private final Context context;
 
 	/**
-	 * Assest manager
+	 * Asset manager
 	 */
 	private final AssetManager assetManager;
 
@@ -95,7 +99,7 @@ public class GeoPackageTableCreator {
 	/**
 	 * Create Geometry Columns table
 	 * 
-	 * @return
+	 * @return executed statements
 	 */
 	public int createGeometryColumns() {
 		int statements = 0;
@@ -116,7 +120,7 @@ public class GeoPackageTableCreator {
 	 * Run the script input stream
 	 * 
 	 * @param stream
-	 * @return
+	 * @return executed statements
 	 */
 	private int runScript(final InputStream stream) {
 		int count = 0;
@@ -132,6 +136,51 @@ public class GeoPackageTableCreator {
 			count++;
 		}
 		return count;
+	}
+
+	/**
+	 * Create the user defined feature table
+	 * 
+	 * @param table
+	 */
+	public void createTable(FeatureTable table) {
+
+		// Verify the table does not already exist
+		if (GeoPackageDatabaseUtils.tableExists(db, table.getTableName())) {
+			throw new GeoPackageException(
+					"Feature Table already exists and can not be created: "
+							+ table.getTableName());
+		}
+
+		// Build the create table sql
+		StringBuilder sql = new StringBuilder();
+		sql.append("CREATE TABLE ").append(table.getTableName()).append(" (\n");
+
+		// Add each column to the sql
+		List<FeatureColumn> columns = table.getColumns();
+		for (int i = 0; i < columns.size(); i++) {
+			FeatureColumn column = columns.get(i);
+			sql.append("  ").append(column.getName()).append(" ")
+					.append(column.getTypeName());
+			if (column.getTypeMax() != null) {
+				sql.append("(").append(column.getTypeMax()).append(")");
+			}
+			if (column.isNotNull()) {
+				sql.append(" NOT NULL");
+			}
+			if (column.isPrimaryKey()) {
+				sql.append(" PRIMARY KEY");
+			}
+			if (i + 1 < columns.size()) {
+				sql.append(",");
+			}
+			sql.append("\n");
+		}
+
+		sql.append(");");
+
+		// Create the table
+		db.execSQL(sql.toString());
 	}
 
 }

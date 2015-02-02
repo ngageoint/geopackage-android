@@ -17,7 +17,7 @@ public class GeoPackageMultiPoint extends
 	 * @param hasM
 	 */
 	public GeoPackageMultiPoint(boolean hasZ, boolean hasM) {
-		super(GeometryType.MULTIPOINT, hasZ, hasM);
+		super(GeoPackageGeometryType.MULTIPOINT, hasZ, hasM);
 	}
 
 	/**

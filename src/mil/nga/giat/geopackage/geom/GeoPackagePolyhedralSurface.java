@@ -22,7 +22,7 @@ public class GeoPackagePolyhedralSurface extends GeoPackageSurface {
 	 * @param hasM
 	 */
 	public GeoPackagePolyhedralSurface(boolean hasZ, boolean hasM) {
-		super(GeometryType.POLYHEDRALSURFACE, hasZ, hasM);
+		super(GeoPackageGeometryType.POLYHEDRALSURFACE, hasZ, hasM);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class GeoPackagePolyhedralSurface extends GeoPackageSurface {
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackagePolyhedralSurface(GeometryType type, boolean hasZ,
+	protected GeoPackagePolyhedralSurface(GeoPackageGeometryType type, boolean hasZ,
 			boolean hasM) {
 		super(type, hasZ, hasM);
 	}

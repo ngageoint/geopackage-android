@@ -15,7 +15,7 @@ public abstract class GeoPackageMultiCurve<T extends GeoPackageCurve> extends
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackageMultiCurve(GeometryType type, boolean hasZ, boolean hasM) {
+	protected GeoPackageMultiCurve(GeoPackageGeometryType type, boolean hasZ, boolean hasM) {
 		super(type, hasZ, hasM);
 	}
 

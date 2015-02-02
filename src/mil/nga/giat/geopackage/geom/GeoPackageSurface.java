@@ -14,7 +14,7 @@ public abstract class GeoPackageSurface extends GeoPackageGeometry {
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackageSurface(GeometryType type, boolean hasZ, boolean hasM) {
+	protected GeoPackageSurface(GeoPackageGeometryType type, boolean hasZ, boolean hasM) {
 		super(type, hasZ, hasM);
 	}
 

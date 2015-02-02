@@ -205,8 +205,9 @@ public class FeatureRow {
 		Object objectValue = getValue(getPkColumnIndex());
 		if (objectValue == null) {
 			throw new GeoPackageException("Feature Row Id was null. Table: "
-					+ table.getTableName() + ", Column Index: " + getPkColumnIndex()
-					+ ", Column Name: " + getPkColumn().getName());
+					+ table.getTableName() + ", Column Index: "
+					+ getPkColumnIndex() + ", Column Name: "
+					+ getPkColumn().getName());
 		}
 		if (objectValue instanceof Number) {
 			id = ((Number) objectValue).longValue();
@@ -298,6 +299,15 @@ public class FeatureRow {
 	}
 
 	/**
+	 * Set the geometry data
+	 * 
+	 * @param geometryData
+	 */
+	public void setGeometry(GeoPackageGeometryData geometryData) {
+		setValue(getGeometryColumnIndex(), geometryData);
+	}
+
+	/**
 	 * Set the id, package access only for the DAO
 	 * 
 	 * @param id
@@ -370,7 +380,10 @@ public class FeatureRow {
 					} else if (value instanceof byte[]) {
 						contentValues.put(columnName, (byte[]) value);
 					} else if (value instanceof Boolean) {
-						contentValues.put(columnName, (Boolean) value);
+						Boolean booleanValue = (Boolean) value;
+						short shortBoolean = booleanValue ? (short) 1
+								: (short) 0;
+						contentValues.put(columnName, shortBoolean);
 					} else {
 						throw new GeoPackageException(
 								"Unsupported update column value. column: "

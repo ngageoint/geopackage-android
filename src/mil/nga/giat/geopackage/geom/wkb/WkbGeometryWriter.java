@@ -18,7 +18,7 @@ import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
 import mil.nga.giat.geopackage.geom.GeoPackagePolyhedralSurface;
 import mil.nga.giat.geopackage.geom.GeoPackageTIN;
 import mil.nga.giat.geopackage.geom.GeoPackageTriangle;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
 import mil.nga.giat.geopackage.util.ByteWriter;
 import mil.nga.giat.geopackage.util.GeoPackageException;
 
@@ -47,7 +47,7 @@ public class WkbGeometryWriter {
 		// Write the geometry type integer
 		writer.writeInt(geometry.getWkbCode());
 
-		GeometryType geometryType = geometry.getGeometryType();
+		GeoPackageGeometryType geometryType = geometry.getGeometryType();
 
 		switch (geometryType) {
 

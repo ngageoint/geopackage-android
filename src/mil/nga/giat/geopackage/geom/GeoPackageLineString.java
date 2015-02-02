@@ -22,7 +22,7 @@ public class GeoPackageLineString extends GeoPackageCurve {
 	 * @param hasM
 	 */
 	public GeoPackageLineString(boolean hasZ, boolean hasM) {
-		super(GeometryType.LINESTRING, hasZ, hasM);
+		super(GeoPackageGeometryType.LINESTRING, hasZ, hasM);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class GeoPackageLineString extends GeoPackageCurve {
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackageLineString(GeometryType type, boolean hasZ, boolean hasM) {
+	protected GeoPackageLineString(GeoPackageGeometryType type, boolean hasZ, boolean hasM) {
 		super(type, hasZ, hasM);
 	}
 

@@ -23,7 +23,7 @@ public class GeoPackageGeometryCollection<T extends GeoPackageGeometry> extends
 	 * @param hasM
 	 */
 	public GeoPackageGeometryCollection(boolean hasZ, boolean hasM) {
-		super(GeometryType.GEOMETRYCOLLECTION, hasZ, hasM);
+		super(GeoPackageGeometryType.GEOMETRYCOLLECTION, hasZ, hasM);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class GeoPackageGeometryCollection<T extends GeoPackageGeometry> extends
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackageGeometryCollection(GeometryType type, boolean hasZ,
+	protected GeoPackageGeometryCollection(GeoPackageGeometryType type, boolean hasZ,
 			boolean hasM) {
 		super(type, hasZ, hasM);
 	}

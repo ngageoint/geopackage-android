@@ -37,17 +37,17 @@ public class GeoPackageGeometryData {
 	/**
 	 * True if an extended geometry, false if standard
 	 */
-	private boolean extended;
+	private boolean extended = false;
 
 	/**
 	 * True if the geometry is empty
 	 */
-	private boolean empty;
+	private boolean empty = true;
 
 	/**
 	 * Byte ordering, big or little endian
 	 */
-	private ByteOrder byteOrder;
+	private ByteOrder byteOrder = ByteOrder.BIG_ENDIAN;
 
 	/**
 	 * Spatial Reference System Id
@@ -68,6 +68,13 @@ public class GeoPackageGeometryData {
 	 * Geometry
 	 */
 	private GeoPackageGeometry geometry;
+
+	/**
+	 * Default constructor
+	 */
+	public GeoPackageGeometryData(int srsId) {
+		this.srsId = srsId;
+	}
 
 	/**
 	 * Constructor
@@ -390,6 +397,9 @@ public class GeoPackageGeometryData {
 
 	public void setGeometry(GeoPackageGeometry geometry) {
 		this.geometry = geometry;
+		if (geometry != null) {
+			empty = false;
+		}
 	}
 
 	/**

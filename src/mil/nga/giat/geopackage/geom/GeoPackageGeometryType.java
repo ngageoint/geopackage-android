@@ -5,7 +5,7 @@ package mil.nga.giat.geopackage.geom;
  * 
  * @author osbornb
  */
-public enum GeometryType {
+public enum GeoPackageGeometryType {
 
 	/**
 	 * The root of the geometry type hierarchy
@@ -121,7 +121,7 @@ public enum GeometryType {
 	 * 
 	 * @param code
 	 */
-	private GeometryType(int code) {
+	private GeoPackageGeometryType(int code) {
 		this.code = code;
 	}
 
@@ -149,8 +149,8 @@ public enum GeometryType {
 	 * @param code
 	 * @return
 	 */
-	public static GeometryType fromCode(int code) {
-		GeometryType geometryType = null;
+	public static GeoPackageGeometryType fromCode(int code) {
+		GeoPackageGeometryType geometryType = null;
 
 		switch (code) {
 		case 0:

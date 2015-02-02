@@ -23,7 +23,7 @@ public class GeoPackageCurvePolygon<T extends GeoPackageCurve> extends
 	 * @param hasM
 	 */
 	public GeoPackageCurvePolygon(boolean hasZ, boolean hasM) {
-		super(GeometryType.CURVEPOLYGON, hasZ, hasM);
+		super(GeoPackageGeometryType.CURVEPOLYGON, hasZ, hasM);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class GeoPackageCurvePolygon<T extends GeoPackageCurve> extends
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackageCurvePolygon(GeometryType type, boolean hasZ,
+	protected GeoPackageCurvePolygon(GeoPackageGeometryType type, boolean hasZ,
 			boolean hasM) {
 		super(type, hasZ, hasM);
 	}

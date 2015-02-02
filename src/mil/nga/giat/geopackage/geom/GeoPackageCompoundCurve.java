@@ -22,7 +22,7 @@ public class GeoPackageCompoundCurve extends GeoPackageCurve {
 	 * @param hasM
 	 */
 	public GeoPackageCompoundCurve(boolean hasZ, boolean hasM) {
-		super(GeometryType.COMPOUNDCURVE, hasZ, hasM);
+		super(GeoPackageGeometryType.COMPOUNDCURVE, hasZ, hasM);
 	}
 
 	public List<GeoPackageLineString> getLineStrings() {

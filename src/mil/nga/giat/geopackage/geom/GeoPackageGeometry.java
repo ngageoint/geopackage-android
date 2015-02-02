@@ -10,7 +10,7 @@ public abstract class GeoPackageGeometry {
 	/**
 	 * Geometry type
 	 */
-	private final GeometryType geometryType;
+	private final GeoPackageGeometryType geometryType;
 
 	/**
 	 * Has z coordinates
@@ -29,14 +29,14 @@ public abstract class GeoPackageGeometry {
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackageGeometry(GeometryType geometryType, boolean hasZ,
+	protected GeoPackageGeometry(GeoPackageGeometryType geometryType, boolean hasZ,
 			boolean hasM) {
 		this.geometryType = geometryType;
 		this.hasZ = hasZ;
 		this.hasM = hasM;
 	}
 
-	public GeometryType getGeometryType() {
+	public GeoPackageGeometryType getGeometryType() {
 		return geometryType;
 	}
 

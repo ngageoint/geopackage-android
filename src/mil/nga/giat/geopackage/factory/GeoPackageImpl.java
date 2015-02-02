@@ -17,8 +17,8 @@ import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c4.FeatureCursor;
 import mil.nga.giat.geopackage.data.c4.FeatureDao;
 import mil.nga.giat.geopackage.data.c4.FeatureTable;
+import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.util.GeoPackageException;
-import mil.nga.giat.geopackage.util.GeoPackageTableCreator;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -243,7 +243,7 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public void createTable(FeatureTable table) {
-		// TODO create new feature table
+		tableCreator.createTable(table);
 	}
 
 	/**

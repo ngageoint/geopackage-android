@@ -15,7 +15,7 @@ public class GeoPackagePolygon extends
 	 * @param hasM
 	 */
 	public GeoPackagePolygon(boolean hasZ, boolean hasM) {
-		super(GeometryType.POLYGON, hasZ, hasM);
+		super(GeoPackageGeometryType.POLYGON, hasZ, hasM);
 	}
 
 	/**
@@ -25,7 +25,7 @@ public class GeoPackagePolygon extends
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeoPackagePolygon(GeometryType type, boolean hasZ, boolean hasM) {
+	protected GeoPackagePolygon(GeoPackageGeometryType type, boolean hasZ, boolean hasM) {
 		super(type, hasZ, hasM);
 	}
 

@@ -17,6 +17,7 @@ import mil.nga.giat.geopackage.data.c2.ContentsDataType;
 import mil.nga.giat.geopackage.data.c3.GeometryColumns;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
 import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
 import mil.nga.giat.geopackage.test.TestUtils;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
@@ -260,7 +261,7 @@ public class ContentsUtils {
 
 		// Create the feature table
 		geoPackage.createTable(TestUtils.buildTable(contents.getTableName(),
-				"geom", "GEOMETRY"));
+				"geom", GeoPackageGeometryType.GEOMETRY));
 
 		dao.create(contents);
 
