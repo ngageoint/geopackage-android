@@ -122,10 +122,10 @@ public class TestUtils {
 		List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
 
 		columns.add(FeatureColumn.createPrimaryKeyColumn(0, "id"));
-		columns.add(FeatureColumn.createTextColumn(7, "test_text_limited", 5L,
-				false, null));
-		columns.add(FeatureColumn.createBlobColumn(8, "test_blob_limited", 7L,
-				false, null));
+		columns.add(FeatureColumn.createColumn(7, "test_text_limited",
+				GeoPackageDataType.TEXT, 5L, false, null));
+		columns.add(FeatureColumn.createColumn(8, "test_blob_limited",
+				GeoPackageDataType.BLOB, 7L, false, null));
 		columns.add(FeatureColumn.createGeometryColumn(1, geometryColumn,
 				geometryType, false, null));
 		columns.add(FeatureColumn.createColumn(2, "test_text",
@@ -209,9 +209,9 @@ public class TestUtils {
 
 						case TEXT:
 							String text = UUID.randomUUID().toString();
-							if (column.getTypeMax() != null
-									&& text.length() > column.getTypeMax()) {
-								text = text.substring(0, column.getTypeMax()
+							if (column.getMax() != null
+									&& text.length() > column.getMax()) {
+								text = text.substring(0, column.getMax()
 										.intValue());
 							}
 							value = text;
@@ -230,12 +230,12 @@ public class TestUtils {
 						case BLOB:
 							byte[] blob = UUID.randomUUID().toString()
 									.getBytes();
-							if (column.getTypeMax() != null
-									&& blob.length > column.getTypeMax()) {
-								byte[] blobLimited = new byte[column
-										.getTypeMax().intValue()];
+							if (column.getMax() != null
+									&& blob.length > column.getMax()) {
+								byte[] blobLimited = new byte[column.getMax()
+										.intValue()];
 								ByteBuffer.wrap(blob, 0,
-										column.getTypeMax().intValue()).get(
+										column.getMax().intValue()).get(
 										blobLimited);
 								blob = blobLimited;
 							}
@@ -291,8 +291,8 @@ public class TestUtils {
 	 * @param ring
 	 * @return
 	 */
-	public static LineString createLineString(boolean hasZ,
-			boolean hasM, boolean ring) {
+	public static LineString createLineString(boolean hasZ, boolean hasM,
+			boolean ring) {
 
 		LineString lineString = new LineString(hasZ, hasM);
 

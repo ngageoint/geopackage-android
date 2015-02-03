@@ -2,15 +2,15 @@ package mil.nga.giat.geopackage.features.user;
 
 import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.user.UserCursor;
 import android.database.Cursor;
-import android.database.CursorWrapper;
 
 /**
  * Feature Cursor to wrap a database cursor for feature queries
  * 
  * @author osbornb
  */
-public class FeatureCursor extends CursorWrapper {
+public class FeatureCursor extends UserCursor<FeatureRow> {
 
 	/**
 	 * Feature DAO
@@ -50,6 +50,7 @@ public class FeatureCursor extends CursorWrapper {
 	 * 
 	 * @return
 	 */
+	@Override
 	public FeatureRow getRow() {
 
 		FeatureTable table = dao.getTable();

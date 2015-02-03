@@ -1,12 +1,12 @@
-package mil.nga.giat.geopackage.features.user;
+package mil.nga.giat.geopackage.user;
 
 /**
- * Feature Value wrapper to specify additional value attributes, such as a range
+ * Column Value wrapper to specify additional value attributes, such as a range
  * tolerance for floating point numbers
  * 
  * @author osbornb
  */
-public class FeatureValue {
+public class ColumnValue {
 
 	/**
 	 * Value
@@ -23,7 +23,7 @@ public class FeatureValue {
 	 * 
 	 * @param value
 	 */
-	public FeatureValue(Object value) {
+	public ColumnValue(Object value) {
 		this(value, null);
 	}
 
@@ -33,7 +33,7 @@ public class FeatureValue {
 	 * @param value
 	 * @param tolerance
 	 */
-	public FeatureValue(Object value, Double tolerance) {
+	public ColumnValue(Object value, Double tolerance) {
 		this.value = value;
 		this.tolerance = tolerance;
 	}

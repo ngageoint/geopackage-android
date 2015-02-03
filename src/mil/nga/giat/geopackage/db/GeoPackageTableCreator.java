@@ -169,8 +169,8 @@ public class GeoPackageTableCreator {
 			FeatureColumn column = columns.get(i);
 			sql.append("  ").append(column.getName()).append(" ")
 					.append(column.getTypeName());
-			if (column.getTypeMax() != null) {
-				sql.append("(").append(column.getTypeMax()).append(")");
+			if (column.getMax() != null) {
+				sql.append("(").append(column.getMax()).append(")");
 			}
 			if (column.isNotNull()) {
 				sql.append(" NOT NULL");

@@ -18,7 +18,6 @@ import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureRow;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
-import mil.nga.giat.geopackage.features.user.FeatureValue;
 import mil.nga.giat.geopackage.geom.Geometry;
 import mil.nga.giat.geopackage.geom.GeometryCollection;
 import mil.nga.giat.geopackage.geom.GeometryType;
@@ -32,6 +31,7 @@ import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
 import mil.nga.giat.geopackage.io.ByteReader;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
+import mil.nga.giat.geopackage.user.ColumnValue;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 
@@ -186,14 +186,14 @@ public class FeatureUtils {
 						.getClassType();
 				boolean column1Decimal = column1ClassType == Double.class
 						|| column1ClassType == Float.class;
-				FeatureValue column1FeatureValue;
+				ColumnValue column1FeatureValue;
 				if (column1Decimal) {
-					column1FeatureValue = new FeatureValue(column1Value,
+					column1FeatureValue = new ColumnValue(column1Value,
 							.000001);
 				} else {
-					column1FeatureValue = new FeatureValue(column1Value);
+					column1FeatureValue = new ColumnValue(column1Value);
 				}
-				cursor = dao.queryForFeatureEq(column1.getName(),
+				cursor = dao.queryForEq(column1.getName(),
 						column1FeatureValue);
 				TestCase.assertTrue(cursor.getCount() > 0);
 				boolean found = false;
@@ -209,10 +209,10 @@ public class FeatureUtils {
 				cursor.close();
 
 				// Query for field values
-				Map<String, FeatureValue> fieldValues = new HashMap<String, FeatureValue>();
+				Map<String, ColumnValue> fieldValues = new HashMap<String, ColumnValue>();
 				fieldValues.put(column1.getName(), column1FeatureValue);
 				Object column2Value = null;
-				FeatureValue column2FeatureValue;
+				ColumnValue column2FeatureValue;
 				if (column2 != null) {
 					column2Value = featureRow.getValue(column2.getName());
 					Class<?> column2ClassType = column2.getDataType()
@@ -220,14 +220,14 @@ public class FeatureUtils {
 					boolean column2Decimal = column2ClassType == Double.class
 							|| column2ClassType == Float.class;
 					if (column2Decimal) {
-						column2FeatureValue = new FeatureValue(column2Value,
+						column2FeatureValue = new ColumnValue(column2Value,
 								.000001);
 					} else {
-						column2FeatureValue = new FeatureValue(column2Value);
+						column2FeatureValue = new ColumnValue(column2Value);
 					}
 					fieldValues.put(column2.getName(), column2FeatureValue);
 				}
-				cursor = dao.queryForFieldFeatureValues(fieldValues);
+				cursor = dao.queryForValueFieldValues(fieldValues);
 				TestCase.assertTrue(cursor.getCount() > 0);
 				found = false;
 				while (cursor.moveToNext()) {
@@ -661,15 +661,15 @@ public class FeatureUtils {
 										updatedString = UUID.randomUUID()
 												.toString();
 									}
-									if (featureColumn.getTypeMax() != null) {
+									if (featureColumn.getMax() != null) {
 										if (updatedLimitedString != null) {
 											if (updatedString.length() > featureColumn
-													.getTypeMax()) {
+													.getMax()) {
 												updatedLimitedString = updatedString
 														.substring(
 																0,
 																featureColumn
-																		.getTypeMax()
+																		.getMax()
 																		.intValue());
 											} else {
 												updatedLimitedString = updatedString;
@@ -773,18 +773,18 @@ public class FeatureUtils {
 										updatedBytes = UUID.randomUUID()
 												.toString().getBytes();
 									}
-									if (featureColumn.getTypeMax() != null) {
+									if (featureColumn.getMax() != null) {
 										if (updatedLimitedBytes != null) {
 											if (updatedBytes.length > featureColumn
-													.getTypeMax()) {
+													.getMax()) {
 												updatedLimitedBytes = new byte[featureColumn
-														.getTypeMax()
+														.getMax()
 														.intValue()];
 												ByteBuffer
 														.wrap(updatedBytes,
 																0,
 																featureColumn
-																		.getTypeMax()
+																		.getMax()
 																		.intValue())
 														.get(updatedLimitedBytes);
 											} else {
@@ -835,7 +835,7 @@ public class FeatureUtils {
 								&& !readFeatureColumn.isGeometry()) {
 							switch (readRow.getRowColumnType(readColumnName)) {
 							case Cursor.FIELD_TYPE_STRING:
-								if (readFeatureColumn.getTypeMax() != null) {
+								if (readFeatureColumn.getMax() != null) {
 									TestCase.assertEquals(updatedLimitedString,
 											readRow.getValue(readFeatureColumn
 													.getIndex()));
@@ -897,7 +897,7 @@ public class FeatureUtils {
 								}
 								break;
 							case Cursor.FIELD_TYPE_BLOB:
-								if (readFeatureColumn.getTypeMax() != null) {
+								if (readFeatureColumn.getMax() != null) {
 									GeoPackageGeometryDataUtils
 											.compareByteArrays(
 													updatedLimitedBytes,

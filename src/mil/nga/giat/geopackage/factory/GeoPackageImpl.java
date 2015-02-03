@@ -19,6 +19,7 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.features.user.FeatureTableReader;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -181,8 +182,11 @@ class GeoPackageImpl implements GeoPackage {
 					+ FeatureDao.class.getSimpleName());
 		}
 
-		// Create the dao
-		final FeatureDao dao = new FeatureDao(database, geometryColumns);
+		// Read the existing table and create the dao
+		FeatureTableReader tableReader = new FeatureTableReader(geometryColumns);
+		FeatureTable featureTable = tableReader.readTable(database);
+		final FeatureDao dao = new FeatureDao(database, geometryColumns,
+				featureTable);
 
 		// Register the table to wrap cursors with the feature cursor
 		cursorFactory.registerTable(geometryColumns.getTableName(),
