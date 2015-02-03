@@ -9,7 +9,7 @@ import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Geometry Columns from a created database (C.3. gpkg_geometry_columns)
+ * Test Geometry Columns from a created database
  * 
  * @author osbornb
  */

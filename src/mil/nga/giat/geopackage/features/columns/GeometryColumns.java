@@ -159,6 +159,10 @@ public class GeometryColumns {
 		this.geometryTypeName = geometryType.getName();
 	}
 
+	public String getGeometryTypeName() {
+		return geometryTypeName;
+	}
+
 	public SpatialReferenceSystem getSrs() {
 		return srs;
 	}

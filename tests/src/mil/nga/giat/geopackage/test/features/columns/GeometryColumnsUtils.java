@@ -54,24 +54,28 @@ public class GeometryColumnsUtils {
 			for (GeometryColumns result : results) {
 				TestCase.assertNotNull(result.getTableName());
 				TestCase.assertNotNull(result.getColumnName());
+				TestCase.assertNotNull(result.getId());
+				TestCase.assertNotNull(result.getId().getTableName());
+				TestCase.assertNotNull(result.getId().getColumnName());
 				TestCase.assertNotNull(result.getGeometryType());
 				TestCase.assertNotNull(result.getSrsId());
 				TestCase.assertNotNull(result.getZ());
 				TestCase.assertNotNull(result.getM());
+
 				SpatialReferenceSystem srs = result.getSrs();
-				if (srs != null) {
-					TestCase.assertNotNull(srs.getSrsName());
-					TestCase.assertNotNull(srs.getSrsId());
-					TestCase.assertNotNull(srs.getOrganization());
-					TestCase.assertNotNull(srs.getOrganizationCoordsysId());
-					TestCase.assertNotNull(srs.getDefinition());
-				}
+				TestCase.assertNotNull(srs);
+				TestCase.assertNotNull(srs.getSrsName());
+				TestCase.assertNotNull(srs.getSrsId());
+				TestCase.assertNotNull(srs.getOrganization());
+				TestCase.assertNotNull(srs.getOrganizationCoordsysId());
+				TestCase.assertNotNull(srs.getDefinition());
+
 				Contents contents = result.getContents();
-				if (contents != null) {
-					TestCase.assertNotNull(contents.getTableName());
-					TestCase.assertNotNull(contents.getDataType());
-					TestCase.assertNotNull(contents.getLastChange());
-				}
+				TestCase.assertNotNull(contents);
+				TestCase.assertNotNull(contents.getTableName());
+				TestCase.assertNotNull(contents.getDataType());
+				TestCase.assertNotNull(contents.getLastChange());
+
 			}
 
 			// Choose random contents
@@ -126,7 +130,7 @@ public class GeometryColumnsUtils {
 			// Prepared query
 			QueryBuilder<GeometryColumns, GeometryColumnsKey> qb = dao
 					.queryBuilder();
-			qb.where().le(GeometryColumns.COLUMN_COLUMN_NAME,
+			qb.where().eq(GeometryColumns.COLUMN_COLUMN_NAME,
 					geometryColumns.getColumnName());
 			PreparedQuery<GeometryColumns> query = qb.prepare();
 			queryGeometryColumnsList = dao.query(query);
@@ -168,9 +172,10 @@ public class GeometryColumnsUtils {
 
 			// Verify update
 			dao = geoPackage.getGeometryColumnsDao();
-			GeometryColumns updatedContents = dao.queryForId(geometryColumns
-					.getId());
-			TestCase.assertEquals(updatedM, updatedContents.getM().intValue());
+			GeometryColumns updatedGeometryColumns = dao
+					.queryForId(geometryColumns.getId());
+			TestCase.assertEquals(updatedM, updatedGeometryColumns.getM()
+					.intValue());
 
 			// Find expected results for prepared update
 			String updatedColumnName = "new_geom";
@@ -193,10 +198,10 @@ public class GeometryColumnsUtils {
 			int updated = dao.update(update);
 			TestCase.assertEquals(queryGeometryColumns.size(), updated);
 
-			for (GeometryColumns updatedGeometryColumns : queryGeometryColumns) {
-				updatedGeometryColumns.setColumnName(updatedColumnName);
+			for (GeometryColumns updatedQueryGeometryColumns : queryGeometryColumns) {
+				updatedQueryGeometryColumns.setColumnName(updatedColumnName);
 				GeometryColumns reloadedGeometryColumns = dao
-						.queryForId(updatedGeometryColumns.getId());
+						.queryForId(updatedQueryGeometryColumns.getId());
 				TestCase.assertNotNull(reloadedGeometryColumns);
 				TestCase.assertEquals(updatedColumnName,
 						reloadedGeometryColumns.getColumnName());

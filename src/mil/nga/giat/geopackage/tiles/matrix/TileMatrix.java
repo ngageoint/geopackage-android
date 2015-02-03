@@ -217,7 +217,7 @@ public class TileMatrix {
 	}
 
 	public void setPixelXSize(double pixelXSize) {
-		validateDoubleValues(COLUMN_PIXEL_X_SIZE, pixelYSize);
+		validateDoubleValues(COLUMN_PIXEL_X_SIZE, pixelXSize);
 		this.pixelXSize = pixelXSize;
 	}
 
@@ -247,7 +247,7 @@ public class TileMatrix {
 		if (value < 0 || (value == 0 && !allowZero)) {
 			throw new GeoPackageException(column
 					+ " value must be greater than "
-					+ (allowZero ? "or equal to " : "") + "0");
+					+ (allowZero ? "or equal to " : "") + "0: " + value);
 		}
 	}
 
@@ -260,7 +260,7 @@ public class TileMatrix {
 	private void validateDoubleValues(String column, double value) {
 		if (value <= 0.0) {
 			throw new GeoPackageException(column
-					+ " value must be greater than 0");
+					+ " value must be greater than 0: " + value);
 		}
 	}
 

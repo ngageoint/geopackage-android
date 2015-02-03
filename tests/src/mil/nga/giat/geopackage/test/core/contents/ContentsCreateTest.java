@@ -9,7 +9,7 @@ import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Contents from a created database (C.2. gpkg_contents)
+ * Test Contents from a created database
  * 
  * @author osbornb
  */

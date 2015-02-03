@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.core.srs;
+package mil.nga.giat.geopackage.test.tiles.matrixset;
 
 import java.sql.SQLException;
 
@@ -9,11 +9,11 @@ import android.app.Activity;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Spatial Reference System from a created database
+ * Test Tile Matrix Set from a created database
  * 
  * @author osbornb
  */
-public class SpatialReferenceSystemCreateTest extends
+public class TileMatrixSetCreateTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
@@ -29,7 +29,7 @@ public class SpatialReferenceSystemCreateTest extends
 	/**
 	 * Constructor
 	 */
-	public SpatialReferenceSystemCreateTest() {
+	public TileMatrixSetCreateTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -44,7 +44,7 @@ public class SpatialReferenceSystemCreateTest extends
 		activity = getActivity();
 
 		// Create the database
-		geoPackage = TestSetupTeardown.setUpCreate(activity, true, false);
+		geoPackage = TestSetupTeardown.setUpCreate(activity, false, true);
 	}
 
 	/**
@@ -66,32 +66,8 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage,
-				TestSetupTeardown.CREATE_SRS_COUNT);
-
-	}
-
-	/**
-	 * Test reading using the SQL/MM view
-	 * 
-	 * @throws SQLException
-	 */
-	public void testSqlMmRead() throws SQLException {
-
-		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage,
-				TestSetupTeardown.CREATE_SRS_COUNT);
-
-	}
-
-	/**
-	 * Test reading using the SF/SQL view
-	 * 
-	 * @throws SQLException
-	 */
-	public void testSfSqlRead() throws SQLException {
-
-		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage,
-				TestSetupTeardown.CREATE_SRS_COUNT);
+		TileMatrixSetUtils.testRead(geoPackage,
+				TestSetupTeardown.CREATE_TILE_MATRIX_SET_COUNT);
 
 	}
 
@@ -102,7 +78,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testUpdate() throws SQLException {
 
-		SpatialReferenceSystemUtils.testUpdate(geoPackage);
+		TileMatrixSetUtils.testUpdate(geoPackage);
 
 	}
 
@@ -113,7 +89,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testCreate() throws SQLException {
 
-		SpatialReferenceSystemUtils.testCreate(geoPackage);
+		TileMatrixSetUtils.testCreate(geoPackage);
 
 	}
 
@@ -124,18 +100,7 @@ public class SpatialReferenceSystemCreateTest extends
 	 */
 	public void testDelete() throws SQLException {
 
-		SpatialReferenceSystemUtils.testDelete(geoPackage);
-
-	}
-
-	/**
-	 * Test cascade deleting
-	 * 
-	 * @throws SQLException
-	 */
-	public void testDeleteCascade() throws SQLException {
-
-		SpatialReferenceSystemUtils.testDeleteCascade(geoPackage);
+		TileMatrixSetUtils.testDelete(geoPackage);
 
 	}
 

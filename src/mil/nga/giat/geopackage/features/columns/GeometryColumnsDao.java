@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.stmt.PreparedUpdate;
+import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
 /**
@@ -126,6 +128,35 @@ public class GeometryColumnsDao extends
 			}
 		}
 		return count;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Update using the complex key
+	 */
+	@Override
+	public int update(GeometryColumns geometryColumns) throws SQLException {
+
+		UpdateBuilder<GeometryColumns, GeometryColumnsKey> ub = updateBuilder();
+		ub.updateColumnValue(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
+				geometryColumns.getGeometryTypeName());
+		ub.updateColumnValue(GeometryColumns.COLUMN_SRS_ID,
+				geometryColumns.getSrsId());
+		ub.updateColumnValue(GeometryColumns.COLUMN_Z, geometryColumns.getZ());
+		ub.updateColumnValue(GeometryColumns.COLUMN_M, geometryColumns.getM());
+
+		ub.where()
+				.eq(GeometryColumns.COLUMN_TABLE_NAME,
+						geometryColumns.getTableName())
+				.and()
+				.eq(GeometryColumns.COLUMN_COLUMN_NAME,
+						geometryColumns.getColumnName());
+
+		PreparedUpdate<GeometryColumns> update = ub.prepare();
+		int updated = update(update);
+
+		return updated;
 	}
 
 }

@@ -18,6 +18,10 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import android.app.Activity;
 import android.content.Context;
 
@@ -34,6 +38,10 @@ public class TestSetupTeardown {
 	public static final int CREATE_CONTENTS_COUNT = 4;
 
 	public static final int CREATE_GEOMETRY_COLUMNS_COUNT = 4;
+
+	public static final int CREATE_TILE_MATRIX_SET_COUNT = 1;
+	
+	public static final int CREATE_TILE_MATRIX_COUNT = 9;
 
 	/**
 	 * Set up the create database
@@ -65,6 +73,10 @@ public class TestSetupTeardown {
 			setUpCreateFeatures(geoPackage);
 		}
 
+		if (tiles) {
+			setUpCreateTiles(geoPackage);
+		}
+
 		return geoPackage;
 	}
 
@@ -85,8 +97,9 @@ public class TestSetupTeardown {
 		SpatialReferenceSystem undefinedCartesianSrs = srsDao.queryForId(-1);
 		SpatialReferenceSystem undefinedGeographicSrs = srsDao.queryForId(0);
 
-		TestCase.assertNotNull(undefinedGeographicSrs);
 		TestCase.assertNotNull(epsgSrs);
+		TestCase.assertNotNull(undefinedCartesianSrs);
+		TestCase.assertNotNull(undefinedGeographicSrs);
 
 		// Create the Geometry Columns table
 		geoPackage.createGeometryColumnsTable();
@@ -184,8 +197,7 @@ public class TestSetupTeardown {
 		GeometryColumns polygon2dGeometryColumns = new GeometryColumns();
 		polygon2dGeometryColumns.setContents(polygon2dContents);
 		polygon2dGeometryColumns.setColumnName(geometryColumn);
-		polygon2dGeometryColumns
-				.setGeometryType(GeometryType.POLYGON);
+		polygon2dGeometryColumns.setGeometryType(GeometryType.POLYGON);
 		polygon2dGeometryColumns.setSrs(polygon2dContents.getSrs());
 		polygon2dGeometryColumns.setZ(0);
 		polygon2dGeometryColumns.setM(0);
@@ -203,8 +215,7 @@ public class TestSetupTeardown {
 		GeometryColumns lineString3dMGeometryColumns = new GeometryColumns();
 		lineString3dMGeometryColumns.setContents(lineString3dMContents);
 		lineString3dMGeometryColumns.setColumnName(geometryColumn);
-		lineString3dMGeometryColumns
-				.setGeometryType(GeometryType.LINESTRING);
+		lineString3dMGeometryColumns.setGeometryType(GeometryType.LINESTRING);
 		lineString3dMGeometryColumns.setSrs(lineString3dMContents.getSrs());
 		lineString3dMGeometryColumns.setZ(1);
 		lineString3dMGeometryColumns.setM(1);
@@ -219,6 +230,88 @@ public class TestSetupTeardown {
 				point3dTable, 3, true, false);
 		TestUtils.addRowsToTable(geoPackage, lineString3dMGeometryColumns,
 				lineString3dMTable, 3, true, true);
+	}
+
+	/**
+	 * Set up create for tiles test
+	 * 
+	 * @param geoPackage
+	 * @throws SQLException
+	 */
+	public static void setUpCreateTiles(GeoPackage geoPackage)
+			throws SQLException {
+
+		// Get existing SRS objects
+		SpatialReferenceSystemDao srsDao = geoPackage
+				.getSpatialReferenceSystemDao();
+
+		SpatialReferenceSystem epsgSrs = srsDao.queryForId(4326);
+
+		TestCase.assertNotNull(epsgSrs);
+
+		// Create the Tile Matrix Set and Tile Matrix tables
+		geoPackage.createTileMatrixSetTable();
+		geoPackage.createTileMatrixTable();
+
+		// Create new Contents
+		ContentsDao contentsDao = geoPackage.getContentsDao();
+
+		Contents contents = new Contents();
+		contents.setTableName("test_tiles");
+		contents.setDataType(ContentsDataType.TILES);
+		contents.setIdentifier("test_tiles");
+		// contents.setDescription("");
+		contents.setLastChange(new Date());
+		contents.setMinX(-180.0);
+		contents.setMinY(-90.0);
+		contents.setMaxX(180.0);
+		contents.setMaxY(90.0);
+		contents.setSrs(epsgSrs);
+
+		// Create the user tile table
+		// TODO
+
+		// Create the contents
+		contentsDao.create(contents);
+
+		// Create new Tile Matrix Set
+		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+
+		TileMatrixSet tileMatrixSet = new TileMatrixSet();
+		tileMatrixSet.setContents(contents);
+		tileMatrixSet.setSrs(contents.getSrs());
+		tileMatrixSet.setMinX(contents.getMinX());
+		tileMatrixSet.setMinY(contents.getMinY());
+		tileMatrixSet.setMaxX(contents.getMaxX());
+		tileMatrixSet.setMaxY(contents.getMaxY());
+		tileMatrixSetDao.create(tileMatrixSet);
+
+		// Create new Tile Matrix rows
+		TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
+
+		int matrixWidthAndHeight = 8;
+		final int tileWidthAndHeight = 512;
+		double pixelXSize = 69237.2;
+		double pixelYSize = 68412.1;
+
+		for (int zoom = 0; zoom <= 8; zoom++) {
+
+			TileMatrix tileMatrix = new TileMatrix();
+			tileMatrix.setContents(contents);
+			tileMatrix.setZoomLevel(zoom);
+			tileMatrix.setMatrixWidth(matrixWidthAndHeight);
+			tileMatrix.setMatrixHeight(matrixWidthAndHeight);
+			tileMatrix.setTileWidth(tileWidthAndHeight);
+			tileMatrix.setTileHeight(tileWidthAndHeight);
+			tileMatrix.setPixelXSize(pixelXSize);
+			tileMatrix.setPixelYSize(pixelYSize);
+			tileMatrixDao.create(tileMatrix);
+
+			matrixWidthAndHeight *= 2;
+			pixelXSize /= 2.0;
+			pixelYSize /= 2.0;
+		}
+
 	}
 
 	/**

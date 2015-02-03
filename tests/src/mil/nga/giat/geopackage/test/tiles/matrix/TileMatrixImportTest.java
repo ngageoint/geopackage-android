@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.core.contents;
+package mil.nga.giat.geopackage.test.tiles.matrix;
 
 import java.sql.SQLException;
 
@@ -11,11 +11,11 @@ import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Contents from an imported database
+ * Test Tile Matrix from an imported database
  * 
  * @author osbornb
  */
-public class ContentsImportTest extends
+public class TileMatrixImportTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
@@ -36,7 +36,7 @@ public class ContentsImportTest extends
 	/**
 	 * Constructor
 	 */
-	public ContentsImportTest() {
+	public TileMatrixImportTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -74,7 +74,7 @@ public class ContentsImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		ContentsUtils.testRead(geoPackage, 16);
+		TileMatrixUtils.testRead(geoPackage, 0);
 
 	}
 
@@ -85,7 +85,7 @@ public class ContentsImportTest extends
 	 */
 	public void testUpdate() throws SQLException {
 
-		ContentsUtils.testUpdate(geoPackage);
+		TileMatrixUtils.testUpdate(geoPackage);
 
 	}
 
@@ -96,7 +96,7 @@ public class ContentsImportTest extends
 	 */
 	public void testCreate() throws SQLException {
 
-		ContentsUtils.testCreate(geoPackage);
+		TileMatrixUtils.testCreate(geoPackage);
 
 	}
 
@@ -107,18 +107,7 @@ public class ContentsImportTest extends
 	 */
 	public void testDelete() throws SQLException {
 
-		ContentsUtils.testDelete(geoPackage);
-
-	}
-
-	/**
-	 * Test cascade deleting
-	 * 
-	 * @throws SQLException
-	 */
-	public void testDeleteCascade() throws SQLException {
-
-		ContentsUtils.testDeleteCascade(geoPackage);
+		TileMatrixUtils.testDelete(geoPackage);
 
 	}
 

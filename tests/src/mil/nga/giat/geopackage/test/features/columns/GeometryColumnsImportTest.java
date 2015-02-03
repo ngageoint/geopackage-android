@@ -11,7 +11,7 @@ import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Geometry Columns from an imported database (C.3. gpkg_geometry_columns)
+ * Test Geometry Columns from an imported database
  * 
  * @author osbornb
  */

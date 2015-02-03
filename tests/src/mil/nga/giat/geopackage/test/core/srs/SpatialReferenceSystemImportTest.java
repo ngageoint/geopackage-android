@@ -12,8 +12,7 @@ import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Spatial Reference System from an imported database (C.1.
- * gpkg_spatial_ref_sys)
+ * Test Spatial Reference System from an imported database
  * 
  * @author osbornb
  */
