@@ -8,15 +8,15 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.data.c2.Contents;
-import mil.nga.giat.geopackage.data.c2.ContentsDao;
-import mil.nga.giat.geopackage.data.c2.ContentsDataType;
-import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
+import mil.nga.giat.geopackage.core.contents.Contents;
+import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.core.contents.ContentsDataType;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsKey;
+import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.test.TestUtils;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
@@ -245,12 +245,12 @@ public class GeometryColumnsUtils {
 
 		// Create the feature table
 		geoPackage.createTable(TestUtils.buildTable(contents.getTableName(),
-				"geom", GeoPackageGeometryType.GEOMETRY));
+				"geom", GeometryType.GEOMETRY));
 
 		contentsDao.create(contents);
 
 		String columnName = "TEST_COLUMN_NAME";
-		GeoPackageGeometryType geometryType = GeoPackageGeometryType.POINT;
+		GeometryType geometryType = GeometryType.POINT;
 		int z = 2;
 		int m = 2;
 

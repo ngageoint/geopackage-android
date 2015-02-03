@@ -4,21 +4,25 @@ import java.sql.SQLException;
 import java.util.List;
 
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSql;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMm;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
-import mil.nga.giat.geopackage.data.c2.Contents;
-import mil.nga.giat.geopackage.data.c2.ContentsDao;
-import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.data.c4.FeatureCursor;
-import mil.nga.giat.geopackage.data.c4.FeatureDao;
-import mil.nga.giat.geopackage.data.c4.FeatureTable;
+import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.core.contents.Contents;
+import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSql;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSqlDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMm;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.user.FeatureCursor;
+import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -244,6 +248,60 @@ class GeoPackageImpl implements GeoPackage {
 	@Override
 	public void createTable(FeatureTable table) {
 		tableCreator.createTable(table);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TileMatrixSetDao getTileMatrixSetDao() {
+		return createDao(TileMatrixSet.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createTileMatrixSetTable() {
+		boolean created = false;
+		TileMatrixSetDao dao = getTileMatrixSetDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = tableCreator.createTileMatrixSet() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException(
+					"Failed to check if Tile Matrix Set table exists and create it",
+					e);
+		}
+		return created;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TileMatrixDao getTileMatrixDao() {
+		return createDao(TileMatrix.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createTileMatrixTable() {
+		boolean created = false;
+		TileMatrixDao dao = getTileMatrixDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = tableCreator.createTileMatrix() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException(
+					"Failed to check if Tile Matrix table exists and create it",
+					e);
+		}
+		return created;
 	}
 
 	/**

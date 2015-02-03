@@ -1,10 +1,10 @@
 package mil.nga.giat.geopackage.db;
 
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
+import mil.nga.giat.geopackage.geom.GeometryType;
 
 /**
  * GeoPackage Data Types (non Geometry) for database columns as defined in
- * Requirement 5 of the GeoPackage spec. See {@link GeoPackageGeometryType} for
+ * Requirement 5 of the GeoPackage spec. See {@link GeometryType} for
  * Geometry Types
  * 
  * @author osbornb

@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.R;
-import mil.nga.giat.geopackage.data.c4.FeatureColumn;
-import mil.nga.giat.geopackage.data.c4.FeatureTable;
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.features.user.FeatureColumn;
+import mil.nga.giat.geopackage.features.user.FeatureTable;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
@@ -62,18 +62,8 @@ public class GeoPackageTableCreator {
 	 * @return
 	 */
 	public int createSpatialReferenceSystem() {
-		int statements = 0;
-		try {
-
-			InputStream scriptStream = assetManager.open(context
-					.getString(R.string.sql_directory)
-					+ File.separatorChar
-					+ context.getString(R.string.sql_spatial_reference_system));
-			statements = runScript(scriptStream);
-		} catch (IOException e) {
-			Log.e(TAG, "Unable to create spatial reference system tables.", e);
-		}
-		return statements;
+		return createTable(context
+				.getString(R.string.sql_spatial_reference_system));
 	}
 
 	/**
@@ -82,18 +72,7 @@ public class GeoPackageTableCreator {
 	 * @return
 	 */
 	public int createContents() {
-		int statements = 0;
-		try {
-
-			InputStream scriptStream = assetManager.open(context
-					.getString(R.string.sql_directory)
-					+ File.separatorChar
-					+ context.getString(R.string.sql_contents));
-			statements = runScript(scriptStream);
-		} catch (IOException e) {
-			Log.e(TAG, "Unable to create content tables.", e);
-		}
-		return statements;
+		return createTable(context.getString(R.string.sql_contents));
 	}
 
 	/**
@@ -102,16 +81,44 @@ public class GeoPackageTableCreator {
 	 * @return executed statements
 	 */
 	public int createGeometryColumns() {
+		return createTable(context.getString(R.string.sql_geometry_columns));
+	}
+
+	/**
+	 * Create Tile Matrix Set table
+	 * 
+	 * @return executed statements
+	 */
+	public int createTileMatrixSet() {
+		return createTable(context.getString(R.string.sql_tile_matrix_set));
+	}
+
+	/**
+	 * Create Tile Matrix table
+	 * 
+	 * @return executed statements
+	 */
+	public int createTileMatrix() {
+		return createTable(context.getString(R.string.sql_tile_matrix));
+	}
+
+	/**
+	 * Create a table using the table script
+	 * 
+	 * @param tableScript
+	 * @return
+	 */
+	private int createTable(String tableScript) {
 		int statements = 0;
 		try {
 
 			InputStream scriptStream = assetManager.open(context
 					.getString(R.string.sql_directory)
 					+ File.separatorChar
-					+ context.getString(R.string.sql_geometry_columns));
+					+ tableScript);
 			statements = runScript(scriptStream);
 		} catch (IOException e) {
-			Log.e(TAG, "Unable to create geometry columns tables.", e);
+			Log.e(TAG, "Unable to create table from file: " + tableScript, e);
 		}
 		return statements;
 	}
@@ -169,7 +176,7 @@ public class GeoPackageTableCreator {
 				sql.append(" NOT NULL");
 			}
 			if (column.isPrimaryKey()) {
-				sql.append(" PRIMARY KEY");
+				sql.append(" PRIMARY KEY AUTOINCREMENT");
 			}
 			if (i + 1 < columns.size()) {
 				sql.append(",");

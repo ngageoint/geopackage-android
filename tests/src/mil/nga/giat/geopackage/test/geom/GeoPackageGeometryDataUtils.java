@@ -7,28 +7,28 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.data.c4.FeatureCursor;
-import mil.nga.giat.geopackage.data.c4.FeatureDao;
-import mil.nga.giat.geopackage.geom.GeoPackageCircularString;
-import mil.nga.giat.geopackage.geom.GeoPackageCompoundCurve;
-import mil.nga.giat.geopackage.geom.GeoPackageCurvePolygon;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryCollection;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryEnvelope;
-import mil.nga.giat.geopackage.geom.GeoPackageLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPoint;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPolygon;
-import mil.nga.giat.geopackage.geom.GeoPackagePoint;
-import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
-import mil.nga.giat.geopackage.geom.GeoPackagePolyhedralSurface;
-import mil.nga.giat.geopackage.geom.GeoPackageTIN;
-import mil.nga.giat.geopackage.geom.GeoPackageTriangle;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.user.FeatureCursor;
+import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.geom.CircularString;
+import mil.nga.giat.geopackage.geom.CompoundCurve;
+import mil.nga.giat.geopackage.geom.CurvePolygon;
+import mil.nga.giat.geopackage.geom.Geometry;
+import mil.nga.giat.geopackage.geom.GeometryCollection;
+import mil.nga.giat.geopackage.geom.LineString;
+import mil.nga.giat.geopackage.geom.MultiLineString;
+import mil.nga.giat.geopackage.geom.MultiPoint;
+import mil.nga.giat.geopackage.geom.MultiPolygon;
+import mil.nga.giat.geopackage.geom.Point;
+import mil.nga.giat.geopackage.geom.Polygon;
+import mil.nga.giat.geopackage.geom.PolyhedralSurface;
+import mil.nga.giat.geopackage.geom.TIN;
+import mil.nga.giat.geopackage.geom.Triangle;
+import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryEnvelope;
 
 /**
  * GeoPackage Geometry Data test utils
@@ -192,59 +192,59 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	public static void compareGeometries(GeoPackageGeometry expected,
-			GeoPackageGeometry actual) {
+	public static void compareGeometries(Geometry expected,
+			Geometry actual) {
 		if (expected == null) {
 			TestCase.assertNull(actual);
 		} else {
 			TestCase.assertNotNull(actual);
 
-			GeoPackageGeometryType geometryType = expected.getGeometryType();
+			GeometryType geometryType = expected.getGeometryType();
 			switch (geometryType) {
 
 			case GEOMETRY:
 				TestCase.fail("Unexpected Geometry Type of "
 						+ geometryType.name() + " which is abstract");
 			case POINT:
-				comparePoint((GeoPackagePoint) actual,
-						(GeoPackagePoint) expected);
+				comparePoint((Point) actual,
+						(Point) expected);
 				break;
 			case LINESTRING:
-				compareLineString((GeoPackageLineString) expected,
-						(GeoPackageLineString) actual);
+				compareLineString((LineString) expected,
+						(LineString) actual);
 				break;
 			case POLYGON:
-				comparePolygon((GeoPackagePolygon) expected,
-						(GeoPackagePolygon) actual);
+				comparePolygon((Polygon) expected,
+						(Polygon) actual);
 				break;
 			case MULTIPOINT:
-				compareMultiPoint((GeoPackageMultiPoint) expected,
-						(GeoPackageMultiPoint) actual);
+				compareMultiPoint((MultiPoint) expected,
+						(MultiPoint) actual);
 				break;
 			case MULTILINESTRING:
-				compareMultiLineString((GeoPackageMultiLineString) expected,
-						(GeoPackageMultiLineString) actual);
+				compareMultiLineString((MultiLineString) expected,
+						(MultiLineString) actual);
 				break;
 			case MULTIPOLYGON:
-				compareMultiPolygon((GeoPackageMultiPolygon) expected,
-						(GeoPackageMultiPolygon) actual);
+				compareMultiPolygon((MultiPolygon) expected,
+						(MultiPolygon) actual);
 				break;
 			case GEOMETRYCOLLECTION:
 				compareGeometryCollection(
-						(GeoPackageGeometryCollection<?>) expected,
-						(GeoPackageGeometryCollection<?>) actual);
+						(GeometryCollection<?>) expected,
+						(GeometryCollection<?>) actual);
 				break;
 			case CIRCULARSTRING:
-				compareCircularString((GeoPackageCircularString) expected,
-						(GeoPackageCircularString) actual);
+				compareCircularString((CircularString) expected,
+						(CircularString) actual);
 				break;
 			case COMPOUNDCURVE:
-				compareCompoundCurve((GeoPackageCompoundCurve) expected,
-						(GeoPackageCompoundCurve) actual);
+				compareCompoundCurve((CompoundCurve) expected,
+						(CompoundCurve) actual);
 				break;
 			case CURVEPOLYGON:
-				compareCurvePolygon((GeoPackageCurvePolygon<?>) expected,
-						(GeoPackageCurvePolygon<?>) actual);
+				compareCurvePolygon((CurvePolygon<?>) expected,
+						(CurvePolygon<?>) actual);
 				break;
 			case MULTICURVE:
 				TestCase.fail("Unexpected Geometry Type of "
@@ -260,15 +260,15 @@ public class GeoPackageGeometryDataUtils {
 						+ geometryType.name() + " which is abstract");
 			case POLYHEDRALSURFACE:
 				comparePolyhedralSurface(
-						(GeoPackagePolyhedralSurface) expected,
-						(GeoPackagePolyhedralSurface) actual);
+						(PolyhedralSurface) expected,
+						(PolyhedralSurface) actual);
 				break;
 			case TIN:
-				compareTIN((GeoPackageTIN) expected, (GeoPackageTIN) actual);
+				compareTIN((TIN) expected, (TIN) actual);
 				break;
 			case TRIANGLE:
-				compareTriangle((GeoPackageTriangle) expected,
-						(GeoPackageTriangle) actual);
+				compareTriangle((Triangle) expected,
+						(Triangle) actual);
 				break;
 			default:
 				throw new GeoPackageException("Geometry Type not supported: "
@@ -284,7 +284,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param actual
 	 */
 	private static void compareBaseGeometryAttributes(
-			GeoPackageGeometry expected, GeoPackageGeometry actual) {
+			Geometry expected, Geometry actual) {
 		TestCase.assertEquals(expected.getGeometryType(),
 				actual.getGeometryType());
 		TestCase.assertEquals(expected.hasZ(), actual.hasZ());
@@ -298,8 +298,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void comparePoint(GeoPackagePoint expected,
-			GeoPackagePoint actual) {
+	private static void comparePoint(Point expected,
+			Point actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.getX(), actual.getX());
@@ -314,8 +314,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareLineString(GeoPackageLineString expected,
-			GeoPackageLineString actual) {
+	private static void compareLineString(LineString expected,
+			LineString actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
@@ -330,8 +330,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void comparePolygon(GeoPackagePolygon expected,
-			GeoPackagePolygon actual) {
+	private static void comparePolygon(Polygon expected,
+			Polygon actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());
@@ -347,8 +347,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareMultiPoint(GeoPackageMultiPoint expected,
-			GeoPackageMultiPoint actual) {
+	private static void compareMultiPoint(MultiPoint expected,
+			MultiPoint actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
@@ -364,7 +364,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param actual
 	 */
 	private static void compareMultiLineString(
-			GeoPackageMultiLineString expected, GeoPackageMultiLineString actual) {
+			MultiLineString expected, MultiLineString actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numLineStrings(),
@@ -381,8 +381,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareMultiPolygon(GeoPackageMultiPolygon expected,
-			GeoPackageMultiPolygon actual) {
+	private static void compareMultiPolygon(MultiPolygon expected,
+			MultiPolygon actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPolygons(), actual.numPolygons());
@@ -399,8 +399,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param actual
 	 */
 	private static void compareGeometryCollection(
-			GeoPackageGeometryCollection<?> expected,
-			GeoPackageGeometryCollection<?> actual) {
+			GeometryCollection<?> expected,
+			GeometryCollection<?> actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numGeometries(), actual.numGeometries());
@@ -417,7 +417,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param actual
 	 */
 	private static void compareCircularString(
-			GeoPackageCircularString expected, GeoPackageCircularString actual) {
+			CircularString expected, CircularString actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
@@ -432,8 +432,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareCompoundCurve(GeoPackageCompoundCurve expected,
-			GeoPackageCompoundCurve actual) {
+	private static void compareCompoundCurve(CompoundCurve expected,
+			CompoundCurve actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numLineStrings(),
@@ -450,8 +450,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareCurvePolygon(GeoPackageCurvePolygon<?> expected,
-			GeoPackageCurvePolygon<?> actual) {
+	private static void compareCurvePolygon(CurvePolygon<?> expected,
+			CurvePolygon<?> actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());
@@ -468,8 +468,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param actual
 	 */
 	private static void comparePolyhedralSurface(
-			GeoPackagePolyhedralSurface expected,
-			GeoPackagePolyhedralSurface actual) {
+			PolyhedralSurface expected,
+			PolyhedralSurface actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPolygons(), actual.numPolygons());
@@ -485,7 +485,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareTIN(GeoPackageTIN expected, GeoPackageTIN actual) {
+	private static void compareTIN(TIN expected, TIN actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPolygons(), actual.numPolygons());
@@ -501,8 +501,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareTriangle(GeoPackageTriangle expected,
-			GeoPackageTriangle actual) {
+	private static void compareTriangle(Triangle expected,
+			Triangle actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());

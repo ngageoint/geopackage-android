@@ -2,24 +2,24 @@ package mil.nga.giat.geopackage.geom.wkb;
 
 import java.nio.ByteOrder;
 
-import mil.nga.giat.geopackage.geom.GeoPackageCircularString;
-import mil.nga.giat.geopackage.geom.GeoPackageCompoundCurve;
-import mil.nga.giat.geopackage.geom.GeoPackageCurve;
-import mil.nga.giat.geopackage.geom.GeoPackageCurvePolygon;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryCollection;
-import mil.nga.giat.geopackage.geom.GeoPackageLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPoint;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPolygon;
-import mil.nga.giat.geopackage.geom.GeoPackagePoint;
-import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
-import mil.nga.giat.geopackage.geom.GeoPackagePolyhedralSurface;
-import mil.nga.giat.geopackage.geom.GeoPackageTIN;
-import mil.nga.giat.geopackage.geom.GeoPackageTriangle;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
-import mil.nga.giat.geopackage.util.ByteReader;
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.geom.CircularString;
+import mil.nga.giat.geopackage.geom.CompoundCurve;
+import mil.nga.giat.geopackage.geom.Curve;
+import mil.nga.giat.geopackage.geom.CurvePolygon;
+import mil.nga.giat.geopackage.geom.Geometry;
+import mil.nga.giat.geopackage.geom.GeometryCollection;
+import mil.nga.giat.geopackage.geom.LineString;
+import mil.nga.giat.geopackage.geom.MultiLineString;
+import mil.nga.giat.geopackage.geom.MultiPoint;
+import mil.nga.giat.geopackage.geom.MultiPolygon;
+import mil.nga.giat.geopackage.geom.Point;
+import mil.nga.giat.geopackage.geom.Polygon;
+import mil.nga.giat.geopackage.geom.PolyhedralSurface;
+import mil.nga.giat.geopackage.geom.TIN;
+import mil.nga.giat.geopackage.geom.Triangle;
+import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.io.ByteReader;
 
 /**
  * Well Known Binary reader
@@ -34,8 +34,8 @@ public class WkbGeometryReader {
 	 * @param reader
 	 * @return
 	 */
-	public static GeoPackageGeometry readGeometry(ByteReader reader) {
-		GeoPackageGeometry geometry = readGeometry(reader, null);
+	public static Geometry readGeometry(ByteReader reader) {
+		Geometry geometry = readGeometry(reader, null);
 		return geometry;
 	}
 
@@ -47,7 +47,7 @@ public class WkbGeometryReader {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends GeoPackageGeometry> T readGeometry(
+	public static <T extends Geometry> T readGeometry(
 			ByteReader reader, Class<T> expectedType) {
 
 		// Read the single byte order byte
@@ -89,9 +89,9 @@ public class WkbGeometryReader {
 			break;
 		}
 
-		GeoPackageGeometryType geometryType = GeoPackageGeometryType.fromCode(geometryTypeCode);
+		GeometryType geometryType = GeometryType.fromCode(geometryTypeCode);
 
-		GeoPackageGeometry geometry = null;
+		Geometry geometry = null;
 
 		switch (geometryType) {
 
@@ -177,13 +177,13 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackagePoint readPoint(ByteReader reader, boolean hasZ,
+	public static Point readPoint(ByteReader reader, boolean hasZ,
 			boolean hasM) {
 
 		double x = reader.readDouble();
 		double y = reader.readDouble();
 
-		GeoPackagePoint point = new GeoPackagePoint(hasZ, hasM, x, y);
+		Point point = new Point(hasZ, hasM, x, y);
 
 		if (hasZ) {
 			double z = reader.readDouble();
@@ -206,15 +206,15 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageLineString readLineString(ByteReader reader,
+	public static LineString readLineString(ByteReader reader,
 			boolean hasZ, boolean hasM) {
 
-		GeoPackageLineString lineString = new GeoPackageLineString(hasZ, hasM);
+		LineString lineString = new LineString(hasZ, hasM);
 
 		int numPoints = reader.readInt();
 
 		for (int i = 0; i < numPoints; i++) {
-			GeoPackagePoint point = readPoint(reader, hasZ, hasM);
+			Point point = readPoint(reader, hasZ, hasM);
 			lineString.addPoint(point);
 
 		}
@@ -230,15 +230,15 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackagePolygon readPolygon(ByteReader reader,
+	public static Polygon readPolygon(ByteReader reader,
 			boolean hasZ, boolean hasM) {
 
-		GeoPackagePolygon polygon = new GeoPackagePolygon(hasZ, hasM);
+		Polygon polygon = new Polygon(hasZ, hasM);
 
 		int numRings = reader.readInt();
 
 		for (int i = 0; i < numRings; i++) {
-			GeoPackageLineString ring = readLineString(reader, hasZ, hasM);
+			LineString ring = readLineString(reader, hasZ, hasM);
 			polygon.addRing(ring);
 
 		}
@@ -254,15 +254,15 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageMultiPoint readMultiPoint(ByteReader reader,
+	public static MultiPoint readMultiPoint(ByteReader reader,
 			boolean hasZ, boolean hasM) {
 
-		GeoPackageMultiPoint multiPoint = new GeoPackageMultiPoint(hasZ, hasM);
+		MultiPoint multiPoint = new MultiPoint(hasZ, hasM);
 
 		int numPoints = reader.readInt();
 
 		for (int i = 0; i < numPoints; i++) {
-			GeoPackagePoint point = readGeometry(reader, GeoPackagePoint.class);
+			Point point = readGeometry(reader, Point.class);
 			multiPoint.addPoint(point);
 
 		}
@@ -278,17 +278,17 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageMultiLineString readMultiLineString(
+	public static MultiLineString readMultiLineString(
 			ByteReader reader, boolean hasZ, boolean hasM) {
 
-		GeoPackageMultiLineString multiLineString = new GeoPackageMultiLineString(
+		MultiLineString multiLineString = new MultiLineString(
 				hasZ, hasM);
 
 		int numLineStrings = reader.readInt();
 
 		for (int i = 0; i < numLineStrings; i++) {
-			GeoPackageLineString lineString = readGeometry(reader,
-					GeoPackageLineString.class);
+			LineString lineString = readGeometry(reader,
+					LineString.class);
 			multiLineString.addLineString(lineString);
 
 		}
@@ -304,17 +304,17 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageMultiPolygon readMultiPolygon(ByteReader reader,
+	public static MultiPolygon readMultiPolygon(ByteReader reader,
 			boolean hasZ, boolean hasM) {
 
-		GeoPackageMultiPolygon multiPolygon = new GeoPackageMultiPolygon(hasZ,
+		MultiPolygon multiPolygon = new MultiPolygon(hasZ,
 				hasM);
 
 		int numPolygons = reader.readInt();
 
 		for (int i = 0; i < numPolygons; i++) {
-			GeoPackagePolygon polygon = readGeometry(reader,
-					GeoPackagePolygon.class);
+			Polygon polygon = readGeometry(reader,
+					Polygon.class);
 			multiPolygon.addPolygon(polygon);
 
 		}
@@ -330,17 +330,17 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageGeometryCollection<GeoPackageGeometry> readGeometryCollection(
+	public static GeometryCollection<Geometry> readGeometryCollection(
 			ByteReader reader, boolean hasZ, boolean hasM) {
 
-		GeoPackageGeometryCollection<GeoPackageGeometry> geometryCollection = new GeoPackageGeometryCollection<GeoPackageGeometry>(
+		GeometryCollection<Geometry> geometryCollection = new GeometryCollection<Geometry>(
 				hasZ, hasM);
 
 		int numGeometries = reader.readInt();
 
 		for (int i = 0; i < numGeometries; i++) {
-			GeoPackageGeometry geometry = readGeometry(reader,
-					GeoPackageGeometry.class);
+			Geometry geometry = readGeometry(reader,
+					Geometry.class);
 			geometryCollection.addGeometry(geometry);
 
 		}
@@ -356,16 +356,16 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageCircularString readCircularString(
+	public static CircularString readCircularString(
 			ByteReader reader, boolean hasZ, boolean hasM) {
 
-		GeoPackageCircularString circularString = new GeoPackageCircularString(
+		CircularString circularString = new CircularString(
 				hasZ, hasM);
 
 		int numPoints = reader.readInt();
 
 		for (int i = 0; i < numPoints; i++) {
-			GeoPackagePoint point = readPoint(reader, hasZ, hasM);
+			Point point = readPoint(reader, hasZ, hasM);
 			circularString.addPoint(point);
 
 		}
@@ -381,17 +381,17 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageCompoundCurve readCompoundCurve(ByteReader reader,
+	public static CompoundCurve readCompoundCurve(ByteReader reader,
 			boolean hasZ, boolean hasM) {
 
-		GeoPackageCompoundCurve compoundCurve = new GeoPackageCompoundCurve(
+		CompoundCurve compoundCurve = new CompoundCurve(
 				hasZ, hasM);
 
 		int numLineStrings = reader.readInt();
 
 		for (int i = 0; i < numLineStrings; i++) {
-			GeoPackageLineString lineString = readGeometry(reader,
-					GeoPackageLineString.class);
+			LineString lineString = readGeometry(reader,
+					LineString.class);
 			compoundCurve.addLineString(lineString);
 
 		}
@@ -407,16 +407,16 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageCurvePolygon<GeoPackageCurve> readCurvePolygon(
+	public static CurvePolygon<Curve> readCurvePolygon(
 			ByteReader reader, boolean hasZ, boolean hasM) {
 
-		GeoPackageCurvePolygon<GeoPackageCurve> curvePolygon = new GeoPackageCurvePolygon<GeoPackageCurve>(
+		CurvePolygon<Curve> curvePolygon = new CurvePolygon<Curve>(
 				hasZ, hasM);
 
 		int numRings = reader.readInt();
 
 		for (int i = 0; i < numRings; i++) {
-			GeoPackageCurve ring = readGeometry(reader, GeoPackageCurve.class);
+			Curve ring = readGeometry(reader, Curve.class);
 			curvePolygon.addRing(ring);
 
 		}
@@ -432,17 +432,17 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackagePolyhedralSurface readPolyhedralSurface(
+	public static PolyhedralSurface readPolyhedralSurface(
 			ByteReader reader, boolean hasZ, boolean hasM) {
 
-		GeoPackagePolyhedralSurface polyhedralSurface = new GeoPackagePolyhedralSurface(
+		PolyhedralSurface polyhedralSurface = new PolyhedralSurface(
 				hasZ, hasM);
 
 		int numPolygons = reader.readInt();
 
 		for (int i = 0; i < numPolygons; i++) {
-			GeoPackagePolygon polygon = readGeometry(reader,
-					GeoPackagePolygon.class);
+			Polygon polygon = readGeometry(reader,
+					Polygon.class);
 			polyhedralSurface.addPolygon(polygon);
 
 		}
@@ -458,16 +458,16 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageTIN readTIN(ByteReader reader, boolean hasZ,
+	public static TIN readTIN(ByteReader reader, boolean hasZ,
 			boolean hasM) {
 
-		GeoPackageTIN tin = new GeoPackageTIN(hasZ, hasM);
+		TIN tin = new TIN(hasZ, hasM);
 
 		int numPolygons = reader.readInt();
 
 		for (int i = 0; i < numPolygons; i++) {
-			GeoPackagePolygon polygon = readGeometry(reader,
-					GeoPackagePolygon.class);
+			Polygon polygon = readGeometry(reader,
+					Polygon.class);
 			tin.addPolygon(polygon);
 
 		}
@@ -483,15 +483,15 @@ public class WkbGeometryReader {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackageTriangle readTriangle(ByteReader reader,
+	public static Triangle readTriangle(ByteReader reader,
 			boolean hasZ, boolean hasM) {
 
-		GeoPackageTriangle triangle = new GeoPackageTriangle(hasZ, hasM);
+		Triangle triangle = new Triangle(hasZ, hasM);
 
 		int numRings = reader.readInt();
 
 		for (int i = 0; i < numRings; i++) {
-			GeoPackageLineString ring = readLineString(reader, hasZ, hasM);
+			LineString ring = readLineString(reader, hasZ, hasM);
 			triangle.addRing(ring);
 
 		}

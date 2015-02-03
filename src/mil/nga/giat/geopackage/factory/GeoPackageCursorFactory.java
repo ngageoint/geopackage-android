@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.GeoPackageException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
 import android.database.sqlite.SQLiteCursorDriver;

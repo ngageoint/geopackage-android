@@ -6,18 +6,18 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.data.c2.Contents;
-import mil.nga.giat.geopackage.data.c2.ContentsDao;
-import mil.nga.giat.geopackage.data.c2.ContentsDataType;
-import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.data.c4.FeatureTable;
+import mil.nga.giat.geopackage.core.contents.Contents;
+import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.core.contents.ContentsDataType;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.geom.GeometryType;
 import android.app.Activity;
 import android.content.Context;
 
@@ -147,19 +147,19 @@ public class TestSetupTeardown {
 		// Create the feature tables
 		FeatureTable point2dTable = TestUtils.buildTable(
 				point2dContents.getTableName(), geometryColumn,
-				GeoPackageGeometryType.POINT);
+				GeometryType.POINT);
 		geoPackage.createTable(point2dTable);
 		FeatureTable polygon2dTable = TestUtils.buildTable(
 				polygon2dContents.getTableName(), geometryColumn,
-				GeoPackageGeometryType.POLYGON);
+				GeometryType.POLYGON);
 		geoPackage.createTable(polygon2dTable);
 		FeatureTable point3dTable = TestUtils.buildTable(
 				point3dContents.getTableName(), geometryColumn,
-				GeoPackageGeometryType.POINT);
+				GeometryType.POINT);
 		geoPackage.createTable(point3dTable);
 		FeatureTable lineString3dMTable = TestUtils.buildTable(
 				lineString3dMContents.getTableName(), geometryColumn,
-				GeoPackageGeometryType.LINESTRING);
+				GeometryType.LINESTRING);
 		geoPackage.createTable(lineString3dMTable);
 
 		// Create the contents
@@ -175,7 +175,7 @@ public class TestSetupTeardown {
 		GeometryColumns point2dGeometryColumns = new GeometryColumns();
 		point2dGeometryColumns.setContents(point2dContents);
 		point2dGeometryColumns.setColumnName(geometryColumn);
-		point2dGeometryColumns.setGeometryType(GeoPackageGeometryType.POINT);
+		point2dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point2dGeometryColumns.setSrs(point2dContents.getSrs());
 		point2dGeometryColumns.setZ(0);
 		point2dGeometryColumns.setM(0);
@@ -185,7 +185,7 @@ public class TestSetupTeardown {
 		polygon2dGeometryColumns.setContents(polygon2dContents);
 		polygon2dGeometryColumns.setColumnName(geometryColumn);
 		polygon2dGeometryColumns
-				.setGeometryType(GeoPackageGeometryType.POLYGON);
+				.setGeometryType(GeometryType.POLYGON);
 		polygon2dGeometryColumns.setSrs(polygon2dContents.getSrs());
 		polygon2dGeometryColumns.setZ(0);
 		polygon2dGeometryColumns.setM(0);
@@ -194,7 +194,7 @@ public class TestSetupTeardown {
 		GeometryColumns point3dGeometryColumns = new GeometryColumns();
 		point3dGeometryColumns.setContents(point3dContents);
 		point3dGeometryColumns.setColumnName(geometryColumn);
-		point3dGeometryColumns.setGeometryType(GeoPackageGeometryType.POINT);
+		point3dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point3dGeometryColumns.setSrs(point3dContents.getSrs());
 		point3dGeometryColumns.setZ(1);
 		point3dGeometryColumns.setM(0);
@@ -204,7 +204,7 @@ public class TestSetupTeardown {
 		lineString3dMGeometryColumns.setContents(lineString3dMContents);
 		lineString3dMGeometryColumns.setColumnName(geometryColumn);
 		lineString3dMGeometryColumns
-				.setGeometryType(GeoPackageGeometryType.LINESTRING);
+				.setGeometryType(GeometryType.LINESTRING);
 		lineString3dMGeometryColumns.setSrs(lineString3dMContents.getSrs());
 		lineString3dMGeometryColumns.setZ(1);
 		lineString3dMGeometryColumns.setM(1);

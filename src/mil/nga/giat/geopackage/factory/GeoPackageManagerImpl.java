@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Set;
 
 import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.R;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
-import mil.nga.giat.geopackage.util.GeoPackageException;
-import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;

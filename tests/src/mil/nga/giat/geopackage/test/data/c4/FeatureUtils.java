@@ -9,29 +9,29 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.data.c4.FeatureColumn;
-import mil.nga.giat.geopackage.data.c4.FeatureCursor;
-import mil.nga.giat.geopackage.data.c4.FeatureDao;
-import mil.nga.giat.geopackage.data.c4.FeatureRow;
-import mil.nga.giat.geopackage.data.c4.FeatureTable;
-import mil.nga.giat.geopackage.data.c4.FeatureValue;
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryCollection;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
-import mil.nga.giat.geopackage.geom.GeoPackageLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPoint;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPolygon;
-import mil.nga.giat.geopackage.geom.GeoPackagePoint;
-import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.user.FeatureColumn;
+import mil.nga.giat.geopackage.features.user.FeatureCursor;
+import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.features.user.FeatureRow;
+import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.features.user.FeatureValue;
+import mil.nga.giat.geopackage.geom.Geometry;
+import mil.nga.giat.geopackage.geom.GeometryCollection;
+import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.LineString;
+import mil.nga.giat.geopackage.geom.MultiLineString;
+import mil.nga.giat.geopackage.geom.MultiPoint;
+import mil.nga.giat.geopackage.geom.MultiPolygon;
+import mil.nga.giat.geopackage.geom.Point;
+import mil.nga.giat.geopackage.geom.Polygon;
+import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
+import mil.nga.giat.geopackage.io.ByteReader;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
-import mil.nga.giat.geopackage.util.ByteReader;
-import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 
@@ -93,9 +93,9 @@ public class FeatureUtils {
 						.getGeometry();
 				if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
 					TestCase.assertNotNull(geoPackageGeometryData);
-					GeoPackageGeometry geometry = geoPackageGeometryData
+					Geometry geometry = geoPackageGeometryData
 							.getGeometry();
-					GeoPackageGeometryType geometryType = geometryColumns
+					GeometryType geometryType = geometryColumns
 							.getGeometryType();
 					validateGeometry(geometryType, geometry);
 
@@ -105,7 +105,7 @@ public class FeatureUtils {
 					ByteReader wkbReader = new ByteReader(wkbBytes);
 					wkbReader.setByteOrder(geoPackageGeometryData
 							.getByteOrder());
-					GeoPackageGeometry geometryFromBytes = WkbGeometryReader
+					Geometry geometryFromBytes = WkbGeometryReader
 							.readGeometry(wkbReader);
 					TestCase.assertNotNull(geometryFromBytes);
 					TestCase.assertEquals(geometry.getGeometryType(),
@@ -120,7 +120,7 @@ public class FeatureUtils {
 					ByteReader wkbReader2 = new ByteReader(wkbBytes2);
 					wkbReader2.setByteOrder(geoPackageGeometryData
 							.getByteOrder());
-					GeoPackageGeometry geometryFromBytes2 = WkbGeometryReader
+					Geometry geometryFromBytes2 = WkbGeometryReader
 							.readGeometry(wkbReader2);
 					TestCase.assertNotNull(geometryFromBytes2);
 					TestCase.assertEquals(geometry.getGeometryType(),
@@ -362,43 +362,43 @@ public class FeatureUtils {
 	 * @param geometryType
 	 * @param geometry
 	 */
-	private static void validateGeometry(GeoPackageGeometryType geometryType,
-			GeoPackageGeometry geometry) {
+	private static void validateGeometry(GeometryType geometryType,
+			Geometry geometry) {
 
 		switch (geometryType) {
 		case POINT:
-			TestCase.assertTrue(geometry instanceof GeoPackagePoint);
-			GeoPackagePoint point = (GeoPackagePoint) geometry;
+			TestCase.assertTrue(geometry instanceof Point);
+			Point point = (Point) geometry;
 			validatePoint(point, point);
 			break;
 		case LINESTRING:
-			TestCase.assertTrue(geometry instanceof GeoPackageLineString);
-			GeoPackageLineString lineString = (GeoPackageLineString) geometry;
+			TestCase.assertTrue(geometry instanceof LineString);
+			LineString lineString = (LineString) geometry;
 			validateLineString(lineString, lineString);
 			break;
 		case POLYGON:
-			TestCase.assertTrue(geometry instanceof GeoPackagePolygon);
-			GeoPackagePolygon polygon = (GeoPackagePolygon) geometry;
+			TestCase.assertTrue(geometry instanceof Polygon);
+			Polygon polygon = (Polygon) geometry;
 			validatePolygon(polygon, polygon);
 			break;
 		case MULTIPOINT:
-			TestCase.assertTrue(geometry instanceof GeoPackageMultiPoint);
-			GeoPackageMultiPoint multiPoint = (GeoPackageMultiPoint) geometry;
+			TestCase.assertTrue(geometry instanceof MultiPoint);
+			MultiPoint multiPoint = (MultiPoint) geometry;
 			validateMultiPoint(multiPoint, multiPoint);
 			break;
 		case MULTILINESTRING:
-			TestCase.assertTrue(geometry instanceof GeoPackageMultiLineString);
-			GeoPackageMultiLineString multiLineString = (GeoPackageMultiLineString) geometry;
+			TestCase.assertTrue(geometry instanceof MultiLineString);
+			MultiLineString multiLineString = (MultiLineString) geometry;
 			validateMultiLineString(multiLineString, multiLineString);
 			break;
 		case MULTIPOLYGON:
-			TestCase.assertTrue(geometry instanceof GeoPackageMultiPolygon);
-			GeoPackageMultiPolygon multiPolygon = (GeoPackageMultiPolygon) geometry;
+			TestCase.assertTrue(geometry instanceof MultiPolygon);
+			MultiPolygon multiPolygon = (MultiPolygon) geometry;
 			validateMultiPolygon(multiPolygon, multiPolygon);
 			break;
 		case GEOMETRYCOLLECTION:
-			TestCase.assertTrue(geometry instanceof GeoPackageGeometryCollection);
-			GeoPackageGeometryCollection<?> geometryCollection = (GeoPackageGeometryCollection<?>) geometry;
+			TestCase.assertTrue(geometry instanceof GeometryCollection);
+			GeometryCollection<?> geometryCollection = (GeometryCollection<?>) geometry;
 			validateGeometryCollection(geometryCollection, geometryCollection);
 			break;
 		default:
@@ -412,8 +412,8 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param geometry
 	 */
-	private static void validateZAndM(GeoPackageGeometry topGeometry,
-			GeoPackageGeometry geometry) {
+	private static void validateZAndM(Geometry topGeometry,
+			Geometry geometry) {
 		TestCase.assertEquals(topGeometry.hasZ(), geometry.hasZ());
 		TestCase.assertEquals(topGeometry.hasM(), geometry.hasM());
 	}
@@ -424,10 +424,10 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param point
 	 */
-	private static void validatePoint(GeoPackageGeometry topGeometry,
-			GeoPackagePoint point) {
+	private static void validatePoint(Geometry topGeometry,
+			Point point) {
 
-		TestCase.assertEquals(GeoPackageGeometryType.POINT,
+		TestCase.assertEquals(GeometryType.POINT,
 				point.getGeometryType());
 
 		validateZAndM(topGeometry, point);
@@ -451,15 +451,15 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param lineString
 	 */
-	private static void validateLineString(GeoPackageGeometry topGeometry,
-			GeoPackageLineString lineString) {
+	private static void validateLineString(Geometry topGeometry,
+			LineString lineString) {
 
-		TestCase.assertEquals(GeoPackageGeometryType.LINESTRING,
+		TestCase.assertEquals(GeometryType.LINESTRING,
 				lineString.getGeometryType());
 
 		validateZAndM(topGeometry, lineString);
 
-		for (GeoPackagePoint point : lineString.getPoints()) {
+		for (Point point : lineString.getPoints()) {
 			validatePoint(topGeometry, point);
 		}
 
@@ -471,15 +471,15 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param polygon
 	 */
-	private static void validatePolygon(GeoPackageGeometry topGeometry,
-			GeoPackagePolygon polygon) {
+	private static void validatePolygon(Geometry topGeometry,
+			Polygon polygon) {
 
-		TestCase.assertEquals(GeoPackageGeometryType.POLYGON,
+		TestCase.assertEquals(GeometryType.POLYGON,
 				polygon.getGeometryType());
 
 		validateZAndM(topGeometry, polygon);
 
-		for (GeoPackageLineString ring : polygon.getRings()) {
+		for (LineString ring : polygon.getRings()) {
 			validateLineString(topGeometry, ring);
 		}
 
@@ -491,15 +491,15 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param multiPoint
 	 */
-	private static void validateMultiPoint(GeoPackageGeometry topGeometry,
-			GeoPackageMultiPoint multiPoint) {
+	private static void validateMultiPoint(Geometry topGeometry,
+			MultiPoint multiPoint) {
 
-		TestCase.assertEquals(GeoPackageGeometryType.MULTIPOINT,
+		TestCase.assertEquals(GeometryType.MULTIPOINT,
 				multiPoint.getGeometryType());
 
 		validateZAndM(topGeometry, multiPoint);
 
-		for (GeoPackagePoint point : multiPoint.getPoints()) {
+		for (Point point : multiPoint.getPoints()) {
 			validatePoint(topGeometry, point);
 		}
 
@@ -511,15 +511,15 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param multiLineString
 	 */
-	private static void validateMultiLineString(GeoPackageGeometry topGeometry,
-			GeoPackageMultiLineString multiLineString) {
+	private static void validateMultiLineString(Geometry topGeometry,
+			MultiLineString multiLineString) {
 
-		TestCase.assertEquals(GeoPackageGeometryType.MULTILINESTRING,
+		TestCase.assertEquals(GeometryType.MULTILINESTRING,
 				multiLineString.getGeometryType());
 
 		validateZAndM(topGeometry, multiLineString);
 
-		for (GeoPackageLineString lineString : multiLineString.getLineStrings()) {
+		for (LineString lineString : multiLineString.getLineStrings()) {
 			validateLineString(topGeometry, lineString);
 		}
 
@@ -531,15 +531,15 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param multiPolygon
 	 */
-	private static void validateMultiPolygon(GeoPackageGeometry topGeometry,
-			GeoPackageMultiPolygon multiPolygon) {
+	private static void validateMultiPolygon(Geometry topGeometry,
+			MultiPolygon multiPolygon) {
 
-		TestCase.assertEquals(GeoPackageGeometryType.MULTIPOLYGON,
+		TestCase.assertEquals(GeometryType.MULTIPOLYGON,
 				multiPolygon.getGeometryType());
 
 		validateZAndM(topGeometry, multiPolygon);
 
-		for (GeoPackagePolygon polygon : multiPolygon.getPolygons()) {
+		for (Polygon polygon : multiPolygon.getPolygons()) {
 			validatePolygon(topGeometry, polygon);
 		}
 
@@ -552,12 +552,12 @@ public class FeatureUtils {
 	 * @param geometryCollection
 	 */
 	private static void validateGeometryCollection(
-			GeoPackageGeometry topGeometry,
-			GeoPackageGeometryCollection<?> geometryCollection) {
+			Geometry topGeometry,
+			GeometryCollection<?> geometryCollection) {
 
 		validateZAndM(topGeometry, geometryCollection);
 
-		for (GeoPackageGeometry geometry : geometryCollection.getGeometries()) {
+		for (Geometry geometry : geometryCollection.getGeometries()) {
 			validateGeometry(geometry.getGeometryType(), geometry);
 		}
 
@@ -606,7 +606,7 @@ public class FeatureUtils {
 					byte[] updatedBytes = null;
 					byte[] updatedLimitedBytes = null;
 
-					GeoPackageGeometry geometry = geometryData.getGeometry();
+					Geometry geometry = geometryData.getGeometry();
 					FeatureRow originalRow = cursor.getRow();
 					FeatureRow featureRow = cursor.getRow();
 
@@ -628,15 +628,15 @@ public class FeatureUtils {
 								switch (geometry.getGeometryType()) {
 
 								case POINT:
-									GeoPackagePoint point = (GeoPackagePoint) geometry;
+									Point point = (Point) geometry;
 									updatePoint(point);
 									break;
 								case MULTIPOINT:
-									GeoPackageMultiPoint multiPoint = (GeoPackageMultiPoint) geometry;
+									MultiPoint multiPoint = (MultiPoint) geometry;
 									if (multiPoint.numPoints() > 1) {
 										multiPoint.getPoints().remove(0);
 									}
-									for (GeoPackagePoint multiPointPoint : multiPoint
+									for (Point multiPointPoint : multiPoint
 											.getPoints()) {
 										updatePoint(multiPointPoint);
 									}
@@ -824,7 +824,7 @@ public class FeatureUtils {
 					TestCase.assertEquals(originalRow.getId(), readRow.getId());
 					GeoPackageGeometryData readGeometryData = readRow
 							.getGeometry();
-					GeoPackageGeometry readGeometry = readGeometryData
+					Geometry readGeometry = readGeometryData
 							.getGeometry();
 
 					for (String readColumnName : readRow.getColumnNames()) {
@@ -922,16 +922,16 @@ public class FeatureUtils {
 					switch (geometry.getGeometryType()) {
 
 					case POINT:
-						GeoPackagePoint point = (GeoPackagePoint) readGeometry;
+						Point point = (Point) readGeometry;
 						validateUpdatedPoint(point);
 						break;
 
 					case MULTIPOINT:
-						GeoPackageMultiPoint originalMultiPoint = (GeoPackageMultiPoint) geometry;
-						GeoPackageMultiPoint multiPoint = (GeoPackageMultiPoint) readGeometry;
+						MultiPoint originalMultiPoint = (MultiPoint) geometry;
+						MultiPoint multiPoint = (MultiPoint) readGeometry;
 						TestCase.assertEquals(originalMultiPoint.numPoints(),
 								multiPoint.numPoints());
-						for (GeoPackagePoint multiPointPoint : multiPoint
+						for (Point multiPointPoint : multiPoint
 								.getPoints()) {
 							validateUpdatedPoint(multiPointPoint);
 						}
@@ -965,7 +965,7 @@ public class FeatureUtils {
 	 * 
 	 * @param point
 	 */
-	private static void updatePoint(GeoPackagePoint point) {
+	private static void updatePoint(Point point) {
 		point.setX(POINT_UPDATED_X);
 		point.setY(POINT_UPDATED_Y);
 		if (point.hasZ()) {
@@ -981,7 +981,7 @@ public class FeatureUtils {
 	 * 
 	 * @param point
 	 */
-	private static void validateUpdatedPoint(GeoPackagePoint point) {
+	private static void validateUpdatedPoint(Point point) {
 		TestCase.assertEquals(POINT_UPDATED_X, point.getX());
 		TestCase.assertEquals(POINT_UPDATED_Y, point.getY());
 		if (point.hasZ()) {

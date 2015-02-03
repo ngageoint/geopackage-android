@@ -1,6 +1,6 @@
 package mil.nga.giat.geopackage.db;
 
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.GeoPackageException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 

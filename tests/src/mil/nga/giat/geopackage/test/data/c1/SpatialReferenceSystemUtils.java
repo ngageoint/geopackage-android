@@ -8,17 +8,17 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSql;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSfSqlDao;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMm;
-import mil.nga.giat.geopackage.data.c1.SpatialReferenceSystemSqlMmDao;
-import mil.nga.giat.geopackage.data.c2.Contents;
-import mil.nga.giat.geopackage.data.c2.ContentsDao;
-import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsDao;
-import mil.nga.giat.geopackage.data.c3.GeometryColumnsKey;
+import mil.nga.giat.geopackage.core.contents.Contents;
+import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSql;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSqlDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMm;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsKey;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;

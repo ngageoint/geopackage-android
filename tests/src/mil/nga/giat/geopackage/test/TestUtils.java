@@ -11,20 +11,20 @@ import java.util.List;
 import java.util.UUID;
 
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.data.c3.GeometryColumns;
-import mil.nga.giat.geopackage.data.c4.FeatureColumn;
-import mil.nga.giat.geopackage.data.c4.FeatureDao;
-import mil.nga.giat.geopackage.data.c4.FeatureRow;
-import mil.nga.giat.geopackage.data.c4.FeatureTable;
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
-import mil.nga.giat.geopackage.geom.GeoPackageLineString;
-import mil.nga.giat.geopackage.geom.GeoPackagePoint;
-import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
-import mil.nga.giat.geopackage.util.GeoPackageException;
-import mil.nga.giat.geopackage.util.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
+import mil.nga.giat.geopackage.features.user.FeatureColumn;
+import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.features.user.FeatureRow;
+import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.geom.Geometry;
+import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.LineString;
+import mil.nga.giat.geopackage.geom.Point;
+import mil.nga.giat.geopackage.geom.Polygon;
+import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -117,7 +117,7 @@ public class TestUtils {
 	 * @return
 	 */
 	public static FeatureTable buildTable(String tableName,
-			String geometryColumn, GeoPackageGeometryType geometryType) {
+			String geometryColumn, GeometryType geometryType) {
 
 		List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
 
@@ -177,7 +177,7 @@ public class TestUtils {
 
 					if (column.isGeometry()) {
 
-						GeoPackageGeometry geometry = null;
+						Geometry geometry = null;
 
 						switch (column.getGeometryType()) {
 						case POINT:
@@ -263,12 +263,12 @@ public class TestUtils {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackagePoint createPoint(boolean hasZ, boolean hasM) {
+	public static Point createPoint(boolean hasZ, boolean hasM) {
 
 		double x = Math.random() * 180.0 * (Math.random() < .5 ? 1 : -1);
 		double y = Math.random() * 90.0 * (Math.random() < .5 ? 1 : -1);
 
-		GeoPackagePoint point = new GeoPackagePoint(hasZ, hasM, x, y);
+		Point point = new Point(hasZ, hasM, x, y);
 
 		if (hasZ) {
 			double z = Math.random() * 1000.0;
@@ -291,10 +291,10 @@ public class TestUtils {
 	 * @param ring
 	 * @return
 	 */
-	public static GeoPackageLineString createLineString(boolean hasZ,
+	public static LineString createLineString(boolean hasZ,
 			boolean hasM, boolean ring) {
 
-		GeoPackageLineString lineString = new GeoPackageLineString(hasZ, hasM);
+		LineString lineString = new LineString(hasZ, hasM);
 
 		int numPoints = 2 + ((int) (Math.random() * 9));
 
@@ -316,9 +316,9 @@ public class TestUtils {
 	 * @param hasM
 	 * @return
 	 */
-	public static GeoPackagePolygon createPolygon(boolean hasZ, boolean hasM) {
+	public static Polygon createPolygon(boolean hasZ, boolean hasM) {
 
-		GeoPackagePolygon polygon = new GeoPackagePolygon(hasZ, hasM);
+		Polygon polygon = new Polygon(hasZ, hasM);
 
 		int numLineStrings = 1 + ((int) (Math.random() * 5));
 

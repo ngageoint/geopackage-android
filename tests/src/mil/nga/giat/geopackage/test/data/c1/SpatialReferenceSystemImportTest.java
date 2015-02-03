@@ -4,9 +4,9 @@ import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.test.TestSetupTeardown;
 import mil.nga.giat.geopackage.test.TestUtils;
-import mil.nga.giat.geopackage.util.GeoPackageException;
 import android.app.Activity;
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;

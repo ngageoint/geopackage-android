@@ -3,24 +3,24 @@ package mil.nga.giat.geopackage.geom.wkb;
 import java.io.IOException;
 import java.nio.ByteOrder;
 
-import mil.nga.giat.geopackage.geom.GeoPackageCircularString;
-import mil.nga.giat.geopackage.geom.GeoPackageCompoundCurve;
-import mil.nga.giat.geopackage.geom.GeoPackageCurve;
-import mil.nga.giat.geopackage.geom.GeoPackageCurvePolygon;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometry;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryCollection;
-import mil.nga.giat.geopackage.geom.GeoPackageLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiLineString;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPoint;
-import mil.nga.giat.geopackage.geom.GeoPackageMultiPolygon;
-import mil.nga.giat.geopackage.geom.GeoPackagePoint;
-import mil.nga.giat.geopackage.geom.GeoPackagePolygon;
-import mil.nga.giat.geopackage.geom.GeoPackagePolyhedralSurface;
-import mil.nga.giat.geopackage.geom.GeoPackageTIN;
-import mil.nga.giat.geopackage.geom.GeoPackageTriangle;
-import mil.nga.giat.geopackage.geom.GeoPackageGeometryType;
-import mil.nga.giat.geopackage.util.ByteWriter;
-import mil.nga.giat.geopackage.util.GeoPackageException;
+import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.geom.CircularString;
+import mil.nga.giat.geopackage.geom.CompoundCurve;
+import mil.nga.giat.geopackage.geom.Curve;
+import mil.nga.giat.geopackage.geom.CurvePolygon;
+import mil.nga.giat.geopackage.geom.Geometry;
+import mil.nga.giat.geopackage.geom.GeometryCollection;
+import mil.nga.giat.geopackage.geom.LineString;
+import mil.nga.giat.geopackage.geom.MultiLineString;
+import mil.nga.giat.geopackage.geom.MultiPoint;
+import mil.nga.giat.geopackage.geom.MultiPolygon;
+import mil.nga.giat.geopackage.geom.Point;
+import mil.nga.giat.geopackage.geom.Polygon;
+import mil.nga.giat.geopackage.geom.PolyhedralSurface;
+import mil.nga.giat.geopackage.geom.TIN;
+import mil.nga.giat.geopackage.geom.Triangle;
+import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.io.ByteWriter;
 
 /**
  * Well Known Binary writer
@@ -37,7 +37,7 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeGeometry(ByteWriter writer,
-			GeoPackageGeometry geometry) throws IOException {
+			Geometry geometry) throws IOException {
 
 		// Write the single byte order byte
 		byte byteOrder = writer.getByteOrder() == ByteOrder.BIG_ENDIAN ? (byte) 0
@@ -47,7 +47,7 @@ public class WkbGeometryWriter {
 		// Write the geometry type integer
 		writer.writeInt(geometry.getWkbCode());
 
-		GeoPackageGeometryType geometryType = geometry.getGeometryType();
+		GeometryType geometryType = geometry.getGeometryType();
 
 		switch (geometryType) {
 
@@ -55,35 +55,35 @@ public class WkbGeometryWriter {
 			throw new GeoPackageException("Unexpected Geometry Type of "
 					+ geometryType.name() + " which is abstract");
 		case POINT:
-			writePoint(writer, (GeoPackagePoint) geometry);
+			writePoint(writer, (Point) geometry);
 			break;
 		case LINESTRING:
-			writeLineString(writer, (GeoPackageLineString) geometry);
+			writeLineString(writer, (LineString) geometry);
 			break;
 		case POLYGON:
-			writePolygon(writer, (GeoPackagePolygon) geometry);
+			writePolygon(writer, (Polygon) geometry);
 			break;
 		case MULTIPOINT:
-			writeMultiPoint(writer, (GeoPackageMultiPoint) geometry);
+			writeMultiPoint(writer, (MultiPoint) geometry);
 			break;
 		case MULTILINESTRING:
-			writeMultiLineString(writer, (GeoPackageMultiLineString) geometry);
+			writeMultiLineString(writer, (MultiLineString) geometry);
 			break;
 		case MULTIPOLYGON:
-			writeMultiPolygon(writer, (GeoPackageMultiPolygon) geometry);
+			writeMultiPolygon(writer, (MultiPolygon) geometry);
 			break;
 		case GEOMETRYCOLLECTION:
 			writeGeometryCollection(writer,
-					(GeoPackageGeometryCollection<?>) geometry);
+					(GeometryCollection<?>) geometry);
 			break;
 		case CIRCULARSTRING:
-			writeCircularString(writer, (GeoPackageCircularString) geometry);
+			writeCircularString(writer, (CircularString) geometry);
 			break;
 		case COMPOUNDCURVE:
-			writeCompoundCurve(writer, (GeoPackageCompoundCurve) geometry);
+			writeCompoundCurve(writer, (CompoundCurve) geometry);
 			break;
 		case CURVEPOLYGON:
-			writeCurvePolygon(writer, (GeoPackageCurvePolygon<?>) geometry);
+			writeCurvePolygon(writer, (CurvePolygon<?>) geometry);
 			break;
 		case MULTICURVE:
 			throw new GeoPackageException("Unexpected Geometry Type of "
@@ -99,13 +99,13 @@ public class WkbGeometryWriter {
 					+ geometryType.name() + " which is abstract");
 		case POLYHEDRALSURFACE:
 			writePolyhedralSurface(writer,
-					(GeoPackagePolyhedralSurface) geometry);
+					(PolyhedralSurface) geometry);
 			break;
 		case TIN:
-			writeTIN(writer, (GeoPackageTIN) geometry);
+			writeTIN(writer, (TIN) geometry);
 			break;
 		case TRIANGLE:
-			writeTriangle(writer, (GeoPackageTriangle) geometry);
+			writeTriangle(writer, (Triangle) geometry);
 			break;
 		default:
 			throw new GeoPackageException("Geometry Type not supported: "
@@ -121,7 +121,7 @@ public class WkbGeometryWriter {
 	 * @param point
 	 * @throws IOException
 	 */
-	public static void writePoint(ByteWriter writer, GeoPackagePoint point)
+	public static void writePoint(ByteWriter writer, Point point)
 			throws IOException {
 
 		writer.writeDouble(point.getX());
@@ -144,11 +144,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeLineString(ByteWriter writer,
-			GeoPackageLineString lineString) throws IOException {
+			LineString lineString) throws IOException {
 
 		writer.writeInt(lineString.numPoints());
 
-		for (GeoPackagePoint point : lineString.getPoints()) {
+		for (Point point : lineString.getPoints()) {
 			writePoint(writer, point);
 		}
 	}
@@ -160,12 +160,12 @@ public class WkbGeometryWriter {
 	 * @param polygon
 	 * @throws IOException
 	 */
-	public static void writePolygon(ByteWriter writer, GeoPackagePolygon polygon)
+	public static void writePolygon(ByteWriter writer, Polygon polygon)
 			throws IOException {
 
 		writer.writeInt(polygon.numRings());
 
-		for (GeoPackageLineString ring : polygon.getRings()) {
+		for (LineString ring : polygon.getRings()) {
 			writeLineString(writer, ring);
 		}
 	}
@@ -178,11 +178,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeMultiPoint(ByteWriter writer,
-			GeoPackageMultiPoint multiPoint) throws IOException {
+			MultiPoint multiPoint) throws IOException {
 
 		writer.writeInt(multiPoint.numPoints());
 
-		for (GeoPackagePoint point : multiPoint.getPoints()) {
+		for (Point point : multiPoint.getPoints()) {
 			writeGeometry(writer, point);
 		}
 	}
@@ -195,11 +195,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeMultiLineString(ByteWriter writer,
-			GeoPackageMultiLineString multiLineString) throws IOException {
+			MultiLineString multiLineString) throws IOException {
 
 		writer.writeInt(multiLineString.numLineStrings());
 
-		for (GeoPackageLineString lineString : multiLineString.getLineStrings()) {
+		for (LineString lineString : multiLineString.getLineStrings()) {
 			writeGeometry(writer, lineString);
 		}
 	}
@@ -212,11 +212,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeMultiPolygon(ByteWriter writer,
-			GeoPackageMultiPolygon multiPolygon) throws IOException {
+			MultiPolygon multiPolygon) throws IOException {
 
 		writer.writeInt(multiPolygon.numPolygons());
 
-		for (GeoPackagePolygon polygon : multiPolygon.getPolygons()) {
+		for (Polygon polygon : multiPolygon.getPolygons()) {
 			writeGeometry(writer, polygon);
 		}
 	}
@@ -229,12 +229,12 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeGeometryCollection(ByteWriter writer,
-			GeoPackageGeometryCollection<?> geometryCollection)
+			GeometryCollection<?> geometryCollection)
 			throws IOException {
 
 		writer.writeInt(geometryCollection.numGeometries());
 
-		for (GeoPackageGeometry geometry : geometryCollection.getGeometries()) {
+		for (Geometry geometry : geometryCollection.getGeometries()) {
 			writeGeometry(writer, geometry);
 		}
 	}
@@ -247,11 +247,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeCircularString(ByteWriter writer,
-			GeoPackageCircularString circularString) throws IOException {
+			CircularString circularString) throws IOException {
 
 		writer.writeInt(circularString.numPoints());
 
-		for (GeoPackagePoint point : circularString.getPoints()) {
+		for (Point point : circularString.getPoints()) {
 			writePoint(writer, point);
 		}
 	}
@@ -264,11 +264,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeCompoundCurve(ByteWriter writer,
-			GeoPackageCompoundCurve compoundCurve) throws IOException {
+			CompoundCurve compoundCurve) throws IOException {
 
 		writer.writeInt(compoundCurve.numLineStrings());
 
-		for (GeoPackageLineString lineString : compoundCurve.getLineStrings()) {
+		for (LineString lineString : compoundCurve.getLineStrings()) {
 			writeGeometry(writer, lineString);
 		}
 	}
@@ -281,11 +281,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeCurvePolygon(ByteWriter writer,
-			GeoPackageCurvePolygon<?> curvePolygon) throws IOException {
+			CurvePolygon<?> curvePolygon) throws IOException {
 
 		writer.writeInt(curvePolygon.numRings());
 
-		for (GeoPackageCurve ring : curvePolygon.getRings()) {
+		for (Curve ring : curvePolygon.getRings()) {
 			writeGeometry(writer, ring);
 		}
 	}
@@ -298,11 +298,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writePolyhedralSurface(ByteWriter writer,
-			GeoPackagePolyhedralSurface polyhedralSurface) throws IOException {
+			PolyhedralSurface polyhedralSurface) throws IOException {
 
 		writer.writeInt(polyhedralSurface.numPolygons());
 
-		for (GeoPackagePolygon polygon : polyhedralSurface.getPolygons()) {
+		for (Polygon polygon : polyhedralSurface.getPolygons()) {
 			writeGeometry(writer, polygon);
 		}
 	}
@@ -314,12 +314,12 @@ public class WkbGeometryWriter {
 	 * @param tin
 	 * @throws IOException
 	 */
-	public static void writeTIN(ByteWriter writer, GeoPackageTIN tin)
+	public static void writeTIN(ByteWriter writer, TIN tin)
 			throws IOException {
 
 		writer.writeInt(tin.numPolygons());
 
-		for (GeoPackagePolygon polygon : tin.getPolygons()) {
+		for (Polygon polygon : tin.getPolygons()) {
 			writeGeometry(writer, polygon);
 		}
 	}
@@ -332,11 +332,11 @@ public class WkbGeometryWriter {
 	 * @throws IOException
 	 */
 	public static void writeTriangle(ByteWriter writer,
-			GeoPackageTriangle triangle) throws IOException {
+			Triangle triangle) throws IOException {
 
 		writer.writeInt(triangle.numRings());
 
-		for (GeoPackageLineString ring : triangle.getRings()) {
+		for (LineString ring : triangle.getRings()) {
 			writeLineString(writer, ring);
 		}
 	}
