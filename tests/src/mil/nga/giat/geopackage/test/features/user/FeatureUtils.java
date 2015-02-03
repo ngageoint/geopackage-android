@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c4;
+package mil.nga.giat.geopackage.test.features.user;
 
 import java.nio.ByteBuffer;
 import java.sql.SQLException;

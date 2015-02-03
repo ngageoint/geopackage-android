@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c2;
+package mil.nga.giat.geopackage.test.core.contents;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

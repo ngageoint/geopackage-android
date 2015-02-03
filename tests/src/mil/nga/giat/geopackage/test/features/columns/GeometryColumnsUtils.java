@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c3;
+package mil.nga.giat.geopackage.test.features.columns;
 
 import java.sql.SQLException;
 import java.util.Date;

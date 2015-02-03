@@ -1,32 +1,25 @@
-package mil.nga.giat.geopackage.test.data.c3;
+package mil.nga.giat.geopackage.test.core.contents;
 
 import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
 import mil.nga.giat.geopackage.test.TestSetupTeardown;
-import mil.nga.giat.geopackage.test.TestUtils;
 import android.app.Activity;
-import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Geometry Columns from an imported database (C.3. gpkg_geometry_columns)
+ * Test Contents from a created database (C.2. gpkg_contents)
  * 
  * @author osbornb
  */
-public class GeometryColumnsImportTest extends
+public class ContentsCreateTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
 	 * GeoPackage activity
 	 */
 	private Activity activity = null;
-
-	/**
-	 * GeoPackage test context
-	 */
-	private Context testContext = null;
 
 	/**
 	 * GeoPackage
@@ -36,7 +29,7 @@ public class GeometryColumnsImportTest extends
 	/**
 	 * Constructor
 	 */
-	public GeometryColumnsImportTest() {
+	public ContentsCreateTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -47,12 +40,11 @@ public class GeometryColumnsImportTest extends
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		// Set the activity and test context
+		// Set the activity
 		activity = getActivity();
-		testContext = TestUtils.getTestContext(activity);
 
-		// Import the database
-		geoPackage = TestSetupTeardown.setUpImport(activity, testContext);
+		// Create the database
+		geoPackage = TestSetupTeardown.setUpCreate(activity, true, false);
 	}
 
 	/**
@@ -61,8 +53,8 @@ public class GeometryColumnsImportTest extends
 	@Override
 	protected void tearDown() throws Exception {
 
-		// Tear down the import database
-		TestSetupTeardown.tearDownImport(activity, geoPackage);
+		// Tear down the create database
+		TestSetupTeardown.tearDownCreate(activity, geoPackage);
 
 		super.tearDown();
 	}
@@ -74,7 +66,8 @@ public class GeometryColumnsImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		GeometryColumnsUtils.testRead(geoPackage, 16);
+		ContentsUtils.testRead(geoPackage,
+				TestSetupTeardown.CREATE_CONTENTS_COUNT);
 
 	}
 
@@ -85,7 +78,7 @@ public class GeometryColumnsImportTest extends
 	 */
 	public void testUpdate() throws SQLException {
 
-		GeometryColumnsUtils.testUpdate(geoPackage);
+		ContentsUtils.testUpdate(geoPackage);
 
 	}
 
@@ -96,7 +89,7 @@ public class GeometryColumnsImportTest extends
 	 */
 	public void testCreate() throws SQLException {
 
-		GeometryColumnsUtils.testCreate(geoPackage);
+		ContentsUtils.testCreate(geoPackage);
 
 	}
 
@@ -107,7 +100,18 @@ public class GeometryColumnsImportTest extends
 	 */
 	public void testDelete() throws SQLException {
 
-		GeometryColumnsUtils.testDelete(geoPackage);
+		ContentsUtils.testDelete(geoPackage);
+
+	}
+
+	/**
+	 * Test cascade deleting
+	 * 
+	 * @throws SQLException
+	 */
+	public void testDeleteCascade() throws SQLException {
+
+		ContentsUtils.testDeleteCascade(geoPackage);
 
 	}
 

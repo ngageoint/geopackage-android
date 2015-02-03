@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c4;
+package mil.nga.giat.geopackage.test.features.columns;
 
 import java.sql.SQLException;
 
@@ -11,11 +11,11 @@ import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Features from an imported database
+ * Test Geometry Columns from an imported database (C.3. gpkg_geometry_columns)
  * 
  * @author osbornb
  */
-public class FeatureImportTest extends
+public class GeometryColumnsImportTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
@@ -36,7 +36,7 @@ public class FeatureImportTest extends
 	/**
 	 * Constructor
 	 */
-	public FeatureImportTest() {
+	public GeometryColumnsImportTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -74,7 +74,7 @@ public class FeatureImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		FeatureUtils.testRead(geoPackage);
+		GeometryColumnsUtils.testRead(geoPackage, 16);
 
 	}
 
@@ -85,7 +85,7 @@ public class FeatureImportTest extends
 	 */
 	public void testUpdate() throws SQLException {
 
-		FeatureUtils.testUpdate(geoPackage);
+		GeometryColumnsUtils.testUpdate(geoPackage);
 
 	}
 
@@ -96,7 +96,7 @@ public class FeatureImportTest extends
 	 */
 	public void testCreate() throws SQLException {
 
-		FeatureUtils.testCreate(geoPackage);
+		GeometryColumnsUtils.testCreate(geoPackage);
 
 	}
 
@@ -107,7 +107,7 @@ public class FeatureImportTest extends
 	 */
 	public void testDelete() throws SQLException {
 
-		FeatureUtils.testDelete(geoPackage);
+		GeometryColumnsUtils.testDelete(geoPackage);
 
 	}
 

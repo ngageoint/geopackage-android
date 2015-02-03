@@ -1,10 +1,9 @@
-package mil.nga.giat.geopackage.test.data.c1;
+package mil.nga.giat.geopackage.test.features.user;
 
 import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageActivity;
-import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.test.TestSetupTeardown;
 import mil.nga.giat.geopackage.test.TestUtils;
 import android.app.Activity;
@@ -12,12 +11,11 @@ import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
 
 /**
- * Test Spatial Reference System from an imported database (C.1.
- * gpkg_spatial_ref_sys)
+ * Test Features from an imported database
  * 
  * @author osbornb
  */
-public class SpatialReferenceSystemImportTest extends
+public class FeatureImportTest extends
 		ActivityInstrumentationTestCase2<GeoPackageActivity> {
 
 	/**
@@ -38,7 +36,7 @@ public class SpatialReferenceSystemImportTest extends
 	/**
 	 * Constructor
 	 */
-	public SpatialReferenceSystemImportTest() {
+	public FeatureImportTest() {
 		super(GeoPackageActivity.class);
 	}
 
@@ -76,35 +74,7 @@ public class SpatialReferenceSystemImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage, 4);
-
-	}
-
-	/**
-	 * Test reading using the SQL/MM view
-	 */
-	public void testSqlMmRead() {
-
-		try {
-			geoPackage.getSpatialReferenceSystemSqlMmDao();
-			fail("No exception was thrown when the SQL/MM view was not expected to exist");
-		} catch (GeoPackageException e) {
-			// Expected
-		}
-
-	}
-
-	/**
-	 * Test reading using the SF/SQL view
-	 */
-	public void testSfSqlRead() {
-
-		try {
-			geoPackage.getSpatialReferenceSystemSfSqlDao();
-			fail("No exception was thrown when the SF/SQL view was not expected to exist");
-		} catch (GeoPackageException e) {
-			// Expected
-		}
+		FeatureUtils.testRead(geoPackage);
 
 	}
 
@@ -115,7 +85,7 @@ public class SpatialReferenceSystemImportTest extends
 	 */
 	public void testUpdate() throws SQLException {
 
-		SpatialReferenceSystemUtils.testUpdate(geoPackage);
+		FeatureUtils.testUpdate(geoPackage);
 
 	}
 
@@ -126,7 +96,7 @@ public class SpatialReferenceSystemImportTest extends
 	 */
 	public void testCreate() throws SQLException {
 
-		SpatialReferenceSystemUtils.testCreate(geoPackage);
+		FeatureUtils.testCreate(geoPackage);
 
 	}
 
@@ -137,18 +107,7 @@ public class SpatialReferenceSystemImportTest extends
 	 */
 	public void testDelete() throws SQLException {
 
-		SpatialReferenceSystemUtils.testDelete(geoPackage);
-
-	}
-
-	/**
-	 * Test cascade deleting
-	 * 
-	 * @throws SQLException
-	 */
-	public void testDeleteCascade() throws SQLException {
-
-		SpatialReferenceSystemUtils.testDeleteCascade(geoPackage);
+		FeatureUtils.testDelete(geoPackage);
 
 	}
 

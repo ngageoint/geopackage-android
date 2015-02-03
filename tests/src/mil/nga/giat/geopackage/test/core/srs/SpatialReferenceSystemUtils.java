@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.data.c1;
+package mil.nga.giat.geopackage.test.core.srs;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
