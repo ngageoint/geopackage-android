@@ -151,7 +151,7 @@ public class Contents {
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 */
 	@DatabaseField(columnName = COLUMN_SRS_ID)
-	private int srsId;
+	private long srsId;
 
 	/**
 	 * Geometry Columns
@@ -269,7 +269,7 @@ public class Contents {
 		}
 	}
 
-	public int getSrsId() {
+	public long getSrsId() {
 		return srsId;
 	}
 

@@ -94,9 +94,9 @@ public class TestSetupTeardown {
 		SpatialReferenceSystemDao srsDao = geoPackage
 				.getSpatialReferenceSystemDao();
 
-		SpatialReferenceSystem epsgSrs = srsDao.queryForId(4326);
-		SpatialReferenceSystem undefinedCartesianSrs = srsDao.queryForId(-1);
-		SpatialReferenceSystem undefinedGeographicSrs = srsDao.queryForId(0);
+		SpatialReferenceSystem epsgSrs = srsDao.queryForId(4326l);
+		SpatialReferenceSystem undefinedCartesianSrs = srsDao.queryForId(-1l);
+		SpatialReferenceSystem undefinedGeographicSrs = srsDao.queryForId(0l);
 
 		TestCase.assertNotNull(epsgSrs);
 		TestCase.assertNotNull(undefinedCartesianSrs);
@@ -191,8 +191,8 @@ public class TestSetupTeardown {
 		point2dGeometryColumns.setColumnName(geometryColumn);
 		point2dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point2dGeometryColumns.setSrs(point2dContents.getSrs());
-		point2dGeometryColumns.setZ(0);
-		point2dGeometryColumns.setM(0);
+		point2dGeometryColumns.setZ((byte)0);
+		point2dGeometryColumns.setM((byte)0);
 		geometryColumnsDao.create(point2dGeometryColumns);
 
 		GeometryColumns polygon2dGeometryColumns = new GeometryColumns();
@@ -200,8 +200,8 @@ public class TestSetupTeardown {
 		polygon2dGeometryColumns.setColumnName(geometryColumn);
 		polygon2dGeometryColumns.setGeometryType(GeometryType.POLYGON);
 		polygon2dGeometryColumns.setSrs(polygon2dContents.getSrs());
-		polygon2dGeometryColumns.setZ(0);
-		polygon2dGeometryColumns.setM(0);
+		polygon2dGeometryColumns.setZ((byte)0);
+		polygon2dGeometryColumns.setM((byte)0);
 		geometryColumnsDao.create(polygon2dGeometryColumns);
 
 		GeometryColumns point3dGeometryColumns = new GeometryColumns();
@@ -209,8 +209,8 @@ public class TestSetupTeardown {
 		point3dGeometryColumns.setColumnName(geometryColumn);
 		point3dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point3dGeometryColumns.setSrs(point3dContents.getSrs());
-		point3dGeometryColumns.setZ(1);
-		point3dGeometryColumns.setM(0);
+		point3dGeometryColumns.setZ((byte)1);
+		point3dGeometryColumns.setM((byte)0);
 		geometryColumnsDao.create(point3dGeometryColumns);
 
 		GeometryColumns lineString3dMGeometryColumns = new GeometryColumns();
@@ -218,8 +218,8 @@ public class TestSetupTeardown {
 		lineString3dMGeometryColumns.setColumnName(geometryColumn);
 		lineString3dMGeometryColumns.setGeometryType(GeometryType.LINESTRING);
 		lineString3dMGeometryColumns.setSrs(lineString3dMContents.getSrs());
-		lineString3dMGeometryColumns.setZ(1);
-		lineString3dMGeometryColumns.setM(1);
+		lineString3dMGeometryColumns.setZ((byte)1);
+		lineString3dMGeometryColumns.setM((byte)1);
 		geometryColumnsDao.create(lineString3dMGeometryColumns);
 
 		// Populate the feature tables with rows
@@ -248,7 +248,7 @@ public class TestSetupTeardown {
 		SpatialReferenceSystemDao srsDao = geoPackage
 				.getSpatialReferenceSystemDao();
 
-		SpatialReferenceSystem epsgSrs = srsDao.queryForId(4326);
+		SpatialReferenceSystem epsgSrs = srsDao.queryForId(4326l);
 
 		TestCase.assertNotNull(epsgSrs);
 

@@ -75,7 +75,7 @@ public class TileMatrixSet {
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 */
 	@DatabaseField(columnName = COLUMN_SRS_ID, canBeNull = false)
-	private int srsId;
+	private long srsId;
 
 	/**
 	 * Bounding box minimum easting or longitude for all content in table_name
@@ -151,7 +151,7 @@ public class TileMatrixSet {
 		}
 	}
 
-	public int getSrsId() {
+	public long getSrsId() {
 		return srsId;
 	}
 

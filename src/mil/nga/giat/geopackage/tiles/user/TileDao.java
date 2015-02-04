@@ -9,6 +9,7 @@ import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.user.UserDao;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.util.LongSparseArray;
 
 /**
  * Tile DAO for reading tile user tables
@@ -23,9 +24,14 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	private final TileMatrixSet tileMatrixSet;
 
 	/**
-	 * Tile Matrix
+	 * Tile Matrices
 	 */
-	private final List<TileMatrix> tileMatrix;
+	private final List<TileMatrix> tileMatrices;
+
+	/**
+	 * Mapping between zoom levels and the tile matrix
+	 */
+	private final LongSparseArray<TileMatrix> zoomLevelToTileMatrix = new LongSparseArray<TileMatrix>();
 
 	/**
 	 * Constructor
@@ -36,11 +42,14 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @param table
 	 */
 	public TileDao(SQLiteDatabase db, TileMatrixSet tileMatrixSet,
-			List<TileMatrix> tileMatrix, TileTable table) {
+			List<TileMatrix> tileMatrices, TileTable table) {
 		super(db, table);
 
 		this.tileMatrixSet = tileMatrixSet;
-		this.tileMatrix = tileMatrix;
+		this.tileMatrices = tileMatrices;
+		for (TileMatrix tileMatrix : tileMatrices) {
+			zoomLevelToTileMatrix.put(tileMatrix.getZoomLevel(), tileMatrix);
+		}
 		if (tileMatrixSet.getContents() == null) {
 			throw new GeoPackageException(TileMatrixSet.class.getSimpleName()
 					+ " " + tileMatrixSet.getId() + " has null "
@@ -72,12 +81,22 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	}
 
 	/**
-	 * Get the tile matrix list
+	 * Get the tile matrices
 	 * 
 	 * @return
 	 */
-	public List<TileMatrix> getTileMatrix() {
-		return tileMatrix;
+	public List<TileMatrix> getTileMatrices() {
+		return tileMatrices;
+	}
+
+	/**
+	 * Get the tile matrix at the zoom level
+	 * 
+	 * @param zoomLevel
+	 * @return
+	 */
+	public TileMatrix getTileMatrix(long zoomLevel) {
+		return zoomLevelToTileMatrix.get(zoomLevel);
 	}
 
 }

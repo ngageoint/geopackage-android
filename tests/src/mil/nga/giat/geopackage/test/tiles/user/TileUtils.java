@@ -25,6 +25,7 @@ import mil.nga.giat.geopackage.tiles.user.TileTable;
 import mil.nga.giat.geopackage.user.ColumnValue;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
 
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -64,7 +65,7 @@ public class TileUtils {
 						.getTileMatrixSet().getId());
 				TestCase.assertEquals(tileMatrixSet.getTableName(),
 						dao.getTableName());
-				TestCase.assertFalse(dao.getTileMatrix().isEmpty());
+				TestCase.assertFalse(dao.getTileMatrices().isEmpty());
 
 				TileTable tileTable = dao.getTable();
 				String[] columns = tileTable.getColumnNames();
@@ -96,7 +97,7 @@ public class TileUtils {
 				while (cursor.moveToNext()) {
 
 					TileRow tileRow = cursor.getRow();
-					validateTileRow(columns, tileRow);
+					validateTileRow(dao, columns, tileRow, manualCount < 5);
 
 					manualCount++;
 				}
@@ -216,10 +217,13 @@ public class TileUtils {
 	/**
 	 * Validate a tile row
 	 * 
+	 * @param dao
 	 * @param columns
 	 * @param tileRow
+	 * @param testBitmap
 	 */
-	private static void validateTileRow(String[] columns, TileRow tileRow) {
+	private static void validateTileRow(TileDao dao, String[] columns,
+			TileRow tileRow, boolean testBitmap) {
 		TestCase.assertEquals(columns.length, tileRow.columnCount());
 
 		for (int i = 0; i < tileRow.columnCount(); i++) {
@@ -253,6 +257,25 @@ public class TileUtils {
 				break;
 
 			}
+		}
+
+		TestCase.assertTrue(tileRow.getId() >= 0);
+		TestCase.assertTrue(tileRow.getZoomLevel() >= 0);
+		TestCase.assertTrue(tileRow.getTileColumn() >= 0);
+		TestCase.assertTrue(tileRow.getTileRow() >= 0);
+		byte[] tileData = tileRow.getTileData();
+		TestCase.assertNotNull(tileData);
+		TestCase.assertTrue(tileData.length > 0);
+
+		TileMatrix tileMatrix = dao.getTileMatrix(tileRow.getZoomLevel());
+		TestCase.assertNotNull(tileMatrix);
+
+		if (testBitmap) {
+			Bitmap bitmap = tileRow.getTileDataBitmap();
+			TestCase.assertNotNull(bitmap);
+			TestCase.assertEquals(tileMatrix.getTileWidth(), bitmap.getWidth());
+			TestCase.assertEquals(tileMatrix.getTileHeight(),
+					bitmap.getHeight());
 		}
 	}
 
@@ -596,7 +619,7 @@ public class TileUtils {
 					qb.orderBy(TileMatrix.COLUMN_ZOOM_LEVEL, false);
 					PreparedQuery<TileMatrix> query = qb.prepare();
 					TileMatrix tileMatrix = tileMatrixDao.queryForFirst(query);
-					int highestZoomLevel = tileMatrix.getZoomLevel();
+					long highestZoomLevel = tileMatrix.getZoomLevel();
 
 					// Create new row from existing
 					long id = tileRow.getId();

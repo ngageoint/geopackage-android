@@ -176,7 +176,7 @@ public class GeometryColumnsUtils {
 				GeometryColumns geometryColumns = results.get(random);
 
 				// Update
-				int updatedM = 2;
+				byte updatedM = 2;
 				geometryColumns.setM(updatedM);
 				dao.update(geometryColumns);
 
@@ -184,8 +184,7 @@ public class GeometryColumnsUtils {
 				dao = geoPackage.getGeometryColumnsDao();
 				GeometryColumns updatedGeometryColumns = dao
 						.queryForId(geometryColumns.getId());
-				TestCase.assertEquals(updatedM, updatedGeometryColumns.getM()
-						.intValue());
+				TestCase.assertEquals(updatedM, updatedGeometryColumns.getM());
 
 				// Find expected results for prepared update
 				String updatedColumnName = "new_geom";
@@ -270,8 +269,8 @@ public class GeometryColumnsUtils {
 
 			String columnName = "TEST_COLUMN_NAME";
 			GeometryType geometryType = GeometryType.POINT;
-			int z = 2;
-			int m = 2;
+			byte z = 2;
+			byte m = 2;
 
 			// Create new geometry columns
 			GeometryColumns geometryColumns = new GeometryColumns();
@@ -298,8 +297,8 @@ public class GeometryColumnsUtils {
 					queryGeometryColumns.getGeometryType());
 			TestCase.assertEquals(contents.getSrsId(),
 					queryGeometryColumns.getSrsId());
-			TestCase.assertEquals(z, queryGeometryColumns.getZ().intValue());
-			TestCase.assertEquals(m, queryGeometryColumns.getM().intValue());
+			TestCase.assertEquals(z, queryGeometryColumns.getZ());
+			TestCase.assertEquals(m, queryGeometryColumns.getM());
 			TestCase.assertEquals(contents.getId(), queryGeometryColumns
 					.getContents().getId());
 			TestCase.assertEquals(contents.getSrsId(), queryGeometryColumns

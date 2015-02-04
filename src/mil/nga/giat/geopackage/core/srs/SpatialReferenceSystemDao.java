@@ -26,7 +26,7 @@ import com.j256.ormlite.support.ConnectionSource;
  * @author osbornb
  */
 public class SpatialReferenceSystemDao extends
-		BaseDaoImpl<SpatialReferenceSystem, Integer> {
+		BaseDaoImpl<SpatialReferenceSystem, Long> {
 
 	/**
 	 * Contents DAO
@@ -217,7 +217,7 @@ public class SpatialReferenceSystemDao extends
 	 * @return
 	 * @throws SQLException
 	 */
-	public int deleteByIdCascade(Integer id) throws SQLException {
+	public int deleteByIdCascade(Long id) throws SQLException {
 		int count = 0;
 		if (id != null) {
 			SpatialReferenceSystem srs = super.queryForId(id);
@@ -235,11 +235,11 @@ public class SpatialReferenceSystemDao extends
 	 * @return
 	 * @throws SQLException
 	 */
-	public int deleteIdsCascade(Collection<Integer> idCollection)
+	public int deleteIdsCascade(Collection<Long> idCollection)
 			throws SQLException {
 		int count = 0;
 		if (idCollection != null) {
-			for (Integer id : idCollection) {
+			for (Long id : idCollection) {
 				count += deleteByIdCascade(id);
 			}
 		}

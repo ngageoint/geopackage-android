@@ -88,19 +88,19 @@ public class GeometryColumns {
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 */
 	@DatabaseField(columnName = COLUMN_SRS_ID, canBeNull = false)
-	private int srsId;
+	private long srsId;
 
 	/**
 	 * 0: z values prohibited; 1: z values mandatory; 2: z values optional
 	 */
 	@DatabaseField(columnName = COLUMN_Z, canBeNull = false)
-	private Integer z;
+	private byte z;
 
 	/**
 	 * 0: m values prohibited; 1: m values mandatory; 2: m values optional
 	 */
 	@DatabaseField(columnName = COLUMN_M, canBeNull = false)
-	private Integer m;
+	private byte m;
 
 	/**
 	 * Default Constructor
@@ -174,42 +174,40 @@ public class GeometryColumns {
 		}
 	}
 
-	public int getSrsId() {
+	public long getSrsId() {
 		return srsId;
 	}
 
-	public Integer getZ() {
+	public byte getZ() {
 		return z;
 	}
 
-	public void setZ(Integer z) {
-		validateIntegerValues(COLUMN_Z, z);
+	public void setZ(byte z) {
+		validateValues(COLUMN_Z, z);
 		this.z = z;
 	}
 
-	public Integer getM() {
+	public byte getM() {
 		return m;
 	}
 
-	public void setM(Integer m) {
-		validateIntegerValues(COLUMN_M, m);
+	public void setM(byte m) {
+		validateValues(COLUMN_M, m);
 		this.m = m;
 	}
 
 	/**
-	 * Validate the z and m integer values. They must be 0 for prohibited, 1 for
+	 * Validate the z and m byte values. They must be 0 for prohibited, 1 for
 	 * mandatory, or 2 for optional. (Spec Requirement 27 & 28)
 	 * 
 	 * @param column
 	 * @param value
 	 */
-	private void validateIntegerValues(String column, Integer value) {
-		if (value != null) {
-			if (value < 0 || value > 2) {
-				throw new GeoPackageException(
-						column
-								+ " value must be 0 for prohibited, 1 for mandatory, or 2 for optional");
-			}
+	private void validateValues(String column, byte value) {
+		if (value < 0 || value > 2) {
+			throw new GeoPackageException(
+					column
+							+ " value must be 0 for prohibited, 1 for mandatory, or 2 for optional");
 		}
 	}
 

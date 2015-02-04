@@ -1,6 +1,9 @@
 package mil.nga.giat.geopackage.tiles.user;
 
 import mil.nga.giat.geopackage.user.UserRow;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 
 /**
  * Tile Row containing the values from a single cursor row
@@ -171,6 +174,28 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 */
 	public void setTileData(byte[] tileData) {
 		setValue(getTileDataColumnIndex(), tileData);
+	}
+
+	/**
+	 * Get the tile data bitmap
+	 * 
+	 * @return
+	 */
+	public Bitmap getTileDataBitmap() {
+		return getTileDataBitmap(null);
+	}
+
+	/**
+	 * Get the tile data bitmap with decoding options
+	 * 
+	 * @param options
+	 * @return
+	 */
+	public Bitmap getTileDataBitmap(Options options) {
+		byte[] tileData = getTileData();
+		Bitmap bitmap = BitmapFactory.decodeByteArray(tileData, 0,
+				tileData.length, options);
+		return bitmap;
 	}
 
 }

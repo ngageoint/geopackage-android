@@ -72,10 +72,14 @@ public class GeoPackageGeometryData {
 	private Geometry geometry;
 
 	/**
-	 * Default constructor
+	 * Constructor
+	 * 
+	 * @param srsId
 	 */
-	public GeoPackageGeometryData(int srsId) {
-		this.srsId = srsId;
+	public GeoPackageGeometryData(long srsId) {
+		// SRS ID in the database is a long (db INTEGER) but the wkb srs id is
+		// only 4 bytes
+		this.srsId = (int) srsId;
 	}
 
 	/**

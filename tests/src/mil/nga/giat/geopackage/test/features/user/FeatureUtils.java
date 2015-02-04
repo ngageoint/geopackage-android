@@ -305,6 +305,8 @@ public class FeatureUtils {
 
 			}
 		}
+		
+		TestCase.assertTrue(featureRow.getId() >= 0);
 	}
 
 	/**

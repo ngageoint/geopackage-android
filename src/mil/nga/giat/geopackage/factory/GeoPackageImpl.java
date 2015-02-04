@@ -336,7 +336,7 @@ class GeoPackageImpl implements GeoPackage {
 
 		// Get the Tile Matrix collection, order by zoom level ascending & pixel
 		// size descending per requirement 51
-		List<TileMatrix> tileMatrixList;
+		List<TileMatrix> tileMatrices;
 		try {
 			TileMatrixDao tileMatrixDao = getTileMatrixDao();
 			QueryBuilder<TileMatrix, TileMatrixKey> qb = tileMatrixDao
@@ -347,7 +347,7 @@ class GeoPackageImpl implements GeoPackage {
 			qb.orderBy(TileMatrix.COLUMN_PIXEL_X_SIZE, false);
 			qb.orderBy(TileMatrix.COLUMN_PIXEL_Y_SIZE, false);
 			PreparedQuery<TileMatrix> query = qb.prepare();
-			tileMatrixList = tileMatrixDao.query(query);
+			tileMatrices = tileMatrixDao.query(query);
 		} catch (SQLException e) {
 			throw new GeoPackageException("Failed to retrieve "
 					+ TileDao.class.getSimpleName() + " for table name: "
@@ -359,7 +359,7 @@ class GeoPackageImpl implements GeoPackage {
 		TileTableReader tableReader = new TileTableReader(
 				tileMatrixSet.getTableName());
 		final TileTable tileTable = tableReader.readTable(database);
-		TileDao dao = new TileDao(database, tileMatrixSet, tileMatrixList,
+		TileDao dao = new TileDao(database, tileMatrixSet, tileMatrices,
 				tileTable);
 
 		// Register the table to wrap cursors with the tile cursor

@@ -79,31 +79,31 @@ public class TileMatrix {
 	 * 0 ⇐ zoom_level ⇐ max_level for table_name
 	 */
 	@DatabaseField(columnName = COLUMN_ZOOM_LEVEL, canBeNull = false, uniqueCombo = true)
-	private int zoomLevel;
+	private long zoomLevel;
 
 	/**
 	 * Number of columns (>= 1) in tile matrix at this zoom level
 	 */
 	@DatabaseField(columnName = COLUMN_MATRIX_WIDTH, canBeNull = false)
-	private int matrixWidth;
+	private long matrixWidth;
 
 	/**
 	 * Number of rows (>= 1) in tile matrix at this zoom level
 	 */
 	@DatabaseField(columnName = COLUMN_MATRIX_HEIGHT, canBeNull = false)
-	private int matrixHeight;
+	private long matrixHeight;
 
 	/**
 	 * Tile width in pixels (>= 1)for this zoom level
 	 */
 	@DatabaseField(columnName = COLUMN_TILE_WIDTH, canBeNull = false)
-	private int tileWidth;
+	private long tileWidth;
 
 	/**
 	 * Tile height in pixels (>= 1)for this zoom level
 	 */
 	@DatabaseField(columnName = COLUMN_TILE_HEIGHT, canBeNull = false)
-	private int tileHeight;
+	private long tileHeight;
 
 	/**
 	 * In t_table_name srid units or default meters for srid 0 (>0)
@@ -167,48 +167,48 @@ public class TileMatrix {
 		return tableName;
 	}
 
-	public int getZoomLevel() {
+	public long getZoomLevel() {
 		return zoomLevel;
 	}
 
-	public void setZoomLevel(int zoomLevel) {
-		validateIntegerValues(COLUMN_ZOOM_LEVEL, zoomLevel, true);
+	public void setZoomLevel(long zoomLevel) {
+		validateValues(COLUMN_ZOOM_LEVEL, zoomLevel, true);
 		this.zoomLevel = zoomLevel;
 	}
 
-	public int getMatrixWidth() {
+	public long getMatrixWidth() {
 		return matrixWidth;
 	}
 
-	public void setMatrixWidth(int matrixWidth) {
-		validateIntegerValues(COLUMN_MATRIX_WIDTH, matrixWidth, false);
+	public void setMatrixWidth(long matrixWidth) {
+		validateValues(COLUMN_MATRIX_WIDTH, matrixWidth, false);
 		this.matrixWidth = matrixWidth;
 	}
 
-	public int getMatrixHeight() {
+	public long getMatrixHeight() {
 		return matrixHeight;
 	}
 
-	public void setMatrixHeight(int matrixHeight) {
-		validateIntegerValues(COLUMN_MATRIX_HEIGHT, matrixHeight, false);
+	public void setMatrixHeight(long matrixHeight) {
+		validateValues(COLUMN_MATRIX_HEIGHT, matrixHeight, false);
 		this.matrixHeight = matrixHeight;
 	}
 
-	public int getTileWidth() {
+	public long getTileWidth() {
 		return tileWidth;
 	}
 
-	public void setTileWidth(int tileWidth) {
-		validateIntegerValues(COLUMN_TILE_WIDTH, tileWidth, false);
+	public void setTileWidth(long tileWidth) {
+		validateValues(COLUMN_TILE_WIDTH, tileWidth, false);
 		this.tileWidth = tileWidth;
 	}
 
-	public int getTileHeight() {
+	public long getTileHeight() {
 		return tileHeight;
 	}
 
-	public void setTileHeight(int tileHeight) {
-		validateIntegerValues(COLUMN_TILE_HEIGHT, tileHeight, false);
+	public void setTileHeight(long tileHeight) {
+		validateValues(COLUMN_TILE_HEIGHT, tileHeight, false);
 		this.tileHeight = tileHeight;
 	}
 
@@ -217,7 +217,7 @@ public class TileMatrix {
 	}
 
 	public void setPixelXSize(double pixelXSize) {
-		validateDoubleValues(COLUMN_PIXEL_X_SIZE, pixelXSize);
+		validateValues(COLUMN_PIXEL_X_SIZE, pixelXSize);
 		this.pixelXSize = pixelXSize;
 	}
 
@@ -226,7 +226,7 @@ public class TileMatrix {
 	}
 
 	public void setPixelYSize(double pixelYSize) {
-		validateDoubleValues(COLUMN_PIXEL_Y_SIZE, pixelYSize);
+		validateValues(COLUMN_PIXEL_Y_SIZE, pixelYSize);
 		this.pixelYSize = pixelYSize;
 	}
 
@@ -235,15 +235,14 @@ public class TileMatrix {
 	}
 
 	/**
-	 * Validate the integer values are greater than 0, or greater than or equal
-	 * to 0 based upon the allowZero flag
+	 * Validate the long values are greater than 0, or greater than or equal to
+	 * 0 based upon the allowZero flag
 	 * 
 	 * @param column
 	 * @param value
 	 * @param allowZero
 	 */
-	private void validateIntegerValues(String column, int value,
-			boolean allowZero) {
+	private void validateValues(String column, long value, boolean allowZero) {
 		if (value < 0 || (value == 0 && !allowZero)) {
 			throw new GeoPackageException(column
 					+ " value must be greater than "
@@ -257,7 +256,7 @@ public class TileMatrix {
 	 * @param column
 	 * @param value
 	 */
-	private void validateDoubleValues(String column, double value) {
+	private void validateValues(String column, double value) {
 		if (value <= 0.0) {
 			throw new GeoPackageException(column
 					+ " value must be greater than 0: " + value);

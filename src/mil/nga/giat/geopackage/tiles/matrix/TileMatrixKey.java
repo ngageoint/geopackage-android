@@ -15,7 +15,7 @@ public class TileMatrixKey {
 	/**
 	 * Zoom level
 	 */
-	private int zoomLevel;
+	private long zoomLevel;
 
 	/**
 	 * Constructor
@@ -23,7 +23,7 @@ public class TileMatrixKey {
 	 * @param tableName
 	 * @param zoomLevel
 	 */
-	public TileMatrixKey(String tableName, int zoomLevel) {
+	public TileMatrixKey(String tableName, long zoomLevel) {
 		this.tableName = tableName;
 		this.zoomLevel = zoomLevel;
 	}
@@ -36,11 +36,11 @@ public class TileMatrixKey {
 		this.tableName = tableName;
 	}
 
-	public int getZoomLevel() {
+	public long getZoomLevel() {
 		return zoomLevel;
 	}
 
-	public void setZoomLevel(int zoomLevel) {
+	public void setZoomLevel(long zoomLevel) {
 		this.zoomLevel = zoomLevel;
 	}
 
@@ -61,7 +61,7 @@ public class TileMatrixKey {
 		int result = 1;
 		result = prime * result
 				+ ((tableName == null) ? 0 : tableName.hashCode());
-		result = prime * result + zoomLevel;
+		result = prime * result + (int) (zoomLevel ^ (zoomLevel >>> 32));
 		return result;
 	}
 

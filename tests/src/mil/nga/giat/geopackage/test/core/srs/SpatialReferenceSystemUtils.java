@@ -283,7 +283,7 @@ public class SpatialReferenceSystemUtils {
 
 			// Prepared update
 			String updatedDescription = "TEST_DESCRIPTION";
-			UpdateBuilder<SpatialReferenceSystem, Integer> ub = dao
+			UpdateBuilder<SpatialReferenceSystem, Long> ub = dao
 					.updateBuilder();
 			ub.updateColumnValue(SpatialReferenceSystem.COLUMN_DESCRIPTION,
 					updatedDescription);
@@ -321,7 +321,7 @@ public class SpatialReferenceSystemUtils {
 		long count = dao.countOf();
 
 		String srsName = "TEST_SRS_NAME";
-		int srsId = 123456;
+		long srsId = 123456l;
 		String organization = "TEST_ORG";
 		int organizationCoordSysId = 123456;
 		String definition = "TEST_DEFINITION";
@@ -456,7 +456,7 @@ public class SpatialReferenceSystemUtils {
 				srs = results.get(random);
 
 				// Find which srs to delete and the contents
-				QueryBuilder<SpatialReferenceSystem, Integer> qb = dao
+				QueryBuilder<SpatialReferenceSystem, Long> qb = dao
 						.queryBuilder();
 				qb.where().eq(SpatialReferenceSystem.COLUMN_ORGANIZATION,
 						srs.getOrganization());
@@ -482,7 +482,7 @@ public class SpatialReferenceSystemUtils {
 				if (cascade) {
 					deleted = dao.deleteCascade(query);
 				} else {
-					DeleteBuilder<SpatialReferenceSystem, Integer> db = dao
+					DeleteBuilder<SpatialReferenceSystem, Long> db = dao
 							.deleteBuilder();
 					db.where().eq(SpatialReferenceSystem.COLUMN_ORGANIZATION,
 							srs.getOrganization());

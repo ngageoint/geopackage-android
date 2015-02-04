@@ -70,7 +70,7 @@ public class SpatialReferenceSystem {
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 */
 	@DatabaseField(columnName = COLUMN_SRS_ID, id = true, canBeNull = false)
-	private int srsId;
+	private long srsId;
 
 	/**
 	 * Case-insensitive name of the defining organization e.g. EPSG or epsg
@@ -82,7 +82,7 @@ public class SpatialReferenceSystem {
 	 * Numeric ID of the Spatial Reference System assigned by the organization
 	 */
 	@DatabaseField(columnName = COLUMN_ORGANIZATION_COORDSYS_ID, canBeNull = false)
-	private int organizationCoordsysId;
+	private long organizationCoordsysId;
 
 	/**
 	 * Well-known Text [32] Representation of the Spatial Reference System
@@ -121,11 +121,11 @@ public class SpatialReferenceSystem {
 
 	}
 
-	public int getId() {
+	public long getId() {
 		return srsId;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.srsId = id;
 	}
 
@@ -137,11 +137,11 @@ public class SpatialReferenceSystem {
 		this.srsName = srsName;
 	}
 
-	public int getSrsId() {
+	public long getSrsId() {
 		return srsId;
 	}
 
-	public void setSrsId(int srsId) {
+	public void setSrsId(long srsId) {
 		this.srsId = srsId;
 	}
 
@@ -153,11 +153,11 @@ public class SpatialReferenceSystem {
 		this.organization = organization;
 	}
 
-	public int getOrganizationCoordsysId() {
+	public long getOrganizationCoordsysId() {
 		return organizationCoordsysId;
 	}
 
-	public void setOrganizationCoordsysId(int organizationCoordsysId) {
+	public void setOrganizationCoordsysId(long organizationCoordsysId) {
 		this.organizationCoordsysId = organizationCoordsysId;
 	}
 
