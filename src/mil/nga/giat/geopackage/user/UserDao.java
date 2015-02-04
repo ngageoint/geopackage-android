@@ -13,13 +13,13 @@ import android.database.sqlite.SQLiteDatabase;
 /**
  * Abstract User DAO for reading user tables
  * 
+ * @param <TTable>
  * @param <TRow>
  * @param <TCursor>
- * @param <TTable>
  * 
  * @author osbornb
  */
-public abstract class UserDao<TRow extends UserRow<?, ?>, TCursor extends UserCursor<TRow>, TTable extends UserTable<?>> {
+public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<?, TTable>, TCursor extends UserCursor<?, TTable, TRow>> {
 
 	/**
 	 * Database connection

@@ -184,9 +184,8 @@ class GeoPackageImpl implements GeoPackage {
 
 		// Read the existing table and create the dao
 		FeatureTableReader tableReader = new FeatureTableReader(geometryColumns);
-		FeatureTable featureTable = tableReader.readTable(database);
-		final FeatureDao dao = new FeatureDao(database, geometryColumns,
-				featureTable);
+		final FeatureTable featureTable = tableReader.readTable(database);
+		FeatureDao dao = new FeatureDao(database, geometryColumns, featureTable);
 
 		// Register the table to wrap cursors with the feature cursor
 		cursorFactory.registerTable(geometryColumns.getTableName(),
@@ -194,7 +193,7 @@ class GeoPackageImpl implements GeoPackage {
 
 					@Override
 					public Cursor wrapCursor(Cursor cursor) {
-						return new FeatureCursor(dao, cursor);
+						return new FeatureCursor(featureTable, cursor);
 					}
 				});
 

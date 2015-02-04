@@ -2,7 +2,7 @@ package mil.nga.giat.geopackage.features.user;
 
 import java.util.List;
 
-import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.user.UserTable;
 
 /**
@@ -32,23 +32,14 @@ public class FeatureTable extends UserTable<FeatureColumn> {
 		for (FeatureColumn column : columns) {
 
 			if (column.isGeometry()) {
-				if (geometry != null) {
-					throw new GeoPackageException(
-							"More than one geometry column was found for feature table '"
-									+ tableName + "'. Index " + geometry
-									+ " and " + column.getIndex());
-
-				}
+				duplicateCheck(column.getIndex(), geometry,
+						GeometryType.GEOMETRY.name());
 				geometry = column.getIndex();
 			}
 
 		}
 
-		if (geometry == null) {
-			throw new GeoPackageException(
-					"No geometry column was found for feature table '"
-							+ tableName + "'");
-		}
+		missingCheck(geometry, GeometryType.GEOMETRY.name());
 		geometryIndex = geometry;
 
 	}

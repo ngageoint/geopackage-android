@@ -79,10 +79,6 @@ public class FeatureColumn extends UserColumn {
 	public static FeatureColumn createColumn(int index, String name,
 			GeoPackageDataType type, Long max, boolean notNull,
 			Object defaultValue) {
-		if (type == null) {
-			throw new GeoPackageException(
-					"Data Type is required to create column: " + name);
-		}
 		return new FeatureColumn(index, name, type, max, notNull, defaultValue,
 				false, null);
 	}
@@ -93,17 +89,21 @@ public class FeatureColumn extends UserColumn {
 	 * @param index
 	 * @param name
 	 * @param dataType
-	 * @param typeMax
+	 * @param max
 	 * @param notNull
 	 * @param defaultValue
 	 * @param primaryKey
 	 * @param geometryType
 	 */
 	FeatureColumn(int index, String name, GeoPackageDataType dataType,
-			Long typeMax, boolean notNull, Object defaultValue,
-			boolean primaryKey, GeometryType geometryType) {
-		super(index, name, dataType, typeMax, notNull, defaultValue, primaryKey);
+			Long max, boolean notNull, Object defaultValue, boolean primaryKey,
+			GeometryType geometryType) {
+		super(index, name, dataType, max, notNull, defaultValue, primaryKey);
 		this.geometryType = geometryType;
+		if (geometryType == null && dataType == null) {
+			throw new GeoPackageException(
+					"Data Type is required to create column: " + name);
+		}
 	}
 
 	/**

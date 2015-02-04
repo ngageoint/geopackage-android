@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.features.user;
+package mil.nga.giat.geopackage.tiles.user;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
@@ -13,8 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
  * 
  * @author osbornb
  */
-public class FeatureDao extends
-		UserDao<FeatureTable, FeatureRow, FeatureCursor> {
+public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 
 	/**
 	 * Geometry Columns
@@ -28,8 +27,8 @@ public class FeatureDao extends
 	 * @param geometryColumns
 	 * @param table
 	 */
-	public FeatureDao(SQLiteDatabase db, GeometryColumns geometryColumns,
-			FeatureTable table) {
+	public TileDao(SQLiteDatabase db, GeometryColumns geometryColumns,
+			TileTable table) {
 		super(db, table);
 
 		this.geometryColumns = geometryColumns;
@@ -50,8 +49,8 @@ public class FeatureDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FeatureRow newRow() {
-		return new FeatureRow(getTable());
+	public TileRow newRow() {
+		return new TileRow(getTable());
 	}
 
 	/**

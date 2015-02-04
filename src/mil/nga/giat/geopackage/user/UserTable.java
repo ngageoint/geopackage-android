@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.db.GeoPackageDataType;
 
 /**
  * Abstract user table
@@ -102,6 +103,55 @@ public abstract class UserTable<TColumn extends UserColumn> {
 
 		// Sort the columns by index
 		Collections.sort(columns);
+	}
+
+	/**
+	 * Check for duplicate column names
+	 * 
+	 * @param tableName
+	 * @param index
+	 * @param previousIndex
+	 * @param column
+	 */
+	protected void duplicateCheck(int index, Integer previousIndex,
+			String column) {
+		if (previousIndex != null) {
+			throw new GeoPackageException("More than one " + column
+					+ " column was found for table '" + tableName + "'. Index "
+					+ previousIndex + " and " + index);
+
+		}
+	}
+
+	/**
+	 * Check for the expected data type
+	 * 
+	 * @param expected
+	 * @param column
+	 */
+	protected void typeCheck(GeoPackageDataType expected, TColumn column) {
+
+		GeoPackageDataType actual = column.getDataType();
+		if (actual == null || !actual.equals(expected)) {
+			throw new GeoPackageException("Unexpected " + column.getName()
+					+ " column data type was found for table '" + tableName
+					+ "', expected: " + expected.name() + ", actual: "
+					+ (actual != null ? actual.name() : "null"));
+		}
+	}
+
+	/**
+	 * Check for missing columns
+	 * 
+	 * @param tableName
+	 * @param index
+	 * @param column
+	 */
+	protected void missingCheck(Integer index, String column) {
+		if (index == null) {
+			throw new GeoPackageException("No " + column
+					+ " column was found for table '" + tableName + "'");
+		}
 	}
 
 	/**
