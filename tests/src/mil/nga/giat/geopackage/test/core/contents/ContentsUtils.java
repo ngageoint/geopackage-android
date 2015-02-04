@@ -260,7 +260,7 @@ public class ContentsUtils {
 		contents.setSrs(srs);
 
 		// Create the feature table
-		geoPackage.createTable(TestUtils.buildTable(contents.getTableName(),
+		geoPackage.createTable(TestUtils.buildFeatureTable(contents.getTableName(),
 				"geom", GeometryType.GEOMETRY));
 
 		dao.create(contents);

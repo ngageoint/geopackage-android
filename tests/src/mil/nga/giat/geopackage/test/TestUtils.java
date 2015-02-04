@@ -25,6 +25,8 @@ import mil.nga.giat.geopackage.geom.Point;
 import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.tiles.user.TileColumn;
+import mil.nga.giat.geopackage.tiles.user.TileTable;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -116,7 +118,7 @@ public class TestUtils {
 	 * @param geometryType
 	 * @return
 	 */
-	public static FeatureTable buildTable(String tableName,
+	public static FeatureTable buildFeatureTable(String tableName,
 			String geometryColumn, GeometryType geometryType) {
 
 		List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
@@ -145,6 +147,21 @@ public class TestUtils {
 	}
 
 	/**
+	 * Build an example tile table
+	 * 
+	 * @param tableName
+	 * @return
+	 */
+	public static TileTable buildTileTable(String tableName) {
+
+		List<TileColumn> columns = TileTable.createRequiredColumns();
+
+		TileTable table = new TileTable(tableName, columns);
+
+		return table;
+	}
+
+	/**
 	 * Add rows to the feature table
 	 * 
 	 * @param geoPackage
@@ -155,7 +172,7 @@ public class TestUtils {
 	 * @param hasM
 	 * @throws SQLException
 	 */
-	public static void addRowsToTable(GeoPackage geoPackage,
+	public static void addRowsToFeatureTable(GeoPackage geoPackage,
 			GeometryColumns geometryColumns, FeatureTable table, int numRows,
 			boolean hasZ, boolean hasM) throws SQLException {
 

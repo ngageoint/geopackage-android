@@ -44,7 +44,7 @@ public class ContentsCreateTest extends
 		activity = getActivity();
 
 		// Create the database
-		geoPackage = TestSetupTeardown.setUpCreate(activity, true, false);
+		geoPackage = TestSetupTeardown.setUpCreate(activity, true, true);
 	}
 
 	/**

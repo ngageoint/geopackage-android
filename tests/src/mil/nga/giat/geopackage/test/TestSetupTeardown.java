@@ -22,6 +22,7 @@ import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
+import mil.nga.giat.geopackage.tiles.user.TileTable;
 import android.app.Activity;
 import android.content.Context;
 
@@ -40,7 +41,7 @@ public class TestSetupTeardown {
 	public static final int CREATE_GEOMETRY_COLUMNS_COUNT = 4;
 
 	public static final int CREATE_TILE_MATRIX_SET_COUNT = 1;
-	
+
 	public static final int CREATE_TILE_MATRIX_COUNT = 9;
 
 	/**
@@ -158,19 +159,19 @@ public class TestSetupTeardown {
 		String geometryColumn = "geometry";
 
 		// Create the feature tables
-		FeatureTable point2dTable = TestUtils.buildTable(
+		FeatureTable point2dTable = TestUtils.buildFeatureTable(
 				point2dContents.getTableName(), geometryColumn,
 				GeometryType.POINT);
 		geoPackage.createTable(point2dTable);
-		FeatureTable polygon2dTable = TestUtils.buildTable(
+		FeatureTable polygon2dTable = TestUtils.buildFeatureTable(
 				polygon2dContents.getTableName(), geometryColumn,
 				GeometryType.POLYGON);
 		geoPackage.createTable(polygon2dTable);
-		FeatureTable point3dTable = TestUtils.buildTable(
+		FeatureTable point3dTable = TestUtils.buildFeatureTable(
 				point3dContents.getTableName(), geometryColumn,
 				GeometryType.POINT);
 		geoPackage.createTable(point3dTable);
-		FeatureTable lineString3dMTable = TestUtils.buildTable(
+		FeatureTable lineString3dMTable = TestUtils.buildFeatureTable(
 				lineString3dMContents.getTableName(), geometryColumn,
 				GeometryType.LINESTRING);
 		geoPackage.createTable(lineString3dMTable);
@@ -221,15 +222,17 @@ public class TestSetupTeardown {
 		lineString3dMGeometryColumns.setM(1);
 		geometryColumnsDao.create(lineString3dMGeometryColumns);
 
-		// Populated the feature tables with rows
-		TestUtils.addRowsToTable(geoPackage, point2dGeometryColumns,
+		// Populate the feature tables with rows
+		TestUtils.addRowsToFeatureTable(geoPackage, point2dGeometryColumns,
 				point2dTable, 3, false, false);
-		TestUtils.addRowsToTable(geoPackage, polygon2dGeometryColumns,
+		TestUtils.addRowsToFeatureTable(geoPackage, polygon2dGeometryColumns,
 				polygon2dTable, 3, false, false);
-		TestUtils.addRowsToTable(geoPackage, point3dGeometryColumns,
+		TestUtils.addRowsToFeatureTable(geoPackage, point3dGeometryColumns,
 				point3dTable, 3, true, false);
-		TestUtils.addRowsToTable(geoPackage, lineString3dMGeometryColumns,
-				lineString3dMTable, 3, true, true);
+		TestUtils
+				.addRowsToFeatureTable(geoPackage,
+						lineString3dMGeometryColumns, lineString3dMTable, 3,
+						true, true);
 	}
 
 	/**
@@ -269,7 +272,8 @@ public class TestSetupTeardown {
 		contents.setSrs(epsgSrs);
 
 		// Create the user tile table
-		// TODO
+		TileTable tileTable = TestUtils.buildTileTable(contents.getTableName());
+		geoPackage.createTable(tileTable);
 
 		// Create the contents
 		contentsDao.create(contents);
@@ -311,6 +315,9 @@ public class TestSetupTeardown {
 			pixelXSize /= 2.0;
 			pixelYSize /= 2.0;
 		}
+
+		// Populate the tile table with rows
+		// TODO
 
 	}
 

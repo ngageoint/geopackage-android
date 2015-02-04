@@ -5,6 +5,7 @@ import java.util.List;
 
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.user.UserTable;
+import mil.nga.giat.geopackage.user.UserUniqueConstraint;
 
 /**
  * Represents a user tile table
@@ -72,6 +73,9 @@ public class TileTable extends UserTable<TileColumn> {
 		Integer tileRow = null;
 		Integer tileData = null;
 
+		// Build a unique constraint on zoom level, tile column, and tile data
+		UserUniqueConstraint<TileColumn> uniqueConstraint = new UserUniqueConstraint<TileColumn>();
+
 		// Find the required columns
 		for (TileColumn column : columns) {
 
@@ -82,14 +86,17 @@ public class TileTable extends UserTable<TileColumn> {
 				duplicateCheck(columnIndex, zoomLevel, COLUMN_ZOOM_LEVEL);
 				typeCheck(GeoPackageDataType.INTEGER, column);
 				zoomLevel = columnIndex;
+				uniqueConstraint.add(column);
 			} else if (columnName.equals(COLUMN_TILE_COLUMN)) {
 				duplicateCheck(columnIndex, tileColumn, COLUMN_TILE_COLUMN);
 				typeCheck(GeoPackageDataType.INTEGER, column);
 				tileColumn = columnIndex;
+				uniqueConstraint.add(column);
 			} else if (columnName.equals(COLUMN_TILE_ROW)) {
 				duplicateCheck(columnIndex, tileRow, COLUMN_TILE_ROW);
 				typeCheck(GeoPackageDataType.INTEGER, column);
 				tileRow = columnIndex;
+				uniqueConstraint.add(column);
 			} else if (columnName.equals(COLUMN_TILE_DATA)) {
 				duplicateCheck(columnIndex, tileData, COLUMN_TILE_DATA);
 				typeCheck(GeoPackageDataType.BLOB, column);
@@ -110,6 +117,9 @@ public class TileTable extends UserTable<TileColumn> {
 
 		missingCheck(tileData, COLUMN_TILE_DATA);
 		tileDataIndex = tileData;
+
+		// Add the unique constraint
+		addUniqueConstraint(uniqueConstraint);
 
 	}
 

@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.user;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -43,6 +44,11 @@ public abstract class UserTable<TColumn extends UserColumn> {
 	 * Primary key column index
 	 */
 	private final int pkIndex;
+
+	/**
+	 * Unique constraints
+	 */
+	private final List<UserUniqueConstraint<TColumn>> uniqueConstraints = new ArrayList<UserUniqueConstraint<TColumn>>();
 
 	/**
 	 * Constructor
@@ -251,6 +257,25 @@ public abstract class UserTable<TColumn extends UserColumn> {
 	 */
 	public TColumn getPkColumn() {
 		return columns.get(pkIndex);
+	}
+
+	/**
+	 * Add unique constraint
+	 * 
+	 * @param uniqueConstraint
+	 */
+	public void addUniqueConstraint(
+			UserUniqueConstraint<TColumn> uniqueConstraint) {
+		uniqueConstraints.add(uniqueConstraint);
+	}
+
+	/**
+	 * Get the unique constraints
+	 * 
+	 * @return
+	 */
+	public List<UserUniqueConstraint<TColumn>> getUniqueConstraints() {
+		return uniqueConstraints;
 	}
 
 }

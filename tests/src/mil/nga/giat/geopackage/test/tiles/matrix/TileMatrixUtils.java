@@ -13,6 +13,7 @@ import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.contents.ContentsDataType;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
@@ -245,7 +246,8 @@ public class TileMatrixUtils {
 			contents.setSrs(srs);
 
 			// Create the user tile table
-			// TODO
+			geoPackage.createTable(TestUtils.buildTileTable(contents
+					.getTableName()));
 
 			contentsDao.create(contents);
 
