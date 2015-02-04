@@ -36,13 +36,13 @@ public class TestSetupTeardown {
 
 	public static final int CREATE_SRS_COUNT = 3;
 
-	public static final int CREATE_CONTENTS_COUNT = 4;
+	public static final int CREATE_CONTENTS_COUNT = 5;
 
 	public static final int CREATE_GEOMETRY_COLUMNS_COUNT = 4;
 
 	public static final int CREATE_TILE_MATRIX_SET_COUNT = 1;
 
-	public static final int CREATE_TILE_MATRIX_COUNT = 9;
+	public static final int CREATE_TILE_MATRIX_COUNT = 3;
 
 	/**
 	 * Set up the create database
@@ -293,12 +293,12 @@ public class TestSetupTeardown {
 		// Create new Tile Matrix rows
 		TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
 
-		int matrixWidthAndHeight = 8;
+		int matrixWidthAndHeight = 2;
 		final int tileWidthAndHeight = 512;
 		double pixelXSize = 69237.2;
 		double pixelYSize = 68412.1;
 
-		for (int zoom = 0; zoom <= 8; zoom++) {
+		for (int zoom = 0; zoom < CREATE_TILE_MATRIX_COUNT; zoom++) {
 
 			TileMatrix tileMatrix = new TileMatrix();
 			tileMatrix.setContents(contents);
@@ -314,10 +314,10 @@ public class TestSetupTeardown {
 			matrixWidthAndHeight *= 2;
 			pixelXSize /= 2.0;
 			pixelYSize /= 2.0;
-		}
 
-		// Populate the tile table with rows
-		// TODO
+			// Populate the tile table with rows
+			TestUtils.addRowsToFeatureTable(geoPackage, tileMatrix);
+		}
 
 	}
 

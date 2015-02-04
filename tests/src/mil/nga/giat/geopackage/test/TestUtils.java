@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
@@ -25,11 +26,15 @@ import mil.nga.giat.geopackage.geom.Point;
 import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.user.TileColumn;
+import mil.nga.giat.geopackage.tiles.user.TileDao;
+import mil.nga.giat.geopackage.tiles.user.TileRow;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.sqlite.SQLiteException;
 
 /**
  * Test utility methods
@@ -274,6 +279,35 @@ public class TestUtils {
 	}
 
 	/**
+	 * Add rows to the tile table
+	 * 
+	 * @param geoPackage
+	 * @param tileMatrix
+	 */
+	public static void addRowsToFeatureTable(GeoPackage geoPackage,
+			TileMatrix tileMatrix) {
+
+		TileDao dao = geoPackage.getTileDao(tileMatrix.getTableName());
+
+		for (int column = 0; column < tileMatrix.getMatrixWidth(); column++) {
+
+			for (int row = 0; row < tileMatrix.getMatrixHeight(); row++) {
+
+				TileRow newRow = dao.newRow();
+
+				newRow.setZoomLevel(tileMatrix.getZoomLevel());
+				newRow.setTileColumn(column);
+				newRow.setTileRow(row);
+				newRow.setTileData("TEMP_TILE_DATA".getBytes());
+
+				dao.create(newRow);
+			}
+
+		}
+
+	}
+
+	/**
 	 * Create a random point
 	 * 
 	 * @param hasZ
@@ -344,6 +378,79 @@ public class TestUtils {
 		}
 
 		return polygon;
+	}
+
+	/**
+	 * Validate the integer value with the data type
+	 * 
+	 * @param value
+	 * @param dataType
+	 * @return
+	 */
+	public static void validateIntegerValue(Object value,
+			GeoPackageDataType dataType) {
+
+		switch (dataType) {
+
+		case BOOLEAN:
+			TestCase.assertTrue(value instanceof Boolean);
+			break;
+		case TINYINT:
+			TestCase.assertTrue(value instanceof Byte);
+			break;
+		case SMALLINT:
+			TestCase.assertTrue(value instanceof Short);
+			break;
+		case MEDIUMINT:
+			TestCase.assertTrue(value instanceof Integer);
+			break;
+		case INT:
+		case INTEGER:
+			TestCase.assertTrue(value instanceof Long);
+			break;
+		default:
+			throw new GeoPackageException("Data Type " + dataType
+					+ " is not an integer type");
+		}
+	}
+
+	/**
+	 * Validate the float value with the data type
+	 * 
+	 * @param value
+	 * @param dataType
+	 * @return
+	 */
+	public static void validateFloatValue(Object value,
+			GeoPackageDataType dataType) {
+
+		switch (dataType) {
+
+		case FLOAT:
+			TestCase.assertTrue(value instanceof Float);
+			break;
+		case DOUBLE:
+		case REAL:
+			TestCase.assertTrue(value instanceof Double);
+			break;
+		default:
+			throw new GeoPackageException("Data Type " + dataType
+					+ " is not a float type");
+		}
+	}
+
+	/**
+	 * Determine if the exception is caused from a missing function or module in
+	 * SQLite versions 4.2.0 and later. Lollipop uses version 3.8.4.3 so these
+	 * are not supported in Android.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	public static boolean isFutureSQLiteException(SQLiteException e) {
+		String message = e.getMessage();
+		return message.contains("no such function: ST_IsEmpty")
+				|| message.contains("no such module: rtree");
 	}
 
 }

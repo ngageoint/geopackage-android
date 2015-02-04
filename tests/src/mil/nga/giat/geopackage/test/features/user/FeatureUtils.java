@@ -10,7 +10,6 @@ import java.util.UUID;
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
-import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.user.FeatureColumn;
@@ -30,6 +29,7 @@ import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
 import mil.nga.giat.geopackage.io.ByteReader;
+import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.giat.geopackage.user.ColumnValue;
 import android.database.Cursor;
@@ -93,8 +93,7 @@ public class FeatureUtils {
 						.getGeometry();
 				if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
 					TestCase.assertNotNull(geoPackageGeometryData);
-					Geometry geometry = geoPackageGeometryData
-							.getGeometry();
+					Geometry geometry = geoPackageGeometryData.getGeometry();
 					GeometryType geometryType = geometryColumns
 							.getGeometryType();
 					validateGeometry(geometryType, geometry);
@@ -188,13 +187,11 @@ public class FeatureUtils {
 						|| column1ClassType == Float.class;
 				ColumnValue column1FeatureValue;
 				if (column1Decimal) {
-					column1FeatureValue = new ColumnValue(column1Value,
-							.000001);
+					column1FeatureValue = new ColumnValue(column1Value, .000001);
 				} else {
 					column1FeatureValue = new ColumnValue(column1Value);
 				}
-				cursor = dao.queryForEq(column1.getName(),
-						column1FeatureValue);
+				cursor = dao.queryForEq(column1.getName(), column1FeatureValue);
 				TestCase.assertTrue(cursor.getCount() > 0);
 				boolean found = false;
 				while (cursor.moveToNext()) {
@@ -270,11 +267,11 @@ public class FeatureUtils {
 			switch (rowType) {
 
 			case Cursor.FIELD_TYPE_INTEGER:
-				validateIntegerValue(value, column.getDataType());
+				TestUtils.validateIntegerValue(value, column.getDataType());
 				break;
 
 			case Cursor.FIELD_TYPE_FLOAT:
-				validateFloatValue(value, column.getDataType());
+				TestUtils.validateFloatValue(value, column.getDataType());
 				break;
 
 			case Cursor.FIELD_TYPE_STRING:
@@ -294,65 +291,6 @@ public class FeatureUtils {
 				break;
 
 			}
-		}
-	}
-
-	/**
-	 * Validate the integer value with the data type
-	 * 
-	 * @param value
-	 * @param dataType
-	 * @return
-	 */
-	public static void validateIntegerValue(Object value,
-			GeoPackageDataType dataType) {
-
-		switch (dataType) {
-
-		case BOOLEAN:
-			TestCase.assertTrue(value instanceof Boolean);
-			break;
-		case TINYINT:
-			TestCase.assertTrue(value instanceof Byte);
-			break;
-		case SMALLINT:
-			TestCase.assertTrue(value instanceof Short);
-			break;
-		case MEDIUMINT:
-			TestCase.assertTrue(value instanceof Integer);
-			break;
-		case INT:
-		case INTEGER:
-			TestCase.assertTrue(value instanceof Long);
-			break;
-		default:
-			throw new GeoPackageException("Data Type " + dataType
-					+ " is not an integer type");
-		}
-	}
-
-	/**
-	 * Validate the float value with the data type
-	 * 
-	 * @param value
-	 * @param dataType
-	 * @return
-	 */
-	public static void validateFloatValue(Object value,
-			GeoPackageDataType dataType) {
-
-		switch (dataType) {
-
-		case FLOAT:
-			TestCase.assertTrue(value instanceof Float);
-			break;
-		case DOUBLE:
-		case REAL:
-			TestCase.assertTrue(value instanceof Double);
-			break;
-		default:
-			throw new GeoPackageException("Data Type " + dataType
-					+ " is not a float type");
 		}
 	}
 
@@ -412,8 +350,7 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param geometry
 	 */
-	private static void validateZAndM(Geometry topGeometry,
-			Geometry geometry) {
+	private static void validateZAndM(Geometry topGeometry, Geometry geometry) {
 		TestCase.assertEquals(topGeometry.hasZ(), geometry.hasZ());
 		TestCase.assertEquals(topGeometry.hasM(), geometry.hasM());
 	}
@@ -424,11 +361,9 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param point
 	 */
-	private static void validatePoint(Geometry topGeometry,
-			Point point) {
+	private static void validatePoint(Geometry topGeometry, Point point) {
 
-		TestCase.assertEquals(GeometryType.POINT,
-				point.getGeometryType());
+		TestCase.assertEquals(GeometryType.POINT, point.getGeometryType());
 
 		validateZAndM(topGeometry, point);
 
@@ -471,11 +406,9 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param polygon
 	 */
-	private static void validatePolygon(Geometry topGeometry,
-			Polygon polygon) {
+	private static void validatePolygon(Geometry topGeometry, Polygon polygon) {
 
-		TestCase.assertEquals(GeometryType.POLYGON,
-				polygon.getGeometryType());
+		TestCase.assertEquals(GeometryType.POLYGON, polygon.getGeometryType());
 
 		validateZAndM(topGeometry, polygon);
 
@@ -551,8 +484,7 @@ public class FeatureUtils {
 	 * @param topGeometry
 	 * @param geometryCollection
 	 */
-	private static void validateGeometryCollection(
-			Geometry topGeometry,
+	private static void validateGeometryCollection(Geometry topGeometry,
 			GeometryCollection<?> geometryCollection) {
 
 		validateZAndM(topGeometry, geometryCollection);
@@ -697,7 +629,7 @@ public class FeatureUtils {
 												updatedBoolean);
 										break;
 									case TINYINT:
-										if (updatedByte != null) {
+										if (updatedByte == null) {
 											updatedByte = (byte) (((int) (Math
 													.random() * (Byte.MAX_VALUE + 1))) * (Math
 													.random() < .5 ? 1 : -1));
@@ -707,7 +639,7 @@ public class FeatureUtils {
 												updatedByte);
 										break;
 									case SMALLINT:
-										if (updatedShort != null) {
+										if (updatedShort == null) {
 											updatedShort = (short) (((int) (Math
 													.random() * (Short.MAX_VALUE + 1))) * (Math
 													.random() < .5 ? 1 : -1));
@@ -717,7 +649,7 @@ public class FeatureUtils {
 												updatedShort);
 										break;
 									case MEDIUMINT:
-										if (updatedInteger != null) {
+										if (updatedInteger == null) {
 											updatedInteger = (int) (((int) (Math
 													.random() * (Integer.MAX_VALUE + 1))) * (Math
 													.random() < .5 ? 1 : -1));
@@ -728,7 +660,7 @@ public class FeatureUtils {
 										break;
 									case INT:
 									case INTEGER:
-										if (updatedLong != null) {
+										if (updatedLong == null) {
 											updatedLong = (long) (((int) (Math
 													.random() * (Long.MAX_VALUE + 1))) * (Math
 													.random() < .5 ? 1 : -1));
@@ -745,7 +677,7 @@ public class FeatureUtils {
 								case Cursor.FIELD_TYPE_FLOAT:
 									switch (featureColumn.getDataType()) {
 									case FLOAT:
-										if (updatedFloat != null) {
+										if (updatedFloat == null) {
 											updatedFloat = (float) Math
 													.random() * Float.MAX_VALUE;
 										}
@@ -755,7 +687,7 @@ public class FeatureUtils {
 										break;
 									case DOUBLE:
 									case REAL:
-										if (updatedDouble != null) {
+										if (updatedDouble == null) {
 											updatedDouble = Math.random()
 													* Double.MAX_VALUE;
 										}
@@ -778,8 +710,7 @@ public class FeatureUtils {
 											if (updatedBytes.length > featureColumn
 													.getMax()) {
 												updatedLimitedBytes = new byte[featureColumn
-														.getMax()
-														.intValue()];
+														.getMax().intValue()];
 												ByteBuffer
 														.wrap(updatedBytes,
 																0,
@@ -811,7 +742,7 @@ public class FeatureUtils {
 					try {
 						TestCase.assertEquals(1, dao.update(featureRow));
 					} catch (SQLiteException e) {
-						if (isFutureSQLiteException(e)) {
+						if (TestUtils.isFutureSQLiteException(e)) {
 							continue;
 						} else {
 							throw e;
@@ -824,8 +755,7 @@ public class FeatureUtils {
 					TestCase.assertEquals(originalRow.getId(), readRow.getId());
 					GeoPackageGeometryData readGeometryData = readRow
 							.getGeometry();
-					Geometry readGeometry = readGeometryData
-							.getGeometry();
+					Geometry readGeometry = readGeometryData.getGeometry();
 
 					for (String readColumnName : readRow.getColumnNames()) {
 
@@ -931,8 +861,7 @@ public class FeatureUtils {
 						MultiPoint multiPoint = (MultiPoint) readGeometry;
 						TestCase.assertEquals(originalMultiPoint.numPoints(),
 								multiPoint.numPoints());
-						for (Point multiPointPoint : multiPoint
-								.getPoints()) {
+						for (Point multiPointPoint : multiPoint.getPoints()) {
 							validateUpdatedPoint(multiPointPoint);
 						}
 						break;
@@ -1027,7 +956,7 @@ public class FeatureUtils {
 				try {
 					newRowId = dao.create(featureRow);
 				} catch (SQLiteException e) {
-					if (isFutureSQLiteException(e)) {
+					if (TestUtils.isFutureSQLiteException(e)) {
 						continue;
 					} else {
 						throw e;
@@ -1065,7 +994,7 @@ public class FeatureUtils {
 				try {
 					newRowId2 = dao.create(newRow);
 				} catch (SQLiteException e) {
-					if (isFutureSQLiteException(e)) {
+					if (TestUtils.isFutureSQLiteException(e)) {
 						continue;
 					} else {
 						throw e;
@@ -1117,7 +1046,7 @@ public class FeatureUtils {
 				try {
 					TestCase.assertEquals(1, dao.delete(featureRow));
 				} catch (SQLiteException e) {
-					if (isFutureSQLiteException(e)) {
+					if (TestUtils.isFutureSQLiteException(e)) {
 						continue;
 					} else {
 						throw e;
@@ -1135,20 +1064,6 @@ public class FeatureUtils {
 			cursor.close();
 		}
 
-	}
-
-	/**
-	 * Determine if the exception is caused from a missing function or module in
-	 * SQLite versions 4.2.0 and later. Lollipop uses version 3.8.4.3 so these
-	 * are not supported in Android.
-	 * 
-	 * @param e
-	 * @return
-	 */
-	private static boolean isFutureSQLiteException(SQLiteException e) {
-		String message = e.getMessage();
-		return message.contains("no such function: ST_IsEmpty")
-				|| message.contains("no such module: rtree");
 	}
 
 }

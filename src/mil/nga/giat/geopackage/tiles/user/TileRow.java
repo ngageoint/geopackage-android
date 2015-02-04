@@ -52,8 +52,8 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 * 
 	 * @return
 	 */
-	public int getZoomLevel() {
-		return (Integer) getValue(getZoomLevelColumnIndex());
+	public long getZoomLevel() {
+		return ((Number) getValue(getZoomLevelColumnIndex())).longValue();
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 * 
 	 * @param zoomLevel
 	 */
-	public void setZoomLevel(int zoomLevel) {
+	public void setZoomLevel(long zoomLevel) {
 		setValue(getZoomLevelColumnIndex(), zoomLevel);
 	}
 
@@ -88,8 +88,8 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 * 
 	 * @return
 	 */
-	public int getTileColumn() {
-		return (Integer) getValue(getTileColumnColumnIndex());
+	public long getTileColumn() {
+		return ((Number) getValue(getTileColumnColumnIndex())).longValue();
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 * 
 	 * @param tileColumn
 	 */
-	public void setTileColumn(int tileColumn) {
+	public void setTileColumn(long tileColumn) {
 		setValue(getTileColumnColumnIndex(), tileColumn);
 	}
 
@@ -124,8 +124,8 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 * 
 	 * @return
 	 */
-	public int getTileRow() {
-		return (Integer) getValue(getTileRowColumnIndex());
+	public long getTileRow() {
+		return ((Number) getValue(getTileRowColumnIndex())).longValue();
 	}
 
 	/**
@@ -133,7 +133,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 * 
 	 * @param tileRow
 	 */
-	public void setTileRow(int tileRow) {
+	public void setTileRow(long tileRow) {
 		setValue(getTileRowColumnIndex(), tileRow);
 	}
 
