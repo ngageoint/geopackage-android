@@ -75,7 +75,7 @@ public class SpatialReferenceSystemImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		SpatialReferenceSystemUtils.testRead(geoPackage, 4);
+		SpatialReferenceSystemUtils.testRead(geoPackage, null);
 
 	}
 

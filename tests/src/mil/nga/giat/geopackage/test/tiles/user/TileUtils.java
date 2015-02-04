@@ -10,9 +10,11 @@ import java.util.UUID;
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
-import mil.nga.giat.geopackage.test.TestSetupTeardown;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.giat.geopackage.tiles.user.TileColumn;
@@ -23,6 +25,9 @@ import mil.nga.giat.geopackage.tiles.user.TileTable;
 import mil.nga.giat.geopackage.user.ColumnValue;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
+
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 /**
  * Tiles Utility test methods
@@ -582,10 +587,21 @@ public class TileUtils {
 					TileRow tileRow = cursor.getRow();
 					cursor.close();
 
+					// Find the largest zoom level
+					TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
+					QueryBuilder<TileMatrix, TileMatrixKey> qb = tileMatrixDao
+							.queryBuilder();
+					qb.where().eq(TileMatrix.COLUMN_TABLE_NAME,
+							tileMatrixSet.getTableName());
+					qb.orderBy(TileMatrix.COLUMN_ZOOM_LEVEL, false);
+					PreparedQuery<TileMatrix> query = qb.prepare();
+					TileMatrix tileMatrix = tileMatrixDao.queryForFirst(query);
+					int highestZoomLevel = tileMatrix.getZoomLevel();
+
 					// Create new row from existing
 					long id = tileRow.getId();
 					tileRow.resetId();
-					tileRow.setZoomLevel(TestSetupTeardown.CREATE_TILE_MATRIX_COUNT);
+					tileRow.setZoomLevel(highestZoomLevel + 1);
 					long newRowId;
 					try {
 						newRowId = dao.create(tileRow);

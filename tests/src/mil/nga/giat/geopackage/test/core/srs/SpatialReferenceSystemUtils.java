@@ -41,15 +41,17 @@ public class SpatialReferenceSystemUtils {
 	 * @param expectedResults
 	 * @throws SQLException
 	 */
-	public static void testRead(GeoPackage geoPackage, int expectedResults)
+	public static void testRead(GeoPackage geoPackage, Integer expectedResults)
 			throws SQLException {
 
 		SpatialReferenceSystemDao dao = geoPackage
 				.getSpatialReferenceSystemDao();
 		List<SpatialReferenceSystem> results = dao.queryForAll();
-		TestCase.assertEquals(
-				"Unexpected number of spatial reference system rows",
-				expectedResults, results.size());
+		if (expectedResults != null) {
+			TestCase.assertEquals(
+					"Unexpected number of spatial reference system rows",
+					expectedResults.intValue(), results.size());
+		}
 
 		if (!results.isEmpty()) {
 

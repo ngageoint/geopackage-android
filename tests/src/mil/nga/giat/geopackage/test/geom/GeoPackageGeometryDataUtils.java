@@ -17,6 +17,7 @@ import mil.nga.giat.geopackage.geom.CompoundCurve;
 import mil.nga.giat.geopackage.geom.CurvePolygon;
 import mil.nga.giat.geopackage.geom.Geometry;
 import mil.nga.giat.geopackage.geom.GeometryCollection;
+import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.LineString;
 import mil.nga.giat.geopackage.geom.MultiLineString;
 import mil.nga.giat.geopackage.geom.MultiPoint;
@@ -26,7 +27,6 @@ import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.PolyhedralSurface;
 import mil.nga.giat.geopackage.geom.TIN;
 import mil.nga.giat.geopackage.geom.Triangle;
-import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryEnvelope;
 
@@ -49,77 +49,86 @@ public class GeoPackageGeometryDataUtils {
 
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();
-		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-		for (GeometryColumns geometryColumns : results) {
+		if (geometryColumnsDao.isTableExists()) {
+			List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
-			TestCase.assertNotNull(dao);
+			for (GeometryColumns geometryColumns : results) {
 
-			FeatureCursor cursor = dao.queryForAll();
+				FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+				TestCase.assertNotNull(dao);
 
-			while (cursor.moveToNext()) {
+				FeatureCursor cursor = dao.queryForAll();
 
-				GeoPackageGeometryData geometryData = cursor.getGeometry();
-				if (geometryData != null) {
+				while (cursor.moveToNext()) {
 
-					byte[] geometryDataToBytes = geometryData.toBytes();
-					compareByteArrays(geometryDataToBytes,
-							geometryData.getBytes());
+					GeoPackageGeometryData geometryData = cursor.getGeometry();
+					if (geometryData != null) {
 
-					GeoPackageGeometryData geometryDataAfterToBytes = geometryData;
+						byte[] geometryDataToBytes = geometryData.toBytes();
+						compareByteArrays(geometryDataToBytes,
+								geometryData.getBytes());
 
-					// Re-retrieve the original geometry data
-					geometryData = cursor.getGeometry();
+						GeoPackageGeometryData geometryDataAfterToBytes = geometryData;
 
-					// Compare the original with the toBytes geometry data
-					compareGeometryData(geometryData, geometryDataAfterToBytes);
+						// Re-retrieve the original geometry data
+						geometryData = cursor.getGeometry();
 
-					// Create a new geometry data from the bytes and compare
-					// with original
-					GeoPackageGeometryData geometryDataFromBytes = new GeoPackageGeometryData(
-							geometryDataToBytes);
-					compareGeometryData(geometryData, geometryDataFromBytes);
+						// Compare the original with the toBytes geometry data
+						compareGeometryData(geometryData,
+								geometryDataAfterToBytes);
 
-					// Set the geometry empty flag and verify the geometry was
-					// not written / read
-					geometryDataAfterToBytes = cursor.getGeometry();
-					geometryDataAfterToBytes.setEmpty(true);
-					geometryDataToBytes = geometryDataAfterToBytes.toBytes();
-					geometryDataFromBytes = new GeoPackageGeometryData(
-							geometryDataToBytes);
-					TestCase.assertNull(geometryDataFromBytes.getGeometry());
-					compareByteArrays(
-							geometryDataAfterToBytes.getHeaderBytes(),
-							geometryDataFromBytes.getHeaderBytes());
+						// Create a new geometry data from the bytes and compare
+						// with original
+						GeoPackageGeometryData geometryDataFromBytes = new GeoPackageGeometryData(
+								geometryDataToBytes);
+						compareGeometryData(geometryData, geometryDataFromBytes);
 
-					// Flip the byte order and verify the header and bytes no
-					// longer matches the original, but the geometries still do
-					geometryDataAfterToBytes = cursor.getGeometry();
-					geometryDataAfterToBytes
-							.setByteOrder(geometryDataAfterToBytes
-									.getByteOrder() == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN
-									: ByteOrder.BIG_ENDIAN);
-					geometryDataToBytes = geometryDataAfterToBytes.toBytes();
-					geometryDataFromBytes = new GeoPackageGeometryData(
-							geometryDataToBytes);
-					compareGeometryData(geometryDataAfterToBytes,
-							geometryDataFromBytes);
-					TestCase.assertFalse(equalByteArrays(
-							geometryDataAfterToBytes.getHeaderBytes(),
-							geometryData.getHeaderBytes()));
-					TestCase.assertFalse(equalByteArrays(
-							geometryDataAfterToBytes.getWkbBytes(),
-							geometryData.getWkbBytes()));
-					TestCase.assertFalse(equalByteArrays(
-							geometryDataAfterToBytes.getBytes(),
-							geometryData.getBytes()));
-					compareGeometries(geometryData.getGeometry(),
-							geometryDataAfterToBytes.getGeometry());
+						// Set the geometry empty flag and verify the geometry
+						// was
+						// not written / read
+						geometryDataAfterToBytes = cursor.getGeometry();
+						geometryDataAfterToBytes.setEmpty(true);
+						geometryDataToBytes = geometryDataAfterToBytes
+								.toBytes();
+						geometryDataFromBytes = new GeoPackageGeometryData(
+								geometryDataToBytes);
+						TestCase.assertNull(geometryDataFromBytes.getGeometry());
+						compareByteArrays(
+								geometryDataAfterToBytes.getHeaderBytes(),
+								geometryDataFromBytes.getHeaderBytes());
+
+						// Flip the byte order and verify the header and bytes
+						// no
+						// longer matches the original, but the geometries still
+						// do
+						geometryDataAfterToBytes = cursor.getGeometry();
+						geometryDataAfterToBytes
+								.setByteOrder(geometryDataAfterToBytes
+										.getByteOrder() == ByteOrder.BIG_ENDIAN ? ByteOrder.LITTLE_ENDIAN
+										: ByteOrder.BIG_ENDIAN);
+						geometryDataToBytes = geometryDataAfterToBytes
+								.toBytes();
+						geometryDataFromBytes = new GeoPackageGeometryData(
+								geometryDataToBytes);
+						compareGeometryData(geometryDataAfterToBytes,
+								geometryDataFromBytes);
+						TestCase.assertFalse(equalByteArrays(
+								geometryDataAfterToBytes.getHeaderBytes(),
+								geometryData.getHeaderBytes()));
+						TestCase.assertFalse(equalByteArrays(
+								geometryDataAfterToBytes.getWkbBytes(),
+								geometryData.getWkbBytes()));
+						TestCase.assertFalse(equalByteArrays(
+								geometryDataAfterToBytes.getBytes(),
+								geometryData.getBytes()));
+						compareGeometries(geometryData.getGeometry(),
+								geometryDataAfterToBytes.getGeometry());
+					}
+
 				}
-
+				cursor.close();
 			}
-			cursor.close();
 		}
 
 	}
@@ -192,8 +201,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	public static void compareGeometries(Geometry expected,
-			Geometry actual) {
+	public static void compareGeometries(Geometry expected, Geometry actual) {
 		if (expected == null) {
 			TestCase.assertNull(actual);
 		} else {
@@ -206,20 +214,16 @@ public class GeoPackageGeometryDataUtils {
 				TestCase.fail("Unexpected Geometry Type of "
 						+ geometryType.name() + " which is abstract");
 			case POINT:
-				comparePoint((Point) actual,
-						(Point) expected);
+				comparePoint((Point) actual, (Point) expected);
 				break;
 			case LINESTRING:
-				compareLineString((LineString) expected,
-						(LineString) actual);
+				compareLineString((LineString) expected, (LineString) actual);
 				break;
 			case POLYGON:
-				comparePolygon((Polygon) expected,
-						(Polygon) actual);
+				comparePolygon((Polygon) expected, (Polygon) actual);
 				break;
 			case MULTIPOINT:
-				compareMultiPoint((MultiPoint) expected,
-						(MultiPoint) actual);
+				compareMultiPoint((MultiPoint) expected, (MultiPoint) actual);
 				break;
 			case MULTILINESTRING:
 				compareMultiLineString((MultiLineString) expected,
@@ -230,8 +234,7 @@ public class GeoPackageGeometryDataUtils {
 						(MultiPolygon) actual);
 				break;
 			case GEOMETRYCOLLECTION:
-				compareGeometryCollection(
-						(GeometryCollection<?>) expected,
+				compareGeometryCollection((GeometryCollection<?>) expected,
 						(GeometryCollection<?>) actual);
 				break;
 			case CIRCULARSTRING:
@@ -259,16 +262,14 @@ public class GeoPackageGeometryDataUtils {
 				TestCase.fail("Unexpected Geometry Type of "
 						+ geometryType.name() + " which is abstract");
 			case POLYHEDRALSURFACE:
-				comparePolyhedralSurface(
-						(PolyhedralSurface) expected,
+				comparePolyhedralSurface((PolyhedralSurface) expected,
 						(PolyhedralSurface) actual);
 				break;
 			case TIN:
 				compareTIN((TIN) expected, (TIN) actual);
 				break;
 			case TRIANGLE:
-				compareTriangle((Triangle) expected,
-						(Triangle) actual);
+				compareTriangle((Triangle) expected, (Triangle) actual);
 				break;
 			default:
 				throw new GeoPackageException("Geometry Type not supported: "
@@ -283,8 +284,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareBaseGeometryAttributes(
-			Geometry expected, Geometry actual) {
+	private static void compareBaseGeometryAttributes(Geometry expected,
+			Geometry actual) {
 		TestCase.assertEquals(expected.getGeometryType(),
 				actual.getGeometryType());
 		TestCase.assertEquals(expected.hasZ(), actual.hasZ());
@@ -298,8 +299,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void comparePoint(Point expected,
-			Point actual) {
+	private static void comparePoint(Point expected, Point actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.getX(), actual.getX());
@@ -314,8 +314,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareLineString(LineString expected,
-			LineString actual) {
+	private static void compareLineString(LineString expected, LineString actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
@@ -330,8 +329,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void comparePolygon(Polygon expected,
-			Polygon actual) {
+	private static void comparePolygon(Polygon expected, Polygon actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());
@@ -347,8 +345,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareMultiPoint(MultiPoint expected,
-			MultiPoint actual) {
+	private static void compareMultiPoint(MultiPoint expected, MultiPoint actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
@@ -363,8 +360,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareMultiLineString(
-			MultiLineString expected, MultiLineString actual) {
+	private static void compareMultiLineString(MultiLineString expected,
+			MultiLineString actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numLineStrings(),
@@ -399,8 +396,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param actual
 	 */
 	private static void compareGeometryCollection(
-			GeometryCollection<?> expected,
-			GeometryCollection<?> actual) {
+			GeometryCollection<?> expected, GeometryCollection<?> actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numGeometries(), actual.numGeometries());
@@ -416,8 +412,8 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareCircularString(
-			CircularString expected, CircularString actual) {
+	private static void compareCircularString(CircularString expected,
+			CircularString actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
@@ -467,8 +463,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void comparePolyhedralSurface(
-			PolyhedralSurface expected,
+	private static void comparePolyhedralSurface(PolyhedralSurface expected,
 			PolyhedralSurface actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
@@ -501,8 +496,7 @@ public class GeoPackageGeometryDataUtils {
 	 * @param expected
 	 * @param actual
 	 */
-	private static void compareTriangle(Triangle expected,
-			Triangle actual) {
+	private static void compareTriangle(Triangle expected, Triangle actual) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());

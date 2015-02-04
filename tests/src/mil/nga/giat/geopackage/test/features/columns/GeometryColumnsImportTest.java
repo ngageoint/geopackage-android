@@ -74,7 +74,7 @@ public class GeometryColumnsImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		GeometryColumnsUtils.testRead(geoPackage, 16);
+		GeometryColumnsUtils.testRead(geoPackage, null);
 
 	}
 

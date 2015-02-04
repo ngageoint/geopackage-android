@@ -39,16 +39,17 @@ public class TileMatrixUtils {
 	 * @param expectedResults
 	 * @throws SQLException
 	 */
-	public static void testRead(GeoPackage geoPackage, int expectedResults)
+	public static void testRead(GeoPackage geoPackage, Integer expectedResults)
 			throws SQLException {
 
 		TileMatrixDao dao = geoPackage.getTileMatrixDao();
-		if (!dao.isTableExists()) {
-			TestCase.assertEquals(0, expectedResults);
-		} else {
+		if (dao.isTableExists()) {
+
 			List<TileMatrix> results = dao.queryForAll();
-			TestCase.assertEquals("Unexpected number of tile matrix rows",
-					expectedResults, results.size());
+			if (expectedResults != null) {
+				TestCase.assertEquals("Unexpected number of tile matrix rows",
+						expectedResults.intValue(), results.size());
+			}
 
 			if (!results.isEmpty()) {
 

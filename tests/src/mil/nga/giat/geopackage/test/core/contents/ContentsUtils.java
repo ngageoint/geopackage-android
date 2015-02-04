@@ -41,13 +41,15 @@ public class ContentsUtils {
 	 * @param expectedResults
 	 * @throws SQLException
 	 */
-	public static void testRead(GeoPackage geoPackage, int expectedResults)
+	public static void testRead(GeoPackage geoPackage, Integer expectedResults)
 			throws SQLException {
 
 		ContentsDao dao = geoPackage.getContentsDao();
 		List<Contents> results = dao.queryForAll();
-		TestCase.assertEquals("Unexpected number of contents rows",
-				expectedResults, results.size());
+		if (expectedResults != null) {
+			TestCase.assertEquals("Unexpected number of contents rows",
+					expectedResults.intValue(), results.size());
+		}
 
 		if (!results.isEmpty()) {
 
@@ -260,8 +262,10 @@ public class ContentsUtils {
 		contents.setSrs(srs);
 
 		// Create the feature table
-		geoPackage.createTable(TestUtils.buildFeatureTable(contents.getTableName(),
-				"geom", GeometryType.GEOMETRY));
+		geoPackage.createTable(TestUtils.buildFeatureTable(
+				contents.getTableName(), "geom", GeometryType.GEOMETRY));
+
+		geoPackage.createGeometryColumnsTable();
 
 		dao.create(contents);
 

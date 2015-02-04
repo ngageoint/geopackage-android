@@ -74,7 +74,7 @@ public class TileMatrixSetImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		TileMatrixSetUtils.testRead(geoPackage, 0);
+		TileMatrixSetUtils.testRead(geoPackage, null);
 
 	}
 

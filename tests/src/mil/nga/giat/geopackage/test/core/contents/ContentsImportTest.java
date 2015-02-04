@@ -74,7 +74,7 @@ public class ContentsImportTest extends
 	 */
 	public void testRead() throws SQLException {
 
-		ContentsUtils.testRead(geoPackage, 16);
+		ContentsUtils.testRead(geoPackage, null);
 
 	}
 

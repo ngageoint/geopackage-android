@@ -57,190 +57,203 @@ public class FeatureUtils {
 
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();
-		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-		for (GeometryColumns geometryColumns : results) {
+		if (geometryColumnsDao.isTableExists()) {
+			List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-			// Test the get feature DAO methods
-			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
-			TestCase.assertNotNull(dao);
-			dao = geoPackage.getFeatureDao(geometryColumns.getContents());
-			TestCase.assertNotNull(dao);
-			dao = geoPackage.getFeatureDao(geometryColumns.getTableName());
-			TestCase.assertNotNull(dao);
+			for (GeometryColumns geometryColumns : results) {
 
-			TestCase.assertNotNull(dao.getDb());
-			TestCase.assertEquals(geometryColumns.getId(), dao
-					.getGeometryColumns().getId());
-			TestCase.assertEquals(geometryColumns.getTableName(),
-					dao.getTableName());
-			TestCase.assertEquals(geometryColumns.getColumnName(),
-					dao.getGeometryColumnName());
+				// Test the get feature DAO methods
+				FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+				TestCase.assertNotNull(dao);
+				dao = geoPackage.getFeatureDao(geometryColumns.getContents());
+				TestCase.assertNotNull(dao);
+				dao = geoPackage.getFeatureDao(geometryColumns.getTableName());
+				TestCase.assertNotNull(dao);
 
-			FeatureTable featureTable = dao.getTable();
-			String[] columns = featureTable.getColumnNames();
-			int geomIndex = featureTable.getGeometryColumnIndex();
-			TestCase.assertTrue(geomIndex >= 0 && geomIndex < columns.length);
-			TestCase.assertEquals(geometryColumns.getColumnName(),
-					columns[geomIndex]);
+				TestCase.assertNotNull(dao.getDb());
+				TestCase.assertEquals(geometryColumns.getId(), dao
+						.getGeometryColumns().getId());
+				TestCase.assertEquals(geometryColumns.getTableName(),
+						dao.getTableName());
+				TestCase.assertEquals(geometryColumns.getColumnName(),
+						dao.getGeometryColumnName());
 
-			// Query for all
-			FeatureCursor cursor = dao.queryForAll();
-			int count = cursor.getCount();
-			int manualCount = 0;
-			while (cursor.moveToNext()) {
-				GeoPackageGeometryData geoPackageGeometryData = cursor
-						.getGeometry();
-				if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
-					TestCase.assertNotNull(geoPackageGeometryData);
-					Geometry geometry = geoPackageGeometryData.getGeometry();
-					GeometryType geometryType = geometryColumns
-							.getGeometryType();
-					validateGeometry(geometryType, geometry);
+				FeatureTable featureTable = dao.getTable();
+				String[] columns = featureTable.getColumnNames();
+				int geomIndex = featureTable.getGeometryColumnIndex();
+				TestCase.assertTrue(geomIndex >= 0
+						&& geomIndex < columns.length);
+				TestCase.assertEquals(geometryColumns.getColumnName(),
+						columns[geomIndex]);
 
-					byte[] wkbBytes = geoPackageGeometryData.getWkbBytes();
-					int byteLenth = wkbBytes.length;
-					TestCase.assertTrue(byteLenth > 0);
-					ByteReader wkbReader = new ByteReader(wkbBytes);
-					wkbReader.setByteOrder(geoPackageGeometryData
-							.getByteOrder());
-					Geometry geometryFromBytes = WkbGeometryReader
-							.readGeometry(wkbReader);
-					TestCase.assertNotNull(geometryFromBytes);
-					TestCase.assertEquals(geometry.getGeometryType(),
-							geometryFromBytes.getGeometryType());
-					validateGeometry(geometryType, geometryFromBytes);
-
-					ByteBuffer wkbByteBuffer = geoPackageGeometryData
-							.getWkbByteBuffer();
-					TestCase.assertEquals(byteLenth, wkbByteBuffer.remaining());
-					byte[] wkbBytes2 = new byte[wkbByteBuffer.remaining()];
-					wkbByteBuffer.get(wkbBytes2);
-					ByteReader wkbReader2 = new ByteReader(wkbBytes2);
-					wkbReader2.setByteOrder(geoPackageGeometryData
-							.getByteOrder());
-					Geometry geometryFromBytes2 = WkbGeometryReader
-							.readGeometry(wkbReader2);
-					TestCase.assertNotNull(geometryFromBytes2);
-					TestCase.assertEquals(geometry.getGeometryType(),
-							geometryFromBytes2.getGeometryType());
-					validateGeometry(geometryType, geometryFromBytes2);
-				}
-
-				FeatureRow featureRow = cursor.getRow();
-				validateFeatureRow(columns, featureRow);
-
-				manualCount++;
-			}
-			TestCase.assertEquals(count, manualCount);
-			cursor.close();
-
-			// Manually query for all and compare
-			cursor = (FeatureCursor) dao.getDb().query(dao.getTableName(),
-					null, null, null, null, null, null);
-			count = cursor.getCount();
-			manualCount = 0;
-			while (cursor.moveToNext()) {
-				GeoPackageGeometryData geometry = cursor.getGeometry();
-				if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
-					TestCase.assertNotNull(geometry);
-				}
-				manualCount++;
-			}
-			TestCase.assertEquals(count, manualCount);
-
-			TestCase.assertTrue("No features to test", count > 0);
-
-			// Choose random feature
-			int random = (int) (Math.random() * count);
-			cursor.moveToPosition(random);
-			FeatureRow featureRow = cursor.getRow();
-
-			cursor.close();
-
-			// Query by id
-			FeatureRow queryFeatureRow = dao.queryForIdRow(featureRow.getId());
-			TestCase.assertNotNull(queryFeatureRow);
-			TestCase.assertEquals(featureRow.getId(), queryFeatureRow.getId());
-
-			// Find two non id non geom columns
-			FeatureColumn column1 = null;
-			FeatureColumn column2 = null;
-			for (FeatureColumn column : featureRow.getTable().getColumns()) {
-				if (!column.isPrimaryKey() && !column.isGeometry()) {
-					if (column1 == null) {
-						column1 = column;
-					} else {
-						column2 = column;
-						break;
-					}
-				}
-			}
-
-			// Query for equal
-			if (column1 != null) {
-
-				Object column1Value = featureRow.getValue(column1.getName());
-				Class<?> column1ClassType = column1.getDataType()
-						.getClassType();
-				boolean column1Decimal = column1ClassType == Double.class
-						|| column1ClassType == Float.class;
-				ColumnValue column1FeatureValue;
-				if (column1Decimal) {
-					column1FeatureValue = new ColumnValue(column1Value, .000001);
-				} else {
-					column1FeatureValue = new ColumnValue(column1Value);
-				}
-				cursor = dao.queryForEq(column1.getName(), column1FeatureValue);
-				TestCase.assertTrue(cursor.getCount() > 0);
-				boolean found = false;
+				// Query for all
+				FeatureCursor cursor = dao.queryForAll();
+				int count = cursor.getCount();
+				int manualCount = 0;
 				while (cursor.moveToNext()) {
-					queryFeatureRow = cursor.getRow();
-					TestCase.assertEquals(column1Value,
-							queryFeatureRow.getValue(column1.getName()));
-					if (!found) {
-						found = featureRow.getId() == queryFeatureRow.getId();
+					GeoPackageGeometryData geoPackageGeometryData = cursor
+							.getGeometry();
+					if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
+						TestCase.assertNotNull(geoPackageGeometryData);
+						Geometry geometry = geoPackageGeometryData
+								.getGeometry();
+						GeometryType geometryType = geometryColumns
+								.getGeometryType();
+						validateGeometry(geometryType, geometry);
+
+						byte[] wkbBytes = geoPackageGeometryData.getWkbBytes();
+						int byteLenth = wkbBytes.length;
+						TestCase.assertTrue(byteLenth > 0);
+						ByteReader wkbReader = new ByteReader(wkbBytes);
+						wkbReader.setByteOrder(geoPackageGeometryData
+								.getByteOrder());
+						Geometry geometryFromBytes = WkbGeometryReader
+								.readGeometry(wkbReader);
+						TestCase.assertNotNull(geometryFromBytes);
+						TestCase.assertEquals(geometry.getGeometryType(),
+								geometryFromBytes.getGeometryType());
+						validateGeometry(geometryType, geometryFromBytes);
+
+						ByteBuffer wkbByteBuffer = geoPackageGeometryData
+								.getWkbByteBuffer();
+						TestCase.assertEquals(byteLenth,
+								wkbByteBuffer.remaining());
+						byte[] wkbBytes2 = new byte[wkbByteBuffer.remaining()];
+						wkbByteBuffer.get(wkbBytes2);
+						ByteReader wkbReader2 = new ByteReader(wkbBytes2);
+						wkbReader2.setByteOrder(geoPackageGeometryData
+								.getByteOrder());
+						Geometry geometryFromBytes2 = WkbGeometryReader
+								.readGeometry(wkbReader2);
+						TestCase.assertNotNull(geometryFromBytes2);
+						TestCase.assertEquals(geometry.getGeometryType(),
+								geometryFromBytes2.getGeometryType());
+						validateGeometry(geometryType, geometryFromBytes2);
 					}
+
+					FeatureRow featureRow = cursor.getRow();
+					validateFeatureRow(columns, featureRow);
+
+					manualCount++;
 				}
-				TestCase.assertTrue(found);
+				TestCase.assertEquals(count, manualCount);
 				cursor.close();
 
-				// Query for field values
-				Map<String, ColumnValue> fieldValues = new HashMap<String, ColumnValue>();
-				fieldValues.put(column1.getName(), column1FeatureValue);
-				Object column2Value = null;
-				ColumnValue column2FeatureValue;
-				if (column2 != null) {
-					column2Value = featureRow.getValue(column2.getName());
-					Class<?> column2ClassType = column2.getDataType()
+				// Manually query for all and compare
+				cursor = (FeatureCursor) dao.getDb().query(dao.getTableName(),
+						null, null, null, null, null, null);
+				count = cursor.getCount();
+				manualCount = 0;
+				while (cursor.moveToNext()) {
+					GeoPackageGeometryData geometry = cursor.getGeometry();
+					if (cursor.getBlob(featureTable.getGeometryColumnIndex()) != null) {
+						TestCase.assertNotNull(geometry);
+					}
+					manualCount++;
+				}
+				TestCase.assertEquals(count, manualCount);
+
+				TestCase.assertTrue("No features to test", count > 0);
+
+				// Choose random feature
+				int random = (int) (Math.random() * count);
+				cursor.moveToPosition(random);
+				FeatureRow featureRow = cursor.getRow();
+
+				cursor.close();
+
+				// Query by id
+				FeatureRow queryFeatureRow = dao.queryForIdRow(featureRow
+						.getId());
+				TestCase.assertNotNull(queryFeatureRow);
+				TestCase.assertEquals(featureRow.getId(),
+						queryFeatureRow.getId());
+
+				// Find two non id non geom columns
+				FeatureColumn column1 = null;
+				FeatureColumn column2 = null;
+				for (FeatureColumn column : featureRow.getTable().getColumns()) {
+					if (!column.isPrimaryKey() && !column.isGeometry()) {
+						if (column1 == null) {
+							column1 = column;
+						} else {
+							column2 = column;
+							break;
+						}
+					}
+				}
+
+				// Query for equal
+				if (column1 != null) {
+
+					Object column1Value = featureRow
+							.getValue(column1.getName());
+					Class<?> column1ClassType = column1.getDataType()
 							.getClassType();
-					boolean column2Decimal = column2ClassType == Double.class
-							|| column2ClassType == Float.class;
-					if (column2Decimal) {
-						column2FeatureValue = new ColumnValue(column2Value,
+					boolean column1Decimal = column1ClassType == Double.class
+							|| column1ClassType == Float.class;
+					ColumnValue column1FeatureValue;
+					if (column1Decimal) {
+						column1FeatureValue = new ColumnValue(column1Value,
 								.000001);
 					} else {
-						column2FeatureValue = new ColumnValue(column2Value);
+						column1FeatureValue = new ColumnValue(column1Value);
 					}
-					fieldValues.put(column2.getName(), column2FeatureValue);
-				}
-				cursor = dao.queryForValueFieldValues(fieldValues);
-				TestCase.assertTrue(cursor.getCount() > 0);
-				found = false;
-				while (cursor.moveToNext()) {
-					queryFeatureRow = cursor.getRow();
-					TestCase.assertEquals(column1Value,
-							queryFeatureRow.getValue(column1.getName()));
+					cursor = dao.queryForEq(column1.getName(),
+							column1FeatureValue);
+					TestCase.assertTrue(cursor.getCount() > 0);
+					boolean found = false;
+					while (cursor.moveToNext()) {
+						queryFeatureRow = cursor.getRow();
+						TestCase.assertEquals(column1Value,
+								queryFeatureRow.getValue(column1.getName()));
+						if (!found) {
+							found = featureRow.getId() == queryFeatureRow
+									.getId();
+						}
+					}
+					TestCase.assertTrue(found);
+					cursor.close();
+
+					// Query for field values
+					Map<String, ColumnValue> fieldValues = new HashMap<String, ColumnValue>();
+					fieldValues.put(column1.getName(), column1FeatureValue);
+					Object column2Value = null;
+					ColumnValue column2FeatureValue;
 					if (column2 != null) {
-						TestCase.assertEquals(column2Value,
-								queryFeatureRow.getValue(column2.getName()));
+						column2Value = featureRow.getValue(column2.getName());
+						Class<?> column2ClassType = column2.getDataType()
+								.getClassType();
+						boolean column2Decimal = column2ClassType == Double.class
+								|| column2ClassType == Float.class;
+						if (column2Decimal) {
+							column2FeatureValue = new ColumnValue(column2Value,
+									.000001);
+						} else {
+							column2FeatureValue = new ColumnValue(column2Value);
+						}
+						fieldValues.put(column2.getName(), column2FeatureValue);
 					}
-					if (!found) {
-						found = featureRow.getId() == queryFeatureRow.getId();
+					cursor = dao.queryForValueFieldValues(fieldValues);
+					TestCase.assertTrue(cursor.getCount() > 0);
+					found = false;
+					while (cursor.moveToNext()) {
+						queryFeatureRow = cursor.getRow();
+						TestCase.assertEquals(column1Value,
+								queryFeatureRow.getValue(column1.getName()));
+						if (column2 != null) {
+							TestCase.assertEquals(column2Value,
+									queryFeatureRow.getValue(column2.getName()));
+						}
+						if (!found) {
+							found = featureRow.getId() == queryFeatureRow
+									.getId();
+						}
 					}
+					TestCase.assertTrue(found);
+					cursor.close();
 				}
-				TestCase.assertTrue(found);
-				cursor.close();
 			}
 		}
 
@@ -505,230 +518,362 @@ public class FeatureUtils {
 
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();
-		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-		for (GeometryColumns geometryColumns : results) {
+		if (geometryColumnsDao.isTableExists()) {
+			List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
-			TestCase.assertNotNull(dao);
+			for (GeometryColumns geometryColumns : results) {
 
-			FeatureCursor cursor = dao.queryForAll();
-			int count = cursor.getCount();
-			if (count > 0) {
+				FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+				TestCase.assertNotNull(dao);
 
-				// // Choose random feature
-				// int random = (int) (Math.random() * count);
-				// cursor.moveToPosition(random);
-				cursor.moveToFirst();
+				FeatureCursor cursor = dao.queryForAll();
+				int count = cursor.getCount();
+				if (count > 0) {
 
-				GeoPackageGeometryData geometryData = cursor.getGeometry();
-				while (geometryData == null && cursor.moveToNext()) {
-					geometryData = cursor.getGeometry();
-				}
-				if (geometryData != null) {
-					String updatedString = null;
-					String updatedLimitedString = null;
-					Boolean updatedBoolean = null;
-					Byte updatedByte = null;
-					Short updatedShort = null;
-					Integer updatedInteger = null;
-					Long updatedLong = null;
-					Float updatedFloat = null;
-					Double updatedDouble = null;
-					byte[] updatedBytes = null;
-					byte[] updatedLimitedBytes = null;
+					// // Choose random feature
+					// int random = (int) (Math.random() * count);
+					// cursor.moveToPosition(random);
+					cursor.moveToFirst();
 
-					Geometry geometry = geometryData.getGeometry();
-					FeatureRow originalRow = cursor.getRow();
-					FeatureRow featureRow = cursor.getRow();
-
-					try {
-						featureRow.setValue(featureRow.getPkColumnIndex(), 9);
-						TestCase.fail("Updated the primary key value");
-					} catch (GeoPackageException e) {
-						// expected
+					GeoPackageGeometryData geometryData = cursor.getGeometry();
+					while (geometryData == null && cursor.moveToNext()) {
+						geometryData = cursor.getGeometry();
 					}
+					if (geometryData != null) {
+						String updatedString = null;
+						String updatedLimitedString = null;
+						Boolean updatedBoolean = null;
+						Byte updatedByte = null;
+						Short updatedShort = null;
+						Integer updatedInteger = null;
+						Long updatedLong = null;
+						Float updatedFloat = null;
+						Double updatedDouble = null;
+						byte[] updatedBytes = null;
+						byte[] updatedLimitedBytes = null;
 
-					for (FeatureColumn featureColumn : dao.getTable()
-							.getColumns()) {
-						if (!featureColumn.isPrimaryKey()) {
+						Geometry geometry = geometryData.getGeometry();
+						FeatureRow originalRow = cursor.getRow();
+						FeatureRow featureRow = cursor.getRow();
 
-							if (featureColumn.isGeometry()) {
+						try {
+							featureRow.setValue(featureRow.getPkColumnIndex(),
+									9);
+							TestCase.fail("Updated the primary key value");
+						} catch (GeoPackageException e) {
+							// expected
+						}
 
-								boolean updateGeometry = true;
+						for (FeatureColumn featureColumn : dao.getTable()
+								.getColumns()) {
+							if (!featureColumn.isPrimaryKey()) {
 
-								switch (geometry.getGeometryType()) {
+								if (featureColumn.isGeometry()) {
 
-								case POINT:
-									Point point = (Point) geometry;
-									updatePoint(point);
-									break;
-								case MULTIPOINT:
-									MultiPoint multiPoint = (MultiPoint) geometry;
-									if (multiPoint.numPoints() > 1) {
-										multiPoint.getPoints().remove(0);
-									}
-									for (Point multiPointPoint : multiPoint
-											.getPoints()) {
-										updatePoint(multiPointPoint);
-									}
-									break;
+									boolean updateGeometry = true;
 
-								default:
-									updateGeometry = false;
-								}
-								if (updateGeometry) {
-									featureRow.setValue(
-											featureColumn.getIndex(),
-											geometryData);
-								}
+									switch (geometry.getGeometryType()) {
 
-							} else {
-								switch (featureRow
-										.getRowColumnType(featureColumn
-												.getIndex())) {
-
-								case Cursor.FIELD_TYPE_STRING:
-									if (updatedString == null) {
-										updatedString = UUID.randomUUID()
-												.toString();
-									}
-									if (featureColumn.getMax() != null) {
-										if (updatedLimitedString != null) {
-											if (updatedString.length() > featureColumn
-													.getMax()) {
-												updatedLimitedString = updatedString
-														.substring(
-																0,
-																featureColumn
-																		.getMax()
-																		.intValue());
-											} else {
-												updatedLimitedString = updatedString;
-											}
+									case POINT:
+										Point point = (Point) geometry;
+										updatePoint(point);
+										break;
+									case MULTIPOINT:
+										MultiPoint multiPoint = (MultiPoint) geometry;
+										if (multiPoint.numPoints() > 1) {
+											multiPoint.getPoints().remove(0);
 										}
+										for (Point multiPointPoint : multiPoint
+												.getPoints()) {
+											updatePoint(multiPointPoint);
+										}
+										break;
+
+									default:
+										updateGeometry = false;
+									}
+									if (updateGeometry) {
 										featureRow.setValue(
 												featureColumn.getIndex(),
-												updatedLimitedString);
+												geometryData);
+									}
+
+								} else {
+									switch (featureRow
+											.getRowColumnType(featureColumn
+													.getIndex())) {
+
+									case Cursor.FIELD_TYPE_STRING:
+										if (updatedString == null) {
+											updatedString = UUID.randomUUID()
+													.toString();
+										}
+										if (featureColumn.getMax() != null) {
+											if (updatedLimitedString != null) {
+												if (updatedString.length() > featureColumn
+														.getMax()) {
+													updatedLimitedString = updatedString
+															.substring(
+																	0,
+																	featureColumn
+																			.getMax()
+																			.intValue());
+												} else {
+													updatedLimitedString = updatedString;
+												}
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedLimitedString);
+										} else {
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedString);
+										}
+										break;
+									case Cursor.FIELD_TYPE_INTEGER:
+										switch (featureColumn.getDataType()) {
+										case BOOLEAN:
+											if (updatedBoolean == null) {
+												updatedBoolean = !((Boolean) featureRow
+														.getValue(featureColumn
+																.getIndex()));
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedBoolean);
+											break;
+										case TINYINT:
+											if (updatedByte == null) {
+												updatedByte = (byte) (((int) (Math
+														.random() * (Byte.MAX_VALUE + 1))) * (Math
+														.random() < .5 ? 1 : -1));
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedByte);
+											break;
+										case SMALLINT:
+											if (updatedShort == null) {
+												updatedShort = (short) (((int) (Math
+														.random() * (Short.MAX_VALUE + 1))) * (Math
+														.random() < .5 ? 1 : -1));
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedShort);
+											break;
+										case MEDIUMINT:
+											if (updatedInteger == null) {
+												updatedInteger = (int) (((int) (Math
+														.random() * (Integer.MAX_VALUE + 1))) * (Math
+														.random() < .5 ? 1 : -1));
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedInteger);
+											break;
+										case INT:
+										case INTEGER:
+											if (updatedLong == null) {
+												updatedLong = (long) (((int) (Math
+														.random() * (Long.MAX_VALUE + 1))) * (Math
+														.random() < .5 ? 1 : -1));
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedLong);
+											break;
+										default:
+											TestCase.fail("Unexpected integer type: "
+													+ featureColumn
+															.getDataType());
+										}
+										break;
+									case Cursor.FIELD_TYPE_FLOAT:
+										switch (featureColumn.getDataType()) {
+										case FLOAT:
+											if (updatedFloat == null) {
+												updatedFloat = (float) Math
+														.random()
+														* Float.MAX_VALUE;
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedFloat);
+											break;
+										case DOUBLE:
+										case REAL:
+											if (updatedDouble == null) {
+												updatedDouble = Math.random()
+														* Double.MAX_VALUE;
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedDouble);
+											break;
+										default:
+											TestCase.fail("Unexpected float type: "
+													+ featureColumn
+															.getDataType());
+										}
+										break;
+									case Cursor.FIELD_TYPE_BLOB:
+										if (updatedBytes == null) {
+											updatedBytes = UUID.randomUUID()
+													.toString().getBytes();
+										}
+										if (featureColumn.getMax() != null) {
+											if (updatedLimitedBytes != null) {
+												if (updatedBytes.length > featureColumn
+														.getMax()) {
+													updatedLimitedBytes = new byte[featureColumn
+															.getMax()
+															.intValue()];
+													ByteBuffer
+															.wrap(updatedBytes,
+																	0,
+																	featureColumn
+																			.getMax()
+																			.intValue())
+															.get(updatedLimitedBytes);
+												} else {
+													updatedLimitedBytes = updatedBytes;
+												}
+											}
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedLimitedBytes);
+										} else {
+											featureRow.setValue(
+													featureColumn.getIndex(),
+													updatedBytes);
+										}
+										break;
+									default:
+									}
+								}
+
+							}
+						}
+
+						cursor.close();
+						try {
+							TestCase.assertEquals(1, dao.update(featureRow));
+						} catch (SQLiteException e) {
+							if (TestUtils.isFutureSQLiteException(e)) {
+								continue;
+							} else {
+								throw e;
+							}
+						}
+
+						long id = featureRow.getId();
+						FeatureRow readRow = dao.queryForIdRow(id);
+						TestCase.assertNotNull(readRow);
+						TestCase.assertEquals(originalRow.getId(),
+								readRow.getId());
+						GeoPackageGeometryData readGeometryData = readRow
+								.getGeometry();
+						Geometry readGeometry = readGeometryData.getGeometry();
+
+						for (String readColumnName : readRow.getColumnNames()) {
+
+							FeatureColumn readFeatureColumn = readRow
+									.getColumn(readColumnName);
+							if (!readFeatureColumn.isPrimaryKey()
+									&& !readFeatureColumn.isGeometry()) {
+								switch (readRow
+										.getRowColumnType(readColumnName)) {
+								case Cursor.FIELD_TYPE_STRING:
+									if (readFeatureColumn.getMax() != null) {
+										TestCase.assertEquals(
+												updatedLimitedString,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 									} else {
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedString);
+										TestCase.assertEquals(
+												updatedString,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 									}
 									break;
 								case Cursor.FIELD_TYPE_INTEGER:
-									switch (featureColumn.getDataType()) {
+									switch (readFeatureColumn.getDataType()) {
 									case BOOLEAN:
-										if (updatedBoolean == null) {
-											updatedBoolean = !((Boolean) featureRow
-													.getValue(featureColumn
-															.getIndex()));
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedBoolean);
+										TestCase.assertEquals(
+												updatedBoolean,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 										break;
 									case TINYINT:
-										if (updatedByte == null) {
-											updatedByte = (byte) (((int) (Math
-													.random() * (Byte.MAX_VALUE + 1))) * (Math
-													.random() < .5 ? 1 : -1));
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedByte);
+										TestCase.assertEquals(
+												updatedByte,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 										break;
 									case SMALLINT:
-										if (updatedShort == null) {
-											updatedShort = (short) (((int) (Math
-													.random() * (Short.MAX_VALUE + 1))) * (Math
-													.random() < .5 ? 1 : -1));
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedShort);
+										TestCase.assertEquals(
+												updatedShort,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 										break;
 									case MEDIUMINT:
-										if (updatedInteger == null) {
-											updatedInteger = (int) (((int) (Math
-													.random() * (Integer.MAX_VALUE + 1))) * (Math
-													.random() < .5 ? 1 : -1));
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedInteger);
+										TestCase.assertEquals(
+												updatedInteger,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 										break;
 									case INT:
 									case INTEGER:
-										if (updatedLong == null) {
-											updatedLong = (long) (((int) (Math
-													.random() * (Long.MAX_VALUE + 1))) * (Math
-													.random() < .5 ? 1 : -1));
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedLong);
+										TestCase.assertEquals(
+												updatedLong,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 										break;
 									default:
 										TestCase.fail("Unexpected integer type: "
-												+ featureColumn.getDataType());
+												+ readFeatureColumn
+														.getDataType());
 									}
 									break;
 								case Cursor.FIELD_TYPE_FLOAT:
-									switch (featureColumn.getDataType()) {
+									switch (readFeatureColumn.getDataType()) {
 									case FLOAT:
-										if (updatedFloat == null) {
-											updatedFloat = (float) Math
-													.random() * Float.MAX_VALUE;
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedFloat);
+										TestCase.assertEquals(
+												updatedFloat,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 										break;
 									case DOUBLE:
 									case REAL:
-										if (updatedDouble == null) {
-											updatedDouble = Math.random()
-													* Double.MAX_VALUE;
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedDouble);
+										TestCase.assertEquals(
+												updatedDouble,
+												readRow.getValue(readFeatureColumn
+														.getIndex()));
 										break;
 									default:
-										TestCase.fail("Unexpected float type: "
-												+ featureColumn.getDataType());
+										TestCase.fail("Unexpected integer type: "
+												+ readFeatureColumn
+														.getDataType());
 									}
 									break;
 								case Cursor.FIELD_TYPE_BLOB:
-									if (updatedBytes == null) {
-										updatedBytes = UUID.randomUUID()
-												.toString().getBytes();
-									}
-									if (featureColumn.getMax() != null) {
-										if (updatedLimitedBytes != null) {
-											if (updatedBytes.length > featureColumn
-													.getMax()) {
-												updatedLimitedBytes = new byte[featureColumn
-														.getMax().intValue()];
-												ByteBuffer
-														.wrap(updatedBytes,
-																0,
-																featureColumn
-																		.getMax()
-																		.intValue())
-														.get(updatedLimitedBytes);
-											} else {
-												updatedLimitedBytes = updatedBytes;
-											}
-										}
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedLimitedBytes);
+									if (readFeatureColumn.getMax() != null) {
+										GeoPackageGeometryDataUtils
+												.compareByteArrays(
+														updatedLimitedBytes,
+														(byte[]) readRow
+																.getValue(readFeatureColumn
+																		.getIndex()));
 									} else {
-										featureRow.setValue(
-												featureColumn.getIndex(),
-												updatedBytes);
+										GeoPackageGeometryDataUtils
+												.compareByteArrays(
+														updatedBytes,
+														(byte[]) readRow
+																.getValue(readFeatureColumn
+																		.getIndex()));
 									}
 									break;
 								default:
@@ -736,155 +881,46 @@ public class FeatureUtils {
 							}
 
 						}
-					}
 
-					cursor.close();
-					try {
-						TestCase.assertEquals(1, dao.update(featureRow));
-					} catch (SQLiteException e) {
-						if (TestUtils.isFutureSQLiteException(e)) {
-							continue;
-						} else {
-							throw e;
-						}
-					}
+						switch (geometry.getGeometryType()) {
 
-					long id = featureRow.getId();
-					FeatureRow readRow = dao.queryForIdRow(id);
-					TestCase.assertNotNull(readRow);
-					TestCase.assertEquals(originalRow.getId(), readRow.getId());
-					GeoPackageGeometryData readGeometryData = readRow
-							.getGeometry();
-					Geometry readGeometry = readGeometryData.getGeometry();
+						case POINT:
+							Point point = (Point) readGeometry;
+							validateUpdatedPoint(point);
+							break;
 
-					for (String readColumnName : readRow.getColumnNames()) {
-
-						FeatureColumn readFeatureColumn = readRow
-								.getColumn(readColumnName);
-						if (!readFeatureColumn.isPrimaryKey()
-								&& !readFeatureColumn.isGeometry()) {
-							switch (readRow.getRowColumnType(readColumnName)) {
-							case Cursor.FIELD_TYPE_STRING:
-								if (readFeatureColumn.getMax() != null) {
-									TestCase.assertEquals(updatedLimitedString,
-											readRow.getValue(readFeatureColumn
-													.getIndex()));
-								} else {
-									TestCase.assertEquals(updatedString,
-											readRow.getValue(readFeatureColumn
-													.getIndex()));
-								}
-								break;
-							case Cursor.FIELD_TYPE_INTEGER:
-								switch (readFeatureColumn.getDataType()) {
-								case BOOLEAN:
-									TestCase.assertEquals(updatedBoolean,
-											readRow.getValue(readFeatureColumn
-													.getIndex()));
-									break;
-								case TINYINT:
-									TestCase.assertEquals(updatedByte, readRow
-											.getValue(readFeatureColumn
-													.getIndex()));
-									break;
-								case SMALLINT:
-									TestCase.assertEquals(updatedShort, readRow
-											.getValue(readFeatureColumn
-													.getIndex()));
-									break;
-								case MEDIUMINT:
-									TestCase.assertEquals(updatedInteger,
-											readRow.getValue(readFeatureColumn
-													.getIndex()));
-									break;
-								case INT:
-								case INTEGER:
-									TestCase.assertEquals(updatedLong, readRow
-											.getValue(readFeatureColumn
-													.getIndex()));
-									break;
-								default:
-									TestCase.fail("Unexpected integer type: "
-											+ readFeatureColumn.getDataType());
-								}
-								break;
-							case Cursor.FIELD_TYPE_FLOAT:
-								switch (readFeatureColumn.getDataType()) {
-								case FLOAT:
-									TestCase.assertEquals(updatedFloat, readRow
-											.getValue(readFeatureColumn
-													.getIndex()));
-									break;
-								case DOUBLE:
-								case REAL:
-									TestCase.assertEquals(updatedDouble,
-											readRow.getValue(readFeatureColumn
-													.getIndex()));
-									break;
-								default:
-									TestCase.fail("Unexpected integer type: "
-											+ readFeatureColumn.getDataType());
-								}
-								break;
-							case Cursor.FIELD_TYPE_BLOB:
-								if (readFeatureColumn.getMax() != null) {
-									GeoPackageGeometryDataUtils
-											.compareByteArrays(
-													updatedLimitedBytes,
-													(byte[]) readRow
-															.getValue(readFeatureColumn
-																	.getIndex()));
-								} else {
-									GeoPackageGeometryDataUtils
-											.compareByteArrays(
-													updatedBytes,
-													(byte[]) readRow
-															.getValue(readFeatureColumn
-																	.getIndex()));
-								}
-								break;
-							default:
+						case MULTIPOINT:
+							MultiPoint originalMultiPoint = (MultiPoint) geometry;
+							MultiPoint multiPoint = (MultiPoint) readGeometry;
+							TestCase.assertEquals(
+									originalMultiPoint.numPoints(),
+									multiPoint.numPoints());
+							for (Point multiPointPoint : multiPoint.getPoints()) {
+								validateUpdatedPoint(multiPointPoint);
 							}
+							break;
+
+						default:
+							geometry.getGeometryType();
 						}
 
+						// Compare the modified geometry with the updated
+						// geometry
+						// from the database
+						GeoPackageGeometryDataUtils.compareGeometries(geometry,
+								readGeometry);
+
+						// Compare the geo package headers since nothing in the
+						// header was changed
+						GeoPackageGeometryDataUtils.compareByteArrays(
+								geometryData.getHeaderBytes(),
+								readGeometryData.getHeaderBytes());
+
 					}
-
-					switch (geometry.getGeometryType()) {
-
-					case POINT:
-						Point point = (Point) readGeometry;
-						validateUpdatedPoint(point);
-						break;
-
-					case MULTIPOINT:
-						MultiPoint originalMultiPoint = (MultiPoint) geometry;
-						MultiPoint multiPoint = (MultiPoint) readGeometry;
-						TestCase.assertEquals(originalMultiPoint.numPoints(),
-								multiPoint.numPoints());
-						for (Point multiPointPoint : multiPoint.getPoints()) {
-							validateUpdatedPoint(multiPointPoint);
-						}
-						break;
-
-					default:
-						geometry.getGeometryType();
-					}
-
-					// Compare the modified geometry with the updated geometry
-					// from the database
-					GeoPackageGeometryDataUtils.compareGeometries(geometry,
-							readGeometry);
-
-					// Compare the geo package headers since nothing in the
-					// header was changed
-					GeoPackageGeometryDataUtils.compareByteArrays(
-							geometryData.getHeaderBytes(),
-							readGeometryData.getHeaderBytes());
 
 				}
-
+				cursor.close();
 			}
-			cursor.close();
 		}
 
 	}
@@ -931,85 +967,88 @@ public class FeatureUtils {
 
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();
-		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-		for (GeometryColumns geometryColumns : results) {
+		if (geometryColumnsDao.isTableExists()) {
+			List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
-			TestCase.assertNotNull(dao);
+			for (GeometryColumns geometryColumns : results) {
 
-			FeatureCursor cursor = dao.queryForAll();
-			int count = cursor.getCount();
-			if (count > 0) {
+				FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+				TestCase.assertNotNull(dao);
 
-				// Choose random feature
-				int random = (int) (Math.random() * count);
-				cursor.moveToPosition(random);
+				FeatureCursor cursor = dao.queryForAll();
+				int count = cursor.getCount();
+				if (count > 0) {
 
-				FeatureRow featureRow = cursor.getRow();
-				cursor.close();
+					// Choose random feature
+					int random = (int) (Math.random() * count);
+					cursor.moveToPosition(random);
 
-				// Create new row from existing
-				long id = featureRow.getId();
-				featureRow.resetId();
-				long newRowId;
-				try {
-					newRowId = dao.create(featureRow);
-				} catch (SQLiteException e) {
-					if (TestUtils.isFutureSQLiteException(e)) {
-						continue;
-					} else {
-						throw e;
-					}
-				}
-				TestCase.assertEquals(newRowId, featureRow.getId());
+					FeatureRow featureRow = cursor.getRow();
+					cursor.close();
 
-				// Verify original still exists and new was created
-				featureRow = dao.queryForIdRow(id);
-				TestCase.assertNotNull(featureRow);
-				FeatureRow queryFeatureRow = dao.queryForIdRow(newRowId);
-				TestCase.assertNotNull(queryFeatureRow);
-				cursor = dao.queryForAll();
-				TestCase.assertEquals(count + 1, cursor.getCount());
-				cursor.close();
-
-				// Create new row with copied values from another
-				FeatureRow newRow = dao.newRow();
-				for (FeatureColumn column : dao.getTable().getColumns()) {
-
-					if (column.isPrimaryKey()) {
-						try {
-							newRow.setValue(column.getName(), 10);
-							TestCase.fail("Set primary key on new row");
-						} catch (GeoPackageException e) {
-							// Expected
+					// Create new row from existing
+					long id = featureRow.getId();
+					featureRow.resetId();
+					long newRowId;
+					try {
+						newRowId = dao.create(featureRow);
+					} catch (SQLiteException e) {
+						if (TestUtils.isFutureSQLiteException(e)) {
+							continue;
+						} else {
+							throw e;
 						}
-					} else {
-						newRow.setValue(column.getName(),
-								featureRow.getValue(column.getName()));
 					}
-				}
+					TestCase.assertEquals(newRowId, featureRow.getId());
 
-				long newRowId2;
-				try {
-					newRowId2 = dao.create(newRow);
-				} catch (SQLiteException e) {
-					if (TestUtils.isFutureSQLiteException(e)) {
-						continue;
-					} else {
-						throw e;
+					// Verify original still exists and new was created
+					featureRow = dao.queryForIdRow(id);
+					TestCase.assertNotNull(featureRow);
+					FeatureRow queryFeatureRow = dao.queryForIdRow(newRowId);
+					TestCase.assertNotNull(queryFeatureRow);
+					cursor = dao.queryForAll();
+					TestCase.assertEquals(count + 1, cursor.getCount());
+					cursor.close();
+
+					// Create new row with copied values from another
+					FeatureRow newRow = dao.newRow();
+					for (FeatureColumn column : dao.getTable().getColumns()) {
+
+						if (column.isPrimaryKey()) {
+							try {
+								newRow.setValue(column.getName(), 10);
+								TestCase.fail("Set primary key on new row");
+							} catch (GeoPackageException e) {
+								// Expected
+							}
+						} else {
+							newRow.setValue(column.getName(),
+									featureRow.getValue(column.getName()));
+						}
 					}
-				}
-				TestCase.assertEquals(newRowId2, newRow.getId());
 
-				// Verify new was created
-				FeatureRow queryFeatureRow2 = dao.queryForIdRow(newRowId2);
-				TestCase.assertNotNull(queryFeatureRow2);
-				cursor = dao.queryForAll();
-				TestCase.assertEquals(count + 2, cursor.getCount());
+					long newRowId2;
+					try {
+						newRowId2 = dao.create(newRow);
+					} catch (SQLiteException e) {
+						if (TestUtils.isFutureSQLiteException(e)) {
+							continue;
+						} else {
+							throw e;
+						}
+					}
+					TestCase.assertEquals(newRowId2, newRow.getId());
+
+					// Verify new was created
+					FeatureRow queryFeatureRow2 = dao.queryForIdRow(newRowId2);
+					TestCase.assertNotNull(queryFeatureRow2);
+					cursor = dao.queryForAll();
+					TestCase.assertEquals(count + 2, cursor.getCount());
+					cursor.close();
+				}
 				cursor.close();
 			}
-			cursor.close();
 		}
 
 	}
@@ -1024,46 +1063,48 @@ public class FeatureUtils {
 
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();
-		List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-		for (GeometryColumns geometryColumns : results) {
+		if (geometryColumnsDao.isTableExists()) {
+			List<GeometryColumns> results = geometryColumnsDao.queryForAll();
 
-			FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
-			TestCase.assertNotNull(dao);
+			for (GeometryColumns geometryColumns : results) {
 
-			FeatureCursor cursor = dao.queryForAll();
-			int count = cursor.getCount();
-			if (count > 0) {
+				FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+				TestCase.assertNotNull(dao);
 
-				// Choose random feature
-				int random = (int) (Math.random() * count);
-				cursor.moveToPosition(random);
+				FeatureCursor cursor = dao.queryForAll();
+				int count = cursor.getCount();
+				if (count > 0) {
 
-				FeatureRow featureRow = cursor.getRow();
-				cursor.close();
+					// Choose random feature
+					int random = (int) (Math.random() * count);
+					cursor.moveToPosition(random);
 
-				// Delete row
-				try {
-					TestCase.assertEquals(1, dao.delete(featureRow));
-				} catch (SQLiteException e) {
-					if (TestUtils.isFutureSQLiteException(e)) {
-						continue;
-					} else {
-						throw e;
+					FeatureRow featureRow = cursor.getRow();
+					cursor.close();
+
+					// Delete row
+					try {
+						TestCase.assertEquals(1, dao.delete(featureRow));
+					} catch (SQLiteException e) {
+						if (TestUtils.isFutureSQLiteException(e)) {
+							continue;
+						} else {
+							throw e;
+						}
 					}
-				}
 
-				// Verify deleted
-				FeatureRow queryFeatureRow = dao.queryForIdRow(featureRow
-						.getId());
-				TestCase.assertNull(queryFeatureRow);
-				cursor = dao.queryForAll();
-				TestCase.assertEquals(count - 1, cursor.getCount());
+					// Verify deleted
+					FeatureRow queryFeatureRow = dao.queryForIdRow(featureRow
+							.getId());
+					TestCase.assertNull(queryFeatureRow);
+					cursor = dao.queryForAll();
+					TestCase.assertEquals(count - 1, cursor.getCount());
+					cursor.close();
+				}
 				cursor.close();
 			}
-			cursor.close();
 		}
-
 	}
 
 }
