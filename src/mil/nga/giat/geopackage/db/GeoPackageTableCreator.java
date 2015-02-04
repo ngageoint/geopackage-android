@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.R;
-import mil.nga.giat.geopackage.features.user.FeatureColumn;
-import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.user.UserColumn;
+import mil.nga.giat.geopackage.user.UserTable;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.sqlite.SQLiteDatabase;
@@ -146,11 +146,11 @@ public class GeoPackageTableCreator {
 	}
 
 	/**
-	 * Create the user defined feature table
+	 * Create the user defined table
 	 * 
 	 * @param table
 	 */
-	public void createTable(FeatureTable table) {
+	public void createTable(UserTable<? extends UserColumn> table) {
 
 		// Verify the table does not already exist
 		if (GeoPackageDatabaseUtils.tableExists(db, table.getTableName())) {
@@ -164,9 +164,9 @@ public class GeoPackageTableCreator {
 		sql.append("CREATE TABLE ").append(table.getTableName()).append(" (\n");
 
 		// Add each column to the sql
-		List<FeatureColumn> columns = table.getColumns();
+		List<? extends UserColumn> columns = table.getColumns();
 		for (int i = 0; i < columns.size(); i++) {
-			FeatureColumn column = columns.get(i);
+			UserColumn column = columns.get(i);
 			sql.append("  ").append(column.getName()).append(" ")
 					.append(column.getTypeName());
 			if (column.getMax() != null) {

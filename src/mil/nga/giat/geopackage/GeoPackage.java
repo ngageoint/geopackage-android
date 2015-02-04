@@ -1,7 +1,5 @@
 package mil.nga.giat.geopackage;
 
-import java.sql.SQLException;
-
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
@@ -12,7 +10,10 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
+import mil.nga.giat.geopackage.tiles.user.TileDao;
+import mil.nga.giat.geopackage.tiles.user.TileTable;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.support.ConnectionSource;
@@ -106,9 +107,8 @@ public interface GeoPackage {
 	 * 
 	 * @param tableName
 	 * @return
-	 * @throws SQLException
 	 */
-	public FeatureDao getFeatureDao(String tableName) throws SQLException;
+	public FeatureDao getFeatureDao(String tableName);
 
 	/**
 	 * Create a new feature table
@@ -144,5 +144,36 @@ public interface GeoPackage {
 	 * @return true if created
 	 */
 	public boolean createTileMatrixTable();
+
+	/**
+	 * Get a Tile DAO from Tile Matrix Set
+	 * 
+	 * @param tileMatrixSet
+	 * @return
+	 */
+	public TileDao getTileDao(TileMatrixSet tileMatrixSet);
+
+	/**
+	 * Get a Tile DAO from Contents
+	 * 
+	 * @param contents
+	 * @return
+	 */
+	public TileDao getTileDao(Contents contents);
+
+	/**
+	 * Get a Tile DAO from a table name
+	 * 
+	 * @param tableName
+	 * @return
+	 */
+	public TileDao getTileDao(String tableName);
+
+	/**
+	 * Create a new tile table
+	 * 
+	 * @param table
+	 */
+	public void createTable(TileTable table);
 
 }
