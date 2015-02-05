@@ -4,22 +4,17 @@ import java.io.File;
 import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.GeoPackageActivity;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
-import android.app.Activity;
-import android.content.Context;
-import android.test.ActivityInstrumentationTestCase2;
 
 /**
  * Test GeoPackage Manager methods
  * 
  * @author osbornb
  */
-public class GeoPackageManagerTest extends
-		ActivityInstrumentationTestCase2<GeoPackageActivity> {
+public class GeoPackageManagerTest extends BaseTestCase {
 
 	/**
 	 * Import corrupt database name
@@ -33,20 +28,10 @@ public class GeoPackageManagerTest extends
 			+ "." + TestConstants.GEO_PACKAGE_EXTENSION;
 
 	/**
-	 * GeoPackage activity
-	 */
-	private Activity activity = null;
-
-	/**
-	 * GeoPackage test context
-	 */
-	private Context testContext = null;
-
-	/**
 	 * Constructor
 	 */
 	public GeoPackageManagerTest() {
-		super(GeoPackageActivity.class);
+
 	}
 
 	/**
@@ -55,10 +40,6 @@ public class GeoPackageManagerTest extends
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-
-		// Set the activity and test context
-		activity = getActivity();
-		testContext = TestUtils.getTestContext(activity);
 
 		// Delete existing test databases
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);

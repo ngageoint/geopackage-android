@@ -28,4 +28,15 @@ public class TestConstants {
 	public static final String IMPORT_DB_FILE_NAME = IMPORT_DB_NAME + "."
 			+ GEO_PACKAGE_EXTENSION;
 
+	/**
+	 * Tile file name extension
+	 */
+	public static final String TILE_FILE_NAME_EXTENSION = "png";
+
+	/**
+	 * Tile file name
+	 */
+	public static final String TILE_FILE_NAME = "tile."
+			+ TILE_FILE_NAME_EXTENSION;
+
 }

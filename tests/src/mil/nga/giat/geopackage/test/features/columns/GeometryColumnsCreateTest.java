@@ -2,61 +2,21 @@ package mil.nga.giat.geopackage.test.features.columns;
 
 import java.sql.SQLException;
 
-import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.giat.geopackage.test.TestSetupTeardown;
-import android.app.Activity;
-import android.test.ActivityInstrumentationTestCase2;
 
 /**
  * Test Geometry Columns from a created database
  * 
  * @author osbornb
  */
-public class GeometryColumnsCreateTest extends
-		ActivityInstrumentationTestCase2<GeoPackageActivity> {
-
-	/**
-	 * GeoPackage activity
-	 */
-	private Activity activity = null;
-
-	/**
-	 * GeoPackage
-	 */
-	private GeoPackage geoPackage = null;
+public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 
 	/**
 	 * Constructor
 	 */
 	public GeometryColumnsCreateTest() {
-		super(GeoPackageActivity.class);
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-		// Set the activity
-		activity = getActivity();
-
-		// Create the database
-		geoPackage = TestSetupTeardown.setUpCreate(activity, true, false);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void tearDown() throws Exception {
-
-		// Tear down the create database
-		TestSetupTeardown.tearDownCreate(activity, geoPackage);
-
-		super.tearDown();
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -18,6 +19,7 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -25,6 +27,8 @@ import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 
 /**
  * Test setup and teardown methods for preparing and cleaning the database with
@@ -48,13 +52,16 @@ public class TestSetupTeardown {
 	 * Set up the create database
 	 * 
 	 * @param activity
+	 * @param testContext
 	 * @param features
 	 * @param tiles
 	 * @return
 	 * @throws SQLException
+	 * @throws IOException
 	 */
-	public static GeoPackage setUpCreate(Activity activity, boolean features,
-			boolean tiles) throws SQLException {
+	public static GeoPackage setUpCreate(Activity activity,
+			Context testContext, boolean features, boolean tiles)
+			throws SQLException, IOException {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
@@ -75,7 +82,7 @@ public class TestSetupTeardown {
 		}
 
 		if (tiles) {
-			setUpCreateTiles(geoPackage);
+			setUpCreateTiles(testContext, geoPackage);
 		}
 
 		return geoPackage;
@@ -191,8 +198,8 @@ public class TestSetupTeardown {
 		point2dGeometryColumns.setColumnName(geometryColumn);
 		point2dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point2dGeometryColumns.setSrs(point2dContents.getSrs());
-		point2dGeometryColumns.setZ((byte)0);
-		point2dGeometryColumns.setM((byte)0);
+		point2dGeometryColumns.setZ((byte) 0);
+		point2dGeometryColumns.setM((byte) 0);
 		geometryColumnsDao.create(point2dGeometryColumns);
 
 		GeometryColumns polygon2dGeometryColumns = new GeometryColumns();
@@ -200,8 +207,8 @@ public class TestSetupTeardown {
 		polygon2dGeometryColumns.setColumnName(geometryColumn);
 		polygon2dGeometryColumns.setGeometryType(GeometryType.POLYGON);
 		polygon2dGeometryColumns.setSrs(polygon2dContents.getSrs());
-		polygon2dGeometryColumns.setZ((byte)0);
-		polygon2dGeometryColumns.setM((byte)0);
+		polygon2dGeometryColumns.setZ((byte) 0);
+		polygon2dGeometryColumns.setM((byte) 0);
 		geometryColumnsDao.create(polygon2dGeometryColumns);
 
 		GeometryColumns point3dGeometryColumns = new GeometryColumns();
@@ -209,8 +216,8 @@ public class TestSetupTeardown {
 		point3dGeometryColumns.setColumnName(geometryColumn);
 		point3dGeometryColumns.setGeometryType(GeometryType.POINT);
 		point3dGeometryColumns.setSrs(point3dContents.getSrs());
-		point3dGeometryColumns.setZ((byte)1);
-		point3dGeometryColumns.setM((byte)0);
+		point3dGeometryColumns.setZ((byte) 1);
+		point3dGeometryColumns.setM((byte) 0);
 		geometryColumnsDao.create(point3dGeometryColumns);
 
 		GeometryColumns lineString3dMGeometryColumns = new GeometryColumns();
@@ -218,8 +225,8 @@ public class TestSetupTeardown {
 		lineString3dMGeometryColumns.setColumnName(geometryColumn);
 		lineString3dMGeometryColumns.setGeometryType(GeometryType.LINESTRING);
 		lineString3dMGeometryColumns.setSrs(lineString3dMContents.getSrs());
-		lineString3dMGeometryColumns.setZ((byte)1);
-		lineString3dMGeometryColumns.setM((byte)1);
+		lineString3dMGeometryColumns.setZ((byte) 1);
+		lineString3dMGeometryColumns.setM((byte) 1);
 		geometryColumnsDao.create(lineString3dMGeometryColumns);
 
 		// Populate the feature tables with rows
@@ -238,11 +245,13 @@ public class TestSetupTeardown {
 	/**
 	 * Set up create for tiles test
 	 * 
+	 * @param testContext
 	 * @param geoPackage
 	 * @throws SQLException
+	 * @throws IOException
 	 */
-	public static void setUpCreateTiles(GeoPackage geoPackage)
-			throws SQLException {
+	public static void setUpCreateTiles(Context testContext,
+			GeoPackage geoPackage) throws SQLException, IOException {
 
 		// Get existing SRS objects
 		SpatialReferenceSystemDao srsDao = geoPackage
@@ -294,9 +303,21 @@ public class TestSetupTeardown {
 		TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
 
 		int matrixWidthAndHeight = 2;
-		final int tileWidthAndHeight = 512;
 		double pixelXSize = 69237.2;
 		double pixelYSize = 68412.1;
+
+		// Read the asset tile to bytes and convert to bitmap
+		byte[] assetTileData = TestUtils.getAssetFileBytes(testContext,
+				TestConstants.TILE_FILE_NAME);
+		Bitmap bitmap = BitmapConverter.toBitmap(assetTileData);
+
+		// Get the width and height of the bitmap
+		final int tileWidth = bitmap.getWidth();
+		final int tileHeight = bitmap.getHeight();
+
+		// Compress the bitmap back to bytes and use those for the test
+		byte[] tileData = BitmapConverter.toBytes(bitmap, CompressFormat
+				.valueOf(TestConstants.TILE_FILE_NAME_EXTENSION.toUpperCase()));
 
 		for (int zoom = 0; zoom < CREATE_TILE_MATRIX_COUNT; zoom++) {
 
@@ -305,8 +326,8 @@ public class TestSetupTeardown {
 			tileMatrix.setZoomLevel(zoom);
 			tileMatrix.setMatrixWidth(matrixWidthAndHeight);
 			tileMatrix.setMatrixHeight(matrixWidthAndHeight);
-			tileMatrix.setTileWidth(tileWidthAndHeight);
-			tileMatrix.setTileHeight(tileWidthAndHeight);
+			tileMatrix.setTileWidth(tileWidth);
+			tileMatrix.setTileHeight(tileHeight);
 			tileMatrix.setPixelXSize(pixelXSize);
 			tileMatrix.setPixelYSize(pixelYSize);
 			tileMatrixDao.create(tileMatrix);
@@ -316,7 +337,7 @@ public class TestSetupTeardown {
 			pixelYSize /= 2.0;
 
 			// Populate the tile table with rows
-			TestUtils.addRowsToFeatureTable(geoPackage, tileMatrix);
+			TestUtils.addRowsToFeatureTable(geoPackage, tileMatrix, tileData);
 		}
 
 	}

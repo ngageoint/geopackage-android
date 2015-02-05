@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,7 +78,7 @@ public class TestUtils {
 	}
 
 	/**
-	 * Get the internal storage location of the assest file
+	 * Get the internal storage location of the asset file
 	 * 
 	 * @param context
 	 * @param assetPath
@@ -99,7 +100,7 @@ public class TestUtils {
 	private static void copyAssetFile(Context testContext, String assetPath,
 			String filePath) throws IOException {
 
-		InputStream assetFile = testContext.getAssets().open(assetPath);
+		InputStream assetFile = getAssetFileStream(testContext, assetPath);
 
 		OutputStream newFile = new FileOutputStream(filePath);
 
@@ -113,6 +114,48 @@ public class TestUtils {
 		newFile.flush();
 		newFile.close();
 		assetFile.close();
+	}
+
+	/**
+	 * Get asset file bytes
+	 * 
+	 * @param testContext
+	 * @param assetPath
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] getAssetFileBytes(Context testContext, String assetPath)
+			throws IOException {
+
+		InputStream assetFile = getAssetFileStream(testContext, assetPath);
+
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+
+		byte[] buffer = new byte[1024];
+		int length;
+		while ((length = assetFile.read(buffer)) > 0) {
+			byteStream.write(buffer, 0, length);
+		}
+
+		byte[] bytes = byteStream.toByteArray();
+
+		byteStream.close();
+		assetFile.close();
+
+		return bytes;
+	}
+
+	/**
+	 * Get the asset file input stream
+	 * 
+	 * @param testContext
+	 * @param assetPath
+	 * @return
+	 * @throws IOException
+	 */
+	public static InputStream getAssetFileStream(Context testContext,
+			String assetPath) throws IOException {
+		return testContext.getAssets().open(assetPath);
 	}
 
 	/**
@@ -283,9 +326,10 @@ public class TestUtils {
 	 * 
 	 * @param geoPackage
 	 * @param tileMatrix
+	 * @param tileData
 	 */
 	public static void addRowsToFeatureTable(GeoPackage geoPackage,
-			TileMatrix tileMatrix) {
+			TileMatrix tileMatrix, byte[] tileData) {
 
 		TileDao dao = geoPackage.getTileDao(tileMatrix.getTableName());
 
@@ -298,7 +342,7 @@ public class TestUtils {
 				newRow.setZoomLevel(tileMatrix.getZoomLevel());
 				newRow.setTileColumn(column);
 				newRow.setTileRow(row);
-				newRow.setTileData("TEMP_TILE_DATA".getBytes());
+				newRow.setTileData(tileData);
 
 				dao.create(newRow);
 			}

@@ -2,61 +2,21 @@ package mil.nga.giat.geopackage.test.core.contents;
 
 import java.sql.SQLException;
 
-import mil.nga.giat.geopackage.GeoPackage;
-import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.giat.geopackage.test.TestSetupTeardown;
-import android.app.Activity;
-import android.test.ActivityInstrumentationTestCase2;
 
 /**
  * Test Contents from a created database
  * 
  * @author osbornb
  */
-public class ContentsCreateTest extends
-		ActivityInstrumentationTestCase2<GeoPackageActivity> {
-
-	/**
-	 * GeoPackage activity
-	 */
-	private Activity activity = null;
-
-	/**
-	 * GeoPackage
-	 */
-	private GeoPackage geoPackage = null;
+public class ContentsCreateTest extends CreateGeoPackageTestCase {
 
 	/**
 	 * Constructor
 	 */
 	public ContentsCreateTest() {
-		super(GeoPackageActivity.class);
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-		// Set the activity
-		activity = getActivity();
-
-		// Create the database
-		geoPackage = TestSetupTeardown.setUpCreate(activity, true, true);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void tearDown() throws Exception {
-
-		// Tear down the create database
-		TestSetupTeardown.tearDownCreate(activity, geoPackage);
-
-		super.tearDown();
 	}
 
 	/**

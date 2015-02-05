@@ -1,8 +1,11 @@
 package mil.nga.giat.geopackage.tiles.user;
 
+import java.io.IOException;
+
+import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.user.UserRow;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory.Options;
 
 /**
@@ -192,10 +195,33 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	 * @return
 	 */
 	public Bitmap getTileDataBitmap(Options options) {
-		byte[] tileData = getTileData();
-		Bitmap bitmap = BitmapFactory.decodeByteArray(tileData, 0,
-				tileData.length, options);
-		return bitmap;
+		return BitmapConverter.toBitmap(getTileData(), options);
+	}
+
+	/**
+	 * Set the tile data from a full quality bitmap
+	 * 
+	 * @param bitmap
+	 * @param format
+	 * @throws IOException
+	 */
+	public void setTileData(Bitmap bitmap, CompressFormat format)
+			throws IOException {
+		setTileData(bitmap, format, 100);
+	}
+
+	/**
+	 * Set the tile data from a bitmap
+	 * 
+	 * @param bitmap
+	 * @param format
+	 * @param quality
+	 * @throws IOException
+	 */
+	public void setTileData(Bitmap bitmap, CompressFormat format, int quality)
+			throws IOException {
+		byte[] tileData = BitmapConverter.toBytes(bitmap, format, quality);
+		setTileData(tileData);
 	}
 
 }

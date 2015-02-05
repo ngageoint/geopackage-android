@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.test.tiles.user;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -10,6 +11,8 @@ import java.util.UUID;
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.io.BitmapConverter;
+import mil.nga.giat.geopackage.test.TestConstants;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
@@ -23,6 +26,7 @@ import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
 import mil.nga.giat.geopackage.user.ColumnValue;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
@@ -284,8 +288,10 @@ public class TileUtils {
 	 * 
 	 * @param geoPackage
 	 * @throws SQLException
+	 * @throws IOException
 	 */
-	public static void testUpdate(GeoPackage geoPackage) throws SQLException {
+	public static void testUpdate(Context testContext, GeoPackage geoPackage)
+			throws SQLException, IOException {
 
 		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
 
@@ -316,6 +322,8 @@ public class TileUtils {
 					Double updatedDouble = null;
 					byte[] updatedBytes = null;
 					byte[] updatedLimitedBytes = null;
+					Integer updatedBitmapWidth = null;
+					Integer updatedBitmapHeight = null;
 
 					TileRow originalRow = cursor.getRow();
 					TileRow tileRow = cursor.getRow();
@@ -435,8 +443,13 @@ public class TileUtils {
 								break;
 							case Cursor.FIELD_TYPE_BLOB:
 								if (updatedBytes == null) {
-									updatedBytes = UUID.randomUUID().toString()
-											.getBytes();
+									updatedBytes = TestUtils.getAssetFileBytes(
+											testContext,
+											TestConstants.TILE_FILE_NAME);
+									Bitmap bitmap = BitmapConverter
+											.toBitmap(updatedBytes);
+									updatedBitmapWidth = bitmap.getWidth();
+									updatedBitmapHeight = bitmap.getHeight();
 								}
 								if (tileColumn.getMax() != null) {
 									if (updatedLimitedBytes != null) {
@@ -560,12 +573,15 @@ public class TileUtils {
 															.getValue(readTileColumn
 																	.getIndex()));
 								} else {
+									byte[] readBytes = (byte[]) readRow
+											.getValue(readTileColumn.getIndex());
 									GeoPackageGeometryDataUtils
-											.compareByteArrays(
-													updatedBytes,
-													(byte[]) readRow
-															.getValue(readTileColumn
-																	.getIndex()));
+											.compareByteArrays(updatedBytes,
+													readBytes);
+									Bitmap bitmap = BitmapConverter
+											.toBitmap(readBytes);
+									TestCase.assertTrue(bitmap.getWidth() > 0);
+									TestCase.assertTrue(bitmap.getHeight() > 0);
 								}
 								break;
 							default:
@@ -574,6 +590,13 @@ public class TileUtils {
 
 					}
 
+					// Explicitly validate the bitmap
+					Bitmap bitmap = readRow.getTileDataBitmap();
+					TestCase.assertNotNull(bitmap);
+					TestCase.assertEquals(updatedBitmapWidth.intValue(),
+							bitmap.getWidth());
+					TestCase.assertEquals(updatedBitmapHeight.intValue(),
+							bitmap.getHeight());
 				}
 				cursor.close();
 			}
