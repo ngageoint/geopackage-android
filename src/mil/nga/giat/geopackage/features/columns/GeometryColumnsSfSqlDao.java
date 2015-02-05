@@ -12,12 +12,12 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 
 /**
- * Geometry Columns Data Access Object
+ * SF/SQL Geometry Columns Data Access Object
  * 
  * @author osbornb
  */
-public class GeometryColumnsDao extends
-		BaseDaoImpl<GeometryColumns, GeometryColumnsKey> {
+public class GeometryColumnsSfSqlDao extends
+		BaseDaoImpl<GeometryColumnsSfSql, GeometryColumnsKey> {
 
 	/**
 	 * Constructor, required by ORMLite
@@ -26,8 +26,8 @@ public class GeometryColumnsDao extends
 	 * @param dataClass
 	 * @throws SQLException
 	 */
-	public GeometryColumnsDao(ConnectionSource connectionSource,
-			Class<GeometryColumns> dataClass) throws SQLException {
+	public GeometryColumnsSfSqlDao(ConnectionSource connectionSource,
+			Class<GeometryColumnsSfSql> dataClass) throws SQLException {
 		super(connectionSource, dataClass);
 	}
 
@@ -35,21 +35,21 @@ public class GeometryColumnsDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GeometryColumns queryForId(GeometryColumnsKey key)
+	public GeometryColumnsSfSql queryForId(GeometryColumnsKey key)
 			throws SQLException {
-		GeometryColumns geometryColumns = null;
+		GeometryColumnsSfSql geometryColumns = null;
 		if (key != null) {
 			Map<String, Object> fieldValues = new HashMap<String, Object>();
-			fieldValues.put(GeometryColumns.COLUMN_TABLE_NAME,
+			fieldValues.put(GeometryColumnsSfSql.COLUMN_F_TABLE_NAME,
 					key.getTableName());
-			fieldValues.put(GeometryColumns.COLUMN_COLUMN_NAME,
+			fieldValues.put(GeometryColumnsSfSql.COLUMN_F_GEOMETRY_COLUMN,
 					key.getColumnName());
-			List<GeometryColumns> results = super
+			List<GeometryColumnsSfSql> results = super
 					.queryForFieldValues(fieldValues);
 			if (!results.isEmpty()) {
 				if (results.size() > 1) {
 					throw new SQLException("More than one "
-							+ GeometryColumns.class.getSimpleName()
+							+ GeometryColumnsSfSql.class.getSimpleName()
 							+ " returned for key. Table Name: "
 							+ key.getTableName() + ", Column Name: "
 							+ key.getColumnName());
@@ -64,7 +64,7 @@ public class GeometryColumnsDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GeometryColumnsKey extractId(GeometryColumns data)
+	public GeometryColumnsKey extractId(GeometryColumnsSfSql data)
 			throws SQLException {
 		return data.getId();
 	}
@@ -81,7 +81,7 @@ public class GeometryColumnsDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GeometryColumns queryForSameId(GeometryColumns data)
+	public GeometryColumnsSfSql queryForSameId(GeometryColumnsSfSql data)
 			throws SQLException {
 		return queryForId(data.getId());
 	}
@@ -90,10 +90,10 @@ public class GeometryColumnsDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int updateId(GeometryColumns data, GeometryColumnsKey newId)
+	public int updateId(GeometryColumnsSfSql data, GeometryColumnsKey newId)
 			throws SQLException {
 		int count = 0;
-		GeometryColumns readData = queryForId(data.getId());
+		GeometryColumnsSfSql readData = queryForId(data.getId());
 		if (readData != null && newId != null) {
 			readData.setId(newId);
 			count = update(readData);
@@ -108,7 +108,7 @@ public class GeometryColumnsDao extends
 	public int deleteById(GeometryColumnsKey id) throws SQLException {
 		int count = 0;
 		if (id != null) {
-			GeometryColumns geometryColumns = queryForId(id);
+			GeometryColumnsSfSql geometryColumns = queryForId(id);
 			if (geometryColumns != null) {
 				count = delete(geometryColumns);
 			}
@@ -137,24 +137,24 @@ public class GeometryColumnsDao extends
 	 * Update using the complex key
 	 */
 	@Override
-	public int update(GeometryColumns geometryColumns) throws SQLException {
+	public int update(GeometryColumnsSfSql geometryColumns) throws SQLException {
 
-		UpdateBuilder<GeometryColumns, GeometryColumnsKey> ub = updateBuilder();
-		ub.updateColumnValue(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
-				geometryColumns.getGeometryTypeName());
-		ub.updateColumnValue(GeometryColumns.COLUMN_SRS_ID,
-				geometryColumns.getSrsId());
-		ub.updateColumnValue(GeometryColumns.COLUMN_Z, geometryColumns.getZ());
-		ub.updateColumnValue(GeometryColumns.COLUMN_M, geometryColumns.getM());
+		UpdateBuilder<GeometryColumnsSfSql, GeometryColumnsKey> ub = updateBuilder();
+		ub.updateColumnValue(GeometryColumnsSfSql.COLUMN_GEOMETRY_TYPE,
+				geometryColumns.getGeometryTypeCode());
+		ub.updateColumnValue(GeometryColumnsSfSql.COLUMN_COORD_DIMENSION,
+				geometryColumns.getCoordDimension());
+		ub.updateColumnValue(GeometryColumnsSfSql.COLUMN_SRID,
+				geometryColumns.getSrid());
 
 		ub.where()
-				.eq(GeometryColumns.COLUMN_TABLE_NAME,
-						geometryColumns.getTableName())
+				.eq(GeometryColumnsSfSql.COLUMN_F_TABLE_NAME,
+						geometryColumns.getFTableName())
 				.and()
-				.eq(GeometryColumns.COLUMN_COLUMN_NAME,
-						geometryColumns.getColumnName());
+				.eq(GeometryColumnsSfSql.COLUMN_F_GEOMETRY_COLUMN,
+						geometryColumns.getFGeometryColumn());
 
-		PreparedUpdate<GeometryColumns> update = ub.prepare();
+		PreparedUpdate<GeometryColumnsSfSql> update = ub.prepare();
 		int updated = update(update);
 
 		return updated;

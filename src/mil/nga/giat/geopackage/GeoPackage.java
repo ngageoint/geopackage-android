@@ -7,6 +7,8 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
@@ -78,6 +80,20 @@ public interface GeoPackage {
 	 * @return
 	 */
 	public GeometryColumnsDao getGeometryColumnsDao();
+
+	/**
+	 * Get a SQL/MM Geometry Columns DAO
+	 * 
+	 * @return
+	 */
+	public GeometryColumnsSqlMmDao getGeometryColumnsSqlMmDao();
+
+	/**
+	 * Get a SF/SQL Geometry Columns DAO
+	 * 
+	 * @return
+	 */
+	public GeometryColumnsSfSqlDao getGeometryColumnsSfSqlDao();
 
 	/**
 	 * Create the Geometry Columns table if it does not already exist

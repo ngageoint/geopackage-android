@@ -16,6 +16,10 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSql;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMm;
+import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
 import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
@@ -155,6 +159,30 @@ class GeoPackageImpl implements GeoPackage {
 	@Override
 	public GeometryColumnsDao getGeometryColumnsDao() {
 		return createDao(GeometryColumns.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GeometryColumnsSqlMmDao getGeometryColumnsSqlMmDao() {
+
+		GeometryColumnsSqlMmDao dao = createDao(GeometryColumnsSqlMm.class);
+		verifyTableExists(dao);
+
+		return dao;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GeometryColumnsSfSqlDao getGeometryColumnsSfSqlDao() {
+
+		GeometryColumnsSfSqlDao dao = createDao(GeometryColumnsSfSql.class);
+		verifyTableExists(dao);
+
+		return dao;
 	}
 
 	/**

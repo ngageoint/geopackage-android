@@ -32,6 +32,30 @@ public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 	}
 
 	/**
+	 * Test reading using the SQL/MM view
+	 * 
+	 * @throws SQLException
+	 */
+	public void testSqlMmRead() throws SQLException {
+
+		GeometryColumnsUtils.testSqlMmRead(geoPackage,
+				TestSetupTeardown.CREATE_GEOMETRY_COLUMNS_COUNT);
+
+	}
+
+	/**
+	 * Test reading using the SF/SQL view
+	 * 
+	 * @throws SQLException
+	 */
+	public void testSfSqlRead() throws SQLException {
+
+		GeometryColumnsUtils.testSfSqlRead(geoPackage,
+				TestSetupTeardown.CREATE_GEOMETRY_COLUMNS_COUNT);
+
+	}
+
+	/**
 	 * Test updating
 	 * 
 	 * @throws SQLException

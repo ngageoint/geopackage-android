@@ -10,18 +10,18 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
- * Geometry Columns object. Identifies the geometry columns in tables that
- * contain user data representing features.
+ * SQL/MM Geometry Columns object. Identifies the geometry columns in tables
+ * that contain user data representing features.
  * 
  * @author osbornb
  */
-@DatabaseTable(tableName = "gpkg_geometry_columns", daoClass = GeometryColumnsDao.class)
-public class GeometryColumns {
+@DatabaseTable(tableName = "st_geometry_columns", daoClass = GeometryColumnsSqlMmDao.class)
+public class GeometryColumnsSqlMm {
 
 	/**
 	 * Table name
 	 */
-	public static final String TABLE_NAME = "gpkg_geometry_columns";
+	public static final String TABLE_NAME = "st_geometry_columns";
 
 	/**
 	 * tableName field name
@@ -49,19 +49,19 @@ public class GeometryColumns {
 	public static final String COLUMN_GEOMETRY_TYPE_NAME = "geometry_type_name";
 
 	/**
+	 * The prefix added to geometry types
+	 */
+	public static final String COLUMN_GEOMETRY_TYPE_NAME_PREFIX = "ST_";
+
+	/**
 	 * srsId field name
 	 */
 	public static final String COLUMN_SRS_ID = SpatialReferenceSystem.COLUMN_SRS_ID;
 
 	/**
-	 * z field name
+	 * srsName field name
 	 */
-	public static final String COLUMN_Z = "z";
-
-	/**
-	 * m field name
-	 */
-	public static final String COLUMN_M = "m";
+	public static final String COLUMN_SRS_NAME = SpatialReferenceSystem.COLUMN_SRS_NAME;
 
 	/**
 	 * Foreign key to Contents by table name
@@ -101,28 +101,32 @@ public class GeometryColumns {
 	private long srsId;
 
 	/**
-	 * 0: z values prohibited; 1: z values mandatory; 2: z values optional
+	 * Human readable name of this SRS
 	 */
-	@DatabaseField(columnName = COLUMN_Z, canBeNull = false)
-	private byte z;
-
-	/**
-	 * 0: m values prohibited; 1: m values mandatory; 2: m values optional
-	 */
-	@DatabaseField(columnName = COLUMN_M, canBeNull = false)
-	private byte m;
+	@DatabaseField(columnName = COLUMN_SRS_NAME, canBeNull = false)
+	private String srsName;
 
 	/**
 	 * Default Constructor
 	 */
-	public GeometryColumns() {
+	public GeometryColumnsSqlMm() {
 
 	}
 
+	/**
+	 * Get the id
+	 * 
+	 * @return
+	 */
 	public GeometryColumnsKey getId() {
 		return new GeometryColumnsKey(tableName, columnName);
 	}
 
+	/**
+	 * Set the id
+	 * 
+	 * @param id
+	 */
 	public void setId(GeometryColumnsKey id) {
 		tableName = id.getTableName();
 		columnName = id.getColumnName();
@@ -141,7 +145,7 @@ public class GeometryColumns {
 			if (dataType == null || dataType != ContentsDataType.FEATURES) {
 				throw new GeoPackageException("The "
 						+ Contents.class.getSimpleName() + " of a "
-						+ GeometryColumns.class.getSimpleName()
+						+ GeometryColumnsSqlMm.class.getSimpleName()
 						+ " must have a data type of "
 						+ ContentsDataType.FEATURES.getName());
 			}
@@ -162,11 +166,14 @@ public class GeometryColumns {
 	}
 
 	public GeometryType getGeometryType() {
-		return GeometryType.valueOf(geometryTypeName);
+		return GeometryType.valueOf(geometryTypeName.substring(
+				COLUMN_GEOMETRY_TYPE_NAME_PREFIX.length(),
+				geometryTypeName.length()));
 	}
 
 	public void setGeometryType(GeometryType geometryType) {
-		this.geometryTypeName = geometryType.getName();
+		this.geometryTypeName = COLUMN_GEOMETRY_TYPE_NAME_PREFIX
+				+ geometryType.getName();
 	}
 
 	public String getGeometryTypeName() {
@@ -181,6 +188,7 @@ public class GeometryColumns {
 		this.srs = srs;
 		if (srs != null) {
 			srsId = srs.getId();
+			srsName = srs.getSrsName();
 		}
 	}
 
@@ -188,37 +196,8 @@ public class GeometryColumns {
 		return srsId;
 	}
 
-	public byte getZ() {
-		return z;
-	}
-
-	public void setZ(byte z) {
-		validateValues(COLUMN_Z, z);
-		this.z = z;
-	}
-
-	public byte getM() {
-		return m;
-	}
-
-	public void setM(byte m) {
-		validateValues(COLUMN_M, m);
-		this.m = m;
-	}
-
-	/**
-	 * Validate the z and m byte values. They must be 0 for prohibited, 1 for
-	 * mandatory, or 2 for optional. (Spec Requirement 27 & 28)
-	 * 
-	 * @param column
-	 * @param value
-	 */
-	private void validateValues(String column, byte value) {
-		if (value < 0 || value > 2) {
-			throw new GeoPackageException(
-					column
-							+ " value must be 0 for prohibited, 1 for mandatory, or 2 for optional");
-		}
+	public String getSrsName() {
+		return srsName;
 	}
 
 }

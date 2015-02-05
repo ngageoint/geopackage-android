@@ -2,6 +2,7 @@ package mil.nga.giat.geopackage.test.features.columns;
 
 import java.sql.SQLException;
 
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.test.ImportGeoPackageTestCase;
 
 /**
@@ -26,6 +27,34 @@ public class GeometryColumnsImportTest extends ImportGeoPackageTestCase {
 	public void testRead() throws SQLException {
 
 		GeometryColumnsUtils.testRead(geoPackage, null);
+
+	}
+
+	/**
+	 * Test reading using the SQL/MM view
+	 */
+	public void testSqlMmRead() {
+
+		try {
+			geoPackage.getGeometryColumnsSqlMmDao();
+			fail("No exception was thrown when the SQL/MM view was not expected to exist");
+		} catch (GeoPackageException e) {
+			// Expected
+		}
+
+	}
+
+	/**
+	 * Test reading using the SF/SQL view
+	 */
+	public void testSfSqlRead() {
+
+		try {
+			geoPackage.getGeometryColumnsSfSqlDao();
+			fail("No exception was thrown when the SF/SQL view was not expected to exist");
+		} catch (GeoPackageException e) {
+			// Expected
+		}
 
 	}
 

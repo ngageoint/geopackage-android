@@ -29,6 +29,11 @@ public class TileMatrixSet {
 	public static final String COLUMN_TABLE_NAME = Contents.COLUMN_TABLE_NAME;
 
 	/**
+	 * id field name, tableName
+	 */
+	public static final String COLUMN_ID = COLUMN_TABLE_NAME;
+
+	/**
 	 * srsId field name
 	 */
 	public static final String COLUMN_SRS_ID = SpatialReferenceSystem.COLUMN_SRS_ID;

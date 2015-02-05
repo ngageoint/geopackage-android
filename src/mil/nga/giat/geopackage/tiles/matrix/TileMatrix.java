@@ -35,6 +35,16 @@ public class TileMatrix {
 	public static final String COLUMN_ZOOM_LEVEL = "zoom_level";
 
 	/**
+	 * id 1 field name, tableName
+	 */
+	public static final String COLUMN_ID_1 = COLUMN_TABLE_NAME;
+
+	/**
+	 * id 2 field name, zoomLevel
+	 */
+	public static final String COLUMN_ID_2 = COLUMN_ZOOM_LEVEL;
+
+	/**
 	 * matrixWidth field name
 	 */
 	public static final String COLUMN_MATRIX_WIDTH = "matrix_width";
