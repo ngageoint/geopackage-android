@@ -12,6 +12,8 @@
     <string name="sql_geometry_columns">C.3. gpkg_geometry_columns</string>
     <string name="sql_tile_matrix_set">C.5. gpkg_tile_matrix_set</string>
     <string name="sql_tile_matrix">C.6. gpkg_tile_matrix</string>
+    <string name="sql_data_columns">C.8. gpkg_data_columns</string>
+    <string name="sql_data_column_constraints">C.9. gpkg_data_column_constraints</string>
     
     <string name="geopackage_srs_epsg_srs_name">WGS 84 geodetic</string>
     <integer name="geopackage_srs_epsg_srs_id">4326</integer>

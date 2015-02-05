@@ -24,6 +24,10 @@ import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.features.user.FeatureTableReader;
+import mil.nga.giat.geopackage.schema.columns.DataColumns;
+import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
+import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraints;
+import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintsDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
@@ -197,9 +201,9 @@ class GeoPackageImpl implements GeoPackage {
 				created = tableCreator.createGeometryColumns() > 0;
 			}
 		} catch (SQLException e) {
-			throw new GeoPackageException(
-					"Failed to check if Geometry Columns table exists and create it",
-					e);
+			throw new GeoPackageException("Failed to check if "
+					+ GeometryColumns.class.getSimpleName()
+					+ " table exists and create it", e);
 		}
 		return created;
 	}
@@ -316,9 +320,9 @@ class GeoPackageImpl implements GeoPackage {
 				created = tableCreator.createTileMatrixSet() > 0;
 			}
 		} catch (SQLException e) {
-			throw new GeoPackageException(
-					"Failed to check if Tile Matrix Set table exists and create it",
-					e);
+			throw new GeoPackageException("Failed to check if "
+					+ TileMatrixSet.class.getSimpleName()
+					+ " table exists and create it", e);
 		}
 		return created;
 	}
@@ -343,9 +347,9 @@ class GeoPackageImpl implements GeoPackage {
 				created = tableCreator.createTileMatrix() > 0;
 			}
 		} catch (SQLException e) {
-			throw new GeoPackageException(
-					"Failed to check if Tile Matrix table exists and create it",
-					e);
+			throw new GeoPackageException("Failed to check if "
+					+ TileMatrix.class.getSimpleName()
+					+ " table exists and create it", e);
 		}
 		return created;
 	}
@@ -461,6 +465,60 @@ class GeoPackageImpl implements GeoPackage {
 	@Override
 	public void createTable(TileTable table) {
 		tableCreator.createTable(table);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DataColumnsDao getDataColumnsDao() {
+		return createDao(DataColumns.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createDataColumnsTable() {
+		boolean created = false;
+		DataColumnsDao dao = getDataColumnsDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = tableCreator.createDataColumns() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to check if "
+					+ DataColumns.class.getSimpleName()
+					+ " table exists and create it", e);
+		}
+		return created;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public DataColumnConstraintsDao getDataColumnConstraintsDao() {
+		return createDao(DataColumnConstraints.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createDataColumnConstraintsTable() {
+		boolean created = false;
+		DataColumnConstraintsDao dao = getDataColumnConstraintsDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = tableCreator.createDataColumnConstraints() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to check if "
+					+ DataColumnConstraints.class.getSimpleName()
+					+ " table exists and create it", e);
+		}
+		return created;
 	}
 
 	/**

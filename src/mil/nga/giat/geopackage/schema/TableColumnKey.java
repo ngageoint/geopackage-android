@@ -1,11 +1,11 @@
-package mil.nga.giat.geopackage.features.columns;
+package mil.nga.giat.geopackage.schema;
 
 /**
- * Geometry Columns complex primary key
+ * Table and column name complex primary key
  * 
  * @author osbornb
  */
-public class GeometryColumnsKey {
+public class TableColumnKey {
 
 	/**
 	 * Table name
@@ -23,7 +23,7 @@ public class GeometryColumnsKey {
 	 * @param tableName
 	 * @param columnName
 	 */
-	public GeometryColumnsKey(String tableName, String columnName) {
+	public TableColumnKey(String tableName, String columnName) {
 		this.tableName = tableName;
 		this.columnName = columnName;
 	}
@@ -78,7 +78,7 @@ public class GeometryColumnsKey {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		GeometryColumnsKey other = (GeometryColumnsKey) obj;
+		TableColumnKey other = (TableColumnKey) obj;
 		if (!columnName.equals(other.columnName))
 			return false;
 		if (!tableName.equals(other.tableName))

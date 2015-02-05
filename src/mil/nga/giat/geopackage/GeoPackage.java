@@ -11,6 +11,8 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
+import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintsDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
@@ -191,5 +193,33 @@ public interface GeoPackage {
 	 * @param table
 	 */
 	public void createTable(TileTable table);
+
+	/**
+	 * Get a Data Columns DAO
+	 * 
+	 * @return
+	 */
+	public DataColumnsDao getDataColumnsDao();
+
+	/**
+	 * Create the Data Columns table if it does not already exist
+	 * 
+	 * @return true if created
+	 */
+	public boolean createDataColumnsTable();
+
+	/**
+	 * Get a Data Column Constraints DAO
+	 * 
+	 * @return
+	 */
+	public DataColumnConstraintsDao getDataColumnConstraintsDao();
+
+	/**
+	 * Create the Data Column Constraints table if it does not already exist
+	 * 
+	 * @return true if created
+	 */
+	public boolean createDataColumnConstraintsTable();
 
 }

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.giat.geopackage.schema.TableColumnKey;
+
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.stmt.PreparedUpdate;
 import com.j256.ormlite.stmt.UpdateBuilder;
@@ -17,7 +19,7 @@ import com.j256.ormlite.support.ConnectionSource;
  * @author osbornb
  */
 public class GeometryColumnsSqlMmDao extends
-		BaseDaoImpl<GeometryColumnsSqlMm, GeometryColumnsKey> {
+		BaseDaoImpl<GeometryColumnsSqlMm, TableColumnKey> {
 
 	/**
 	 * Constructor, required by ORMLite
@@ -35,7 +37,7 @@ public class GeometryColumnsSqlMmDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GeometryColumnsSqlMm queryForId(GeometryColumnsKey key)
+	public GeometryColumnsSqlMm queryForId(TableColumnKey key)
 			throws SQLException {
 		GeometryColumnsSqlMm geometryColumns = null;
 		if (key != null) {
@@ -64,7 +66,7 @@ public class GeometryColumnsSqlMmDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GeometryColumnsKey extractId(GeometryColumnsSqlMm data)
+	public TableColumnKey extractId(GeometryColumnsSqlMm data)
 			throws SQLException {
 		return data.getId();
 	}
@@ -73,7 +75,7 @@ public class GeometryColumnsSqlMmDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean idExists(GeometryColumnsKey id) throws SQLException {
+	public boolean idExists(TableColumnKey id) throws SQLException {
 		return queryForId(id) != null;
 	}
 
@@ -90,7 +92,7 @@ public class GeometryColumnsSqlMmDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int updateId(GeometryColumnsSqlMm data, GeometryColumnsKey newId)
+	public int updateId(GeometryColumnsSqlMm data, TableColumnKey newId)
 			throws SQLException {
 		int count = 0;
 		GeometryColumnsSqlMm readData = queryForId(data.getId());
@@ -105,7 +107,7 @@ public class GeometryColumnsSqlMmDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int deleteById(GeometryColumnsKey id) throws SQLException {
+	public int deleteById(TableColumnKey id) throws SQLException {
 		int count = 0;
 		if (id != null) {
 			GeometryColumnsSqlMm geometryColumns = queryForId(id);
@@ -120,11 +122,11 @@ public class GeometryColumnsSqlMmDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int deleteIds(Collection<GeometryColumnsKey> idCollection)
+	public int deleteIds(Collection<TableColumnKey> idCollection)
 			throws SQLException {
 		int count = 0;
 		if (idCollection != null) {
-			for (GeometryColumnsKey id : idCollection) {
+			for (TableColumnKey id : idCollection) {
 				count += deleteById(id);
 			}
 		}
@@ -139,7 +141,7 @@ public class GeometryColumnsSqlMmDao extends
 	@Override
 	public int update(GeometryColumnsSqlMm geometryColumns) throws SQLException {
 
-		UpdateBuilder<GeometryColumnsSqlMm, GeometryColumnsKey> ub = updateBuilder();
+		UpdateBuilder<GeometryColumnsSqlMm, TableColumnKey> ub = updateBuilder();
 		ub.updateColumnValue(GeometryColumnsSqlMm.COLUMN_GEOMETRY_TYPE_NAME,
 				geometryColumns.getGeometryTypeName());
 		ub.updateColumnValue(GeometryColumnsSqlMm.COLUMN_SRS_ID,

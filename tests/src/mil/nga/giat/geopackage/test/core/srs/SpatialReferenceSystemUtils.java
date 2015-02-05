@@ -18,7 +18,7 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMm;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
-import mil.nga.giat.geopackage.features.columns.GeometryColumnsKey;
+import mil.nga.giat.geopackage.schema.TableColumnKey;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
@@ -405,7 +405,7 @@ public class SpatialReferenceSystemUtils {
 			}
 
 			// Save the ids of geometry columns
-			List<GeometryColumnsKey> geometryColumnsIds = new ArrayList<GeometryColumnsKey>();
+			List<TableColumnKey> geometryColumnsIds = new ArrayList<TableColumnKey>();
 			GeometryColumnsDao geometryColumnsDao = geoPackage
 					.getGeometryColumnsDao();
 			if (geometryColumnsDao.isTableExists()) {
@@ -437,7 +437,7 @@ public class SpatialReferenceSystemUtils {
 			}
 
 			// Verify that geometry columns or foreign keys were deleted
-			for (GeometryColumnsKey geometryColumnsId : geometryColumnsIds) {
+			for (TableColumnKey geometryColumnsId : geometryColumnsIds) {
 				GeometryColumns queryGeometryColumns = geometryColumnsDao
 						.queryForId(geometryColumnsId);
 				if (cascade) {
@@ -464,7 +464,7 @@ public class SpatialReferenceSystemUtils {
 				List<SpatialReferenceSystem> queryResults = dao.query(query);
 				int count = queryResults.size();
 				contentsIds = new ArrayList<String>();
-				geometryColumnsIds = new ArrayList<GeometryColumnsKey>();
+				geometryColumnsIds = new ArrayList<TableColumnKey>();
 				for (SpatialReferenceSystem queryResultsSrs : queryResults) {
 					for (Contents contents : queryResultsSrs.getContents()) {
 						contentsIds.add(contents.getId());
@@ -503,7 +503,7 @@ public class SpatialReferenceSystemUtils {
 				}
 
 				// Verify that geometry columns or foreign keys were deleted
-				for (GeometryColumnsKey geometryColumnsId : geometryColumnsIds) {
+				for (TableColumnKey geometryColumnsId : geometryColumnsIds) {
 					GeometryColumns queryGeometryColumns = geometryColumnsDao
 							.queryForId(geometryColumnsId);
 					if (cascade) {

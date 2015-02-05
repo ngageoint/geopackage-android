@@ -5,6 +5,7 @@ import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDataType;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.schema.TableColumnKey;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -118,8 +119,8 @@ public class GeometryColumnsSqlMm {
 	 * 
 	 * @return
 	 */
-	public GeometryColumnsKey getId() {
-		return new GeometryColumnsKey(tableName, columnName);
+	public TableColumnKey getId() {
+		return new TableColumnKey(tableName, columnName);
 	}
 
 	/**
@@ -127,7 +128,7 @@ public class GeometryColumnsSqlMm {
 	 * 
 	 * @param id
 	 */
-	public void setId(GeometryColumnsKey id) {
+	public void setId(TableColumnKey id) {
 		tableName = id.getTableName();
 		columnName = id.getColumnName();
 	}

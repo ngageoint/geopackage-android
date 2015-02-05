@@ -15,12 +15,12 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
-import mil.nga.giat.geopackage.features.columns.GeometryColumnsKey;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSql;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMm;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.test.TestUtils;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
@@ -140,7 +140,7 @@ public class GeometryColumnsUtils {
 				TestCase.assertTrue(found);
 
 				// Prepared query
-				QueryBuilder<GeometryColumns, GeometryColumnsKey> qb = dao
+				QueryBuilder<GeometryColumns, TableColumnKey> qb = dao
 						.queryBuilder();
 				qb.where().eq(GeometryColumns.COLUMN_COLUMN_NAME,
 						geometryColumns.getColumnName());
@@ -271,7 +271,7 @@ public class GeometryColumnsUtils {
 				TestCase.assertTrue(found);
 
 				// Prepared query
-				QueryBuilder<GeometryColumnsSqlMm, GeometryColumnsKey> qb = dao
+				QueryBuilder<GeometryColumnsSqlMm, TableColumnKey> qb = dao
 						.queryBuilder();
 				qb.where().eq(GeometryColumnsSqlMm.COLUMN_COLUMN_NAME,
 						geometryColumns.getColumnName());
@@ -402,7 +402,7 @@ public class GeometryColumnsUtils {
 				TestCase.assertTrue(found);
 
 				// Prepared query
-				QueryBuilder<GeometryColumnsSfSql, GeometryColumnsKey> qb = dao
+				QueryBuilder<GeometryColumnsSfSql, TableColumnKey> qb = dao
 						.queryBuilder();
 				qb.where().eq(GeometryColumnsSfSql.COLUMN_F_GEOMETRY_COLUMN,
 						geometryColumns.getFGeometryColumn());
@@ -455,7 +455,7 @@ public class GeometryColumnsUtils {
 
 				// Find expected results for prepared update
 				String updatedColumnName = "new_geom";
-				QueryBuilder<GeometryColumns, GeometryColumnsKey> qb = dao
+				QueryBuilder<GeometryColumns, TableColumnKey> qb = dao
 						.queryBuilder();
 				qb.where().eq(GeometryColumns.COLUMN_Z, 0).or()
 						.eq(GeometryColumns.COLUMN_Z, 2);
@@ -464,7 +464,7 @@ public class GeometryColumnsUtils {
 						.query(preparedQuery);
 
 				// Prepared update
-				UpdateBuilder<GeometryColumns, GeometryColumnsKey> ub = dao
+				UpdateBuilder<GeometryColumns, TableColumnKey> ub = dao
 						.updateBuilder();
 				ub.updateColumnValue(GeometryColumns.COLUMN_COLUMN_NAME,
 						updatedColumnName);
@@ -609,7 +609,7 @@ public class GeometryColumnsUtils {
 					geometryColumns = results.get(random);
 
 					// Find which geometry columns to delete
-					QueryBuilder<GeometryColumns, GeometryColumnsKey> qb = dao
+					QueryBuilder<GeometryColumns, TableColumnKey> qb = dao
 							.queryBuilder();
 					qb.where().eq(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
 							geometryColumns.getGeometryType().getName());
@@ -618,7 +618,7 @@ public class GeometryColumnsUtils {
 					int count = queryResults.size();
 
 					// Delete
-					DeleteBuilder<GeometryColumns, GeometryColumnsKey> db = dao
+					DeleteBuilder<GeometryColumns, TableColumnKey> db = dao
 							.deleteBuilder();
 					db.where().eq(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
 							geometryColumns.getGeometryType().getName());

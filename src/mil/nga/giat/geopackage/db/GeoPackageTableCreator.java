@@ -104,6 +104,25 @@ public class GeoPackageTableCreator {
 	}
 
 	/**
+	 * Create Data Columns table
+	 * 
+	 * @return executed statements
+	 */
+	public int createDataColumns() {
+		return createTable(context.getString(R.string.sql_data_columns));
+	}
+
+	/**
+	 * Create Data Column Constraints table
+	 * 
+	 * @return executed statements
+	 */
+	public int createDataColumnConstraints() {
+		return createTable(context
+				.getString(R.string.sql_data_column_constraints));
+	}
+
+	/**
 	 * Create a table using the table script
 	 * 
 	 * @param tableScript
