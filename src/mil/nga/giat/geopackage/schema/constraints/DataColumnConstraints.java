@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.schema.columns.DataColumns;
 import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
 
@@ -142,6 +143,20 @@ public class DataColumnConstraints {
 
 	public void setConstraintType(DataColumnConstraintType constraintType) {
 		this.constraintType = constraintType.getValue();
+		switch (constraintType) {
+		case RANGE:
+			setValue(null);
+			break;
+		case ENUM:
+		case GLOB:
+			setMin(null);
+			setMax(null);
+			setMinIsInclusive(null);
+			setMaxIsInclusive(null);
+			break;
+		default:
+
+		}
 	}
 
 	public String getValue() {
@@ -149,6 +164,12 @@ public class DataColumnConstraints {
 	}
 
 	public void setValue(String value) {
+		if (constraintType != null && value != null) {
+			if (getConstraintType().equals(DataColumnConstraintType.RANGE)) {
+				throw new GeoPackageException("The value must be null for "
+						+ DataColumnConstraintType.RANGE + " constraints");
+			}
+		}
 		this.value = value;
 	}
 
@@ -157,6 +178,7 @@ public class DataColumnConstraints {
 	}
 
 	public void setMin(BigDecimal min) {
+		validateRangeValue(COLUMN_MIN, min);
 		this.min = min;
 	}
 
@@ -165,6 +187,7 @@ public class DataColumnConstraints {
 	}
 
 	public void setMinIsInclusive(Boolean minIsInclusive) {
+		validateRangeValue(COLUMN_MIN_IS_INCLUSIVE, minIsInclusive);
 		this.minIsInclusive = minIsInclusive;
 	}
 
@@ -173,6 +196,7 @@ public class DataColumnConstraints {
 	}
 
 	public void setMax(BigDecimal max) {
+		validateRangeValue(COLUMN_MAX, max);
 		this.max = max;
 	}
 
@@ -181,6 +205,7 @@ public class DataColumnConstraints {
 	}
 
 	public void setMaxIsInclusive(Boolean maxIsInclusive) {
+		validateRangeValue(COLUMN_MAX_IS_INCLUSIVE, maxIsInclusive);
 		this.maxIsInclusive = maxIsInclusive;
 	}
 
@@ -198,6 +223,23 @@ public class DataColumnConstraints {
 			columns = dao.queryByConstraintName(constraintName);
 		}
 		return columns;
+	}
+
+	/**
+	 * Validate the constraint type when a range value is set
+	 * 
+	 * @param column
+	 * @param value
+	 */
+	private void validateRangeValue(String column, Object value) {
+		if (constraintType != null && value != null) {
+			if (!getConstraintType().equals(DataColumnConstraintType.RANGE)) {
+				throw new GeoPackageException("The " + column
+						+ " must be null for " + DataColumnConstraintType.ENUM
+						+ " and " + DataColumnConstraintType.GLOB
+						+ " constraints");
+			}
+		}
 	}
 
 }
