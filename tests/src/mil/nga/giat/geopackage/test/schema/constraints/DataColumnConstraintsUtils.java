@@ -243,7 +243,7 @@ public class DataColumnConstraintsUtils {
 			// Get current count
 			long count = dao.countOf();
 
-			// Create new data column
+			// Create new data column constraints
 			String name = "test_create_constraint";
 			DataColumnConstraintType type = DataColumnConstraintType.RANGE;
 			BigDecimal min = new BigDecimal(50);
@@ -266,7 +266,7 @@ public class DataColumnConstraintsUtils {
 			long newCount = dao.countOf();
 			TestCase.assertEquals(count + 1, newCount);
 
-			// Verify saved data content constraints
+			// Verify saved data column constraints
 			DataColumnConstraints queryDataColumnConstraints = dao
 					.queryByUnique(name, type, null);
 			TestCase.assertEquals(name,
@@ -343,7 +343,7 @@ public class DataColumnConstraintsUtils {
 					random = (int) (Math.random() * results.size());
 					dataColumnConstraints = results.get(random);
 
-					// Find which data columns to delete
+					// Find which data column constraints to delete
 					QueryBuilder<DataColumnConstraints, Void> qb = dao
 							.queryBuilder();
 					qb.where().eq(DataColumnConstraints.COLUMN_CONSTRAINT_NAME,
