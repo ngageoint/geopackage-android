@@ -9,7 +9,6 @@ import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -52,10 +51,10 @@ public class DataColumnConstraintsDao extends
 		if (constraints != null) {
 
 			// Delete Data Columns
-			ForeignCollection<DataColumns> dataColumnsCollection = constraints
-					.getDataColumns();
+			DataColumnsDao dao = getDataColumnsDao();
+			List<DataColumns> dataColumnsCollection = dao
+					.queryForConstraintName(constraints.getConstraintName());
 			if (!dataColumnsCollection.isEmpty()) {
-				DataColumnsDao dao = getDataColumnsDao();
 				dao.delete(dataColumnsCollection);
 			}
 
@@ -114,6 +113,19 @@ public class DataColumnConstraintsDao extends
 					DataColumns.class);
 		}
 		return dataColumnsDao;
+	}
+
+	/**
+	 * Query for the constraint name
+	 * 
+	 * @param constraintName
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<DataColumnConstraints> queryForConstraintName(
+			String constraintName) throws SQLException {
+		return queryForEq(DataColumnConstraints.COLUMN_CONSTRAINT_NAME,
+				constraintName);
 	}
 
 }

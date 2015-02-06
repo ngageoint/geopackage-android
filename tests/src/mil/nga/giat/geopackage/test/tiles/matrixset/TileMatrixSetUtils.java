@@ -306,11 +306,11 @@ public class TileMatrixSetUtils {
 
 			if (!results.isEmpty()) {
 
-				// Choose random geometry columns
+				// Choose random tile matrix set
 				int random = (int) (Math.random() * results.size());
 				TileMatrixSet tileMatrixSet = results.get(random);
 
-				// Delete the geometry columns
+				// Delete the tile matrix set
 				dao.delete(tileMatrixSet);
 
 				// Verify deleted
@@ -326,7 +326,7 @@ public class TileMatrixSetUtils {
 					random = (int) (Math.random() * results.size());
 					tileMatrixSet = results.get(random);
 
-					// Find which geometry columns to delete
+					// Find which tile matrix set to delete
 					QueryBuilder<TileMatrixSet, String> qb = dao.queryBuilder();
 					qb.where().eq(TileMatrixSet.COLUMN_SRS_ID,
 							tileMatrixSet.getSrsId());

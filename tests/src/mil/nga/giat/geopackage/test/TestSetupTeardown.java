@@ -48,6 +48,8 @@ public class TestSetupTeardown {
 
 	public static final int CREATE_TILE_MATRIX_COUNT = 3;
 
+	public static final int CREATE_DATA_COLUMNS_COUNT = CREATE_GEOMETRY_COLUMNS_COUNT;
+
 	/**
 	 * Set up the create database
 	 * 
@@ -163,25 +165,24 @@ public class TestSetupTeardown {
 		lineString3dMContents.setMaxY(90.0);
 		lineString3dMContents.setSrs(undefinedCartesianSrs);
 
+		// Create Data Column Constraints table and rows
+		TestUtils.createConstraints(geoPackage);
+
+		// Create data columns table
+		geoPackage.createDataColumnsTable();
+
 		String geometryColumn = "geometry";
 
 		// Create the feature tables
-		FeatureTable point2dTable = TestUtils.buildFeatureTable(
-				point2dContents.getTableName(), geometryColumn,
-				GeometryType.POINT);
-		geoPackage.createTable(point2dTable);
-		FeatureTable polygon2dTable = TestUtils.buildFeatureTable(
-				polygon2dContents.getTableName(), geometryColumn,
-				GeometryType.POLYGON);
-		geoPackage.createTable(polygon2dTable);
-		FeatureTable point3dTable = TestUtils.buildFeatureTable(
-				point3dContents.getTableName(), geometryColumn,
-				GeometryType.POINT);
-		geoPackage.createTable(point3dTable);
-		FeatureTable lineString3dMTable = TestUtils.buildFeatureTable(
-				lineString3dMContents.getTableName(), geometryColumn,
+		FeatureTable point2dTable = TestUtils.createFeatureTable(geoPackage,
+				point2dContents, geometryColumn, GeometryType.POINT);
+		FeatureTable polygon2dTable = TestUtils.createFeatureTable(geoPackage,
+				polygon2dContents, geometryColumn, GeometryType.POLYGON);
+		FeatureTable point3dTable = TestUtils.createFeatureTable(geoPackage,
+				point3dContents, geometryColumn, GeometryType.POINT);
+		FeatureTable lineString3dMTable = TestUtils.createFeatureTable(
+				geoPackage, lineString3dMContents, geometryColumn,
 				GeometryType.LINESTRING);
-		geoPackage.createTable(lineString3dMTable);
 
 		// Create the contents
 		contentsDao.create(point2dContents);
@@ -240,6 +241,7 @@ public class TestSetupTeardown {
 				.addRowsToFeatureTable(geoPackage,
 						lineString3dMGeometryColumns, lineString3dMTable, 3,
 						true, true);
+
 	}
 
 	/**

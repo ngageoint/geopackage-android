@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import junit.framework.TestCase;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.user.FeatureColumn;
@@ -27,6 +29,11 @@ import mil.nga.giat.geopackage.geom.Point;
 import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.schema.columns.DataColumns;
+import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
+import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintType;
+import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraints;
+import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintsDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.user.TileColumn;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
@@ -43,6 +50,26 @@ import android.database.sqlite.SQLiteException;
  * @author osbornb
  */
 public class TestUtils {
+
+	/**
+	 * Sample range data column constraint
+	 */
+	public static final String SAMPLE_RANGE_CONSTRAINT = "sampleRange";
+
+	/**
+	 * Sample enum data column constraint
+	 */
+	public static final String SAMPLE_ENUM_CONSTRAINT = "sampleEnum";
+
+	/**
+	 * Sample glob data column constraint
+	 */
+	public static final String SAMPLE_GLOB_CONSTRAINT = "sampleGlob";
+
+	/**
+	 * Test integer column name
+	 */
+	public static final String TEST_INTEGER_COLUMN = "test_integer";
 
 	/**
 	 * Get test context
@@ -159,6 +186,48 @@ public class TestUtils {
 	}
 
 	/**
+	 * Create the feature table with data columns entry
+	 * 
+	 * @param geoPackage
+	 * @param contents
+	 * @param geometryColumn
+	 * @param geometryType
+	 * @return
+	 * @throws SQLException
+	 */
+	public static FeatureTable createFeatureTable(GeoPackage geoPackage,
+			Contents contents, String geometryColumn, GeometryType geometryType)
+			throws SQLException {
+
+		FeatureTable table = buildFeatureTable(contents.getTableName(),
+				geometryColumn, geometryType);
+		geoPackage.createTable(table);
+
+		double random = Math.random();
+
+		DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
+		DataColumns dataColumns = new DataColumns();
+		dataColumns.setContents(contents);
+		dataColumns.setColumnName(TEST_INTEGER_COLUMN);
+		dataColumns.setName("TEST_NAME");
+		dataColumns.setTitle("TEST_TITLE");
+		dataColumns.setDescription("TEST_DESCRIPTION");
+		dataColumns.setMimeType("TEST_MIME_TYPE");
+
+		if (random < (1.0 / 3.0)) {
+			dataColumns.setConstraintName(SAMPLE_RANGE_CONSTRAINT);
+		} else if (random < (2.0 / 3.0)) {
+			dataColumns.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
+		} else {
+			dataColumns.setConstraintName(SAMPLE_GLOB_CONSTRAINT);
+		}
+
+		dataColumnsDao.create(dataColumns);
+
+		return table;
+	}
+
+	/**
 	 * Build an example feature table
 	 * 
 	 * @param tableName
@@ -186,7 +255,7 @@ public class TestUtils {
 				GeoPackageDataType.BOOLEAN, false, null));
 		columns.add(FeatureColumn.createColumn(5, "test_blob",
 				GeoPackageDataType.BLOB, false, null));
-		columns.add(FeatureColumn.createColumn(6, "test_integer",
+		columns.add(FeatureColumn.createColumn(6, TEST_INTEGER_COLUMN,
 				GeoPackageDataType.INTEGER, false, null));
 
 		FeatureTable table = new FeatureTable(tableName, columns);
@@ -495,6 +564,65 @@ public class TestUtils {
 		String message = e.getMessage();
 		return message.contains("no such function: ST_IsEmpty")
 				|| message.contains("no such module: rtree");
+	}
+
+	/**
+	 * Create Data Column Constraints
+	 * 
+	 * @param geoPackage
+	 * @throws SQLException
+	 */
+	public static void createConstraints(GeoPackage geoPackage)
+			throws SQLException {
+
+		geoPackage.createDataColumnConstraintsTable();
+
+		DataColumnConstraintsDao dao = geoPackage.getDataColumnConstraintsDao();
+
+		DataColumnConstraints sampleRange = new DataColumnConstraints();
+		sampleRange.setConstraintName(SAMPLE_RANGE_CONSTRAINT);
+		sampleRange.setConstraintType(DataColumnConstraintType.RANGE);
+		sampleRange.setMin(BigDecimal.ONE);
+		sampleRange.setMinIsInclusive(true);
+		sampleRange.setMax(BigDecimal.TEN);
+		sampleRange.setMaxIsInclusive(true);
+		dao.create(sampleRange);
+
+		DataColumnConstraints sampleEnum1 = new DataColumnConstraints();
+		sampleEnum1.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
+		sampleEnum1.setConstraintType(DataColumnConstraintType.ENUM);
+		sampleEnum1.setValue("1");
+		dao.create(sampleEnum1);
+
+		DataColumnConstraints sampleEnum3 = new DataColumnConstraints();
+		sampleEnum3.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
+		sampleEnum3.setConstraintType(DataColumnConstraintType.ENUM);
+		sampleEnum3.setValue("3");
+		dao.create(sampleEnum3);
+
+		DataColumnConstraints sampleEnum5 = new DataColumnConstraints();
+		sampleEnum5.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
+		sampleEnum5.setConstraintType(DataColumnConstraintType.ENUM);
+		sampleEnum5.setValue("5");
+		dao.create(sampleEnum5);
+
+		DataColumnConstraints sampleEnum7 = new DataColumnConstraints();
+		sampleEnum7.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
+		sampleEnum7.setConstraintType(DataColumnConstraintType.ENUM);
+		sampleEnum7.setValue("7");
+		dao.create(sampleEnum7);
+
+		DataColumnConstraints sampleEnum9 = new DataColumnConstraints();
+		sampleEnum9.setConstraintName(SAMPLE_ENUM_CONSTRAINT);
+		sampleEnum9.setConstraintType(DataColumnConstraintType.ENUM);
+		sampleEnum9.setValue("9");
+		dao.create(sampleEnum9);
+
+		DataColumnConstraints sampleGlob = new DataColumnConstraints();
+		sampleGlob.setConstraintName(SAMPLE_GLOB_CONSTRAINT);
+		sampleGlob.setConstraintType(DataColumnConstraintType.GLOB);
+		sampleGlob.setValue("[1-2][0-9][0-9][0-9]");
+		dao.create(sampleGlob);
 	}
 
 }

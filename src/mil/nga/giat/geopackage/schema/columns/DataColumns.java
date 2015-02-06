@@ -1,9 +1,13 @@
 package mil.nga.giat.geopackage.schema.columns;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraints;
+import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintsDao;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -71,7 +75,7 @@ public class DataColumns {
 	/**
 	 * constraintName field name
 	 */
-	public static final String COLUMN_CONSTRAINT_NAME = "contraint_name";
+	public static final String COLUMN_CONSTRAINT_NAME = "constraint_name";
 
 	/**
 	 * Foreign key to Contents by table name
@@ -114,12 +118,6 @@ public class DataColumns {
 	 */
 	@DatabaseField(columnName = COLUMN_MIME_TYPE)
 	private String mimeType;
-
-	/**
-	 * Foreign key to Data Column Constraints by constraint name
-	 */
-	@DatabaseField(columnName = COLUMN_CONSTRAINT_NAME, foreign = true, foreignAutoRefresh = true)
-	private DataColumnConstraints constraints;
 
 	/**
 	 * Case sensitive column value constraint name specified by reference to
@@ -216,19 +214,29 @@ public class DataColumns {
 		this.mimeType = mimeType;
 	}
 
-	public DataColumnConstraints getConstraints() {
-		return constraints;
-	}
-
-	public void setConstraints(DataColumnConstraints constraints) {
-		this.constraints = constraints;
-		if (constraints != null) {
-			constraintName = constraints.getConstraintName();
-		}
-	}
-
 	public String getConstraintName() {
 		return constraintName;
+	}
+
+	public void setConstraint(DataColumnConstraints constraint) {
+		String name = null;
+		if (constraint != null) {
+			name = constraint.getConstraintName();
+		}
+		setConstraintName(name);
+	}
+
+	public void setConstraintName(String constraintName) {
+		this.constraintName = constraintName;
+	}
+
+	public List<DataColumnConstraints> getConstraints(
+			DataColumnConstraintsDao dao) throws SQLException {
+		List<DataColumnConstraints> constraints = null;
+		if (constraintName != null) {
+			constraints = dao.queryForConstraintName(constraintName);
+		}
+		return constraints;
 	}
 
 }

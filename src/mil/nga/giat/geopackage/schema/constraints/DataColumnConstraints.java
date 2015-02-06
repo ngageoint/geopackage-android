@@ -1,10 +1,9 @@
 package mil.nga.giat.geopackage.schema.constraints;
 
-import mil.nga.giat.geopackage.schema.columns.DataColumns;
+import java.math.BigDecimal;
+import java.util.Locale;
 
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -73,12 +72,6 @@ public class DataColumnConstraints {
 	private String constraintType;
 
 	/**
-	 * Data Columns
-	 */
-	@ForeignCollectionField(eager = false)
-	private ForeignCollection<DataColumns> dataColumns;
-
-	/**
 	 * Specified case sensitive value for enum or glob or NULL for range
 	 * constraint_type
 	 */
@@ -89,7 +82,7 @@ public class DataColumnConstraints {
 	 * Minimum value for ‘range’ or NULL for ‘enum’ or ‘glob’ constraint_type
 	 */
 	@DatabaseField(columnName = COLUMN_MIN)
-	private Number min;
+	private BigDecimal min;
 
 	/**
 	 * 0 (false) if min value is exclusive, or 1 (true) if min value is
@@ -102,7 +95,7 @@ public class DataColumnConstraints {
 	 * Maximum value for ‘range’ or NULL for ‘enum’ or ‘glob’ constraint_type
 	 */
 	@DatabaseField(columnName = COLUMN_MAX)
-	private Number max;
+	private BigDecimal max;
 
 	/**
 	 * 0 (false) if max value is exclusive, or 1 (true) if max value is
@@ -133,16 +126,19 @@ public class DataColumnConstraints {
 		this.constraintName = constraintName;
 	}
 
-	public String getConstraintType() {
-		return constraintType;
+	public DataColumnConstraintType getConstraintType() {
+		return DataColumnConstraintType.valueOf(constraintType
+				.toUpperCase(Locale.ENGLISH));
 	}
 
 	public void setConstraintType(String constraintType) {
-		this.constraintType = constraintType;
+		DataColumnConstraintType type = DataColumnConstraintType
+				.valueOf(constraintType.toUpperCase(Locale.ENGLISH));
+		setConstraintType(type);
 	}
 
-	public ForeignCollection<DataColumns> getDataColumns() {
-		return dataColumns;
+	public void setConstraintType(DataColumnConstraintType constraintType) {
+		this.constraintType = constraintType.name().toLowerCase(Locale.ENGLISH);
 	}
 
 	public String getValue() {
@@ -153,11 +149,11 @@ public class DataColumnConstraints {
 		this.value = value;
 	}
 
-	public Number getMin() {
+	public BigDecimal getMin() {
 		return min;
 	}
 
-	public void setMin(Number min) {
+	public void setMin(BigDecimal min) {
 		this.min = min;
 	}
 
@@ -169,11 +165,11 @@ public class DataColumnConstraints {
 		this.minIsInclusive = minIsInclusive;
 	}
 
-	public Number getMax() {
+	public BigDecimal getMax() {
 		return max;
 	}
 
-	public void setMax(Number max) {
+	public void setMax(BigDecimal max) {
 		this.max = max;
 	}
 

@@ -72,7 +72,7 @@ public class TileMatrixUtils {
 					TestCase.assertNotNull(contents.getLastChange());
 				}
 
-				// Choose random contents
+				// Choose random tile matrix
 				int random = (int) (Math.random() * results.size());
 				TileMatrix tileMatrix = results.get(random);
 
@@ -307,11 +307,11 @@ public class TileMatrixUtils {
 
 			if (!results.isEmpty()) {
 
-				// Choose random geometry columns
+				// Choose random tile matrix
 				int random = (int) (Math.random() * results.size());
 				TileMatrix tileMatrix = results.get(random);
 
-				// Delete the geometry columns
+				// Delete the tile matrix
 				dao.delete(tileMatrix);
 
 				// Verify deleted
@@ -326,7 +326,7 @@ public class TileMatrixUtils {
 					random = (int) (Math.random() * results.size());
 					tileMatrix = results.get(random);
 
-					// Find which geometry columns to delete
+					// Find which tile matrix to delete
 					QueryBuilder<TileMatrix, TileMatrixKey> qb = dao
 							.queryBuilder();
 					qb.where().eq(TileMatrix.COLUMN_ZOOM_LEVEL,
