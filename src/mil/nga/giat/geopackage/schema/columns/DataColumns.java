@@ -234,7 +234,7 @@ public class DataColumns {
 			DataColumnConstraintsDao dao) throws SQLException {
 		List<DataColumnConstraints> constraints = null;
 		if (constraintName != null) {
-			constraints = dao.queryForConstraintName(constraintName);
+			constraints = dao.queryByConstraintName(constraintName);
 		}
 		return constraints;
 	}

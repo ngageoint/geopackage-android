@@ -46,8 +46,7 @@ public class GeometryColumnsSqlMmDao extends
 					key.getTableName());
 			fieldValues.put(GeometryColumnsSqlMm.COLUMN_COLUMN_NAME,
 					key.getColumnName());
-			List<GeometryColumnsSqlMm> results = super
-					.queryForFieldValues(fieldValues);
+			List<GeometryColumnsSqlMm> results = queryForFieldValues(fieldValues);
 			if (!results.isEmpty()) {
 				if (results.size() > 1) {
 					throw new SQLException("More than one "

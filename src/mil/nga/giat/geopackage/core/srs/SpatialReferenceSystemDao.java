@@ -168,7 +168,7 @@ public class SpatialReferenceSystemDao extends
 			}
 
 			// Delete
-			count = super.delete(srs);
+			count = delete(srs);
 		}
 		return count;
 	}
@@ -204,7 +204,7 @@ public class SpatialReferenceSystemDao extends
 			throws SQLException {
 		int count = 0;
 		if (preparedDelete != null) {
-			List<SpatialReferenceSystem> srsList = super.query(preparedDelete);
+			List<SpatialReferenceSystem> srsList = query(preparedDelete);
 			count = deleteCascade(srsList);
 		}
 		return count;
@@ -220,7 +220,7 @@ public class SpatialReferenceSystemDao extends
 	public int deleteByIdCascade(Long id) throws SQLException {
 		int count = 0;
 		if (id != null) {
-			SpatialReferenceSystem srs = super.queryForId(id);
+			SpatialReferenceSystem srs = queryForId(id);
 			if (srs != null) {
 				count = deleteCascade(srs);
 			}

@@ -43,7 +43,7 @@ public class DataColumnsDao extends BaseDaoImpl<DataColumns, TableColumnKey> {
 			fieldValues.put(DataColumns.COLUMN_TABLE_NAME, key.getTableName());
 			fieldValues
 					.put(DataColumns.COLUMN_COLUMN_NAME, key.getColumnName());
-			List<DataColumns> results = super.queryForFieldValues(fieldValues);
+			List<DataColumns> results = queryForFieldValues(fieldValues);
 			if (!results.isEmpty()) {
 				if (results.size() > 1) {
 					throw new SQLException("More than one "
@@ -157,13 +157,13 @@ public class DataColumnsDao extends BaseDaoImpl<DataColumns, TableColumnKey> {
 	}
 
 	/**
-	 * Query for the constraint name
+	 * Query by the constraint name
 	 * 
 	 * @param constraintName
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<DataColumns> queryForConstraintName(String constraintName)
+	public List<DataColumns> queryByConstraintName(String constraintName)
 			throws SQLException {
 		return queryForEq(DataColumns.COLUMN_CONSTRAINT_NAME, constraintName);
 	}

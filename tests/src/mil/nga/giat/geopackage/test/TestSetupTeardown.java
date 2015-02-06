@@ -50,6 +50,8 @@ public class TestSetupTeardown {
 
 	public static final int CREATE_DATA_COLUMNS_COUNT = CREATE_GEOMETRY_COLUMNS_COUNT;
 
+	public static final int CREATE_DATA_COLUMN_CONSTRAINTS_COUNT = 7;
+
 	/**
 	 * Set up the create database
 	 * 

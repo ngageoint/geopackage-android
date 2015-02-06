@@ -142,7 +142,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 				}
 			}
 
-			count = super.delete(contents);
+			count = delete(contents);
 		}
 		return count;
 	}
@@ -176,7 +176,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 			throws SQLException {
 		int count = 0;
 		if (preparedDelete != null) {
-			List<Contents> contentsList = super.query(preparedDelete);
+			List<Contents> contentsList = query(preparedDelete);
 			count = deleteCascade(contentsList);
 		}
 		return count;
@@ -192,7 +192,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	public int deleteByIdCascade(String id) throws SQLException {
 		int count = 0;
 		if (id != null) {
-			Contents contents = super.queryForId(id);
+			Contents contents = queryForId(id);
 			if (contents != null) {
 				count = deleteCascade(contents);
 			}

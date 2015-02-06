@@ -40,7 +40,7 @@ public class TileMatrixDao extends BaseDaoImpl<TileMatrix, TileMatrixKey> {
 			Map<String, Object> fieldValues = new HashMap<String, Object>();
 			fieldValues.put(TileMatrix.COLUMN_TABLE_NAME, key.getTableName());
 			fieldValues.put(TileMatrix.COLUMN_ZOOM_LEVEL, key.getZoomLevel());
-			List<TileMatrix> results = super.queryForFieldValues(fieldValues);
+			List<TileMatrix> results = queryForFieldValues(fieldValues);
 			if (!results.isEmpty()) {
 				if (results.size() > 1) {
 					throw new SQLException(

@@ -1,7 +1,11 @@
 package mil.nga.giat.geopackage.schema.constraints;
 
 import java.math.BigDecimal;
-import java.util.Locale;
+import java.sql.SQLException;
+import java.util.List;
+
+import mil.nga.giat.geopackage.schema.columns.DataColumns;
+import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -127,18 +131,17 @@ public class DataColumnConstraints {
 	}
 
 	public DataColumnConstraintType getConstraintType() {
-		return DataColumnConstraintType.valueOf(constraintType
-				.toUpperCase(Locale.ENGLISH));
+		return DataColumnConstraintType.fromValue(constraintType);
 	}
 
 	public void setConstraintType(String constraintType) {
 		DataColumnConstraintType type = DataColumnConstraintType
-				.valueOf(constraintType.toUpperCase(Locale.ENGLISH));
+				.fromValue(constraintType);
 		setConstraintType(type);
 	}
 
 	public void setConstraintType(DataColumnConstraintType constraintType) {
-		this.constraintType = constraintType.name().toLowerCase(Locale.ENGLISH);
+		this.constraintType = constraintType.getValue();
 	}
 
 	public String getValue() {
@@ -187,6 +190,14 @@ public class DataColumnConstraints {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public List<DataColumns> getColumns(DataColumnsDao dao) throws SQLException {
+		List<DataColumns> columns = null;
+		if (constraintName != null) {
+			columns = dao.queryByConstraintName(constraintName);
+		}
+		return columns;
 	}
 
 }

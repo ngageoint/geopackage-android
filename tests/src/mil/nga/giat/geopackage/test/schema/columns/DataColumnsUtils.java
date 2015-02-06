@@ -53,7 +53,7 @@ public class DataColumnsUtils {
 
 			List<DataColumns> results = dao.queryForAll();
 			if (expectedResults != null) {
-				TestCase.assertEquals("Unexpected number of tile matrix rows",
+				TestCase.assertEquals("Unexpected number of data columns rows",
 						expectedResults.intValue(), results.size());
 			}
 
@@ -332,7 +332,7 @@ public class DataColumnsUtils {
 			dataColumns.setTitle(title);
 			dataColumns.setDescription(description);
 			dataColumns.setConstraint(dataColumnConstraintsDao
-					.queryForConstraintName(TestUtils.SAMPLE_ENUM_CONSTRAINT)
+					.queryByConstraintName(TestUtils.SAMPLE_ENUM_CONSTRAINT)
 					.get(0));
 			dao.create(dataColumns);
 
