@@ -562,14 +562,14 @@ public class GeometryColumnsUtils {
 					queryGeometryColumns.getColumnName());
 			TestCase.assertEquals(geometryType,
 					queryGeometryColumns.getGeometryType());
-			TestCase.assertEquals(contents.getSrsId(),
+			TestCase.assertEquals(contents.getSrsId().longValue(),
 					queryGeometryColumns.getSrsId());
 			TestCase.assertEquals(z, queryGeometryColumns.getZ());
 			TestCase.assertEquals(m, queryGeometryColumns.getM());
 			TestCase.assertEquals(contents.getId(), queryGeometryColumns
 					.getContents().getId());
-			TestCase.assertEquals(contents.getSrsId(), queryGeometryColumns
-					.getSrs().getId());
+			TestCase.assertEquals(contents.getSrsId().longValue(),
+					queryGeometryColumns.getSrs().getId());
 		}
 	}
 

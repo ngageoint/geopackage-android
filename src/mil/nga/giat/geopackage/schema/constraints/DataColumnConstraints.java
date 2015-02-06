@@ -164,11 +164,10 @@ public class DataColumnConstraints {
 	}
 
 	public void setValue(String value) {
-		if (constraintType != null && value != null) {
-			if (getConstraintType().equals(DataColumnConstraintType.RANGE)) {
-				throw new GeoPackageException("The value must be null for "
-						+ DataColumnConstraintType.RANGE + " constraints");
-			}
+		if (constraintType != null && value != null
+				&& getConstraintType().equals(DataColumnConstraintType.RANGE)) {
+			throw new GeoPackageException("The value must be null for "
+					+ DataColumnConstraintType.RANGE + " constraints");
 		}
 		this.value = value;
 	}
@@ -232,13 +231,11 @@ public class DataColumnConstraints {
 	 * @param value
 	 */
 	private void validateRangeValue(String column, Object value) {
-		if (constraintType != null && value != null) {
-			if (!getConstraintType().equals(DataColumnConstraintType.RANGE)) {
-				throw new GeoPackageException("The " + column
-						+ " must be null for " + DataColumnConstraintType.ENUM
-						+ " and " + DataColumnConstraintType.GLOB
-						+ " constraints");
-			}
+		if (constraintType != null && value != null
+				&& !getConstraintType().equals(DataColumnConstraintType.RANGE)) {
+			throw new GeoPackageException("The " + column
+					+ " must be null for " + DataColumnConstraintType.ENUM
+					+ " and " + DataColumnConstraintType.GLOB + " constraints");
 		}
 	}
 

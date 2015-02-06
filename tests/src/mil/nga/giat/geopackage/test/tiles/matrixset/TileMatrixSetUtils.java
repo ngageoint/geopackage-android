@@ -275,7 +275,7 @@ public class TileMatrixSetUtils {
 					.getId());
 			TestCase.assertEquals(contents.getId(),
 					queryTileMatrixSet.getTableName());
-			TestCase.assertEquals(contents.getSrsId(),
+			TestCase.assertEquals(contents.getSrsId().longValue(),
 					queryTileMatrixSet.getSrsId());
 			TestCase.assertEquals(contents.getMinX(),
 					queryTileMatrixSet.getMinX());
@@ -287,8 +287,8 @@ public class TileMatrixSetUtils {
 					queryTileMatrixSet.getMaxY());
 			TestCase.assertEquals(contents.getId(), queryTileMatrixSet
 					.getContents().getId());
-			TestCase.assertEquals(contents.getSrsId(), queryTileMatrixSet
-					.getSrs().getId());
+			TestCase.assertEquals(contents.getSrsId().longValue(),
+					queryTileMatrixSet.getSrs().getId());
 		}
 	}
 

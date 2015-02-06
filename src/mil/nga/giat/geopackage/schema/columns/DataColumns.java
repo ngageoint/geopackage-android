@@ -167,6 +167,8 @@ public class DataColumns {
 						+ " must have a data type");
 			}
 			tableName = contents.getId();
+		} else {
+			tableName = null;
 		}
 	}
 

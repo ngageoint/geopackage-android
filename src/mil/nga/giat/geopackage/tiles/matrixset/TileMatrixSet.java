@@ -138,6 +138,8 @@ public class TileMatrixSet {
 						+ ContentsDataType.TILES.getName());
 			}
 			tableName = contents.getId();
+		} else {
+			tableName = null;
 		}
 	}
 
@@ -151,9 +153,7 @@ public class TileMatrixSet {
 
 	public void setSrs(SpatialReferenceSystem srs) {
 		this.srs = srs;
-		if (srs != null) {
-			srsId = srs.getId();
-		}
+		srsId = srs != null ? srs.getId() : -1;
 	}
 
 	public long getSrsId() {

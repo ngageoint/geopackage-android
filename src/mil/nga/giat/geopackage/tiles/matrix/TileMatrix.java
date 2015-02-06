@@ -170,6 +170,8 @@ public class TileMatrix {
 						+ ContentsDataType.TILES.getName());
 			}
 			tableName = contents.getId();
+		} else {
+			tableName = null;
 		}
 	}
 

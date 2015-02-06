@@ -151,7 +151,7 @@ public class Contents {
 	 * Unique identifier for each Spatial Reference System within a GeoPackage
 	 */
 	@DatabaseField(columnName = COLUMN_SRS_ID)
-	private long srsId;
+	private Long srsId;
 
 	/**
 	 * Geometry Columns
@@ -264,12 +264,10 @@ public class Contents {
 
 	public void setSrs(SpatialReferenceSystem srs) {
 		this.srs = srs;
-		if (srs != null) {
-			srsId = srs.getId();
-		}
+		srsId = srs != null ? srs.getId() : null;
 	}
 
-	public long getSrsId() {
+	public Long getSrsId() {
 		return srsId;
 	}
 
