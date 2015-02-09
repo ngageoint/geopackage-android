@@ -14,6 +14,9 @@ import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.contents.ContentsDataType;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.extension.ExtensionScopeType;
+import mil.nga.giat.geopackage.extension.Extensions;
+import mil.nga.giat.geopackage.extension.ExtensionsDao;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
@@ -61,6 +64,8 @@ public class TestSetupTeardown {
 	public static final int CREATE_METADATA_COUNT = 3;
 
 	public static final int CREATE_METADATA_REFERENCE_COUNT = 3;
+
+	public static final int CREATE_EXTENSIONS_COUNT = 3;
 
 	/**
 	 * Set up the create database
@@ -113,9 +118,8 @@ public class TestSetupTeardown {
 	private static void setUpCreateCommon(GeoPackage geoPackage)
 			throws SQLException {
 
+		// Metadata
 		geoPackage.createMetadataTable();
-		geoPackage.createMetadataReferenceTable();
-
 		MetadataDao metadataDao = geoPackage.getMetadataDao();
 
 		Metadata metadata1 = new Metadata();
@@ -142,6 +146,8 @@ public class TestSetupTeardown {
 		metadata3.setMetadata("TEST METADATA 3");
 		metadataDao.create(metadata3);
 
+		// Metadata Reference
+		geoPackage.createMetadataReferenceTable();
 		MetadataReferenceDao metadataReferenceDao = geoPackage
 				.getMetadataReferenceDao();
 
@@ -167,6 +173,31 @@ public class TestSetupTeardown {
 		reference3.setTimestamp(new Date());
 		reference3.setMetadata(metadata3);
 		metadataReferenceDao.create(reference3);
+
+		// Extensions
+		geoPackage.createExtensionsTable();
+		ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
+
+		Extensions extensions1 = new Extensions();
+		extensions1.setTableName("TEST_TABLE_NAME_1");
+		extensions1.setColumnName("TEST_COLUMN_NAME_1");
+		extensions1.setExtensionName("nga", "test_extension_1");
+		extensions1.setDefinition("TEST DEFINITION 1");
+		extensions1.setScope(ExtensionScopeType.READ_WRITE);
+		extensionsDao.create(extensions1);
+
+		Extensions extensions2 = new Extensions();
+		extensions2.setTableName("TEST_TABLE_NAME_2");
+		extensions2.setExtensionName("nga", "test_extension_2");
+		extensions2.setDefinition("TEST DEFINITION 2");
+		extensions2.setScope(ExtensionScopeType.WRITE_ONLY);
+		extensionsDao.create(extensions2);
+
+		Extensions extensions3 = new Extensions();
+		extensions3.setExtensionName("nga", "test_extension_3");
+		extensions3.setDefinition("TEST DEFINITION 3");
+		extensions3.setScope(ExtensionScopeType.READ_WRITE);
+		extensionsDao.create(extensions3);
 	}
 
 	/**

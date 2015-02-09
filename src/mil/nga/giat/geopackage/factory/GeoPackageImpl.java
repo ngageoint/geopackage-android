@@ -14,6 +14,8 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMm;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
+import mil.nga.giat.geopackage.extension.Extensions;
+import mil.nga.giat.geopackage.extension.ExtensionsDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSql;
@@ -574,6 +576,33 @@ class GeoPackageImpl implements GeoPackage {
 		} catch (SQLException e) {
 			throw new GeoPackageException("Failed to check if "
 					+ MetadataReference.class.getSimpleName()
+					+ " table exists and create it", e);
+		}
+		return created;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExtensionsDao getExtensionsDao() {
+		return createDao(Extensions.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createExtensionsTable() {
+		boolean created = false;
+		ExtensionsDao dao = getExtensionsDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = tableCreator.createExtensions() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to check if "
+					+ Extensions.class.getSimpleName()
 					+ " table exists and create it", e);
 		}
 		return created;

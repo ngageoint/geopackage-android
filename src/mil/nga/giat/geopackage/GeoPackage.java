@@ -5,6 +5,7 @@ import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSqlDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
+import mil.nga.giat.geopackage.extension.ExtensionsDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
@@ -251,5 +252,19 @@ public interface GeoPackage {
 	 * @return
 	 */
 	public boolean createMetadataReferenceTable();
+
+	/**
+	 * Get an Extensions DAO
+	 * 
+	 * @return
+	 */
+	public ExtensionsDao getExtensionsDao();
+
+	/**
+	 * Create the Extensions table if it does not already exist
+	 * 
+	 * @return
+	 */
+	public boolean createExtensionsTable();
 
 }
