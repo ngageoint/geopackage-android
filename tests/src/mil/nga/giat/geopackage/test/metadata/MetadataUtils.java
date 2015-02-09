@@ -264,8 +264,9 @@ public class MetadataUtils {
 						.getMetadataReferenceDao();
 				int referenceCount = metadataReferenceDao.queryByMetadata(
 						metadata.getId()).size();
-				int referenceParentCount = metadataReferenceDao
-						.queryByMetadataParent(metadata.getId()).size();
+				List<MetadataReference> metadataReferenceList = metadataReferenceDao
+						.queryByMetadataParent(metadata.getId());
+				int referenceParentCount = metadataReferenceList.size();
 
 				// Delete the metadata
 				if (cascade) {
@@ -291,6 +292,9 @@ public class MetadataUtils {
 							queryMetadataReference.size());
 					TestCase.assertEquals(referenceParentCount,
 							queryMetadataParentReference.size());
+				}
+				for(MetadataReference metadataReference: metadataReferenceList){
+					TestCase.assertNotNull(metadataReferenceDao.queryByMetadata(metadataReference.getFileId(), metadataReference.getParentId()));
 				}
 
 				// Choose prepared deleted
@@ -340,6 +344,9 @@ public class MetadataUtils {
 								queryMetadataReference.size());
 						TestCase.assertEquals(referenceParentCount,
 								queryMetadataParentReference.size());
+					}
+					for(MetadataReference metadataReference: metadataReferenceList){
+						TestCase.assertNotNull(metadataReferenceDao.queryByMetadata(metadataReference.getFileId(), metadataReference.getParentId()));
 					}
 				}
 			}
