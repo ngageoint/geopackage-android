@@ -24,6 +24,10 @@ import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.features.user.FeatureTableReader;
+import mil.nga.giat.geopackage.metadata.Metadata;
+import mil.nga.giat.geopackage.metadata.MetadataDao;
+import mil.nga.giat.geopackage.metadata.reference.MetadataReference;
+import mil.nga.giat.geopackage.metadata.reference.MetadataReferenceDao;
 import mil.nga.giat.geopackage.schema.columns.DataColumns;
 import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraints;
@@ -516,6 +520,60 @@ class GeoPackageImpl implements GeoPackage {
 		} catch (SQLException e) {
 			throw new GeoPackageException("Failed to check if "
 					+ DataColumnConstraints.class.getSimpleName()
+					+ " table exists and create it", e);
+		}
+		return created;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public MetadataDao getMetadataDao() {
+		return createDao(Metadata.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createMetadataTable() {
+		boolean created = false;
+		MetadataDao dao = getMetadataDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = tableCreator.createMetadata() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to check if "
+					+ Metadata.class.getSimpleName()
+					+ " table exists and create it", e);
+		}
+		return created;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public MetadataReferenceDao getMetadataReferenceDao() {
+		return createDao(MetadataReference.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean createMetadataReferenceTable() {
+		boolean created = false;
+		MetadataReferenceDao dao = getMetadataReferenceDao();
+		try {
+			if (!dao.isTableExists()) {
+				created = tableCreator.createMetadataReference() > 0;
+			}
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to check if "
+					+ MetadataReference.class.getSimpleName()
 					+ " table exists and create it", e);
 		}
 		return created;

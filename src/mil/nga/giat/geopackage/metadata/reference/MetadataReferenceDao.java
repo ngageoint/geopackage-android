@@ -50,8 +50,8 @@ public class MetadataReferenceDao extends BaseDaoImpl<MetadataReference, Void> {
 		ub.updateColumnValue(MetadataReference.COLUMN_TIMESTAMP,
 				metadataReference.getTimestamp());
 
-		setFkWhere(ub.where(), metadataReference.getMdFileId(),
-				metadataReference.getMdParentId());
+		setFkWhere(ub.where(), metadataReference.getFileId(),
+				metadataReference.getParentId());
 
 		PreparedUpdate<MetadataReference> update = ub.prepare();
 		int updated = update(update);
@@ -69,8 +69,8 @@ public class MetadataReferenceDao extends BaseDaoImpl<MetadataReference, Void> {
 
 		DeleteBuilder<MetadataReference, Void> db = deleteBuilder();
 
-		setFkWhere(db.where(), metadataReference.getMdFileId(),
-				metadataReference.getMdParentId());
+		setFkWhere(db.where(), metadataReference.getFileId(),
+				metadataReference.getParentId());
 
 		int deleted = db.delete();
 
@@ -78,18 +78,56 @@ public class MetadataReferenceDao extends BaseDaoImpl<MetadataReference, Void> {
 	}
 
 	/**
-	 * Query by the metadata ids
+	 * Delete metadata references with foreign keys to the metadata file id
 	 * 
-	 * @param mdFileId
-	 * @param mdParentId
+	 * @param fileId
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<MetadataReference> queryByMetadata(long mdFileId,
-			Long mdParentId) throws SQLException {
+	public int deleteByMetadata(long fileId) throws SQLException {
+
+		DeleteBuilder<MetadataReference, Void> db = deleteBuilder();
+		db.where().eq(MetadataReference.COLUMN_FILE_ID, fileId);
+
+		int deleted = db.delete();
+
+		return deleted;
+	}
+
+	/**
+	 * Remove metadata references (by updating the field to null) with foreign
+	 * keys to the metadata parent id
+	 * 
+	 * @param parentId
+	 * @return
+	 * @throws SQLException
+	 */
+	public int removeMetadataParent(long parentId) throws SQLException {
+
+		UpdateBuilder<MetadataReference, Void> ub = updateBuilder();
+		ub.updateColumnValue(MetadataReference.COLUMN_PARENT_ID, null);
+
+		ub.where().eq(MetadataReference.COLUMN_PARENT_ID, parentId);
+
+		PreparedUpdate<MetadataReference> update = ub.prepare();
+		int updated = update(update);
+
+		return updated;
+	}
+
+	/**
+	 * Query by the metadata ids
+	 * 
+	 * @param fileId
+	 * @param parentId
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<MetadataReference> queryByMetadata(long fileId, Long parentId)
+			throws SQLException {
 
 		QueryBuilder<MetadataReference, Void> qb = queryBuilder();
-		setFkWhere(qb.where(), mdFileId, mdParentId);
+		setFkWhere(qb.where(), fileId, parentId);
 		List<MetadataReference> metadataReferences = qb.query();
 
 		return metadataReferences;
@@ -98,15 +136,32 @@ public class MetadataReferenceDao extends BaseDaoImpl<MetadataReference, Void> {
 	/**
 	 * Query by the metadata ids
 	 * 
-	 * @param mdFileId
+	 * @param fileId
 	 * @return
 	 * @throws SQLException
 	 */
-	public List<MetadataReference> queryByMetadata(long mdFileId)
+	public List<MetadataReference> queryByMetadata(long fileId)
 			throws SQLException {
 
 		QueryBuilder<MetadataReference, Void> qb = queryBuilder();
-		setFkWhere(qb.where(), mdFileId);
+		qb.where().eq(MetadataReference.COLUMN_FILE_ID, fileId);
+		List<MetadataReference> metadataReferences = qb.query();
+
+		return metadataReferences;
+	}
+
+	/**
+	 * Query by the metadata parent ids
+	 * 
+	 * @param parentId
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<MetadataReference> queryByMetadataParent(long parentId)
+			throws SQLException {
+
+		QueryBuilder<MetadataReference, Void> qb = queryBuilder();
+		qb.where().eq(MetadataReference.COLUMN_PARENT_ID, parentId);
 		List<MetadataReference> metadataReferences = qb.query();
 
 		return metadataReferences;
@@ -116,33 +171,19 @@ public class MetadataReferenceDao extends BaseDaoImpl<MetadataReference, Void> {
 	 * Set the foreign key column criteria in the where clause
 	 * 
 	 * @param where
-	 * @param mdFileId
-	 * @param mdParentId
+	 * @param fileId
+	 * @param parentId
 	 * @throws SQLException
 	 */
-	private void setFkWhere(Where<MetadataReference, Void> where,
-			long mdFileId, Long mdParentId) throws SQLException {
+	private void setFkWhere(Where<MetadataReference, Void> where, long fileId,
+			Long parentId) throws SQLException {
 
-		where.eq(MetadataReference.COLUMN_MD_FILE_ID, mdFileId);
-		if (mdParentId == null) {
-			where.and().isNull(MetadataReference.COLUMN_MD_PARENT_ID);
+		where.eq(MetadataReference.COLUMN_FILE_ID, fileId);
+		if (parentId == null) {
+			where.and().isNull(MetadataReference.COLUMN_PARENT_ID);
 		} else {
-			where.and().eq(MetadataReference.COLUMN_MD_PARENT_ID, mdParentId);
+			where.and().eq(MetadataReference.COLUMN_PARENT_ID, parentId);
 		}
-
-	}
-
-	/**
-	 * Set the foreign key column criteria in the where clause
-	 * 
-	 * @param where
-	 * @param mdFileId
-	 * @throws SQLException
-	 */
-	private void setFkWhere(Where<MetadataReference, Void> where, long mdFileId)
-			throws SQLException {
-
-		where.eq(MetadataReference.COLUMN_MD_FILE_ID, mdFileId);
 
 	}
 

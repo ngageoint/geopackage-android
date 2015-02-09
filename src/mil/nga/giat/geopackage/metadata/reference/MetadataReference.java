@@ -51,12 +51,12 @@ public class MetadataReference {
 	/**
 	 * mdFileId field name
 	 */
-	public static final String COLUMN_MD_FILE_ID = "md_file_id";
+	public static final String COLUMN_FILE_ID = "md_file_id";
 
 	/**
 	 * mdParentId field name
 	 */
-	public static final String COLUMN_MD_PARENT_ID = "md_parent_id";
+	public static final String COLUMN_PARENT_ID = "md_parent_id";
 
 	/**
 	 * Lowercase metadata reference scope; one of ‘geopackage’,
@@ -77,7 +77,7 @@ public class MetadataReference {
 	 * reference_scope of ‘geopackage’,‘table’ or ‘row’, or the name of a column
 	 * in the table_name table for reference_scope of ‘column’ or ‘row/col’
 	 */
-	@DatabaseField(columnName = COLUMN_REFERENCE_SCOPE)
+	@DatabaseField(columnName = COLUMN_COLUMN_NAME)
 	private String columnName;
 
 	/**
@@ -98,20 +98,20 @@ public class MetadataReference {
 	/**
 	 * Metadata
 	 */
-	@DatabaseField(columnName = COLUMN_MD_FILE_ID, canBeNull = false, foreign = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = COLUMN_FILE_ID, canBeNull = false, foreign = true, foreignAutoRefresh = true)
 	private Metadata metadata;
 
 	/**
 	 * gpkg_metadata table id column value for the metadata to which this
 	 * gpkg_metadata_reference applies
 	 */
-	@DatabaseField(columnName = COLUMN_MD_FILE_ID, canBeNull = false)
-	private long mdFileId;
+	@DatabaseField(columnName = COLUMN_FILE_ID, canBeNull = false)
+	private long fileId;
 
 	/**
 	 * Parent Metadata
 	 */
-	@DatabaseField(columnName = COLUMN_MD_PARENT_ID, foreign = true, foreignAutoRefresh = true)
+	@DatabaseField(columnName = COLUMN_PARENT_ID, foreign = true, foreignAutoRefresh = true)
 	private Metadata parentMetadata;
 
 	/**
@@ -119,8 +119,8 @@ public class MetadataReference {
 	 * gpkg_metadata for the gpkg_metadata to which this gpkg_metadata_reference
 	 * applies, or NULL if md_file_id forms the root of a metadata hierarchy
 	 */
-	@DatabaseField(columnName = COLUMN_MD_PARENT_ID)
-	private Long mdParentId;
+	@DatabaseField(columnName = COLUMN_PARENT_ID)
+	private Long parentId;
 
 	/**
 	 * Default Constructor
@@ -222,11 +222,11 @@ public class MetadataReference {
 
 	public void setMetadata(Metadata metadata) {
 		this.metadata = metadata;
-		mdFileId = metadata != null ? metadata.getId() : -1;
+		fileId = metadata != null ? metadata.getId() : -1;
 	}
 
-	public long getMdFileId() {
-		return mdFileId;
+	public long getFileId() {
+		return fileId;
 	}
 
 	public Metadata getParentMetadata() {
@@ -235,11 +235,11 @@ public class MetadataReference {
 
 	public void setParentMetadata(Metadata parentMetadata) {
 		this.parentMetadata = parentMetadata;
-		mdParentId = parentMetadata != null ? parentMetadata.getId() : -1;
+		parentId = parentMetadata != null ? parentMetadata.getId() : -1;
 	}
 
-	public Long getMdParentId() {
-		return mdParentId;
+	public Long getParentId() {
+		return parentId;
 	}
 
 }

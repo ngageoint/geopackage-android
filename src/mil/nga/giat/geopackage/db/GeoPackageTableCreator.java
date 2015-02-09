@@ -123,6 +123,33 @@ public class GeoPackageTableCreator {
 	}
 
 	/**
+	 * Create Metadata table
+	 * 
+	 * @return executed statements
+	 */
+	public int createMetadata() {
+		return createTable(context.getString(R.string.sql_metadata));
+	}
+
+	/**
+	 * Create Metadata Reference table
+	 * 
+	 * @return executed statements
+	 */
+	public int createMetadataReference() {
+		return createTable(context.getString(R.string.sql_metadata_reference));
+	}
+
+	/**
+	 * Create Extensions table
+	 * 
+	 * @return executed statements
+	 */
+	public int createExtensions() {
+		return createTable(context.getString(R.string.sql_extensions));
+	}
+
+	/**
 	 * Create a table using the table script
 	 * 
 	 * @param tableScript

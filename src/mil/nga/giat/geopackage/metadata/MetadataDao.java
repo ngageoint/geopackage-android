@@ -9,7 +9,6 @@ import mil.nga.giat.geopackage.metadata.reference.MetadataReferenceDao;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.support.ConnectionSource;
 
@@ -49,13 +48,10 @@ public class MetadataDao extends BaseDaoImpl<Metadata, Long> {
 
 		if (metadata != null) {
 
-			// Delete Metadata Reference
-			ForeignCollection<MetadataReference> metadataReferenceCollection = metadata
-					.getMetadataReferences();
-			if (!metadataReferenceCollection.isEmpty()) {
-				MetadataReferenceDao dao = getMetadataReferenceDao();
-				dao.delete(metadataReferenceCollection);
-			}
+			// Delete Metadata References and remove parent references
+			MetadataReferenceDao dao = getMetadataReferenceDao();
+			dao.deleteByMetadata(metadata.getId());
+			dao.removeMetadataParent(metadata.getId());
 
 			// Delete
 			count = delete(metadata);

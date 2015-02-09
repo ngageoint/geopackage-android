@@ -1,10 +1,6 @@
 package mil.nga.giat.geopackage.metadata;
 
-import mil.nga.giat.geopackage.metadata.reference.MetadataReference;
-
-import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 /**
@@ -27,14 +23,14 @@ public class Metadata {
 	public static final String COLUMN_ID = "id";
 
 	/**
-	 * mdScope field name
+	 * scope field name
 	 */
-	public static final String COLUMN_MD_SCOPE = "md_scope";
+	public static final String COLUMN_SCOPE = "md_scope";
 
 	/**
-	 * mdStandardUri field name
+	 * standardUri field name
 	 */
-	public static final String COLUMN_MD_STANDARD_URI = "md_standard_uri";
+	public static final String COLUMN_STANDARD_URI = "md_standard_uri";
 
 	/**
 	 * mimeType field name
@@ -56,14 +52,14 @@ public class Metadata {
 	 * Case sensitive name of the data scope to which this metadata applies; see
 	 * Metadata Scopes below
 	 */
-	@DatabaseField(columnName = COLUMN_MD_SCOPE, canBeNull = false)
-	private String mdScope;
+	@DatabaseField(columnName = COLUMN_SCOPE, canBeNull = false)
+	private String scope;
 
 	/**
 	 * URI reference to the metadata structure definition authority
 	 */
-	@DatabaseField(columnName = COLUMN_MD_STANDARD_URI, canBeNull = false)
-	private String mdStandardUri;
+	@DatabaseField(columnName = COLUMN_STANDARD_URI, canBeNull = false)
+	private String standardUri;
 
 	/**
 	 * MIME encoding of metadata
@@ -76,12 +72,6 @@ public class Metadata {
 	 */
 	@DatabaseField(columnName = COLUMN_METADATA, canBeNull = false)
 	private String metadata;
-
-	/**
-	 * Metadata References
-	 */
-	@ForeignCollectionField(eager = false)
-	private ForeignCollection<MetadataReference> metadataReferences;
 
 	/**
 	 * Default Constructor
@@ -99,19 +89,19 @@ public class Metadata {
 	}
 
 	public MetadataScopeType getMetadataScope() {
-		return MetadataScopeType.fromName(mdScope);
+		return MetadataScopeType.fromName(scope);
 	}
 
 	public void setMetadataScope(MetadataScopeType metadataScope) {
-		this.mdScope = metadataScope.getName();
+		this.scope = metadataScope.getName();
 	}
 
-	public String getMdStandardUri() {
-		return mdStandardUri;
+	public String getStandardUri() {
+		return standardUri;
 	}
 
-	public void setMdStandardUri(String mdStandardUri) {
-		this.mdStandardUri = mdStandardUri;
+	public void setStandardUri(String standardUri) {
+		this.standardUri = standardUri;
 	}
 
 	public String getMimeType() {
@@ -128,10 +118,6 @@ public class Metadata {
 
 	public void setMetadata(String metadata) {
 		this.metadata = metadata;
-	}
-
-	public ForeignCollection<MetadataReference> getMetadataReferences() {
-		return metadataReferences;
 	}
 
 }

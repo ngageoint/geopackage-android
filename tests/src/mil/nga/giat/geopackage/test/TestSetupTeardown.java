@@ -20,6 +20,12 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.io.BitmapConverter;
+import mil.nga.giat.geopackage.metadata.Metadata;
+import mil.nga.giat.geopackage.metadata.MetadataDao;
+import mil.nga.giat.geopackage.metadata.MetadataScopeType;
+import mil.nga.giat.geopackage.metadata.reference.MetadataReference;
+import mil.nga.giat.geopackage.metadata.reference.MetadataReferenceDao;
+import mil.nga.giat.geopackage.metadata.reference.ReferenceScopeType;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -51,6 +57,8 @@ public class TestSetupTeardown {
 	public static final int CREATE_DATA_COLUMNS_COUNT = CREATE_GEOMETRY_COLUMNS_COUNT;
 
 	public static final int CREATE_DATA_COLUMN_CONSTRAINTS_COUNT = 7;
+
+	public static final int CREATE_METADATA_COUNT = 3;
 
 	/**
 	 * Set up the create database
@@ -89,7 +97,74 @@ public class TestSetupTeardown {
 			setUpCreateTiles(testContext, geoPackage);
 		}
 
+		setUpCreateCommon(geoPackage);
+
 		return geoPackage;
+	}
+
+	/**
+	 * Set up create common
+	 * 
+	 * @param geoPackage
+	 * @throws SQLException
+	 */
+	private static void setUpCreateCommon(GeoPackage geoPackage)
+			throws SQLException {
+
+		geoPackage.createMetadataTable();
+		geoPackage.createMetadataReferenceTable();
+
+		MetadataDao metadataDao = geoPackage.getMetadataDao();
+
+		Metadata metadata1 = new Metadata();
+		metadata1.setId(1);
+		metadata1.setMetadataScope(MetadataScopeType.DATASET);
+		metadata1.setStandardUri("TEST_URI_1");
+		metadata1.setMimeType("text/xml");
+		metadata1.setMetadata("TEST METADATA 1");
+		metadataDao.create(metadata1);
+
+		Metadata metadata2 = new Metadata();
+		metadata2.setId(2);
+		metadata2.setMetadataScope(MetadataScopeType.FEATURE_TYPE);
+		metadata2.setStandardUri("TEST_URI_2");
+		metadata2.setMimeType("text/xml");
+		metadata2.setMetadata("TEST METADATA 2");
+		metadataDao.create(metadata2);
+
+		Metadata metadata3 = new Metadata();
+		metadata3.setId(3);
+		metadata3.setMetadataScope(MetadataScopeType.TILE);
+		metadata3.setStandardUri("TEST_URI_3");
+		metadata3.setMimeType("text/xml");
+		metadata3.setMetadata("TEST METADATA 3");
+		metadataDao.create(metadata3);
+
+		MetadataReferenceDao metadataReferenceDao = geoPackage
+				.getMetadataReferenceDao();
+
+		MetadataReference reference1 = new MetadataReference();
+		reference1.setReferenceScope(ReferenceScopeType.GEOPACKAGE);
+		reference1.setTimestamp(new Date());
+		reference1.setMetadata(metadata1);
+		metadataReferenceDao.create(reference1);
+
+		MetadataReference reference2 = new MetadataReference();
+		reference2.setReferenceScope(ReferenceScopeType.TABLE);
+		reference2.setTableName("TEST_TABLE_NAME_2");
+		reference2.setTimestamp(new Date());
+		reference2.setMetadata(metadata2);
+		reference2.setParentMetadata(metadata1);
+		metadataReferenceDao.create(reference2);
+
+		MetadataReference reference3 = new MetadataReference();
+		reference3.setReferenceScope(ReferenceScopeType.ROW_COL);
+		reference3.setTableName("TEST_TABLE_NAME_3");
+		reference3.setColumnName("TEST_COLUMN_NAME_3");
+		reference3.setRowIdValue(5L);
+		reference3.setTimestamp(new Date());
+		reference3.setMetadata(metadata3);
+		metadataReferenceDao.create(reference3);
 	}
 
 	/**
@@ -98,7 +173,7 @@ public class TestSetupTeardown {
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
-	public static void setUpCreateFeatures(GeoPackage geoPackage)
+	private static void setUpCreateFeatures(GeoPackage geoPackage)
 			throws SQLException {
 
 		// Get existing SRS objects
@@ -254,7 +329,7 @@ public class TestSetupTeardown {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
-	public static void setUpCreateTiles(Context testContext,
+	private static void setUpCreateTiles(Context testContext,
 			GeoPackage geoPackage) throws SQLException, IOException {
 
 		// Get existing SRS objects

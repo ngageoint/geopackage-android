@@ -11,6 +11,8 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.metadata.MetadataDao;
+import mil.nga.giat.geopackage.metadata.reference.MetadataReferenceDao;
 import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintsDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
@@ -221,5 +223,33 @@ public interface GeoPackage {
 	 * @return true if created
 	 */
 	public boolean createDataColumnConstraintsTable();
+
+	/**
+	 * Get a Metadata DAO
+	 * 
+	 * @return
+	 */
+	public MetadataDao getMetadataDao();
+
+	/**
+	 * Create the Metadata table if it does not already exist
+	 * 
+	 * @return
+	 */
+	public boolean createMetadataTable();
+
+	/**
+	 * Get a Metadata Reference DAO
+	 * 
+	 * @return
+	 */
+	public MetadataReferenceDao getMetadataReferenceDao();
+
+	/**
+	 * Create the Metadata Reference table if it does not already exist
+	 * 
+	 * @return
+	 */
+	public boolean createMetadataReferenceTable();
 
 }

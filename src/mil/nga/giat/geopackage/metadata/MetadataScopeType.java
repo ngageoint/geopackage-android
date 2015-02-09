@@ -122,7 +122,7 @@ public enum MetadataScopeType {
 			enumName.append(part.toUpperCase(Locale.US));
 		}
 
-		return MetadataScopeType.valueOf(name);
+		return MetadataScopeType.valueOf(enumName.toString());
 	}
 
 }
