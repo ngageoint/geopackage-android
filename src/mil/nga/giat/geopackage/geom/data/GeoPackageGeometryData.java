@@ -6,8 +6,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.extension.GeometryExtensions;
 import mil.nga.giat.geopackage.geom.Geometry;
-import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
 import mil.nga.giat.geopackage.geom.wkb.WkbGeometryWriter;
 import mil.nga.giat.geopackage.io.ByteReader;
@@ -411,8 +411,8 @@ public class GeoPackageGeometryData {
 		this.geometry = geometry;
 		empty = geometry == null;
 		if (geometry != null) {
-			extended = geometry.getGeometryType().getCode() > GeometryType.GEOMETRYCOLLECTION
-					.getCode();
+			extended = GeometryExtensions.isExtension(geometry
+					.getGeometryType());
 		}
 	}
 
