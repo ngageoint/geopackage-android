@@ -60,6 +60,8 @@ public class TestSetupTeardown {
 
 	public static final int CREATE_METADATA_COUNT = 3;
 
+	public static final int CREATE_METADATA_REFERENCE_COUNT = 3;
+
 	/**
 	 * Set up the create database
 	 * 
