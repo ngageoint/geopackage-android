@@ -3,12 +3,12 @@ package mil.nga.giat.geopackage.geom;
 import java.util.List;
 
 /**
- * Multi Point
+ * A restricted form of GeometryCollection where each Geometry in the collection
+ * must be of type Point.
  * 
  * @author osbornb
  */
-public class MultiPoint extends
-		GeometryCollection<Point> {
+public class MultiPoint extends GeometryCollection<Point> {
 
 	/**
 	 * Constructor

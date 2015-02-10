@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Curve Polygon
+ * A planar surface defined by an exterior ring and zero or more interior ring.
+ * Each ring is defined by a Curve instance.
  * 
  * @author osbornb
  */
-public class CurvePolygon<T extends Curve> extends
-		Surface {
+public class CurvePolygon<T extends Curve> extends Surface {
 
 	/**
 	 * List of rings
@@ -33,8 +33,7 @@ public class CurvePolygon<T extends Curve> extends
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected CurvePolygon(GeometryType type, boolean hasZ,
-			boolean hasM) {
+	protected CurvePolygon(GeometryType type, boolean hasZ, boolean hasM) {
 		super(type, hasZ, hasM);
 	}
 

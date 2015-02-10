@@ -1,12 +1,12 @@
 package mil.nga.giat.geopackage.geom;
 
 /**
- * Multi Curve
+ * A restricted form of GeometryCollection where each Geometry in the collection
+ * must be of type Curve.
  * 
  * @author osbornb
  */
-public abstract class MultiCurve<T extends Curve> extends
-		GeometryCollection<T> {
+public abstract class MultiCurve<T extends Curve> extends GeometryCollection<T> {
 
 	/**
 	 * Constructor

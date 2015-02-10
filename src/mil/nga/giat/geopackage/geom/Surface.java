@@ -1,7 +1,8 @@
 package mil.nga.giat.geopackage.geom;
 
 /**
- * Surface
+ * The base type for all 2-dimensional geometry types. A 2-dimensional geometry
+ * is a geometry that has an area.
  * 
  * @author osbornb
  */

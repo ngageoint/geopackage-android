@@ -1,7 +1,8 @@
 package mil.nga.giat.geopackage.geom;
 
 /**
- * Point
+ * A single location in space. Each point has an X and Y coordinate. A point MAY
+ * optionally also have a Z and/or an M value.
  * 
  * @author osbornb
  */

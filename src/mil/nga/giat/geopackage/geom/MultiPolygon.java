@@ -3,12 +3,12 @@ package mil.nga.giat.geopackage.geom;
 import java.util.List;
 
 /**
- * Multi Polygon
+ * A restricted form of MultiSurface where each Surface in the collection must
+ * be of type Polygon.
  * 
  * @author osbornb
  */
-public class MultiPolygon extends
-		MultiSurface<Polygon> {
+public class MultiPolygon extends MultiSurface<Polygon> {
 
 	/**
 	 * Constructor

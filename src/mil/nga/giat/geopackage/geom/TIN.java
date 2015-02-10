@@ -1,7 +1,8 @@
 package mil.nga.giat.geopackage.geom;
 
 /**
- * TIN
+ * A tetrahedron (4 triangular faces), corner at the origin and each unit
+ * coordinate digit.
  * 
  * @author osbornb
  */

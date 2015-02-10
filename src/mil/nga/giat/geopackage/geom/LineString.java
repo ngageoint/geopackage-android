@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Line String
+ * A Curve that connects two or more points in space.
  * 
  * @author osbornb
  */

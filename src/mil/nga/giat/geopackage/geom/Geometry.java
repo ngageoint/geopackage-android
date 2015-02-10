@@ -1,7 +1,7 @@
 package mil.nga.giat.geopackage.geom;
 
 /**
- * Geometry
+ * The root of the geometry type hierarchy
  * 
  * @author osbornb
  */

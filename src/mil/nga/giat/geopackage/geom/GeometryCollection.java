@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Geometry Collection
+ * A collection of zero or more Geometry instances.
  * 
  * @author osbornb
  */
-public class GeometryCollection<T extends Geometry> extends
-		Geometry {
+public class GeometryCollection<T extends Geometry> extends Geometry {
 
 	/**
 	 * List of geometries
@@ -33,8 +32,7 @@ public class GeometryCollection<T extends Geometry> extends
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected GeometryCollection(GeometryType type, boolean hasZ,
-			boolean hasM) {
+	protected GeometryCollection(GeometryType type, boolean hasZ, boolean hasM) {
 		super(type, hasZ, hasM);
 	}
 

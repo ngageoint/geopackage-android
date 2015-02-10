@@ -1,12 +1,12 @@
 package mil.nga.giat.geopackage.geom;
 
 /**
- * Polygon
+ * A restricted form of CurvePolygon where each ring is defined as a simple,
+ * closed LineString.
  * 
  * @author osbornb
  */
-public class Polygon extends
-		CurvePolygon<LineString> {
+public class Polygon extends CurvePolygon<LineString> {
 
 	/**
 	 * Constructor

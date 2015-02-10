@@ -3,12 +3,12 @@ package mil.nga.giat.geopackage.geom;
 import java.util.List;
 
 /**
- * Multi Line String
+ * A restricted form of MultiCurve where each Curve in the collection must be of
+ * type LineString.
  * 
  * @author osbornb
  */
-public class MultiLineString extends
-		MultiCurve<LineString> {
+public class MultiLineString extends MultiCurve<LineString> {
 
 	/**
 	 * Constructor

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Compound Curve
+ * Compound Curve, Curve sub type
  * 
  * @author osbornb
  */

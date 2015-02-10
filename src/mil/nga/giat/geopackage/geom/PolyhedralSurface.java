@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Polyhedral Surface
+ * Contiguous collection of polygons which share common boundary segments.
  * 
  * @author osbornb
  */
@@ -32,8 +32,7 @@ public class PolyhedralSurface extends Surface {
 	 * @param hasZ
 	 * @param hasM
 	 */
-	protected PolyhedralSurface(GeometryType type, boolean hasZ,
-			boolean hasM) {
+	protected PolyhedralSurface(GeometryType type, boolean hasZ, boolean hasM) {
 		super(type, hasZ, hasM);
 	}
 
