@@ -18,6 +18,8 @@ import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.PolyhedralSurface;
 import mil.nga.giat.geopackage.geom.TIN;
 import mil.nga.giat.geopackage.geom.Triangle;
+import mil.nga.giat.geopackage.geom.unit.CoordinateConverter;
+import mil.nga.giat.geopackage.geom.unit.DegreeConverter;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -33,24 +35,24 @@ import com.google.android.gms.maps.model.PolylineOptions;
 public class GoogleMapShapeConverter {
 
 	/**
-	 * Unit converter
+	 * Coordinate converter
 	 */
-	private final UnitConverter unitConverter;
+	private final CoordinateConverter coordinateConverter;
 
 	/**
-	 * Constructor, uses default {@link DegreesConverter}
+	 * Constructor, uses default {@link DegreeConverter}
 	 */
 	public GoogleMapShapeConverter() {
-		this(new DegreesConverter());
+		this(new DegreeConverter());
 	}
 
 	/**
-	 * Constructor with specified unit converter
+	 * Constructor with specified coordinate converter
 	 * 
-	 * @param unitConverter
+	 * @param coordinateConverter
 	 */
-	public GoogleMapShapeConverter(UnitConverter unitConverter) {
-		this.unitConverter = unitConverter;
+	public GoogleMapShapeConverter(CoordinateConverter coordinateConverter) {
+		this.coordinateConverter = coordinateConverter;
 	}
 
 	/**
@@ -60,8 +62,8 @@ public class GoogleMapShapeConverter {
 	 * @return
 	 */
 	public LatLng toLatLng(Point point) {
-		double latitude = unitConverter.toDegrees(point.getY());
-		double longitude = unitConverter.toDegrees(point.getX());
+		double latitude = coordinateConverter.toDegrees(point.getY());
+		double longitude = coordinateConverter.toDegrees(point.getX());
 		LatLng latLng = new LatLng(latitude, longitude);
 		return latLng;
 	}
@@ -85,8 +87,8 @@ public class GoogleMapShapeConverter {
 	 * @return
 	 */
 	public Point toPoint(LatLng latLng, boolean hasZ, boolean hasM) {
-		double y = unitConverter.degreesToUnits(latLng.latitude);
-		double x = unitConverter.degreesToUnits(latLng.longitude);
+		double y = coordinateConverter.degreesToUnits(latLng.latitude);
+		double x = coordinateConverter.degreesToUnits(latLng.longitude);
 		Point point = new Point(hasZ, hasM, x, y);
 		return point;
 	}

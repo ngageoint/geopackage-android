@@ -12,6 +12,8 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
+import mil.nga.giat.geopackage.geom.unit.CoordinateConverter;
+import mil.nga.giat.geopackage.geom.unit.DistanceConverter;
 import mil.nga.giat.geopackage.metadata.MetadataDao;
 import mil.nga.giat.geopackage.metadata.reference.MetadataReferenceDao;
 import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
@@ -175,6 +177,18 @@ public interface GeoPackage {
 	public TileDao getTileDao(TileMatrixSet tileMatrixSet);
 
 	/**
+	 * Get a Tile DAO from Tile Matrix Set
+	 * 
+	 * @param tileMatrixSet
+	 * @param coordinateConverter
+	 * @param distanceConverter
+	 * @return
+	 */
+	public TileDao getTileDao(TileMatrixSet tileMatrixSet,
+			CoordinateConverter coordinateConverter,
+			DistanceConverter distanceConverter);
+
+	/**
 	 * Get a Tile DAO from Contents
 	 * 
 	 * @param contents
@@ -183,12 +197,36 @@ public interface GeoPackage {
 	public TileDao getTileDao(Contents contents);
 
 	/**
+	 * Get a Tile DAO from Contents
+	 * 
+	 * @param contents
+	 * @param coordinateConverter
+	 * @param distanceConverter
+	 * @return
+	 */
+	public TileDao getTileDao(Contents contents,
+			CoordinateConverter coordinateConverter,
+			DistanceConverter distanceConverter);
+
+	/**
 	 * Get a Tile DAO from a table name
 	 * 
 	 * @param tableName
 	 * @return
 	 */
 	public TileDao getTileDao(String tableName);
+
+	/**
+	 * Get a Tile DAO from a table name
+	 * 
+	 * @param tableName
+	 * @param coordinateConverter
+	 * @param distanceConverter
+	 * @return
+	 */
+	public TileDao getTileDao(String tableName,
+			CoordinateConverter coordinateConverter,
+			DistanceConverter distanceConverter);
 
 	/**
 	 * Create a new tile table

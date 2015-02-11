@@ -64,4 +64,26 @@ public class TileCreateTest extends CreateGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test getZoomLevel
+	 * 
+	 * @throws SQLException
+	 */
+	public void testGetZoomLevel() throws SQLException {
+
+		TileUtils.testGetZoomLevel(geoPackage);
+
+	}
+
+	/**
+	 * Test queryByBoundingBox
+	 * 
+	 * @throws SQLException
+	 */
+	public void testQueryByBoundingBox() throws SQLException {
+
+		TileUtils.testQueryByBoundingBox(geoPackage);
+
+	}
+
 }

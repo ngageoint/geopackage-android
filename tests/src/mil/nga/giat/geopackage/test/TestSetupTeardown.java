@@ -449,7 +449,7 @@ public class TestSetupTeardown {
 			pixelYSize /= 2.0;
 
 			// Populate the tile table with rows
-			TestUtils.addRowsToFeatureTable(geoPackage, tileMatrix, tileData);
+			TestUtils.addRowsToTileTable(geoPackage, tileMatrix, tileData);
 		}
 
 	}

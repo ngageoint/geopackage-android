@@ -1,11 +1,11 @@
-package mil.nga.giat.geopackage.geom.conversion;
+package mil.nga.giat.geopackage.geom.unit;
 
 /**
- * Degrees Converter
+ * Degree Converter
  * 
  * @author osbornb
  */
-public class DegreesConverter implements UnitConverter {
+public class DegreeConverter implements CoordinateConverter {
 
 	/**
 	 * {@inheritDoc}

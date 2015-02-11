@@ -397,7 +397,7 @@ public class TestUtils {
 	 * @param tileMatrix
 	 * @param tileData
 	 */
-	public static void addRowsToFeatureTable(GeoPackage geoPackage,
+	public static void addRowsToTileTable(GeoPackage geoPackage,
 			TileMatrix tileMatrix, byte[] tileData) {
 
 		TileDao dao = geoPackage.getTileDao(tileMatrix.getTableName());

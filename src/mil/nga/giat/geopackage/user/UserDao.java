@@ -180,6 +180,19 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	 * 
 	 * @param where
 	 * @param whereArgs
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public TCursor query(String where, String[] whereArgs) {
+		return (TCursor) db.query(getTableName(), table.getColumnNames(),
+				where, whereArgs, null, null, null);
+	}
+
+	/**
+	 * Query for rows
+	 * 
+	 * @param where
+	 * @param whereArgs
 	 * @param groupBy
 	 * @param having
 	 * @param orderBy
@@ -373,7 +386,20 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	 * @return
 	 */
 	public String buildWhere(String field, Object value) {
-		return field + " " + (value != null ? "= ?" : "IS NULL");
+		return buildWhere(field, value, "=");
+	}
+
+	/**
+	 * Build where (or selection) statement for a single field using the
+	 * provided operation
+	 * 
+	 * @param field
+	 * @param value
+	 * @param operation
+	 * @return
+	 */
+	public String buildWhere(String field, Object value, String operation) {
+		return field + " " + (value != null ? operation + " ?" : "IS NULL");
 	}
 
 	/**
@@ -409,6 +435,23 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	 * @return
 	 */
 	public String[] buildWhereArgs(Collection<Object> values) {
+		List<String> selectionArgs = new ArrayList<String>();
+		for (Object value : values) {
+			if (value != null) {
+				selectionArgs.add(value.toString());
+			}
+		}
+		return selectionArgs.isEmpty() ? null : selectionArgs
+				.toArray(new String[] {});
+	}
+
+	/**
+	 * Build where (or selection) args for the values
+	 * 
+	 * @param values
+	 * @return
+	 */
+	public String[] buildWhereArgs(Object[] values) {
 		List<String> selectionArgs = new ArrayList<String>();
 		for (Object value : values) {
 			if (value != null) {

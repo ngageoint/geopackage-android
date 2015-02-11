@@ -1,11 +1,11 @@
-package mil.nga.giat.geopackage.geom.conversion;
+package mil.nga.giat.geopackage.geom.unit;
 
 /**
- * Unit converter interface
+ * Coordinate converter interface
  * 
  * @author osbornb
  */
-public interface UnitConverter {
+public interface CoordinateConverter {
 
 	/**
 	 * Convert from the value in the units to degrees
