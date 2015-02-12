@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GeoPackageSDKSample</string>
+    <string name="app_label_name">GeoPackage</string>
+    <string name="title_map">Map</string>
+    <string name="title_manager">Manager</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
