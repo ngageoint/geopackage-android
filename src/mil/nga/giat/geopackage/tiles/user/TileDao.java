@@ -316,7 +316,8 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * 
 	 * @param boundingBox
 	 * @param zoomLevel
-	 * @return
+	 * @return cursor from query or null if the zoom level tile ranges do not
+	 *         overlap the bounding box
 	 */
 	public TileCursor queryByBoundingBox(TileBoundingBox boundingBox,
 			long zoomLevel) {
@@ -391,15 +392,15 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 
 		TileMatrixRange range = null;
 
-		Long minColumn = getTileColumn(tileMatrix, minLongitude);
-		Long maxColumn = getTileColumn(tileMatrix, maxLongitude);
+		long minColumn = getTileColumn(tileMatrix, minLongitude);
+		long maxColumn = getTileColumn(tileMatrix, maxLongitude);
 
-		if (minColumn != null || maxColumn != null) {
+		if (minColumn < tileMatrix.getMatrixWidth() && maxColumn >= 0) {
 
-			if (minColumn == null) {
-				minColumn = 0l;
+			if (minColumn < 0) {
+				minColumn = 0;
 			}
-			if (maxColumn == null) {
+			if (maxColumn >= tileMatrix.getMatrixWidth()) {
 				maxColumn = tileMatrix.getMatrixWidth() - 1;
 			}
 
@@ -410,21 +411,25 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	}
 
 	/**
-	 * Get the tile column of the value in distance units
+	 * Get the tile column of the longitude in degrees
 	 * 
 	 * @param tileMatrix
 	 * @param longitude
 	 *            in degrees
-	 * @return
+	 * @return tile column if in the range, -1 if before,
+	 *         {@link TileMatrix#getMatrixWidth()} if after
 	 */
-	public Long getTileColumn(TileMatrix tileMatrix, double longitude) {
-
-		Long tileId = null;
+	public long getTileColumn(TileMatrix tileMatrix, double longitude) {
 
 		double minX = coordinateConverter.toDegrees(tileMatrixSet.getMinX());
 		double maxX = coordinateConverter.toDegrees(tileMatrixSet.getMaxX());
 
-		if (longitude >= minX && longitude < maxX) {
+		long tileId;
+		if (longitude < minX) {
+			tileId = -1;
+		} else if (longitude >= maxX) {
+			tileId = tileMatrix.getMatrixWidth();
+		} else {
 			double tileWidth = getTileWidth(tileMatrix);
 			tileId = (long) ((longitude - minX) / tileWidth);
 		}
@@ -470,15 +475,15 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 
 		TileMatrixRange range = null;
 
-		Long maxRow = getTileRow(tileMatrix, minLatitude);
-		Long minRow = getTileRow(tileMatrix, maxLatitude);
+		long maxRow = getTileRow(tileMatrix, minLatitude);
+		long minRow = getTileRow(tileMatrix, maxLatitude);
 
-		if (minRow != null || maxRow != null) {
+		if (minRow < tileMatrix.getMatrixHeight() && maxRow >= 0) {
 
-			if (minRow == null) {
-				minRow = 0l;
+			if (minRow < 0) {
+				minRow = 0;
 			}
-			if (maxRow == null) {
+			if (maxRow >= tileMatrix.getMatrixHeight()) {
 				maxRow = tileMatrix.getMatrixHeight() - 1;
 			}
 
@@ -489,21 +494,25 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	}
 
 	/**
-	 * Get the tile row of the value in meters
+	 * Get the tile row of the latitude in degrees
 	 * 
 	 * @param tileMatrix
 	 * @param latitude
 	 *            in degrees
-	 * @return
+	 * @return tile row if in the range, -1 if before,
+	 *         {@link TileMatrix#getMatrixHeight()} if after
 	 */
-	public Long getTileRow(TileMatrix tileMatrix, double latitude) {
-
-		Long tileId = null;
+	public long getTileRow(TileMatrix tileMatrix, double latitude) {
 
 		double minY = coordinateConverter.toDegrees(tileMatrixSet.getMinY());
 		double maxY = coordinateConverter.toDegrees(tileMatrixSet.getMaxY());
 
-		if (latitude > minY && latitude <= maxY) {
+		long tileId;
+		if (latitude <= minY) {
+			tileId = tileMatrix.getMatrixHeight();
+		} else if (latitude > maxY) {
+			tileId = -1;
+		} else {
 			double tileHeight = getTileHeight(tileMatrix);
 			tileId = (long) ((maxY - latitude) / tileHeight);
 		}
@@ -512,7 +521,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	}
 
 	/**
-	 * Get the tile height in distance units
+	 * Get the tile height in meters
 	 * 
 	 * @param tileMatrix
 	 * @return
@@ -521,4 +530,74 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		return matrixHeight / tileMatrix.getMatrixHeight();
 	}
 
+	/**
+	 * Get the bounding box of the tile row
+	 * 
+	 * @param tileRow
+	 * @return
+	 */
+	public TileBoundingBox getBoundingBox(TileRow tileRow) {
+
+		// Get the tile matrix at the zoom level
+		TileMatrix tileMatrix = getTileMatrix(tileRow.getZoomLevel());
+
+		return getBoundingBox(tileMatrix, tileRow);
+	}
+
+	/**
+	 * Get the bounding box of the tile row at the known zoom level
+	 * 
+	 * @param zoomLevel
+	 * @param tileRow
+	 * @return
+	 */
+	public TileBoundingBox getBoundingBox(long zoomLevel, TileRow tileRow) {
+
+		// Get the tile matrix at the zoom level
+		TileMatrix tileMatrix = getTileMatrix(zoomLevel);
+
+		return getBoundingBox(tileMatrix, tileRow);
+	}
+
+	/**
+	 * Get the bounding box of the Tile Row from the Tile Matrix zoom level
+	 * 
+	 * @param tileMatrix
+	 * @param tileRow
+	 * @return
+	 */
+	public TileBoundingBox getBoundingBox(TileMatrix tileMatrix, TileRow tileRow) {
+
+		long column = tileRow.getTileColumn();
+		long row = tileRow.getTileRow();
+
+		// Get the tile width in degrees
+		double matrixMinX = coordinateConverter.toDegrees(tileMatrixSet
+				.getMinX());
+		double matrixMaxX = coordinateConverter.toDegrees(tileMatrixSet
+				.getMaxX());
+		double matrixWidth = matrixMaxX - matrixMinX;
+		double tileWidth = matrixWidth / tileMatrix.getMatrixWidth();
+
+		// Find the longitude range
+		double minLon = matrixMinX + (tileWidth * column);
+		double maxLon = minLon + tileWidth;
+
+		// Get the tile height in degrees
+		double matrixMinY = coordinateConverter.toDegrees(tileMatrixSet
+				.getMinY());
+		double matrixMaxY = coordinateConverter.toDegrees(tileMatrixSet
+				.getMaxY());
+		double matrixHeight = matrixMaxY - matrixMinY;
+		double tileHeight = matrixHeight / tileMatrix.getMatrixHeight();
+
+		// Find the latitude range
+		double maxLat = matrixMaxY - (tileHeight * row);
+		double minLat = maxLat - tileHeight;
+
+		TileBoundingBox boundingBox = new TileBoundingBox(minLon, maxLon,
+				minLat, maxLat);
+
+		return boundingBox;
+	}
 }

@@ -871,11 +871,14 @@ public class TileUtils {
 							180.0, -90.0, 90.0);
 					TileCursor cursor = dao.queryByBoundingBox(boundingBox,
 							zoomLevel);
+					int cursorCount = cursor != null ? cursor.getCount() : 0;
 					TileCursor expectedCursor = dao.queryForTile(zoomLevel);
 
 					TestCase.assertEquals(expectedCursor.getCount(),
-							cursor.getCount());
-					cursor.close();
+							cursorCount);
+					if (cursor != null) {
+						cursor.close();
+					}
 					expectedCursor.close();
 
 					double maxLon = (360.0 * Math.random()) - 180.0;
@@ -885,6 +888,7 @@ public class TileUtils {
 					boundingBox = new TileBoundingBox(minLon, maxLon, minLat,
 							maxLat);
 					cursor = dao.queryByBoundingBox(boundingBox, zoomLevel);
+					cursorCount = cursor != null ? cursor.getCount() : 0;
 
 					TileMatrixRange rowRange = dao.getTileRowRange(tileMatrix,
 							boundingBox);
@@ -904,11 +908,13 @@ public class TileUtils {
 								}
 							}
 						}
-						TestCase.assertEquals(count, cursor.getCount());
+						TestCase.assertEquals(count, cursorCount);
 					} else {
-						TestCase.assertEquals(0, cursor.getCount());
+						TestCase.assertEquals(0, cursorCount);
 					}
-					cursor.close();
+					if (cursor != null) {
+						cursor.close();
+					}
 
 				}
 
