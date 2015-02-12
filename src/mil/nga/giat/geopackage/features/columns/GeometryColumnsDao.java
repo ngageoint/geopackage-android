@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.features.columns;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -34,11 +35,28 @@ public class GeometryColumnsDao extends
 	}
 
 	/**
+	 * Get all the feature table names
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	public List<String> getFeatureTables() throws SQLException {
+
+		List<String> tableNames = new ArrayList<String>();
+
+		List<GeometryColumns> geometryColumns = queryForAll();
+		for (GeometryColumns geometryColumn : geometryColumns) {
+			tableNames.add(geometryColumn.getTableName());
+		}
+
+		return tableNames;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GeometryColumns queryForId(TableColumnKey key)
-			throws SQLException {
+	public GeometryColumns queryForId(TableColumnKey key) throws SQLException {
 		GeometryColumns geometryColumns = null;
 		if (key != null) {
 			Map<String, Object> fieldValues = new HashMap<String, Object>();
@@ -65,8 +83,7 @@ public class GeometryColumnsDao extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TableColumnKey extractId(GeometryColumns data)
-			throws SQLException {
+	public TableColumnKey extractId(GeometryColumns data) throws SQLException {
 		return data.getId();
 	}
 

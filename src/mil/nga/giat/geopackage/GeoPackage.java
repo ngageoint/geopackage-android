@@ -1,5 +1,7 @@
 package mil.nga.giat.geopackage;
 
+import java.util.List;
+
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
@@ -52,6 +54,20 @@ public interface GeoPackage {
 	 * @return
 	 */
 	public ConnectionSource getConnectionSource();
+
+	/**
+	 * Get the feature tables
+	 * 
+	 * @return
+	 */
+	public List<String> getFeatureTables();
+
+	/**
+	 * Get the tile tables
+	 * 
+	 * @return
+	 */
+	public List<String> getTileTables();
 
 	/**
 	 * Get a Spatial Reference System DAO

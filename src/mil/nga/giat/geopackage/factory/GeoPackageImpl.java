@@ -127,6 +127,37 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public List<String> getFeatureTables() {
+		GeometryColumnsDao geometryColumnsDao = getGeometryColumnsDao();
+		List<String> tableNames;
+		try {
+			tableNames = geometryColumnsDao.getFeatureTables();
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to retrieve feature tables",
+					e);
+		}
+		return tableNames;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<String> getTileTables() {
+		TileMatrixSetDao tileMatrixSetDao = getTileMatrixSetDao();
+		List<String> tableNames;
+		try {
+			tableNames = tileMatrixSetDao.getTileTables();
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to retrieve tile tables", e);
+		}
+		return tableNames;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public SpatialReferenceSystemDao getSpatialReferenceSystemDao() {
 		return createDao(SpatialReferenceSystem.class);
 	}

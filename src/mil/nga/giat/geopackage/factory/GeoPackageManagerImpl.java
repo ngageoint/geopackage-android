@@ -61,7 +61,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<String> databaseList() {
+	public List<String> databases() {
 
 		List<String> databases = new ArrayList<String>();
 

@@ -228,6 +228,7 @@ public class TileMatrixSetUtils {
 
 			// Get current count
 			long count = dao.countOf();
+			TestCase.assertEquals(count, dao.getTileTables().size());
 
 			// Retrieve a random srs
 			List<SpatialReferenceSystem> results = srsDao.queryForAll();
@@ -269,6 +270,9 @@ public class TileMatrixSetUtils {
 			// Verify count
 			long newCount = dao.countOf();
 			TestCase.assertEquals(count + 1, newCount);
+			TestCase.assertEquals(newCount, dao.getTileTables().size());
+			TestCase.assertTrue(dao.getTileTables().contains(
+					contents.getTableName()));
 
 			// Verify saved matrix tile set
 			TileMatrixSet queryTileMatrixSet = dao.queryForId(tileMatrixSet

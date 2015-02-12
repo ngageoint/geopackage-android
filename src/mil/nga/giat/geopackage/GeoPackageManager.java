@@ -17,7 +17,7 @@ public interface GeoPackageManager {
 	 * 
 	 * @return database list
 	 */
-	public List<String> databaseList();
+	public List<String> databases();
 
 	/**
 	 * Set of all GeoPackage databases

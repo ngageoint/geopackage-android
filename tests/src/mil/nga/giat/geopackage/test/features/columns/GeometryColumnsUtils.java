@@ -506,6 +506,7 @@ public class GeometryColumnsUtils {
 
 			// Get current count
 			long count = dao.countOf();
+			TestCase.assertEquals(count, dao.getFeatureTables().size());
 
 			// Retrieve a random srs
 			List<SpatialReferenceSystem> results = srsDao.queryForAll();
@@ -552,6 +553,9 @@ public class GeometryColumnsUtils {
 			// Verify count
 			long newCount = dao.countOf();
 			TestCase.assertEquals(count + 1, newCount);
+			TestCase.assertEquals(newCount, dao.getFeatureTables().size());
+			TestCase.assertTrue(dao.getFeatureTables().contains(
+					contents.getTableName()));
 
 			// Verify saved geometry columns
 			GeometryColumns queryGeometryColumns = dao
