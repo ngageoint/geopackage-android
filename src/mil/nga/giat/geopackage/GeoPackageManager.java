@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -94,6 +95,25 @@ public interface GeoPackageManager {
 	 * @return true if created successfully
 	 */
 	public boolean importGeoPackage(String name, File file, boolean override);
+
+	/**
+	 * Import a GeoPackage file from a URL
+	 * 
+	 * @param name
+	 * @param url
+	 * @return true if created successfully
+	 */
+	public boolean importGeoPackage(String name, URL url);
+
+	/**
+	 * Import a GeoPackage file from a URL
+	 * 
+	 * @param name
+	 * @param url
+	 * @param override
+	 * @return true if created successfully
+	 */
+	public boolean importGeoPackage(String name, URL url, boolean override);
 
 	/**
 	 * Export a GeoPackage database to a file

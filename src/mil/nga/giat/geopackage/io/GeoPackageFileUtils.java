@@ -82,7 +82,7 @@ public class GeoPackageFileUtils {
 	}
 
 	/**
-	 * Copy a file to another location
+	 * Copy a file to a file location
 	 * 
 	 * @param copyFrom
 	 * @param copyTo
@@ -93,15 +93,43 @@ public class GeoPackageFileUtils {
 		InputStream from = new FileInputStream(copyFrom);
 		OutputStream to = new FileOutputStream(copyTo);
 
+		copyStream(from, to);
+	}
+
+	/**
+	 * Copy an input stream to a file location
+	 * 
+	 * @param copyFrom
+	 * @param copyTo
+	 * @throws IOException
+	 */
+	public static void copyFile(InputStream copyFrom, File copyTo)
+			throws IOException {
+
+		OutputStream to = new FileOutputStream(copyTo);
+
+		copyStream(copyFrom, to);
+	}
+
+	/**
+	 * Copy an input stream to an output stream
+	 * 
+	 * @param copyFrom
+	 * @param copyTo
+	 * @throws IOException
+	 */
+	public static void copyStream(InputStream copyFrom, OutputStream copyTo)
+			throws IOException {
+
 		byte[] buffer = new byte[1024];
 		int length;
-		while ((length = from.read(buffer)) > 0) {
-			to.write(buffer, 0, length);
+		while ((length = copyFrom.read(buffer)) > 0) {
+			copyTo.write(buffer, 0, length);
 		}
 
-		to.flush();
-		to.close();
-		from.close();
+		copyTo.flush();
+		copyTo.close();
+		copyFrom.close();
 	}
 
 }

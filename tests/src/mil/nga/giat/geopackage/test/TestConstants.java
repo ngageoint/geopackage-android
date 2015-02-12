@@ -23,6 +23,11 @@ public class TestConstants {
 	public static final String IMPORT_DB_NAME = "import_db";
 
 	/**
+	 * Import url
+	 */
+	public static final String IMPORT_URL = "http://www.geopackage.org/data/gdal_sample.gpkg";
+
+	/**
 	 * Import database file name, located in the test assets
 	 */
 	public static final String IMPORT_DB_FILE_NAME = IMPORT_DB_NAME + "."

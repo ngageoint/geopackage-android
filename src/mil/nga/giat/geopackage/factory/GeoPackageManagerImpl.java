@@ -1,7 +1,12 @@
 package mil.nga.giat.geopackage.factory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -203,36 +208,59 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			database = GeoPackageFileUtils.getFileNameWithoutExtension(file);
 		}
 
-		if (!override && exists(database)) {
-			throw new GeoPackageException(
-					"GeoPackage database already exists: " + database);
-		}
-
-		// Copy the geopackage file over as a database
-		File newDbFile = context.getDatabasePath(database);
+		boolean success = false;
 		try {
-			GeoPackageFileUtils.copyFile(file, newDbFile);
-		} catch (IOException e) {
+			FileInputStream geoPackageStream = new FileInputStream(file);
+			success = importGeoPackage(database, override, geoPackageStream);
+		} catch (FileNotFoundException e) {
 			throw new GeoPackageException(
 					"Failed read or write GeoPackage file '" + file
-							+ "' to database: '" + database, e);
+							+ "' to database: '" + database + "'", e);
 		}
 
-		// Verify that the database is valid
+		return success;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean importGeoPackage(String name, URL url) {
+		return importGeoPackage(name, url, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean importGeoPackage(String name, URL url, boolean override) {
+
+		boolean success = false;
+
+		HttpURLConnection connection = null;
 		try {
-			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
-					Context.MODE_PRIVATE, null, new DatabaseErrorHandler() {
-						@Override
-						public void onCorruption(SQLiteDatabase dbObj) {
-						}
-					});
-			sqlite.close();
-		} catch (Exception e) {
-			delete(database);
-			throw new GeoPackageException("Invalid GeoPackage database file", e);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.connect();
+
+			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+				throw new GeoPackageException("Failed to import GeoPackage "
+						+ name + " from URL: '" + url.toString() + "'. HTTP "
+						+ connection.getResponseCode() + " "
+						+ connection.getResponseMessage());
+			}
+
+			InputStream geoPackageStream = connection.getInputStream();
+			success = importGeoPackage(name, override, geoPackageStream);
+		} catch (IOException e) {
+			throw new GeoPackageException(
+					"Failed to import GeoPackage " + name, e);
+		} finally {
+			if (connection != null) {
+				connection.disconnect();
+			}
 		}
 
-		return exists(database);
+		return success;
 	}
 
 	/**
@@ -286,6 +314,48 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		}
 
 		return db;
+	}
+
+	/**
+	 * Import the GeoPackage stream
+	 * 
+	 * @param database
+	 * @param override
+	 * @param geoPackageStream
+	 * @return true if imported successfully
+	 */
+	private boolean importGeoPackage(String database, boolean override,
+			InputStream geoPackageStream) {
+
+		if (!override && exists(database)) {
+			throw new GeoPackageException(
+					"GeoPackage database already exists: " + database);
+		}
+
+		// Copy the geopackage over as a database
+		File newDbFile = context.getDatabasePath(database);
+		try {
+			GeoPackageFileUtils.copyFile(geoPackageStream, newDbFile);
+		} catch (IOException e) {
+			throw new GeoPackageException(
+					"Failed to import GeoPackage database: " + database, e);
+		}
+
+		// Verify that the database is valid
+		try {
+			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
+					Context.MODE_PRIVATE, null, new DatabaseErrorHandler() {
+						@Override
+						public void onCorruption(SQLiteDatabase dbObj) {
+						}
+					});
+			sqlite.close();
+		} catch (Exception e) {
+			delete(database);
+			throw new GeoPackageException("Invalid GeoPackage database file", e);
+		}
+
+		return exists(database);
 	}
 
 	/**

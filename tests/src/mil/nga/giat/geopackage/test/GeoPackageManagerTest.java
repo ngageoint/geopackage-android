@@ -1,6 +1,8 @@
 package mil.nga.giat.geopackage.test;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 
 import mil.nga.giat.geopackage.GeoPackage;
@@ -180,6 +182,54 @@ public class GeoPackageManagerTest extends BaseTestCase {
 		assertTrue("Import file could not be deleted", importFile.delete());
 		assertTrue("Corrupt Import file could not be deleted",
 				loadCorruptFile.delete());
+	}
+
+	/**
+	 * Test importing a database from a GeoPackage file
+	 * 
+	 * @throws MalformedURLException
+	 */
+	public void testImportUrl() throws MalformedURLException {
+
+		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+
+		// Verify does not exist
+		assertFalse("Database already exists",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database already returned in the set", manager
+				.databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+
+		// Import
+		URL importUrl = new URL(TestConstants.IMPORT_URL);
+		assertTrue("Database not imported", manager.importGeoPackage(
+				TestConstants.IMPORT_DB_NAME, importUrl));
+		assertTrue("Database does not exist",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertTrue("Database not returned in the set", manager.databaseSet()
+				.contains(TestConstants.IMPORT_DB_NAME));
+
+		// Open
+		GeoPackage geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+		assertNotNull("Failed to open database", geoPackage);
+		geoPackage.close();
+
+		// Delete
+		assertTrue("Database not deleted",
+				manager.delete(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database exists after delete",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database returned in the set after delete", manager
+				.databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+
+		// Import a fake url
+		importUrl = new URL("http://doesnotexist/geopackage.gpkg");
+		try {
+			manager.importGeoPackage(TestConstants.IMPORT_DB_NAME, importUrl);
+			fail("Successully imported a fake geopackage url");
+		} catch (GeoPackageException e) {
+			// expected
+		}
+
 	}
 
 	/**
