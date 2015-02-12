@@ -104,6 +104,11 @@ public class GeometryColumnsUtils {
 						.queryForEq(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
 								geometryColumns.getGeometryType().getName());
 				TestCase.assertNotNull(queryGeometryColumnsList);
+				if(queryGeometryColumnsList.isEmpty()){
+					queryGeometryColumnsList = dao
+							.queryForEq(GeometryColumns.COLUMN_GEOMETRY_TYPE_NAME,
+									geometryColumns.getGeometryTypeName());
+				}
 				TestCase.assertTrue(queryGeometryColumnsList.size() >= 1);
 				boolean found = false;
 				for (GeometryColumns queryGeometryColumnsValue : queryGeometryColumnsList) {

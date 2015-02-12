@@ -1,11 +1,13 @@
 package mil.nga.giat.geopackage.db;
 
+import java.util.Locale;
+
 import mil.nga.giat.geopackage.geom.GeometryType;
 
 /**
  * GeoPackage Data Types (non Geometry) for database columns as defined in
- * Requirement 5 of the GeoPackage spec. See {@link GeometryType} for
- * Geometry Types
+ * Requirement 5 of the GeoPackage spec. See {@link GeometryType} for Geometry
+ * Types
  * 
  * @author osbornb
  */
@@ -118,6 +120,16 @@ public enum GeoPackageDataType {
 	 */
 	public Class<?> getClassType() {
 		return classType;
+	}
+
+	/**
+	 * Get the Data Type from the name, ignoring case
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static GeoPackageDataType fromName(String name) {
+		return valueOf(name.toUpperCase(Locale.US));
 	}
 
 }

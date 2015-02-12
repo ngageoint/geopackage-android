@@ -1,5 +1,7 @@
 package mil.nga.giat.geopackage.geom;
 
+import java.util.Locale;
+
 /**
  * Geometry Type enumeration
  * 
@@ -210,6 +212,16 @@ public enum GeometryType {
 		}
 
 		return geometryType;
+	}
+
+	/**
+	 * Get the Geometry Type from the name, ignoring case
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static GeometryType fromName(String name) {
+		return valueOf(name.toUpperCase(Locale.US));
 	}
 
 }

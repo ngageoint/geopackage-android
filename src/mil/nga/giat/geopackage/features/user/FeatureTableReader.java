@@ -54,9 +54,9 @@ public class FeatureTableReader extends
 		GeometryType geometryType = null;
 		GeoPackageDataType dataType = null;
 		if (geometry) {
-			geometryType = GeometryType.valueOf(type);
+			geometryType = GeometryType.fromName(type);
 		} else {
-			dataType = GeoPackageDataType.valueOf(type);
+			dataType = GeoPackageDataType.fromName(type);
 		}
 		Object defaultValue = GeoPackageDatabaseUtils.getValue(cursor,
 				defaultValueIndex, dataType);

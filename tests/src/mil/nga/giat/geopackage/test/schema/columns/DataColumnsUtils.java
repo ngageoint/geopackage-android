@@ -319,6 +319,20 @@ public class DataColumnsUtils {
 
 			contentsDao.create(featureContents);
 
+			// Create constraints
+			String constraintName = "TestConstraintName";
+			DataColumnConstraints sampleEnum1 = new DataColumnConstraints();
+			sampleEnum1.setConstraintName(constraintName);
+			sampleEnum1.setConstraintType(DataColumnConstraintType.ENUM);
+			sampleEnum1.setValue("ONE");
+			dataColumnConstraintsDao.create(sampleEnum1);
+
+			DataColumnConstraints sampleEnum2 = new DataColumnConstraints();
+			sampleEnum2.setConstraintName(constraintName);
+			sampleEnum2.setConstraintType(DataColumnConstraintType.ENUM);
+			sampleEnum2.setValue("TWO");
+			dataColumnConstraintsDao.create(sampleEnum2);
+
 			// Create new data column
 			columnName = TestUtils.TEST_INTEGER_COLUMN;
 			name = columnName + " NAME";
@@ -332,8 +346,7 @@ public class DataColumnsUtils {
 			dataColumns.setTitle(title);
 			dataColumns.setDescription(description);
 			dataColumns.setConstraint(dataColumnConstraintsDao
-					.queryByConstraintName(TestUtils.SAMPLE_ENUM_CONSTRAINT)
-					.get(0));
+					.queryByConstraintName(constraintName).get(0));
 			dao.create(dataColumns);
 
 			// Verify count
@@ -356,7 +369,7 @@ public class DataColumnsUtils {
 					.getConstraints(dataColumnConstraintsDao);
 			TestCase.assertTrue(constraints.size() > 1);
 			for (DataColumnConstraints constraint : constraints) {
-				TestCase.assertEquals(TestUtils.SAMPLE_ENUM_CONSTRAINT,
+				TestCase.assertEquals(constraintName,
 						constraint.getConstraintName());
 				TestCase.assertEquals(DataColumnConstraintType.ENUM,
 						constraint.getConstraintType());

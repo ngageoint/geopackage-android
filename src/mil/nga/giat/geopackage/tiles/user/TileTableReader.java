@@ -40,7 +40,7 @@ public class TileTableReader extends UserTableReader<TileColumn, TileTable> {
 			String type, Long max, boolean notNull, int defaultValueIndex,
 			boolean primaryKey) {
 
-		GeoPackageDataType dataType = GeoPackageDataType.valueOf(type);
+		GeoPackageDataType dataType = GeoPackageDataType.fromName(type);
 
 		Object defaultValue = GeoPackageDatabaseUtils.getValue(cursor,
 				defaultValueIndex, dataType);

@@ -175,7 +175,7 @@ public class GeometryColumns {
 	}
 
 	public GeometryType getGeometryType() {
-		return GeometryType.valueOf(geometryTypeName);
+		return GeometryType.fromName(geometryTypeName);
 	}
 
 	public void setGeometryType(GeometryType geometryType) {

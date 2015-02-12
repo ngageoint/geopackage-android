@@ -167,7 +167,7 @@ public class GeometryColumnsSqlMm {
 	}
 
 	public GeometryType getGeometryType() {
-		return GeometryType.valueOf(geometryTypeName.substring(
+		return GeometryType.fromName(geometryTypeName.substring(
 				COLUMN_GEOMETRY_TYPE_NAME_PREFIX.length(),
 				geometryTypeName.length()));
 	}
