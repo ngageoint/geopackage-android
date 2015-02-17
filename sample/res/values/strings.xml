@@ -3,8 +3,43 @@
 
     <string name="app_name">GeoPackageSDKSample</string>
     <string name="app_label_name">GeoPackage</string>
+    
     <string name="title_map">Map</string>
     <string name="title_manager">Manager</string>
-    <string name="action_settings">Settings</string>
+    
+    <string name="import_geopackage_url">Import URL</string>
+    <string name="import_geopackage_file">Import File</string>
+    
+    <string name="map_type_normal">Normal</string>
+    <string name="map_type_satellite">Satellite</string>
+    <string name="map_type_terrain">Terrain</string>
+    <string name="map_type_hybrid">Hybrid</string>
+    
+    <string name="import_url_name_label">Name</string>
+    <string name="import_url_label">URL</string>
+    <string name="import_url_preloaded_label">Preloaded</string>
 
+    <string name ="geopackage_delete_label">Delete</string>
+    <string name ="table_image_description">Table Type</string>
+    <string name ="geopackage_table_delete_label">Delete</string>
+    
+    <string-array name="preloaded_url_labels">
+    	<item>GDAL Sample</item>
+    	<item>Simple Sewers</item>
+    	<item>Haiti</item>
+    	<item>Belgium Geonames</item>
+    </string-array>
+    <string-array name="preloaded_urls">
+    	<item>http://www.geopackage.org/data/gdal_sample.gpkg</item>
+    	<item>http://www.geopackage.org/data/simple_sewer_features.gpkg</item>
+    	<item>http://www.geopackage.org/data/haiti-vectors-split.gpkg</item>
+    	<item>http://www.geopackage.org/data/geonames_belgium.gpkg</item>
+    </string-array>
+    <string-array name="preloaded_url_names">
+    	<item>gdal_sample</item>
+    	<item>simple_sewer_features</item>
+    	<item>haiti-vectors-split</item>
+    	<item>geonames_belgium</item>
+    </string-array>
+    
 </resources>

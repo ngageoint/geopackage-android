@@ -99,13 +99,13 @@ public final class R {
 		public static final int common_signin_btn_text_normal_light = 0x7f020019;
 		public static final int common_signin_btn_text_pressed_dark = 0x7f02001a;
 		public static final int common_signin_btn_text_pressed_light = 0x7f02001b;
-		public static final int ic_launcher = 0x7f02001e;
-		public static final int ic_plusone_medium_off_client = 0x7f02001f;
-		public static final int ic_plusone_small_off_client = 0x7f020020;
-		public static final int ic_plusone_standard_off_client = 0x7f020021;
-		public static final int ic_plusone_tall_off_client = 0x7f020022;
-		public static final int powered_by_google_dark = 0x7f020023;
-		public static final int powered_by_google_light = 0x7f020024;
+		public static final int ic_launcher = 0x7f020021;
+		public static final int ic_plusone_medium_off_client = 0x7f020022;
+		public static final int ic_plusone_small_off_client = 0x7f020023;
+		public static final int ic_plusone_standard_off_client = 0x7f020024;
+		public static final int ic_plusone_tall_off_client = 0x7f020025;
+		public static final int powered_by_google_dark = 0x7f020027;
+		public static final int powered_by_google_light = 0x7f020028;
 	}
 	public static final class id {
 		public static final int book_now = 0x7f070010;
@@ -140,7 +140,7 @@ public final class R {
 		public static final int google_play_services_version = 0x7f080000;
 	}
 	public static final class layout {
-		public static final int text_bubble = 0x7f030004;
+		public static final int text_bubble = 0x7f030008;
 	}
 	public static final class string {
 		public static final int accept = 0x7f050002;

@@ -78,6 +78,13 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	public int count() {
+		return context.databaseList().length;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Set<String> databaseSet() {
 
@@ -252,8 +259,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			InputStream geoPackageStream = connection.getInputStream();
 			success = importGeoPackage(name, override, geoPackageStream);
 		} catch (IOException e) {
-			throw new GeoPackageException(
-					"Failed to import GeoPackage " + name, e);
+			throw new GeoPackageException("Failed to import GeoPackage " + name
+					+ " from URL: '" + url.toString() + "'", e);
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
@@ -335,6 +342,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		// Copy the geopackage over as a database
 		File newDbFile = context.getDatabasePath(database);
 		try {
+			SQLiteDatabase db = context.openOrCreateDatabase(database,
+					Context.MODE_PRIVATE, null);
+			db.close();
 			GeoPackageFileUtils.copyFile(geoPackageStream, newDbFile);
 		} catch (IOException e) {
 			throw new GeoPackageException(

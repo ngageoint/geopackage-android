@@ -2,10 +2,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="mil.nga.giat.geopackage.sample.MainActivity" >
 
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_settings"/>
+    <group android:id="@+id/menu_group_map" >
+        <item
+            android:id="@+id/normal_map"
+            android:showAsAction="never"
+            android:title="@string/map_type_normal"/>
+        <item
+            android:id="@+id/satellite_map"
+            android:showAsAction="never"
+            android:title="@string/map_type_satellite"/>
+        <item
+            android:id="@+id/terrain_map"
+            android:showAsAction="never"
+            android:title="@string/map_type_terrain"/>
+        <item
+            android:id="@+id/hybrid_map"
+            android:showAsAction="never"
+            android:title="@string/map_type_hybrid"/>
+    </group>
+    <group android:id="@+id/menu_group_list" >
+        <item
+            android:id="@+id/import_geopackage_url"
+            android:icon="@drawable/ic_action_download"
+            android:showAsAction="always"
+            android:title="@string/import_geopackage_url"/>
+        <item
+            android:id="@+id/import_geopackage_file"
+            android:icon="@drawable/ic_action_new"
+            android:showAsAction="always"
+            android:title="@string/import_geopackage_file"/>
+    </group>
 
 </menu>

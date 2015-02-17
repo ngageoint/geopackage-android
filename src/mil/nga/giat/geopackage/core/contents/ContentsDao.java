@@ -148,6 +148,25 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
+	 * Delete the Contents, cascading optionally including the user table
+	 * 
+	 * @param contents
+	 * @param userTable
+	 * @return
+	 * @throws SQLException
+	 */
+	public int deleteCascade(Contents contents, boolean userTable)
+			throws SQLException {
+		int count = deleteCascade(contents);
+
+		if (userTable) {
+			db.execSQL("DROP TABLE " + contents.getTableName());
+		}
+
+		return count;
+	}
+
+	/**
 	 * Delete the collection of Contents, cascading
 	 * 
 	 * @param contentsCollection
@@ -156,10 +175,24 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	 */
 	public int deleteCascade(Collection<Contents> contentsCollection)
 			throws SQLException {
+		return deleteCascade(contentsCollection, false);
+	}
+
+	/**
+	 * Delete the collection of Contents, cascading optionally including the
+	 * user table
+	 * 
+	 * @param contentsCollection
+	 * @param userTable
+	 * @return
+	 * @throws SQLException
+	 */
+	public int deleteCascade(Collection<Contents> contentsCollection,
+			boolean userTable) throws SQLException {
 		int count = 0;
 		if (contentsCollection != null) {
 			for (Contents contents : contentsCollection) {
-				count += deleteCascade(contents);
+				count += deleteCascade(contents, userTable);
 			}
 		}
 		return count;
@@ -174,10 +207,24 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	 */
 	public int deleteCascade(PreparedQuery<Contents> preparedDelete)
 			throws SQLException {
+		return deleteCascade(preparedDelete, false);
+	}
+
+	/**
+	 * Delete the Contents matching the prepared query, cascading optionally
+	 * including the user table
+	 * 
+	 * @param preparedDelete
+	 * @param userTable
+	 * @return
+	 * @throws SQLException
+	 */
+	public int deleteCascade(PreparedQuery<Contents> preparedDelete,
+			boolean userTable) throws SQLException {
 		int count = 0;
 		if (preparedDelete != null) {
 			List<Contents> contentsList = query(preparedDelete);
-			count = deleteCascade(contentsList);
+			count = deleteCascade(contentsList, userTable);
 		}
 		return count;
 	}
@@ -190,11 +237,24 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	 * @throws SQLException
 	 */
 	public int deleteByIdCascade(String id) throws SQLException {
+		return deleteByIdCascade(id, false);
+	}
+
+	/**
+	 * Delete a Contents by id, cascading optionally including the user table
+	 * 
+	 * @param id
+	 * @param userTable
+	 * @return
+	 * @throws SQLException
+	 */
+	public int deleteByIdCascade(String id, boolean userTable)
+			throws SQLException {
 		int count = 0;
 		if (id != null) {
 			Contents contents = queryForId(id);
 			if (contents != null) {
-				count = deleteCascade(contents);
+				count = deleteCascade(contents, userTable);
 			}
 		}
 		return count;
@@ -209,10 +269,24 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	 */
 	public int deleteIdsCascade(Collection<String> idCollection)
 			throws SQLException {
+		return deleteIdsCascade(idCollection, false);
+	}
+
+	/**
+	 * Delete the Contents with the provided ids, cascading optionally including
+	 * the user table
+	 * 
+	 * @param idCollection
+	 * @param userTable
+	 * @return
+	 * @throws SQLException
+	 */
+	public int deleteIdsCascade(Collection<String> idCollection,
+			boolean userTable) throws SQLException {
 		int count = 0;
 		if (idCollection != null) {
 			for (String id : idCollection) {
-				count += deleteByIdCascade(id);
+				count += deleteByIdCascade(id, userTable);
 			}
 		}
 		return count;

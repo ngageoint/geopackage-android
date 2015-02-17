@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.factory;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import mil.nga.giat.geopackage.GeoPackage;
@@ -129,12 +130,17 @@ class GeoPackageImpl implements GeoPackage {
 	@Override
 	public List<String> getFeatureTables() {
 		GeometryColumnsDao geometryColumnsDao = getGeometryColumnsDao();
-		List<String> tableNames;
+		List<String> tableNames = null;
 		try {
-			tableNames = geometryColumnsDao.getFeatureTables();
+			if (geometryColumnsDao.isTableExists()) {
+				tableNames = geometryColumnsDao.getFeatureTables();
+			}
 		} catch (SQLException e) {
 			throw new GeoPackageException("Failed to retrieve feature tables",
 					e);
+		}
+		if (tableNames == null) {
+			tableNames = new ArrayList<String>();
 		}
 		return tableNames;
 	}
@@ -145,11 +151,16 @@ class GeoPackageImpl implements GeoPackage {
 	@Override
 	public List<String> getTileTables() {
 		TileMatrixSetDao tileMatrixSetDao = getTileMatrixSetDao();
-		List<String> tableNames;
+		List<String> tableNames = null;
 		try {
-			tableNames = tileMatrixSetDao.getTileTables();
+			if (tileMatrixSetDao.isTableExists()) {
+				tableNames = tileMatrixSetDao.getTileTables();
+			}
 		} catch (SQLException e) {
 			throw new GeoPackageException("Failed to retrieve tile tables", e);
+		}
+		if (tableNames == null) {
+			tableNames = new ArrayList<String>();
 		}
 		return tableNames;
 	}

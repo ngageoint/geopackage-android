@@ -8,6 +8,7 @@ import java.util.Set;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 /**
@@ -74,6 +75,13 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	 */
 	public TTable getTable() {
 		return table;
+	}
+
+	/**
+	 * Drop the user table
+	 */
+	public void dropTable() {
+		db.execSQL("DROP TABLE " + getTableName());
 	}
 
 	/**
@@ -515,6 +523,35 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 			}
 		}
 		return args;
+	}
+
+	/**
+	 * Get the total count
+	 * 
+	 * @return
+	 */
+	public int count() {
+		return count(null, null);
+	}
+
+	/**
+	 * Get the count
+	 * 
+	 * @return
+	 */
+	public int count(String where, String[] args) {
+
+		StringBuilder countQuery = new StringBuilder();
+		countQuery.append("select count(*) from " + getTableName());
+		if (where != null) {
+			countQuery.append(" where ").append(where);
+		}
+
+		Cursor countCursor = db.rawQuery(countQuery.toString(), args);
+		countCursor.moveToFirst();
+		int count = countCursor.getInt(0);
+		countCursor.close();
+		return count;
 	}
 
 	/**

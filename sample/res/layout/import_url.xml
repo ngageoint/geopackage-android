@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/import_url_name_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/import_url_name_label" />
+
+    <EditText
+        android:id="@+id/import_url_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/import_url_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/import_url_label" />
+
+    <EditText
+        android:id="@+id/import_url_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textUri" />
+
+    <Button
+        android:id="@+id/import_url_preloaded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/import_url_preloaded_label" />
+
+</LinearLayout>

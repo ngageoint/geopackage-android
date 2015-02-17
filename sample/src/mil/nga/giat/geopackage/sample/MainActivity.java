@@ -2,16 +2,14 @@ package mil.nga.giat.geopackage.sample;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 public class MainActivity extends Activity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -28,27 +26,53 @@ public class MainActivity extends Activity implements
 	 */
 	private CharSequence mTitle;
 
+	private static final int MANAGER_POSITION = 0;
+
+	private static final int MAP_POSITION = 1;
+
+	private int navigationPosition = MANAGER_POSITION;
+
+	private GeoPackageDatabases active = new GeoPackageDatabases();
+
 	/**
 	 * Map fragment
 	 */
 	private GeoPackageMapFragment mapFragment = GeoPackageMapFragment
-			.newInstance();
+			.newInstance(active);
 
-	private PlaceholderFragment placeholderFragment = PlaceholderFragment
-			.newInstance();
+	/**
+	 * Manager fragment
+	 */
+	private GeoPackageManagerFragment managerFragment = GeoPackageManagerFragment
+			.newInstance(active);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		active.setPreferences(settings);
+		active.fromPreferences();
+
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
-		mTitle = getString(R.string.title_map);
+		mTitle = getString(R.string.title_manager);
 
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.remove(mapFragment);
+		transaction.remove(managerFragment);
+		transaction.commit();
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -60,7 +84,15 @@ public class MainActivity extends Activity implements
 
 		switch (position) {
 
-		case 0:
+		case MANAGER_POSITION:
+			if (managerFragment.isAdded()) {
+				transaction.show(managerFragment);
+			} else {
+				transaction.add(R.id.container, managerFragment);
+			}
+			mTitle = getString(R.string.title_manager);
+			break;
+		case MAP_POSITION:
 			if (mapFragment.isAdded()) {
 				transaction.show(mapFragment);
 			} else {
@@ -68,28 +100,22 @@ public class MainActivity extends Activity implements
 			}
 			mTitle = getString(R.string.title_map);
 			break;
-		case 1:
-			if (placeholderFragment.isAdded()) {
-				transaction.show(placeholderFragment);
-			} else {
-				transaction.add(R.id.container, placeholderFragment);
-			}
-			mTitle = getString(R.string.title_manager);
-			break;
 		default:
 
 		}
 
-		if (position != 0) {
+		if (position != MANAGER_POSITION) {
+			if (managerFragment.isAdded()) {
+				transaction.hide(managerFragment);
+			}
+		}
+		if (position != MAP_POSITION) {
 			if (mapFragment.isAdded()) {
 				transaction.hide(mapFragment);
 			}
 		}
-		if (position != 1) {
-			if (placeholderFragment.isAdded()) {
-				transaction.hide(placeholderFragment);
-			}
-		}
+
+		navigationPosition = position;
 
 		transaction.commit();
 	}
@@ -108,6 +134,14 @@ public class MainActivity extends Activity implements
 			// if the drawer is not showing. Otherwise, let the drawer
 			// decide what to show in the action bar.
 			getMenuInflater().inflate(R.menu.main, menu);
+
+			if (navigationPosition != MANAGER_POSITION) {
+				menu.setGroupVisible(R.id.menu_group_list, false);
+			}
+			if (navigationPosition != MAP_POSITION) {
+				menu.setGroupVisible(R.id.menu_group_map, false);
+			}
+
 			restoreActionBar();
 			return true;
 		}
@@ -116,44 +150,15 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+
+		if (mapFragment.handleMenuClick(item)) {
 			return true;
 		}
+		if (managerFragment.handleMenuClick(item)) {
+			return true;
+		}
+
 		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		/**
-		 * Returns a new instance of this fragment for the given section number.
-		 */
-		public static PlaceholderFragment newInstance() {
-			PlaceholderFragment fragment = new PlaceholderFragment();
-			return fragment;
-		}
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			return rootView;
-		}
-
-		@Override
-		public void onAttach(Activity activity) {
-			super.onAttach(activity);
-		}
 	}
 
 }

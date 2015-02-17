@@ -20,6 +20,13 @@ public interface GeoPackageManager {
 	public List<String> databases();
 
 	/**
+	 * Get the count of GeoPackage databases
+	 * 
+	 * @return
+	 */
+	public int count();
+
+	/**
 	 * Set of all GeoPackage databases
 	 * 
 	 * @return database set
