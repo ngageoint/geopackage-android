@@ -17,6 +17,7 @@ import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.R;
+import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
@@ -381,6 +382,27 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		} catch (Exception e) {
 			delete(database);
 			throw new GeoPackageException("Invalid GeoPackage database file", e);
+		}
+
+		GeoPackage geoPackage = open(database);
+		try {
+			if (!geoPackage.getSpatialReferenceSystemDao().isTableExists()
+					|| !geoPackage.getContentsDao().isTableExists()) {
+				delete(database);
+				throw new GeoPackageException(
+						"Invalid GeoPackage database file. Does not contain required tables: "
+								+ SpatialReferenceSystem.TABLE_NAME + " & "
+								+ Contents.TABLE_NAME);
+			}
+		} catch (SQLException e) {
+			delete(database);
+			throw new GeoPackageException(
+					"Invalid GeoPackage database file. Could not verify existence of required tables: "
+							+ SpatialReferenceSystem.TABLE_NAME
+							+ " & "
+							+ Contents.TABLE_NAME);
+		} finally {
+			geoPackage.close();
 		}
 
 		return exists(database);
