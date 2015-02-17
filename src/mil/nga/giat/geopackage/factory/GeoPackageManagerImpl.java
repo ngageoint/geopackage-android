@@ -183,6 +183,24 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public boolean importGeoPackage(String database, InputStream stream) {
+		return importGeoPackage(database, stream, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean importGeoPackage(String database, InputStream stream,
+			boolean override) {
+		boolean success = importGeoPackage(database, override, stream);
+		return success;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean importGeoPackage(String name, File file) {
 		return importGeoPackage(name, file, false);
 	}

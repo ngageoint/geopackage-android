@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.sample;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,9 +20,12 @@ import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.user.UserColumn;
 import mil.nga.giat.geopackage.user.UserTable;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -38,7 +42,6 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Manager Fragment, import, view, select, edit GeoPackages
@@ -51,13 +54,10 @@ public class GeoPackageManagerFragment extends Fragment {
 	/**
 	 * Get a new fragment instance
 	 * 
-	 * @param active
 	 * @return
 	 */
-	public static GeoPackageManagerFragment newInstance(
-			GeoPackageDatabases active) {
-		GeoPackageManagerFragment listFragment = new GeoPackageManagerFragment(
-				active);
+	public static GeoPackageManagerFragment newInstance() {
+		GeoPackageManagerFragment listFragment = new GeoPackageManagerFragment();
 		return listFragment;
 	}
 
@@ -103,7 +103,7 @@ public class GeoPackageManagerFragment extends Fragment {
 	 * 
 	 * @param active
 	 */
-	public GeoPackageManagerFragment(GeoPackageDatabases active) {
+	public void setActive(GeoPackageDatabases active) {
 		this.active = active;
 	}
 
@@ -138,8 +138,14 @@ public class GeoPackageManagerFragment extends Fragment {
 			}
 		});
 		elv.setAdapter(adapter);
-		update();
+
 		return v;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		update();
 	}
 
 	/**
@@ -641,9 +647,80 @@ public class GeoPackageManagerFragment extends Fragment {
 	 * Import a GeoPackage from a file
 	 */
 	private void importGeopackageFromFile() {
-		// TODO
-		Toast.makeText(getActivity(), "Not yet supported", Toast.LENGTH_SHORT)
-				.show();
+
+		try {
+			Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+			chooseFile.setType("*/*");
+			Intent intent = Intent.createChooser(chooseFile,
+					"Choose a GeoPackage file");
+			startActivityForResult(intent, MainActivity.ACTIVITY_CHOOSE_FILE);
+		} catch (Exception e) {
+			// eat
+		}
+
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		boolean handled = true;
+
+		switch (requestCode) {
+		case MainActivity.ACTIVITY_CHOOSE_FILE:
+			if (resultCode == Activity.RESULT_OK) {
+				final Uri uri = data.getData();
+
+				try {
+					String[] parts = uri.getLastPathSegment().split(":|/");
+					String name = parts[parts.length - 1];
+					int extensionIndex = name.lastIndexOf(".");
+					if(extensionIndex > -1){
+						name = name.substring(0, extensionIndex);
+					}
+
+					InputStream stream = getActivity().getContentResolver()
+							.openInputStream(uri);
+					boolean imported = manager.importGeoPackage(name, stream);
+					if (!imported) {
+						try {
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									showMessage(
+											"URL Import",
+											"Failed to import Uri: "
+													+ uri.getPath());
+								}
+							});
+						} catch (Exception e2) {
+							// eat
+						}
+					}
+				} catch (final Exception e) {
+					try {
+						getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								showMessage(
+										"File Import",
+										"Uri: " + uri.getPath() + ", "
+												+ e.getMessage());
+							}
+						});
+					} catch (Exception e2) {
+						// eat
+					}
+				}
+
+			}
+			break;
+
+		default:
+			handled = false;
+		}
+
+		if (!handled) {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
 	}
 
 	/**

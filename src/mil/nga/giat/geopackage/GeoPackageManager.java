@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
@@ -69,8 +70,6 @@ public interface GeoPackageManager {
 	/**
 	 * Import a GeoPackage file
 	 * 
-	 * @param name
-	 *            database name to save as
 	 * @param file
 	 *            GeoPackage file to import
 	 * @param override
@@ -78,6 +77,31 @@ public interface GeoPackageManager {
 	 * @return true if created successfully
 	 */
 	public boolean importGeoPackage(File file, boolean override);
+
+	/**
+	 * Import a GeoPackage stream
+	 * 
+	 * @param database
+	 *            database name to save as
+	 * @param stream
+	 *            GeoPackage stream to import
+	 * @return true if loaded
+	 */
+	public boolean importGeoPackage(String database, InputStream stream);
+
+	/**
+	 * Import a GeoPackage stream
+	 * 
+	 * @param database
+	 *            database name to save as
+	 * @param stream
+	 *            GeoPackage stream to import
+	 * @param override
+	 *            true to override existing
+	 * @return true if created successfully
+	 */
+	public boolean importGeoPackage(String database, InputStream stream,
+			boolean override);
 
 	/**
 	 * Import a GeoPackage file

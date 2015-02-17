@@ -48,11 +48,10 @@ public class GeoPackageMapFragment extends Fragment {
 	/**
 	 * Get a new instance of the fragment
 	 * 
-	 * @param active
 	 * @return
 	 */
-	public static GeoPackageMapFragment newInstance(GeoPackageDatabases active) {
-		GeoPackageMapFragment mapFragment = new GeoPackageMapFragment(active);
+	public static GeoPackageMapFragment newInstance() {
+		GeoPackageMapFragment mapFragment = new GeoPackageMapFragment();
 		return mapFragment;
 	}
 
@@ -89,11 +88,11 @@ public class GeoPackageMapFragment extends Fragment {
 	}
 
 	/**
-	 * Constructor
+	 * Set the active databases
 	 * 
 	 * @param active
 	 */
-	public GeoPackageMapFragment(GeoPackageDatabases active) {
+	public void setActive(GeoPackageDatabases active) {
 		this.active = active;
 	}
 

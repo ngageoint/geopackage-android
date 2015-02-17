@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,6 +20,18 @@ import android.view.MenuItem;
 public class MainActivity extends Activity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+	public static final int ACTIVITY_CHOOSE_FILE = 3342;
+
+	/**
+	 * Manager drawer position
+	 */
+	private static final int MANAGER_POSITION = 0;
+
+	/**
+	 * Map drawer position
+	 */
+	private static final int MAP_POSITION = 1;
+
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
@@ -32,16 +45,6 @@ public class MainActivity extends Activity implements
 	private CharSequence title;
 
 	/**
-	 * Manager drawer position
-	 */
-	private static final int MANAGER_POSITION = 0;
-
-	/**
-	 * Map drawer position
-	 */
-	private static final int MAP_POSITION = 1;
-
-	/**
 	 * Current drawer position
 	 */
 	private int navigationPosition = MANAGER_POSITION;
@@ -49,29 +52,45 @@ public class MainActivity extends Activity implements
 	/**
 	 * Active or checked databases
 	 */
-	private GeoPackageDatabases active = new GeoPackageDatabases();
+	private GeoPackageDatabases active;
 
 	/**
 	 * Map fragment
 	 */
 	private GeoPackageMapFragment mapFragment = GeoPackageMapFragment
-			.newInstance(active);
+			.newInstance();
 
 	/**
 	 * Manager fragment
 	 */
 	private GeoPackageManagerFragment managerFragment = GeoPackageManagerFragment
-			.newInstance(active);
+			.newInstance();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		if (savedInstanceState != null) {
+			mapFragment = (GeoPackageMapFragment) getFragmentManager()
+					.getFragment(savedInstanceState, "mapFragment");
+			managerFragment = (GeoPackageManagerFragment) getFragmentManager()
+					.getFragment(savedInstanceState, "managerFragment");
+		}
+		if (mapFragment == null) {
+			mapFragment = GeoPackageMapFragment.newInstance();
+		}
+		if (managerFragment == null) {
+			managerFragment = GeoPackageManagerFragment.newInstance();
+		}
+		
+		active = new GeoPackageDatabases();
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		active.setPreferences(settings);
 		active.loadFromPreferences();
+		mapFragment.setActive(active);
+		managerFragment.setActive(active);
 
 		navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
@@ -83,13 +102,28 @@ public class MainActivity extends Activity implements
 	}
 
 	@Override
+	public void onResume() {
+		active = new GeoPackageDatabases();
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		active.setPreferences(settings);
+		active.loadFromPreferences();
+		mapFragment.setActive(active);
+		managerFragment.setActive(active);
+		super.onResume();
+	}
+
+	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		transaction.remove(mapFragment);
-		transaction.remove(managerFragment);
-		transaction.commit();
 		super.onSaveInstanceState(outState);
+		if (mapFragment.isAdded()) {
+			getFragmentManager().putFragment(outState, "mapFragment",
+					mapFragment);
+		}
+		if (managerFragment.isAdded()) {
+			getFragmentManager().putFragment(outState, "managerFragment",
+					managerFragment);
+		}
 	}
 
 	@Override
