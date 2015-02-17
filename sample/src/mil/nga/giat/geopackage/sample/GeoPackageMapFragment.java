@@ -1,8 +1,18 @@
 package mil.nga.giat.geopackage.sample;
 
+import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageManager;
+import mil.nga.giat.geopackage.factory.GeoPackageFactory;
+import mil.nga.giat.geopackage.features.user.FeatureCursor;
+import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.features.user.FeatureRow;
+import mil.nga.giat.geopackage.geom.Geometry;
+import mil.nga.giat.geopackage.geom.conversion.GoogleMapShapeConverter;
+import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.InflateException;
@@ -14,23 +24,66 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 
+/**
+ * Map Fragment for showing GeoPackage features and tiles
+ * 
+ * @author osbornb
+ */
 public class GeoPackageMapFragment extends Fragment {
 
+	/**
+	 * Map type key for saving to preferences
+	 */
 	private static final String MAP_TYPE_KEY = "map_type_key";
 
+	/**
+	 * Get a new instance of the fragment
+	 * 
+	 * @param active
+	 * @return
+	 */
 	public static GeoPackageMapFragment newInstance(GeoPackageDatabases active) {
 		GeoPackageMapFragment mapFragment = new GeoPackageMapFragment(active);
 		return mapFragment;
 	}
 
+	/**
+	 * Active GeoPackages
+	 */
 	private GeoPackageDatabases active;
+
+	/**
+	 * Google map
+	 */
 	private GoogleMap map;
+
+	/**
+	 * View
+	 */
 	private static View view;
 
-	public GeoPackageMapFragment(){
-		
+	/**
+	 * GeoPackage manager
+	 */
+	private GeoPackageManager manager;
+
+	/**
+	 * Update task
+	 */
+	private MapUpdateTask updateTask;
+
+	/**
+	 * Constructor
+	 */
+	public GeoPackageMapFragment() {
+
 	}
-	
+
+	/**
+	 * Constructor
+	 * 
+	 * @param active
+	 */
 	public GeoPackageMapFragment(GeoPackageDatabases active) {
 		this.active = active;
 	}
@@ -45,17 +98,17 @@ public class GeoPackageMapFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		if(view != null){
+		if (view != null) {
 			ViewGroup parent = (ViewGroup) view.getParent();
-			if(parent != null){
+			if (parent != null) {
 				parent.removeView(view);
 			}
 		}
-		
-		try{
+
+		try {
 			view = inflater.inflate(R.layout.fragment_map, container, false);
-		}catch(InflateException e){
-			
+		} catch (InflateException e) {
+
 		}
 		map = ((MapFragment) getFragmentManager().findFragmentById(
 				R.id.fragment_map_view_ui)).getMap();
@@ -67,14 +120,29 @@ public class GeoPackageMapFragment extends Fragment {
 		int mapType = settings.getInt(MAP_TYPE_KEY, 1);
 		map.setMapType(mapType);
 
+		manager = GeoPackageFactory.getManager(getActivity());
+		updateInBackground();
+
 		return view;
 	}
 
 	@Override
 	public void onHiddenChanged(boolean hidden) {
+		super.onHiddenChanged(hidden);
 		map.setMyLocationEnabled(!hidden);
+
+		if (!hidden && active.isModified()) {
+			active.setModified(false);
+			updateInBackground();
+		}
 	}
 
+	/**
+	 * Handle map menu clicks
+	 * 
+	 * @param item
+	 * @return
+	 */
 	public boolean handleMenuClick(MenuItem item) {
 
 		boolean handled = true;
@@ -100,6 +168,11 @@ public class GeoPackageMapFragment extends Fragment {
 		return handled;
 	}
 
+	/**
+	 * Set the map type
+	 * 
+	 * @param mapType
+	 */
 	private void setMapType(int mapType) {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(getActivity());
@@ -109,6 +182,118 @@ public class GeoPackageMapFragment extends Fragment {
 		if (map != null) {
 			map.setMapType(mapType);
 		}
+	}
+
+	/**
+	 * Update the map by kicking off a background task
+	 */
+	private void updateInBackground() {
+
+		if (updateTask != null) {
+			updateTask.cancel(false);
+		}
+		map.clear();
+		updateTask = new MapUpdateTask();
+		updateTask.execute();
+
+	}
+
+	/**
+	 * Update the map in the background
+	 */
+	private class MapUpdateTask extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			update(this);
+			return null;
+		}
+	}
+
+	/**
+	 * Update the map
+	 * 
+	 * @param task
+	 */
+	private void update(MapUpdateTask task) {
+
+		if (active != null) {
+
+			for (GeoPackageDatabase database : active.getDatabases()) {
+
+				for (GeoPackageTable features : database.getFeatures()) {
+					displayFeatures(task, features);
+				}
+
+				for (GeoPackageTable tiles : database.getTiles()) {
+					displayTiles(task, tiles);
+				}
+
+				if (task.isCancelled()) {
+					break;
+				}
+			}
+
+		}
+
+	}
+
+	/**
+	 * Display features
+	 * 
+	 * @param task
+	 * @param features
+	 */
+	private void displayFeatures(MapUpdateTask task, GeoPackageTable features) {
+
+		GeoPackage geoPackage = manager.open(features.getDatabase());
+
+		try {
+
+			FeatureDao featureDao = geoPackage
+					.getFeatureDao(features.getName());
+
+			FeatureCursor cursor = featureDao.queryForAll();
+			try {
+
+				final GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
+
+				while (!task.isCancelled() && cursor.moveToNext()) {
+					FeatureRow row = cursor.getRow();
+					GeoPackageGeometryData geometryData = row.getGeometry();
+					if (geometryData != null && !geometryData.isEmpty()) {
+
+						final Geometry geometry = geometryData.getGeometry();
+
+						if (geometry != null) {
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									converter.addToMap(map, geometry);
+								}
+							});
+						}
+					}
+				}
+
+			} finally {
+				cursor.close();
+			}
+
+		} finally {
+			geoPackage.close();
+		}
+
+	}
+
+	/**
+	 * Display tiles
+	 * 
+	 * @param task
+	 * @param tiles
+	 */
+	private void displayTiles(MapUpdateTask task, GeoPackageTable tiles) {
+		// TODO
 	}
 
 }

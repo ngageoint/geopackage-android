@@ -21,7 +21,10 @@ import mil.nga.giat.geopackage.geom.Triangle;
 import mil.nga.giat.geopackage.geom.unit.CoordinateConverter;
 import mil.nga.giat.geopackage.geom.unit.DegreeConverter;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -704,6 +707,7 @@ public class GoogleMapShapeConverter {
 	 * @param geometry
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public Object toShape(Geometry geometry) {
 
 		Object shape = null;
@@ -743,6 +747,9 @@ public class GoogleMapShapeConverter {
 		case TRIANGLE:
 			shape = toPolygon((Triangle) geometry);
 			break;
+		case GEOMETRYCOLLECTION:
+			shape = toShapes((GeometryCollection<Geometry>) geometry);
+			break;
 		default:
 			throw new GeoPackageException("Unsupported Geometry Type: "
 					+ geometryType.getName());
@@ -768,4 +775,185 @@ public class GoogleMapShapeConverter {
 
 		return shapes;
 	}
+
+	/**
+	 * Convert a {@link Geometry} to a Map shape and add it
+	 * 
+	 * @param map
+	 * @param geometry
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Object addToMap(GoogleMap map, Geometry geometry) {
+
+		Object shape = null;
+
+		GeometryType geometryType = geometry.getGeometryType();
+		switch (geometryType) {
+		case POINT:
+			shape = addLatLngToMap(map, toLatLng((Point) geometry));
+			break;
+		case LINESTRING:
+			shape = addPolylineToMap(map, toPolyline((LineString) geometry));
+			break;
+		case POLYGON:
+			shape = addPolygonToMap(map, toPolygon((Polygon) geometry));
+			break;
+		case MULTIPOINT:
+			shape = addLatLngsToMap(map, toLatLngs((MultiPoint) geometry));
+			break;
+		case MULTILINESTRING:
+			shape = addPolylinesToMap(map,
+					toPolylines((MultiLineString) geometry));
+			break;
+		case MULTIPOLYGON:
+			shape = addPolygonsToMap(map, toPolygons((MultiPolygon) geometry));
+			break;
+		case CIRCULARSTRING:
+			shape = addPolylineToMap(map, toPolyline((CircularString) geometry));
+			break;
+		case COMPOUNDCURVE:
+			shape = addPolylinesToMap(map,
+					toPolylines((CompoundCurve) geometry));
+			break;
+		case POLYHEDRALSURFACE:
+			shape = addPolygonsToMap(map,
+					toPolygons((PolyhedralSurface) geometry));
+			break;
+		case TIN:
+			shape = addPolygonsToMap(map, toPolygons((TIN) geometry));
+			break;
+		case TRIANGLE:
+			shape = addPolygonToMap(map, toPolygon((Triangle) geometry));
+			break;
+		case GEOMETRYCOLLECTION:
+			shape = addToMap(map, (GeometryCollection<Geometry>) geometry);
+			break;
+		default:
+			throw new GeoPackageException("Unsupported Geometry Type: "
+					+ geometryType.getName());
+		}
+
+		return shape;
+	}
+
+	/**
+	 * Add a LatLng to the map
+	 * 
+	 * @param map
+	 * @param latLng
+	 * @return
+	 */
+	public Marker addLatLngToMap(GoogleMap map, LatLng latLng) {
+		return addLatLngToMap(map, latLng, new MarkerOptions());
+	}
+
+	/**
+	 * Add a LatLng to the map
+	 * 
+	 * @param map
+	 * @param latLng
+	 * @param options
+	 * @return
+	 */
+	public Marker addLatLngToMap(GoogleMap map, LatLng latLng,
+			MarkerOptions options) {
+		return map.addMarker(options.position(latLng));
+	}
+
+	/**
+	 * Add a Polyline to the map
+	 * 
+	 * @param map
+	 * @param polyline
+	 * @return
+	 */
+	public Polyline addPolylineToMap(GoogleMap map, PolylineOptions polyline) {
+		return map.addPolyline(polyline);
+	}
+
+	/**
+	 * Add a Polygon to the map
+	 * 
+	 * @param map
+	 * @param polygon
+	 * @return
+	 */
+	public com.google.android.gms.maps.model.Polygon addPolygonToMap(
+			GoogleMap map, PolygonOptions polygon) {
+		return map.addPolygon(polygon);
+	}
+
+	/**
+	 * Add a list of LatLngs to the map
+	 * 
+	 * @param map
+	 * @param latLngs
+	 * @return
+	 */
+	public List<Marker> addLatLngsToMap(GoogleMap map, List<LatLng> latLngs) {
+		List<Marker> markers = new ArrayList<Marker>();
+		for (LatLng latLng : latLngs) {
+			Marker marker = addLatLngToMap(map, latLng);
+			markers.add(marker);
+		}
+		return markers;
+	}
+
+	/**
+	 * Add a list of Polylines to the map
+	 * 
+	 * @param map
+	 * @param latLngs
+	 * @return
+	 */
+	public List<Polyline> addPolylinesToMap(GoogleMap map,
+			List<PolylineOptions> polylines) {
+		List<Polyline> polylineList = new ArrayList<Polyline>();
+		for (PolylineOptions polylineOption : polylines) {
+			Polyline polyline = addPolylineToMap(map, polylineOption);
+			polylineList.add(polyline);
+		}
+		return polylineList;
+	}
+
+	/**
+	 * Add a list of Polygons to the map
+	 * 
+	 * @param map
+	 * @param latLngs
+	 * @return
+	 */
+	public List<com.google.android.gms.maps.model.Polygon> addPolygonsToMap(
+			GoogleMap map, List<PolygonOptions> polygons) {
+		List<com.google.android.gms.maps.model.Polygon> polygonList = new ArrayList<com.google.android.gms.maps.model.Polygon>();
+		for (PolygonOptions polygonOption : polygons) {
+			com.google.android.gms.maps.model.Polygon polygon = addPolygonToMap(
+					map, polygonOption);
+			polygonList.add(polygon);
+		}
+		return polygonList;
+	}
+
+	/**
+	 * Convert a {@link GeometryCollection} to a list of Map shapes and add to
+	 * the map
+	 * 
+	 * @param map
+	 * @param geometryCollection
+	 * @return
+	 */
+	public List<Object> addToMap(GoogleMap map,
+			GeometryCollection<Geometry> geometryCollection) {
+
+		List<Object> shapes = new ArrayList<Object>();
+
+		for (Geometry geometry : geometryCollection.getGeometries()) {
+			Object shape = addToMap(map, geometry);
+			shapes.add(shape);
+		}
+
+		return shapes;
+	}
+
 }

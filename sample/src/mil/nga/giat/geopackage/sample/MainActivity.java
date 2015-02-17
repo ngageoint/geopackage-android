@@ -11,6 +11,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
+/**
+ * Main Activity
+ * 
+ * @author osbornb
+ */
 public class MainActivity extends Activity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
 
@@ -18,20 +23,32 @@ public class MainActivity extends Activity implements
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
 	 */
-	private NavigationDrawerFragment mNavigationDrawerFragment;
+	private NavigationDrawerFragment navigationDrawerFragment;
 
 	/**
 	 * Used to store the last screen title. For use in
 	 * {@link #restoreActionBar()}.
 	 */
-	private CharSequence mTitle;
+	private CharSequence title;
 
+	/**
+	 * Manager drawer position
+	 */
 	private static final int MANAGER_POSITION = 0;
 
+	/**
+	 * Map drawer position
+	 */
 	private static final int MAP_POSITION = 1;
 
+	/**
+	 * Current drawer position
+	 */
 	private int navigationPosition = MANAGER_POSITION;
 
+	/**
+	 * Active or checked databases
+	 */
 	private GeoPackageDatabases active = new GeoPackageDatabases();
 
 	/**
@@ -54,14 +71,14 @@ public class MainActivity extends Activity implements
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		active.setPreferences(settings);
-		active.fromPreferences();
+		active.loadFromPreferences();
 
-		mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
+		navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
-		mTitle = getString(R.string.title_manager);
+		title = getString(R.string.title_manager);
 
 		// Set up the drawer.
-		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
+		navigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
 	}
 
@@ -90,7 +107,7 @@ public class MainActivity extends Activity implements
 			} else {
 				transaction.add(R.id.container, managerFragment);
 			}
-			mTitle = getString(R.string.title_manager);
+			title = getString(R.string.title_manager);
 			break;
 		case MAP_POSITION:
 			if (mapFragment.isAdded()) {
@@ -98,7 +115,7 @@ public class MainActivity extends Activity implements
 			} else {
 				transaction.add(R.id.container, mapFragment);
 			}
-			mTitle = getString(R.string.title_map);
+			title = getString(R.string.title_map);
 			break;
 		default:
 
@@ -124,12 +141,12 @@ public class MainActivity extends Activity implements
 		ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		actionBar.setDisplayShowTitleEnabled(true);
-		actionBar.setTitle(mTitle);
+		actionBar.setTitle(title);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (!mNavigationDrawerFragment.isDrawerOpen()) {
+		if (!navigationDrawerFragment.isDrawerOpen()) {
 			// Only show items in the action bar relevant to this screen
 			// if the drawer is not showing. Otherwise, let the drawer
 			// decide what to show in the action bar.

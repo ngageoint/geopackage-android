@@ -111,6 +111,8 @@ public class GeoPackageDatabaseUtils {
 			break;
 		case DOUBLE:
 		case REAL:
+		case INTEGER:
+		case INT:
 			value = cursor.getDouble(index);
 			break;
 		default:

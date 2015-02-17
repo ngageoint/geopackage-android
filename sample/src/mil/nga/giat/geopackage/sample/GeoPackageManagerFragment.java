@@ -31,8 +31,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Manager Fragment, import, view, select, edit GeoPackages
+ * 
+ * @author osbornb
+ * 
+ */
 public class GeoPackageManagerFragment extends Fragment {
 
+	/**
+	 * Get a new fragment instance
+	 * 
+	 * @param active
+	 * @return
+	 */
 	public static GeoPackageManagerFragment newInstance(
 			GeoPackageDatabases active) {
 		GeoPackageManagerFragment listFragment = new GeoPackageManagerFragment(
@@ -40,16 +52,43 @@ public class GeoPackageManagerFragment extends Fragment {
 		return listFragment;
 	}
 
+	/**
+	 * Active GeoPackages
+	 */
 	private GeoPackageDatabases active;
+
+	/**
+	 * Expandable list adapter
+	 */
 	private GeoPackageListAdapter adapter = new GeoPackageListAdapter();
+
+	/**
+	 * List of databases
+	 */
 	private List<String> databases = new ArrayList<String>();
+
+	/**
+	 * List of database tables within each database
+	 */
 	private List<List<GeoPackageTable>> databaseTables = new ArrayList<List<GeoPackageTable>>();
+
+	/**
+	 * Layout inflater
+	 */
 	private LayoutInflater inflater;
 
+	/**
+	 * Constructor
+	 */
 	public GeoPackageManagerFragment() {
 
 	}
 
+	/**
+	 * Constructor
+	 * 
+	 * @param active
+	 */
 	public GeoPackageManagerFragment(GeoPackageDatabases active) {
 		this.active = active;
 	}
@@ -103,6 +142,7 @@ public class GeoPackageManagerFragment extends Fragment {
 				int count = featureDao.count();
 				GeoPackageTable table = GeoPackageTable.createFeature(database,
 						tableName, count);
+				table.setActive(active.exists(table));
 				tables.add(table);
 			}
 			for (String tableName : geoPackage.getTileTables()) {
@@ -110,6 +150,7 @@ public class GeoPackageManagerFragment extends Fragment {
 				int count = tileDao.count();
 				GeoPackageTable table = GeoPackageTable.createTile(database,
 						tableName, count);
+				table.setActive(active.exists(table));
 				tables.add(table);
 			}
 			databaseTables.add(tables);
@@ -385,12 +426,16 @@ public class GeoPackageManagerFragment extends Fragment {
 							+ "' at url '" + url + "'");
 				}
 			} catch (final Exception e) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						showMessage("URL Import", e.getMessage());
-					}
-				});
+				try {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							showMessage("URL Import", e.getMessage());
+						}
+					});
+				} catch (Exception e2) {
+					// eat
+				}
 			}
 			return null;
 		}
@@ -503,10 +548,13 @@ public class GeoPackageManagerFragment extends Fragment {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView,
 						boolean isChecked) {
-					if (isChecked) {
-						active.addTable(table);
-					} else {
-						active.removeTable(table);
+					if (table.isActive() != isChecked) {
+						table.setActive(isChecked);
+						if (isChecked) {
+							active.addTable(table);
+						} else {
+							active.removeTable(table);
+						}
 					}
 				}
 			});
@@ -517,6 +565,8 @@ public class GeoPackageManagerFragment extends Fragment {
 					GeoPackageManagerFragment.this.tableOptions(table);
 				}
 			});
+
+			checkBox.setChecked(table.isActive());
 			if (table.isFeature()) {
 				imageView.setImageDrawable(getResources().getDrawable(
 						R.drawable.ic_features));
