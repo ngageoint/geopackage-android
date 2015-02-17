@@ -19,8 +19,10 @@
     <string name="import_url_label">URL</string>
     <string name="import_url_preloaded_label">Preloaded</string>
 
+    <string name ="geopackage_view_label">View</string>
     <string name ="geopackage_delete_label">Delete</string>
     <string name ="table_image_description">Table Type</string>
+    <string name ="geopackage_table_view_label">View</string>
     <string name ="geopackage_table_delete_label">Delete</string>
     
     <string-array name="preloaded_url_labels">

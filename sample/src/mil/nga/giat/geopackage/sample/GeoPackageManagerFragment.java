@@ -1,15 +1,25 @@
 package mil.nga.giat.geopackage.sample;
 
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
+import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
+import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
+import mil.nga.giat.geopackage.user.UserColumn;
+import mil.nga.giat.geopackage.user.UserTable;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
@@ -78,6 +88,11 @@ public class GeoPackageManagerFragment extends Fragment {
 	private LayoutInflater inflater;
 
 	/**
+	 * GeoPackage manager
+	 */
+	private GeoPackageManager manager;
+
+	/**
 	 * Constructor
 	 */
 	public GeoPackageManagerFragment() {
@@ -97,6 +112,7 @@ public class GeoPackageManagerFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		this.inflater = inflater;
+		manager = GeoPackageFactory.getManager(getActivity());
 		View v = inflater.inflate(R.layout.fragment_manager, null);
 		ExpandableListView elv = (ExpandableListView) v
 				.findViewById(R.id.fragment_manager_view_ui);
@@ -131,7 +147,6 @@ public class GeoPackageManagerFragment extends Fragment {
 	 * Update the listing of databases and tables
 	 */
 	public void update() {
-		GeoPackageManager manager = GeoPackageFactory.getManager(getActivity());
 		databases = manager.databases();
 		databaseTables.clear();
 		for (String database : databases) {
@@ -169,6 +184,7 @@ public class GeoPackageManagerFragment extends Fragment {
 
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
 				android.R.layout.select_dialog_item);
+		adapter.add(getString(R.string.geopackage_view_label));
 		adapter.add(getString(R.string.geopackage_delete_label));
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(database);
@@ -177,41 +193,135 @@ public class GeoPackageManagerFragment extends Fragment {
 
 				if (item >= 0) {
 
-					final GeoPackageManager manager = GeoPackageFactory
-							.getManager(getActivity());
 					switch (item) {
 					case 0:
-						AlertDialog deleteDialog = new AlertDialog.Builder(
-								getActivity())
-								.setTitle(
-										getString(R.string.geopackage_delete_label))
-								.setMessage(
-										"Are you sure you want to delete "
-												+ database)
-								.setPositiveButton("Delete",
+						viewDatabaseOption(database);
+						break;
+					case 1:
+						deleteDatabaseOption(database);
+						break;
+					default:
+					}
+				}
+			}
+		});
 
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
 
-										manager.delete(database);
-										active.removeDatabase(database);
-										update();
-									}
-								})
+	/**
+	 * View database information
+	 * 
+	 * @param database
+	 */
+	private void viewDatabaseOption(final String database) {
+		StringBuilder databaseInfo = new StringBuilder();
+		GeoPackage geoPackage = manager.open(database);
+		try {
+			SpatialReferenceSystemDao srsDao = geoPackage
+					.getSpatialReferenceSystemDao();
 
-								.setNegativeButton("Cancel",
-										new DialogInterface.OnClickListener() {
-											@Override
-											public void onClick(
-													DialogInterface dialog,
-													int which) {
-												dialog.dismiss();
-											}
-										}).create();
-						deleteDialog.show();
+			List<SpatialReferenceSystem> srsList = srsDao.queryForAll();
+			databaseInfo.append("Feature Tables: ").append(
+					geoPackage.getFeatureTables().size());
+			databaseInfo.append("\nTile Tables: ").append(
+					geoPackage.getTileTables().size());
+			databaseInfo.append("\n\nSpatial Reference Systems: ").append(
+					srsList.size());
+			for (SpatialReferenceSystem srs : srsList) {
+				databaseInfo.append("\n");
+				addSrs(databaseInfo, srs);
+			}
 
+		} catch (SQLException e) {
+			databaseInfo.append(e.getMessage());
+		} finally {
+			geoPackage.close();
+		}
+		AlertDialog viewDialog = new AlertDialog.Builder(getActivity())
+				.setTitle(database).setPositiveButton("OK",
+
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).setMessage(databaseInfo.toString()).create();
+		viewDialog.show();
+	}
+
+	/**
+	 * Add Spatial Reference System to the info
+	 * 
+	 * @param info
+	 * @param srs
+	 */
+	private void addSrs(StringBuilder info, SpatialReferenceSystem srs) {
+		info.append("\nSRS Name: ").append(srs.getSrsName());
+		info.append("\nSRS ID: ").append(srs.getSrsId());
+		info.append("\nOrganization: ").append(srs.getOrganization());
+		info.append("\nCoordsys ID: ").append(srs.getOrganizationCoordsysId());
+		info.append("\nDefinition: ").append(srs.getDefinition());
+		info.append("\nDescription: ").append(srs.getDescription());
+	}
+
+	/**
+	 * Delete database alert option
+	 * 
+	 * @param database
+	 */
+	private void deleteDatabaseOption(final String database) {
+		AlertDialog deleteDialog = new AlertDialog.Builder(getActivity())
+				.setTitle(getString(R.string.geopackage_delete_label))
+				.setMessage("Are you sure you want to delete " + database)
+				.setPositiveButton("Delete",
+
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						manager.delete(database);
+						active.removeDatabase(database);
+						update();
+					}
+				})
+
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dialog.dismiss();
+							}
+						}).create();
+		deleteDialog.show();
+	}
+
+	/**
+	 * Show options for the GeoPackage table
+	 * 
+	 * @param table
+	 */
+	private void tableOptions(final GeoPackageTable table) {
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+				android.R.layout.select_dialog_item);
+		adapter.add(getString(R.string.geopackage_table_view_label));
+		adapter.add(getString(R.string.geopackage_table_delete_label));
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle(table.getDatabase() + " - " + table.getName());
+		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int item) {
+
+				if (item >= 0) {
+
+					switch (item) {
+					case 0:
+						viewTableOption(table);
+						break;
+					case 1:
+						deleteTableOption(table);
 						break;
 
 					default:
@@ -225,85 +335,175 @@ public class GeoPackageManagerFragment extends Fragment {
 	}
 
 	/**
-	 * Show options for the GeoPackage table
+	 * View table information
 	 * 
 	 * @param table
 	 */
-	private void tableOptions(final GeoPackageTable table) {
+	private void viewTableOption(final GeoPackageTable table) {
+		StringBuilder info = new StringBuilder();
+		GeoPackage geoPackage = manager.open(table.getDatabase());
+		try {
+			Contents contents = null;
+			FeatureDao featureDao = null;
+			TileDao tileDao = null;
+			UserTable<? extends UserColumn> userTable = null;
+			if (table.isFeature()) {
+				featureDao = geoPackage.getFeatureDao(table.getName());
+				contents = featureDao.getGeometryColumns().getContents();
+				info.append("Feature Table");
+				info.append("\nFeatures: ").append(featureDao.count());
+				userTable = featureDao.getTable();
+			} else {
+				tileDao = geoPackage.getTileDao(table.getName());
+				contents = tileDao.getTileMatrixSet().getContents();
+				info.append("Tile Table");
+				info.append("\nZoom Levels: ").append(
+						tileDao.getTileMatrices().size());
+				info.append("\nTiles: ").append(tileDao.count());
+				userTable = tileDao.getTable();
+			}
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-				android.R.layout.select_dialog_item);
-		adapter.add(getString(R.string.geopackage_table_delete_label));
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setTitle(table.getDatabase() + " - " + table.getName());
-		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
+			SpatialReferenceSystem srs = contents.getSrs();
 
-				if (item >= 0) {
+			info.append("\n\nSpatial Reference System:");
+			addSrs(info, srs);
 
-					final GeoPackageManager manager = GeoPackageFactory
-							.getManager(getActivity());
-					switch (item) {
-					case 0:
-						AlertDialog deleteDialog = new AlertDialog.Builder(
-								getActivity())
-								.setTitle(
-										getString(R.string.geopackage_table_delete_label))
-								.setMessage(
-										"Are you sure you want to delete "
-												+ table.getDatabase() + " - "
-												+ table.getName())
-								.setPositiveButton("Delete",
+			info.append("\n\nContents:");
+			info.append("\nTable Name: ").append(contents.getTableName());
+			info.append("\nData Type: ").append(contents.getDataType());
+			info.append("\nIdentifier: ").append(contents.getIdentifier());
+			info.append("\nDescription: ").append(contents.getDescription());
+			info.append("\nLast Change: ").append(contents.getLastChange());
+			info.append("\nMin X: ").append(contents.getMinX());
+			info.append("\nMin Y: ").append(contents.getMinY());
+			info.append("\nMax X: ").append(contents.getMaxX());
+			info.append("\nMax Y: ").append(contents.getMaxY());
 
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
+			if (featureDao != null) {
+				GeometryColumns geometryColumns = featureDao
+						.getGeometryColumns();
+				info.append("\n\nGeometry Columns:");
+				info.append("\nTable Name: ").append(
+						geometryColumns.getTableName());
+				info.append("\nColumn Name: ").append(
+						geometryColumns.getColumnName());
+				info.append("\nGeometry Type Name: ").append(
+						geometryColumns.getGeometryTypeName());
+				info.append("\nZ: ").append(geometryColumns.getZ());
+				info.append("\nM: ").append(geometryColumns.getM());
+			}
 
-										GeoPackage geoPackage = manager
-												.open(table.getDatabase());
-										try {
-											ContentsDao contents = geoPackage
-													.getContentsDao();
-											contents.deleteByIdCascade(
-													table.getName(), true);
-											active.removeTable(table);
-											update();
-										} catch (Exception e) {
-											showMessage(
-													"Delete "
-															+ table.getDatabase()
-															+ " "
-															+ table.getName()
-															+ " Table", e
-															.getMessage());
-										} finally {
-											geoPackage.close();
-										}
-									}
-								})
+			if (tileDao != null) {
+				TileMatrixSet tileMatrixSet = tileDao.getTileMatrixSet();
+				info.append("\n\nTile Matrix Set:");
+				info.append("\nTable Name: ").append(
+						tileMatrixSet.getTableName());
+				info.append("\nMin X: ").append(tileMatrixSet.getMinX());
+				info.append("\nMin Y: ").append(tileMatrixSet.getMinY());
+				info.append("\nMax X: ").append(tileMatrixSet.getMaxX());
+				info.append("\nMax Y: ").append(tileMatrixSet.getMaxY());
 
-								.setNegativeButton("Cancel",
-										new DialogInterface.OnClickListener() {
-											@Override
-											public void onClick(
-													DialogInterface dialog,
-													int which) {
-												dialog.dismiss();
-											}
-										}).create();
-						deleteDialog.show();
-
-						break;
-
-					default:
-					}
+				info.append("\n\nTile Matrices:");
+				for (TileMatrix tileMatrix : tileDao.getTileMatrices()) {
+					info.append("\n\nTable Name: ").append(
+							tileMatrix.getTableName());
+					info.append("\nZoom Level: ").append(
+							tileMatrix.getZoomLevel());
+					info.append("\nMatrix Width: ").append(
+							tileMatrix.getMatrixWidth());
+					info.append("\nMatrix Height: ").append(
+							tileMatrix.getMatrixHeight());
+					info.append("\nTile Width: ").append(
+							tileMatrix.getTileWidth());
+					info.append("\nTile Height: ").append(
+							tileMatrix.getTileHeight());
+					info.append("\nPixel X Size: ").append(
+							tileMatrix.getPixelXSize());
+					info.append("\nPixel Y Size: ").append(
+							tileMatrix.getPixelYSize());
 				}
 			}
-		});
 
-		AlertDialog alert = builder.create();
-		alert.show();
+			info.append("\n\n").append(table.getName()).append(" columns:");
+			for (UserColumn userColumn : userTable.getColumns()) {
+				info.append("\n\nIndex: ").append(userColumn.getIndex());
+				info.append("\nName: ").append(userColumn.getName());
+				if (userColumn.getMax() != null) {
+					info.append("\nMax: ").append(userColumn.getMax());
+				}
+				info.append("\nNot Null: ").append(userColumn.isNotNull());
+				if (userColumn.getDefaultValue() != null) {
+					info.append("\nDefault Value: ").append(
+							userColumn.getDefaultValue());
+				}
+				if (userColumn.isPrimaryKey()) {
+					info.append("\nPrimary Key: ").append(
+							userColumn.isPrimaryKey());
+				}
+				info.append("\nType: ").append(userColumn.getTypeName());
+			}
+
+		} catch (GeoPackageException e) {
+			info.append(e.getMessage());
+		} finally {
+			geoPackage.close();
+		}
+		AlertDialog viewDialog = new AlertDialog.Builder(getActivity())
+				.setTitle(table.getDatabase() + " - " + table.getName())
+				.setPositiveButton("OK",
+
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).setMessage(info.toString()).create();
+		viewDialog.show();
+	}
+
+	/**
+	 * Delete table alert option
+	 * 
+	 * @param table
+	 */
+	private void deleteTableOption(final GeoPackageTable table) {
+		AlertDialog deleteDialog = new AlertDialog.Builder(getActivity())
+				.setTitle(getString(R.string.geopackage_table_delete_label))
+				.setMessage(
+						"Are you sure you want to delete "
+								+ table.getDatabase() + " - " + table.getName())
+				.setPositiveButton("Delete",
+
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+
+						GeoPackage geoPackage = manager.open(table
+								.getDatabase());
+						try {
+							ContentsDao contents = geoPackage.getContentsDao();
+							contents.deleteByIdCascade(table.getName(), true);
+							active.removeTable(table);
+							update();
+						} catch (Exception e) {
+							showMessage("Delete " + table.getDatabase() + " "
+									+ table.getName() + " Table",
+									e.getMessage());
+						} finally {
+							geoPackage.close();
+						}
+					}
+				})
+
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dialog.dismiss();
+							}
+						}).create();
+		deleteDialog.show();
 	}
 
 	/**
@@ -412,8 +612,6 @@ public class GeoPackageManagerFragment extends Fragment {
 			try {
 				String name = params[0];
 				URL url = new URL(params[1]);
-				GeoPackageManager manager = GeoPackageFactory
-						.getManager(getActivity());
 				if (manager.importGeoPackage(name, url)) {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
@@ -558,11 +756,12 @@ public class GeoPackageManagerFragment extends Fragment {
 					}
 				}
 			});
-			tableName.setOnClickListener(new View.OnClickListener() {
+			tableName.setOnLongClickListener(new View.OnLongClickListener() {
 
 				@Override
-				public void onClick(View v) {
+				public boolean onLongClick(View v) {
 					GeoPackageManagerFragment.this.tableOptions(table);
+					return true;
 				}
 			});
 
