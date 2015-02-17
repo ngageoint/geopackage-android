@@ -4,6 +4,10 @@
 
     <group android:id="@+id/menu_group_map" >
         <item
+            android:id="@+id/max_features"
+            android:showAsAction="never"
+            android:title="@string/map_max_features"/>
+        <item
             android:id="@+id/normal_map"
             android:showAsAction="never"
             android:title="@string/map_type_normal"/>

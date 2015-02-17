@@ -9,17 +9,21 @@ import mil.nga.giat.geopackage.features.user.FeatureRow;
 import mil.nga.giat.geopackage.geom.Geometry;
 import mil.nga.giat.geopackage.geom.conversion.GoogleMapShapeConverter;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -30,6 +34,11 @@ import com.google.android.gms.maps.MapFragment;
  * @author osbornb
  */
 public class GeoPackageMapFragment extends Fragment {
+
+	/**
+	 * Max features key for saving to preferences
+	 */
+	private static final String MAX_FEATURES_KEY = "max_features_key";
 
 	/**
 	 * Map type key for saving to preferences
@@ -148,6 +157,9 @@ public class GeoPackageMapFragment extends Fragment {
 		boolean handled = true;
 
 		switch (item.getItemId()) {
+		case R.id.max_features:
+			setMaxFeatures();
+			break;
 		case R.id.normal_map:
 			setMapType(GoogleMap.MAP_TYPE_NORMAL);
 			break;
@@ -166,6 +178,45 @@ public class GeoPackageMapFragment extends Fragment {
 		}
 
 		return handled;
+	}
+
+	/**
+	 * Let the user set the max number of features to draw
+	 */
+	private void setMaxFeatures() {
+
+		final EditText input = new EditText(getActivity());
+		input.setInputType(InputType.TYPE_CLASS_NUMBER);
+		final String maxFeatures = String.valueOf(getMaxFeatures());
+		input.setText(maxFeatures);
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
+				.setTitle("Max Features")
+				.setMessage("Set the max number of features to draw on the map")
+				.setView(input)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString();
+						if (value != null && !value.equals(maxFeatures)) {
+							int maxFeature = Integer.parseInt(value);
+							SharedPreferences settings = PreferenceManager
+									.getDefaultSharedPreferences(getActivity());
+							Editor editor = settings.edit();
+							editor.putInt(MAX_FEATURES_KEY, maxFeature);
+							editor.commit();
+							updateInBackground();
+						}
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								dialog.cancel();
+							}
+						});
+
+		dialog.show();
 	}
 
 	/**
@@ -211,6 +262,19 @@ public class GeoPackageMapFragment extends Fragment {
 	}
 
 	/**
+	 * Get the max features
+	 * 
+	 * @return
+	 */
+	private int getMaxFeatures() {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(getActivity());
+		int maxFeatures = settings.getInt(MAX_FEATURES_KEY, getResources()
+				.getInteger(R.integer.map_max_features_default));
+		return maxFeatures;
+	}
+
+	/**
 	 * Update the map
 	 * 
 	 * @param task
@@ -219,14 +283,26 @@ public class GeoPackageMapFragment extends Fragment {
 
 		if (active != null) {
 
+			int featuresLeft = getMaxFeatures();
+
 			for (GeoPackageDatabase database : active.getDatabases()) {
 
-				for (GeoPackageTable features : database.getFeatures()) {
-					displayFeatures(task, features);
+				if (featuresLeft > 0) {
+					for (GeoPackageTable features : database.getFeatures()) {
+						int count = displayFeatures(task, features,
+								featuresLeft);
+						featuresLeft -= count;
+						if (task.isCancelled() || featuresLeft <= 0) {
+							break;
+						}
+					}
 				}
 
 				for (GeoPackageTable tiles : database.getTiles()) {
 					displayTiles(task, tiles);
+					if (task.isCancelled()) {
+						break;
+					}
 				}
 
 				if (task.isCancelled()) {
@@ -243,8 +319,13 @@ public class GeoPackageMapFragment extends Fragment {
 	 * 
 	 * @param task
 	 * @param features
+	 * @param maxFeatures
+	 * @return count of features added
 	 */
-	private void displayFeatures(MapUpdateTask task, GeoPackageTable features) {
+	private int displayFeatures(MapUpdateTask task, GeoPackageTable features,
+			int maxFeatures) {
+
+		int count = 0;
 
 		GeoPackage geoPackage = manager.open(features.getDatabase());
 
@@ -258,7 +339,8 @@ public class GeoPackageMapFragment extends Fragment {
 
 				final GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
 
-				while (!task.isCancelled() && cursor.moveToNext()) {
+				while (!task.isCancelled() && count < maxFeatures
+						&& cursor.moveToNext()) {
 					FeatureRow row = cursor.getRow();
 					GeoPackageGeometryData geometryData = row.getGeometry();
 					if (geometryData != null && !geometryData.isEmpty()) {
@@ -266,6 +348,7 @@ public class GeoPackageMapFragment extends Fragment {
 						final Geometry geometry = geometryData.getGeometry();
 
 						if (geometry != null) {
+							count++;
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
@@ -284,6 +367,7 @@ public class GeoPackageMapFragment extends Fragment {
 			geoPackage.close();
 		}
 
+		return count;
 	}
 
 	/**

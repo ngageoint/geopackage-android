@@ -10,6 +10,7 @@
     <string name="import_geopackage_url">Import URL</string>
     <string name="import_geopackage_file">Import File</string>
     
+    <string name="map_max_features">Max Features</string>
     <string name="map_type_normal">Normal</string>
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
