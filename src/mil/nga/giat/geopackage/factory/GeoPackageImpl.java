@@ -684,6 +684,19 @@ class GeoPackageImpl implements GeoPackage {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void deleteTable(String table) {
+		ContentsDao contentsDao = getContentsDao();
+		try {
+			contentsDao.deleteByIdCascade(table, true);
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to delete table: " + table, e);
+		}
+	}
+
+	/**
 	 * Create a dao
 	 * 
 	 * @param type

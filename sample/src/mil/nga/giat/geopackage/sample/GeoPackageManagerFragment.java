@@ -9,7 +9,6 @@ import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.core.contents.Contents;
-import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
@@ -481,8 +480,7 @@ public class GeoPackageManagerFragment extends Fragment {
 						GeoPackage geoPackage = manager.open(table
 								.getDatabase());
 						try {
-							ContentsDao contents = geoPackage.getContentsDao();
-							contents.deleteByIdCascade(table.getName(), true);
+							geoPackage.deleteTable(table.getName());
 							active.removeTable(table);
 							update();
 						} catch (Exception e) {

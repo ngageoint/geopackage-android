@@ -321,4 +321,11 @@ public interface GeoPackage {
 	 */
 	public boolean createExtensionsTable();
 
+	/**
+	 * Delete the user table and all GeoPackage metadata
+	 * 
+	 * @param table
+	 */
+	public void deleteTable(String table);
+
 }
