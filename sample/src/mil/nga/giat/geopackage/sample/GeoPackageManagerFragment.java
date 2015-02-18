@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.sample;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -193,6 +195,7 @@ public class GeoPackageManagerFragment extends Fragment {
 		adapter.add(getString(R.string.geopackage_delete_label));
 		adapter.add(getString(R.string.geopackage_rename_label));
 		adapter.add(getString(R.string.geopackage_copy_label));
+		adapter.add(getString(R.string.geopackage_export_label));
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(database);
 		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
@@ -212,6 +215,9 @@ public class GeoPackageManagerFragment extends Fragment {
 						break;
 					case 3:
 						copyDatabaseOption(database);
+						break;
+					case 4:
+						exportDatabaseOption(database);
 						break;
 					default:
 					}
@@ -389,12 +395,61 @@ public class GeoPackageManagerFragment extends Fragment {
 										if (manager.copy(database, value)) {
 											update();
 										} else {
-											showMessage(getString(R.string.geopackage_copy_label), "Copy from "
-													+ database + " to " + value
-													+ " was not successful");
+											showMessage(
+													getString(R.string.geopackage_copy_label),
+													"Copy from "
+															+ database
+															+ " to "
+															+ value
+															+ " was not successful");
 										}
 									} catch (Exception e) {
-										showMessage(getString(R.string.geopackage_copy_label), e.getMessage());
+										showMessage(
+												getString(R.string.geopackage_copy_label),
+												e.getMessage());
+									}
+								}
+							}
+						})
+				.setNegativeButton(getString(R.string.button_cancel_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								dialog.cancel();
+							}
+						});
+
+		dialog.show();
+	}
+
+	/**
+	 * Export database option
+	 * 
+	 * @param database
+	 */
+	private void exportDatabaseOption(final String database) {
+
+		final File directory = Environment.getExternalStorageDirectory();
+		final EditText input = new EditText(getActivity());
+		input.setText(database);
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
+				.setTitle(getString(R.string.geopackage_export_label))
+				.setMessage(directory.getPath() + File.separator)
+				.setView(input)
+				.setPositiveButton(getString(R.string.button_ok_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								String value = input.getText().toString();
+								if (value != null) {
+									try {
+										manager.exportGeoPackage(database,
+												value, directory);
+									} catch (Exception e) {
+										showMessage(
+												getString(R.string.geopackage_export_label),
+												e.getMessage());
 									}
 								}
 							}
@@ -583,28 +638,31 @@ public class GeoPackageManagerFragment extends Fragment {
 				.setTitle(getString(R.string.geopackage_table_delete_label))
 				.setMessage(
 						getString(R.string.geopackage_table_delete_label) + " "
-								+ table.getDatabase() + " - " + table.getName() + "?")
-				.setPositiveButton(getString(R.string.geopackage_table_delete_label),
+								+ table.getDatabase() + " - " + table.getName()
+								+ "?")
+				.setPositiveButton(
+						getString(R.string.geopackage_table_delete_label),
 
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
 
-						GeoPackage geoPackage = manager.open(table
-								.getDatabase());
-						try {
-							geoPackage.deleteTable(table.getName());
-							active.removeTable(table);
-							update();
-						} catch (Exception e) {
-							showMessage("Delete " + table.getDatabase() + " "
-									+ table.getName() + " Table",
-									e.getMessage());
-						} finally {
-							geoPackage.close();
-						}
-					}
-				})
+								GeoPackage geoPackage = manager.open(table
+										.getDatabase());
+								try {
+									geoPackage.deleteTable(table.getName());
+									active.removeTable(table);
+									update();
+								} catch (Exception e) {
+									showMessage("Delete " + table.getDatabase()
+											+ " " + table.getName() + " Table",
+											e.getMessage());
+								} finally {
+									geoPackage.close();
+								}
+							}
+						})
 
 				.setNegativeButton(getString(R.string.button_cancel_label),
 						new DialogInterface.OnClickListener() {
@@ -739,7 +797,9 @@ public class GeoPackageManagerFragment extends Fragment {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							showMessage(getString(R.string.geopackage_import_label), e.getMessage());
+							showMessage(
+									getString(R.string.geopackage_import_label),
+									e.getMessage());
 						}
 					});
 				} catch (Exception e2) {
