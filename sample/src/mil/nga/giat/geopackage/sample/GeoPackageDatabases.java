@@ -183,8 +183,8 @@ public class GeoPackageDatabases {
 				addTable(GeoPackageTable.createTile(database, tile, 0), false);
 			}
 			for (String feature : features) {
-				addTable(GeoPackageTable.createFeature(database, feature, 0),
-						false);
+				addTable(GeoPackageTable.createFeature(database, feature, null,
+						0), false);
 			}
 		}
 	}

@@ -1,5 +1,7 @@
 package mil.nga.giat.geopackage.sample;
 
+import mil.nga.giat.geopackage.geom.GeometryType;
+
 /**
  * GeoPackage table information
  * 
@@ -33,16 +35,25 @@ public class GeoPackageTable {
 	public boolean active = false;
 
 	/**
+	 * Geometry Type
+	 */
+	public GeometryType geometryType;
+
+	/**
 	 * Create a new feature table
 	 * 
 	 * @param database
 	 * @param name
+	 * @param geometryType
 	 * @param count
 	 * @return
 	 */
 	public static GeoPackageTable createFeature(String database, String name,
-			int count) {
-		return new GeoPackageTable(database, name, count, false);
+			GeometryType geometryType, int count) {
+		GeoPackageTable table = new GeoPackageTable(database, name, count,
+				false);
+		table.setGeometryType(geometryType);
+		return table;
 	}
 
 	/**
@@ -104,6 +115,14 @@ public class GeoPackageTable {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public GeometryType getGeometryType() {
+		return geometryType;
+	}
+
+	public void setGeometryType(GeometryType geometryType) {
+		this.geometryType = geometryType;
 	}
 
 }

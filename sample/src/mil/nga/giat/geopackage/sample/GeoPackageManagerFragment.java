@@ -11,11 +11,13 @@ import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.core.contents.Contents;
+import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.tiles.TileGenerator;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -160,11 +162,22 @@ public class GeoPackageManagerFragment extends Fragment {
 		for (String database : databases) {
 			GeoPackage geoPackage = manager.open(database);
 			List<GeoPackageTable> tables = new ArrayList<GeoPackageTable>();
+			ContentsDao contentsDao = geoPackage.getContentsDao();
 			for (String tableName : geoPackage.getFeatureTables()) {
 				FeatureDao featureDao = geoPackage.getFeatureDao(tableName);
 				int count = featureDao.count();
+
+				GeometryType geometryType = null;
+				try {
+					Contents contents = contentsDao.queryForId(tableName);
+					GeometryColumns geometryColumns = contents
+							.getGeometryColumns();
+					geometryType = geometryColumns.getGeometryType();
+				} catch (Exception e) {
+				}
+
 				GeoPackageTable table = GeoPackageTable.createFeature(database,
-						tableName, count);
+						tableName, geometryType, count);
 				table.setActive(active.exists(table));
 				tables.add(table);
 			}
@@ -1122,8 +1135,45 @@ public class GeoPackageManagerFragment extends Fragment {
 
 			checkBox.setChecked(table.isActive());
 			if (table.isFeature()) {
+				GeometryType geometryType = table.getGeometryType();
+				int drawableId = R.drawable.ic_geometry;
+				if (geometryType != null) {
+
+					switch (geometryType) {
+
+					case POINT:
+					case MULTIPOINT:
+						drawableId = R.drawable.ic_point;
+						break;
+
+					case LINESTRING:
+					case MULTILINESTRING:
+					case CURVE:
+					case COMPOUNDCURVE:
+					case CIRCULARSTRING:
+					case MULTICURVE:
+						drawableId = R.drawable.ic_linestring;
+						break;
+
+					case POLYGON:
+					case SURFACE:
+					case CURVEPOLYGON:
+					case TRIANGLE:
+					case POLYHEDRALSURFACE:
+					case TIN:
+					case MULTIPOLYGON:
+					case MULTISURFACE:
+						drawableId = R.drawable.ic_polygon;
+						break;
+
+					case GEOMETRY:
+					case GEOMETRYCOLLECTION:
+						drawableId = R.drawable.ic_geometry;
+						break;
+					}
+				}
 				imageView.setImageDrawable(getResources().getDrawable(
-						R.drawable.ic_features));
+						drawableId));
 			} else {
 				imageView.setImageDrawable(getResources().getDrawable(
 						R.drawable.ic_tiles));
