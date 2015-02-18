@@ -253,7 +253,8 @@ public class GeoPackageManagerFragment extends Fragment {
 			geoPackage.close();
 		}
 		AlertDialog viewDialog = new AlertDialog.Builder(getActivity())
-				.setTitle(database).setPositiveButton("OK",
+				.setTitle(database)
+				.setPositiveButton(getString(R.string.button_ok_label),
 
 				new DialogInterface.OnClickListener() {
 					@Override
@@ -287,8 +288,10 @@ public class GeoPackageManagerFragment extends Fragment {
 	private void deleteDatabaseOption(final String database) {
 		AlertDialog deleteDialog = new AlertDialog.Builder(getActivity())
 				.setTitle(getString(R.string.geopackage_delete_label))
-				.setMessage("Are you sure you want to delete " + database)
-				.setPositiveButton("Delete",
+				.setMessage(
+						getString(R.string.geopackage_delete_label) + " "
+								+ database + "?")
+				.setPositiveButton(getString(R.string.geopackage_delete_label),
 
 				new DialogInterface.OnClickListener() {
 					@Override
@@ -300,7 +303,7 @@ public class GeoPackageManagerFragment extends Fragment {
 					}
 				})
 
-				.setNegativeButton("Cancel",
+				.setNegativeButton(getString(R.string.button_cancel_label),
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,
@@ -322,28 +325,37 @@ public class GeoPackageManagerFragment extends Fragment {
 		input.setText(database);
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
-				.setTitle("Rename GeoPackage")
+				.setTitle(getString(R.string.geopackage_rename_label))
 				.setView(input)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString();
-						if (value != null && !value.equals(database)) {
-							try {
-								if (manager.rename(database, value)) {
-									active.renameDatabase(database, value);
-									update();
-								} else {
-									showMessage("Rename", "Rename from "
-											+ database + " to " + value
-											+ " was not successful");
+				.setPositiveButton(getString(R.string.button_ok_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								String value = input.getText().toString();
+								if (value != null && !value.equals(database)) {
+									try {
+										if (manager.rename(database, value)) {
+											active.renameDatabase(database,
+													value);
+											update();
+										} else {
+											showMessage(
+													getString(R.string.geopackage_rename_label),
+													"Rename from "
+															+ database
+															+ " to "
+															+ value
+															+ " was not successful");
+										}
+									} catch (Exception e) {
+										showMessage(
+												getString(R.string.geopackage_rename_label),
+												e.getMessage());
+									}
 								}
-							} catch (Exception e) {
-								showMessage("Rename", e.getMessage());
 							}
-						}
-					}
-				})
-				.setNegativeButton("Cancel",
+						})
+				.setNegativeButton(getString(R.string.button_cancel_label),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
@@ -365,27 +377,29 @@ public class GeoPackageManagerFragment extends Fragment {
 		input.setText(database + getString(R.string.geopackage_copy_suffix));
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
-				.setTitle("Copy GeoPackage")
+				.setTitle(getString(R.string.geopackage_copy_label))
 				.setView(input)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString();
-						if (value != null && !value.equals(database)) {
-							try {
-								if (manager.copy(database, value)) {
-									update();
-								} else {
-									showMessage("Copy", "Copy from " + database
-											+ " to " + value
-											+ " was not successful");
+				.setPositiveButton(getString(R.string.button_ok_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								String value = input.getText().toString();
+								if (value != null && !value.equals(database)) {
+									try {
+										if (manager.copy(database, value)) {
+											update();
+										} else {
+											showMessage(getString(R.string.geopackage_copy_label), "Copy from "
+													+ database + " to " + value
+													+ " was not successful");
+										}
+									} catch (Exception e) {
+										showMessage(getString(R.string.geopackage_copy_label), e.getMessage());
+									}
 								}
-							} catch (Exception e) {
-								showMessage("Copy", e.getMessage());
 							}
-						}
-					}
-				})
-				.setNegativeButton("Cancel",
+						})
+				.setNegativeButton(getString(R.string.button_cancel_label),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
@@ -548,7 +562,7 @@ public class GeoPackageManagerFragment extends Fragment {
 		}
 		AlertDialog viewDialog = new AlertDialog.Builder(getActivity())
 				.setTitle(table.getDatabase() + " - " + table.getName())
-				.setPositiveButton("OK",
+				.setPositiveButton(getString(R.string.button_ok_label),
 
 				new DialogInterface.OnClickListener() {
 					@Override
@@ -568,9 +582,9 @@ public class GeoPackageManagerFragment extends Fragment {
 		AlertDialog deleteDialog = new AlertDialog.Builder(getActivity())
 				.setTitle(getString(R.string.geopackage_table_delete_label))
 				.setMessage(
-						"Are you sure you want to delete "
-								+ table.getDatabase() + " - " + table.getName())
-				.setPositiveButton("Delete",
+						getString(R.string.geopackage_table_delete_label) + " "
+								+ table.getDatabase() + " - " + table.getName() + "?")
+				.setPositiveButton(getString(R.string.geopackage_table_delete_label),
 
 				new DialogInterface.OnClickListener() {
 					@Override
@@ -592,7 +606,7 @@ public class GeoPackageManagerFragment extends Fragment {
 					}
 				})
 
-				.setNegativeButton("Cancel",
+				.setNegativeButton(getString(R.string.button_cancel_label),
 						new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog,
@@ -675,7 +689,7 @@ public class GeoPackageManagerFragment extends Fragment {
 			}
 		});
 
-		dialog.setPositiveButton("Import",
+		dialog.setPositiveButton(getString(R.string.geopackage_import_label),
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -684,7 +698,7 @@ public class GeoPackageManagerFragment extends Fragment {
 						downloadTask.execute(nameInput.getText().toString(),
 								urlInput.getText().toString());
 					}
-				}).setNegativeButton("Cancel",
+				}).setNegativeButton(getString(R.string.button_cancel_label),
 				new DialogInterface.OnClickListener() {
 
 					@Override
@@ -725,7 +739,7 @@ public class GeoPackageManagerFragment extends Fragment {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							showMessage("URL Import", e.getMessage());
+							showMessage(getString(R.string.geopackage_import_label), e.getMessage());
 						}
 					});
 				} catch (Exception e2) {
@@ -793,58 +807,62 @@ public class GeoPackageManagerFragment extends Fragment {
 		input.setText(name);
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
-				.setTitle("Import GeoPackage")
-				.setMessage("Name:")
+				.setTitle(getString(R.string.geopackage_import_label))
+				.setMessage(getString(R.string.geopackage_import_name_label))
 				.setView(input)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
+				.setPositiveButton(getString(R.string.button_ok_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
 
-						String value = input.getText().toString();
-						if (value != null) {
-							try {
-								InputStream stream = getActivity()
-										.getContentResolver().openInputStream(
-												uri);
-								boolean imported = manager.importGeoPackage(
-										value, stream);
-								if (imported) {
-									update();
-								} else {
+								String value = input.getText().toString();
+								if (value != null) {
 									try {
-										getActivity().runOnUiThread(
-												new Runnable() {
-													@Override
-													public void run() {
-														showMessage(
-																"URL Import",
-																"Failed to import Uri: "
-																		+ uri.getPath());
-													}
-												});
-									} catch (Exception e2) {
-										// eat
+										InputStream stream = getActivity()
+												.getContentResolver()
+												.openInputStream(uri);
+										boolean imported = manager
+												.importGeoPackage(value, stream);
+										if (imported) {
+											update();
+										} else {
+											try {
+												getActivity().runOnUiThread(
+														new Runnable() {
+															@Override
+															public void run() {
+																showMessage(
+																		"URL Import",
+																		"Failed to import Uri: "
+																				+ uri.getPath());
+															}
+														});
+											} catch (Exception e2) {
+												// eat
+											}
+										}
+									} catch (final Exception e) {
+										try {
+											getActivity().runOnUiThread(
+													new Runnable() {
+														@Override
+														public void run() {
+															showMessage(
+																	"File Import",
+																	"Uri: "
+																			+ uri.getPath()
+																			+ ", "
+																			+ e.getMessage());
+														}
+													});
+										} catch (Exception e2) {
+											// eat
+										}
 									}
 								}
-							} catch (final Exception e) {
-								try {
-									getActivity().runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											showMessage(
-													"File Import",
-													"Uri: " + uri.getPath()
-															+ ", "
-															+ e.getMessage());
-										}
-									});
-								} catch (Exception e2) {
-									// eat
-								}
 							}
-						}
-					}
-				})
-				.setNegativeButton("Cancel",
+						})
+				.setNegativeButton(getString(R.string.button_cancel_label),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
@@ -866,7 +884,7 @@ public class GeoPackageManagerFragment extends Fragment {
 			new AlertDialog.Builder(getActivity())
 					.setTitle(title != null ? title : "")
 					.setMessage(message != null ? message : "")
-					.setNeutralButton("OK",
+					.setNeutralButton(getString(R.string.button_ok_label),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {

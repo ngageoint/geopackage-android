@@ -11,6 +11,7 @@
     <string name="import_geopackage_file">Import File</string>
     
     <string name="map_max_features">Max Features</string>
+    <string name="map_max_features_message">Set the max number of features to draw on the map</string>
     <string name="map_type_normal">Normal</string>
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
@@ -25,9 +26,14 @@
     <string name ="geopackage_rename_label">Rename</string>
     <string name ="geopackage_copy_label">Copy</string>
     <string name ="geopackage_copy_suffix">_copy</string>
+    <string name ="geopackage_import_label">Import</string>
+    <string name ="geopackage_import_name_label">Name:</string>
     <string name ="table_image_description">Table Type</string>
     <string name ="geopackage_table_view_label">View</string>
     <string name ="geopackage_table_delete_label">Delete</string>
+    
+    <string name ="button_ok_label">OK</string>
+    <string name ="button_cancel_label">Cancel</string>
     
     <string-array name="preloaded_url_labels">
     	<item>GDAL Sample</item>

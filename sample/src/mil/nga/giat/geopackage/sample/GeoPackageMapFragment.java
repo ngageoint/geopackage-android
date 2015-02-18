@@ -190,24 +190,26 @@ public class GeoPackageMapFragment extends Fragment {
 		input.setText(maxFeatures);
 
 		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
-				.setTitle("Max Features")
-				.setMessage("Set the max number of features to draw on the map")
+				.setTitle(getString(R.string.map_max_features))
+				.setMessage(getString(R.string.map_max_features_message))
 				.setView(input)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString();
-						if (value != null && !value.equals(maxFeatures)) {
-							int maxFeature = Integer.parseInt(value);
-							SharedPreferences settings = PreferenceManager
-									.getDefaultSharedPreferences(getActivity());
-							Editor editor = settings.edit();
-							editor.putInt(MAX_FEATURES_KEY, maxFeature);
-							editor.commit();
-							updateInBackground();
-						}
-					}
-				})
-				.setNegativeButton("Cancel",
+				.setPositiveButton(getString(R.string.button_ok_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								String value = input.getText().toString();
+								if (value != null && !value.equals(maxFeatures)) {
+									int maxFeature = Integer.parseInt(value);
+									SharedPreferences settings = PreferenceManager
+											.getDefaultSharedPreferences(getActivity());
+									Editor editor = settings.edit();
+									editor.putInt(MAX_FEATURES_KEY, maxFeature);
+									editor.commit();
+									updateInBackground();
+								}
+							}
+						})
+				.setNegativeButton(getString(R.string.button_cancel_label),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
