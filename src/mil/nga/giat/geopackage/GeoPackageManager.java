@@ -171,4 +171,22 @@ public interface GeoPackageManager {
 	 */
 	public GeoPackage open(String database);
 
+	/**
+	 * Copy the database
+	 * 
+	 * @param database
+	 * @param databaseCopy
+	 * @return
+	 */
+	public boolean copy(String database, String databaseCopy);
+
+	/**
+	 * Rename the database to the new name
+	 * 
+	 * @param database
+	 * @param newDatabase
+	 * @return
+	 */
+	public boolean rename(String database, String newDatabase);
+
 }

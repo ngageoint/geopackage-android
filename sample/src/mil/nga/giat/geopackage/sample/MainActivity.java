@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -71,26 +70,18 @@ public class MainActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		if (savedInstanceState != null) {
-			mapFragment = (GeoPackageMapFragment) getFragmentManager()
-					.getFragment(savedInstanceState, "mapFragment");
-			managerFragment = (GeoPackageManagerFragment) getFragmentManager()
-					.getFragment(savedInstanceState, "managerFragment");
-		}
-		if (mapFragment == null) {
-			mapFragment = GeoPackageMapFragment.newInstance();
-		}
-		if (managerFragment == null) {
-			managerFragment = GeoPackageManagerFragment.newInstance();
-		}
-		
-		active = new GeoPackageDatabases();
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		active.setPreferences(settings);
-		active.loadFromPreferences();
-		mapFragment.setActive(active);
-		managerFragment.setActive(active);
+//		if (savedInstanceState != null) {
+//			mapFragment = (GeoPackageMapFragment) getFragmentManager()
+//					.getFragment(savedInstanceState, "mapFragment");
+//			managerFragment = (GeoPackageManagerFragment) getFragmentManager()
+//					.getFragment(savedInstanceState, "managerFragment");
+//		}
+//		if (mapFragment == null) {
+//			mapFragment = GeoPackageMapFragment.newInstance();
+//		}
+//		if (managerFragment == null) {
+//			managerFragment = GeoPackageManagerFragment.newInstance();
+//		}
 
 		navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
@@ -116,14 +107,14 @@ public class MainActivity extends Activity implements
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		if (mapFragment.isAdded()) {
-			getFragmentManager().putFragment(outState, "mapFragment",
-					mapFragment);
-		}
-		if (managerFragment.isAdded()) {
-			getFragmentManager().putFragment(outState, "managerFragment",
-					managerFragment);
-		}
+//		if (mapFragment.isAdded()) {
+//			getFragmentManager().putFragment(outState, "mapFragment",
+//					mapFragment);
+//		}
+//		if (managerFragment.isAdded()) {
+//			getFragmentManager().putFragment(outState, "managerFragment",
+//					managerFragment);
+//		}
 	}
 
 	@Override

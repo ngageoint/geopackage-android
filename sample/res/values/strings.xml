@@ -22,6 +22,9 @@
 
     <string name ="geopackage_view_label">View</string>
     <string name ="geopackage_delete_label">Delete</string>
+    <string name ="geopackage_rename_label">Rename</string>
+    <string name ="geopackage_copy_label">Copy</string>
+    <string name ="geopackage_copy_suffix">_copy</string>
     <string name ="table_image_description">Table Type</string>
     <string name ="geopackage_table_view_label">View</string>
     <string name ="geopackage_table_delete_label">Delete</string>

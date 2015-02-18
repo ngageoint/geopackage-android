@@ -343,6 +343,35 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean copy(String database, String databaseCopy) {
+		// Copy the database as a new file
+		File dbFile = context.getDatabasePath(database);
+		File dbCopyFile = context.getDatabasePath(databaseCopy);
+		try {
+			GeoPackageFileUtils.copyFile(dbFile, dbCopyFile);
+		} catch (IOException e) {
+			throw new GeoPackageException(
+					"Failed to import GeoPackage database: " + database, e);
+		}
+
+		return exists(databaseCopy);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean rename(String database, String newDatabase) {
+		if (copy(database, newDatabase)) {
+			delete(database);
+		}
+		return exists(newDatabase);
+	}
+
+	/**
 	 * Import the GeoPackage stream
 	 * 
 	 * @param database

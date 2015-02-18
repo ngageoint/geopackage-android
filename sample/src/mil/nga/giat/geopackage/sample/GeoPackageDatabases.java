@@ -141,6 +141,31 @@ public class GeoPackageDatabases {
 	}
 
 	/**
+	 * Rename a database
+	 * 
+	 * @param database
+	 * @param newDatabase
+	 */
+	public void renameDatabase(String database, String newDatabase) {
+		GeoPackageDatabase geoPackageDatabase = databases.remove(database);
+		if (geoPackageDatabase != null) {
+			geoPackageDatabase.setDatabase(newDatabase);
+			databases.put(newDatabase, geoPackageDatabase);
+			removeDatabaseFromPreferences(database);
+			for (GeoPackageTable featureTable : geoPackageDatabase
+					.getFeatures()) {
+				featureTable.setDatabase(newDatabase);
+				addTableToPreferences(featureTable);
+			}
+			for (GeoPackageTable tileTable : geoPackageDatabase.getTiles()) {
+				tileTable.setDatabase(newDatabase);
+				addTableToPreferences(tileTable);
+			}
+		}
+		setModified(true);
+	}
+
+	/**
 	 * Load the GeoPackage databases from the saved preferences
 	 */
 	public void loadFromPreferences() {

@@ -15,7 +15,7 @@ public class GeoPackageTable {
 	/**
 	 * Database name
 	 */
-	public final String database;
+	public String database;
 
 	/**
 	 * Count of features or tiles
@@ -96,6 +96,10 @@ public class GeoPackageTable {
 
 	public boolean isActive() {
 		return active;
+	}
+
+	public void setDatabase(String database) {
+		this.database = database;
 	}
 
 	public void setActive(boolean active) {

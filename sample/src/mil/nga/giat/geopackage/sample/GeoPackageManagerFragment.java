@@ -191,6 +191,8 @@ public class GeoPackageManagerFragment extends Fragment {
 				android.R.layout.select_dialog_item);
 		adapter.add(getString(R.string.geopackage_view_label));
 		adapter.add(getString(R.string.geopackage_delete_label));
+		adapter.add(getString(R.string.geopackage_rename_label));
+		adapter.add(getString(R.string.geopackage_copy_label));
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(database);
 		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
@@ -204,6 +206,12 @@ public class GeoPackageManagerFragment extends Fragment {
 						break;
 					case 1:
 						deleteDatabaseOption(database);
+						break;
+					case 2:
+						renameDatabaseOption(database);
+						break;
+					case 3:
+						copyDatabaseOption(database);
 						break;
 					default:
 					}
@@ -301,6 +309,91 @@ public class GeoPackageManagerFragment extends Fragment {
 							}
 						}).create();
 		deleteDialog.show();
+	}
+
+	/**
+	 * Rename database option
+	 * 
+	 * @param database
+	 */
+	private void renameDatabaseOption(final String database) {
+
+		final EditText input = new EditText(getActivity());
+		input.setText(database);
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
+				.setTitle("Rename GeoPackage")
+				.setView(input)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString();
+						if (value != null && !value.equals(database)) {
+							try {
+								if (manager.rename(database, value)) {
+									active.renameDatabase(database, value);
+									update();
+								} else {
+									showMessage("Rename", "Rename from "
+											+ database + " to " + value
+											+ " was not successful");
+								}
+							} catch (Exception e) {
+								showMessage("Rename", e.getMessage());
+							}
+						}
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								dialog.cancel();
+							}
+						});
+
+		dialog.show();
+	}
+
+	/**
+	 * Copy database option
+	 * 
+	 * @param database
+	 */
+	private void copyDatabaseOption(final String database) {
+
+		final EditText input = new EditText(getActivity());
+		input.setText(database + getString(R.string.geopackage_copy_suffix));
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
+				.setTitle("Copy GeoPackage")
+				.setView(input)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString();
+						if (value != null && !value.equals(database)) {
+							try {
+								if (manager.copy(database, value)) {
+									update();
+								} else {
+									showMessage("Copy", "Copy from " + database
+											+ " to " + value
+											+ " was not successful");
+								}
+							} catch (Exception e) {
+								showMessage("Copy", e.getMessage());
+							}
+						}
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								dialog.cancel();
+							}
+						});
+
+		dialog.show();
 	}
 
 	/**
@@ -667,50 +760,7 @@ public class GeoPackageManagerFragment extends Fragment {
 		switch (requestCode) {
 		case MainActivity.ACTIVITY_CHOOSE_FILE:
 			if (resultCode == Activity.RESULT_OK) {
-				final Uri uri = data.getData();
-
-				try {
-					String[] parts = uri.getLastPathSegment().split(":|/");
-					String name = parts[parts.length - 1];
-					int extensionIndex = name.lastIndexOf(".");
-					if(extensionIndex > -1){
-						name = name.substring(0, extensionIndex);
-					}
-
-					InputStream stream = getActivity().getContentResolver()
-							.openInputStream(uri);
-					boolean imported = manager.importGeoPackage(name, stream);
-					if (!imported) {
-						try {
-							getActivity().runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									showMessage(
-											"URL Import",
-											"Failed to import Uri: "
-													+ uri.getPath());
-								}
-							});
-						} catch (Exception e2) {
-							// eat
-						}
-					}
-				} catch (final Exception e) {
-					try {
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								showMessage(
-										"File Import",
-										"Uri: " + uri.getPath() + ", "
-												+ e.getMessage());
-							}
-						});
-					} catch (Exception e2) {
-						// eat
-					}
-				}
-
+				importFile(data);
 			}
 			break;
 
@@ -721,6 +771,88 @@ public class GeoPackageManagerFragment extends Fragment {
 		if (!handled) {
 			super.onActivityResult(requestCode, resultCode, data);
 		}
+	}
+
+	/**
+	 * Import the GeoPackage file selected
+	 * 
+	 * @param data
+	 */
+	private void importFile(Intent data) {
+
+		final Uri uri = data.getData();
+
+		String[] parts = uri.getLastPathSegment().split(":|/");
+		String name = parts[parts.length - 1];
+		int extensionIndex = name.lastIndexOf(".");
+		if (extensionIndex > -1) {
+			name = name.substring(0, extensionIndex);
+		}
+
+		final EditText input = new EditText(getActivity());
+		input.setText(name);
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
+				.setTitle("Import GeoPackage")
+				.setMessage("Name:")
+				.setView(input)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+
+						String value = input.getText().toString();
+						if (value != null) {
+							try {
+								InputStream stream = getActivity()
+										.getContentResolver().openInputStream(
+												uri);
+								boolean imported = manager.importGeoPackage(
+										value, stream);
+								if (imported) {
+									update();
+								} else {
+									try {
+										getActivity().runOnUiThread(
+												new Runnable() {
+													@Override
+													public void run() {
+														showMessage(
+																"URL Import",
+																"Failed to import Uri: "
+																		+ uri.getPath());
+													}
+												});
+									} catch (Exception e2) {
+										// eat
+									}
+								}
+							} catch (final Exception e) {
+								try {
+									getActivity().runOnUiThread(new Runnable() {
+										@Override
+										public void run() {
+											showMessage(
+													"File Import",
+													"Uri: " + uri.getPath()
+															+ ", "
+															+ e.getMessage());
+										}
+									});
+								} catch (Exception e2) {
+									// eat
+								}
+							}
+						}
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								dialog.cancel();
+							}
+						});
+
+		dialog.show();
 	}
 
 	/**

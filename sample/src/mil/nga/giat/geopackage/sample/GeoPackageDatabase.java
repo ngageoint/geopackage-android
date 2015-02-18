@@ -24,7 +24,7 @@ public class GeoPackageDatabase {
 	/**
 	 * Database name
 	 */
-	private final String database;
+	private String database;
 
 	/**
 	 * Constructor
@@ -51,6 +51,10 @@ public class GeoPackageDatabase {
 	 */
 	public Collection<GeoPackageTable> getTiles() {
 		return tiles.values();
+	}
+
+	public void setDatabase(String database) {
+		this.database = database;
 	}
 
 	public String getDatabase() {
