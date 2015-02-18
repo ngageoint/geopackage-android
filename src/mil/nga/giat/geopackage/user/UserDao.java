@@ -81,7 +81,7 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	 * Drop the user table
 	 */
 	public void dropTable() {
-		db.execSQL("DROP TABLE " + getTableName());
+		db.execSQL("DROP TABLE IF EXISTS " + getTableName());
 	}
 
 	/**

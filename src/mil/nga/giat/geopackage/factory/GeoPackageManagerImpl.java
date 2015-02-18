@@ -21,7 +21,7 @@ import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
-import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
@@ -231,7 +231,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		if (name != null) {
 			database = name;
 		} else {
-			database = GeoPackageFileUtils.getFileNameWithoutExtension(file);
+			database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
 		}
 
 		boolean success = false;
@@ -314,7 +314,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		// Copy the geopackage database to the new file location
 		File dbFile = context.getDatabasePath(database);
 		try {
-			GeoPackageFileUtils.copyFile(dbFile, file);
+			GeoPackageIOUtils.copyFile(dbFile, file);
 		} catch (IOException e) {
 			throw new GeoPackageException(
 					"Failed read or write GeoPackage database '" + database
@@ -351,7 +351,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		File dbFile = context.getDatabasePath(database);
 		File dbCopyFile = context.getDatabasePath(databaseCopy);
 		try {
-			GeoPackageFileUtils.copyFile(dbFile, dbCopyFile);
+			GeoPackageIOUtils.copyFile(dbFile, dbCopyFile);
 		} catch (IOException e) {
 			throw new GeoPackageException(
 					"Failed to import GeoPackage database: " + database, e);
@@ -393,7 +393,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			SQLiteDatabase db = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
 			db.close();
-			GeoPackageFileUtils.copyFile(geoPackageStream, newDbFile);
+			GeoPackageIOUtils.copyFile(geoPackageStream, newDbFile);
 		} catch (IOException e) {
 			throw new GeoPackageException(
 					"Failed to import GeoPackage database: " + database, e);
@@ -455,7 +455,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * @return true if GeoPackage extension
 	 */
 	private boolean hasGeoPackageExtension(File file) {
-		String extension = GeoPackageFileUtils.getFileExtension(file);
+		String extension = GeoPackageIOUtils.getFileExtension(file);
 		boolean isGeoPackage = extension != null
 				&& (extension.equalsIgnoreCase(context
 						.getString(R.string.geopackage_file_suffix)) || extension

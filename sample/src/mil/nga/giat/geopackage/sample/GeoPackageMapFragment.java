@@ -1,5 +1,8 @@
 package mil.nga.giat.geopackage.sample;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
@@ -9,6 +12,8 @@ import mil.nga.giat.geopackage.features.user.FeatureRow;
 import mil.nga.giat.geopackage.geom.Geometry;
 import mil.nga.giat.geopackage.geom.conversion.GoogleMapShapeConverter;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.tiles.overlay.GoogleAPIGeoPackageOverlay;
+import mil.nga.giat.geopackage.tiles.user.TileDao;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
@@ -27,6 +32,7 @@ import android.widget.EditText;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.TileOverlayOptions;
 
 /**
  * Map Fragment for showing GeoPackage features and tiles
@@ -79,6 +85,11 @@ public class GeoPackageMapFragment extends Fragment {
 	 * Update task
 	 */
 	private MapUpdateTask updateTask;
+
+	/**
+	 * Mapping of open GeoPackages by name
+	 */
+	private Map<String, GeoPackage> geoPackages = new HashMap<String, GeoPackage>();
 
 	/**
 	 * Constructor
@@ -245,6 +256,10 @@ public class GeoPackageMapFragment extends Fragment {
 			updateTask.cancel(false);
 		}
 		map.clear();
+		for (GeoPackage geoPackage : geoPackages.values()) {
+			geoPackage.close();
+		}
+		geoPackages.clear();
 		updateTask = new MapUpdateTask();
 		updateTask.execute();
 
@@ -284,24 +299,38 @@ public class GeoPackageMapFragment extends Fragment {
 
 		if (active != null) {
 
-			int featuresLeft = getMaxFeatures();
-
+			// Add tile overlays first
 			for (GeoPackageDatabase database : active.getDatabases()) {
 
-				if (featuresLeft > 0) {
-					for (GeoPackageTable features : database.getFeatures()) {
-						int count = displayFeatures(task, features,
-								featuresLeft);
-						featuresLeft -= count;
-						if (task.isCancelled() || featuresLeft <= 0) {
-							break;
-						}
-					}
-				}
+				// Open each GeoPackage
+				GeoPackage geoPackage = manager.open(database.getDatabase());
+				geoPackages.put(database.getDatabase(), geoPackage);
 
+				// Display the tiles
 				for (GeoPackageTable tiles : database.getTiles()) {
 					displayTiles(task, tiles);
 					if (task.isCancelled()) {
+						break;
+					}
+				}
+
+				if (task.isCancelled()) {
+					break;
+				}
+			}
+
+			// Add features
+			int featuresLeft = getMaxFeatures();
+			for (GeoPackageDatabase database : active.getDatabases()) {
+
+				if (featuresLeft <= 0) {
+					break;
+				}
+
+				for (GeoPackageTable features : database.getFeatures()) {
+					int count = displayFeatures(task, features, featuresLeft);
+					featuresLeft -= count;
+					if (task.isCancelled() || featuresLeft <= 0) {
 						break;
 					}
 				}
@@ -328,44 +357,37 @@ public class GeoPackageMapFragment extends Fragment {
 
 		int count = 0;
 
-		GeoPackage geoPackage = manager.open(features.getDatabase());
+		GeoPackage geoPackage = geoPackages.get(features.getDatabase());
 
+		FeatureDao featureDao = geoPackage.getFeatureDao(features.getName());
+
+		FeatureCursor cursor = featureDao.queryForAll();
 		try {
 
-			FeatureDao featureDao = geoPackage
-					.getFeatureDao(features.getName());
+			final GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
 
-			FeatureCursor cursor = featureDao.queryForAll();
-			try {
+			while (!task.isCancelled() && count < maxFeatures
+					&& cursor.moveToNext()) {
+				FeatureRow row = cursor.getRow();
+				GeoPackageGeometryData geometryData = row.getGeometry();
+				if (geometryData != null && !geometryData.isEmpty()) {
 
-				final GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
+					final Geometry geometry = geometryData.getGeometry();
 
-				while (!task.isCancelled() && count < maxFeatures
-						&& cursor.moveToNext()) {
-					FeatureRow row = cursor.getRow();
-					GeoPackageGeometryData geometryData = row.getGeometry();
-					if (geometryData != null && !geometryData.isEmpty()) {
-
-						final Geometry geometry = geometryData.getGeometry();
-
-						if (geometry != null) {
-							count++;
-							getActivity().runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									converter.addToMap(map, geometry);
-								}
-							});
-						}
+					if (geometry != null) {
+						count++;
+						getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								converter.addToMap(map, geometry);
+							}
+						});
 					}
 				}
-
-			} finally {
-				cursor.close();
 			}
 
 		} finally {
-			geoPackage.close();
+			cursor.close();
 		}
 
 		return count;
@@ -378,7 +400,23 @@ public class GeoPackageMapFragment extends Fragment {
 	 * @param tiles
 	 */
 	private void displayTiles(MapUpdateTask task, GeoPackageTable tiles) {
-		// TODO
+
+		GeoPackage geoPackage = geoPackages.get(tiles.getDatabase());
+
+		TileDao tileDao = geoPackage.getTileDao(tiles.getName());
+
+		GoogleAPIGeoPackageOverlay overlay = new GoogleAPIGeoPackageOverlay(
+				tileDao);
+		final TileOverlayOptions overlayOptions = new TileOverlayOptions();
+		overlayOptions.tileProvider(overlay);
+		overlayOptions.zIndex(-1);
+
+		getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				map.addTileOverlay(overlayOptions);
+			}
+		});
 	}
 
 }

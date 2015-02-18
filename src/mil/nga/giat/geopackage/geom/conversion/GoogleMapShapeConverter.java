@@ -105,10 +105,18 @@ public class GoogleMapShapeConverter {
 	public PolylineOptions toPolyline(LineString lineString) {
 
 		PolylineOptions polylineOptions = new PolylineOptions();
+		Double z = null;
 
 		for (Point point : lineString.getPoints()) {
 			LatLng latLng = toLatLng(point);
 			polylineOptions.add(latLng);
+			if (point.hasZ()) {
+				z = (z == null) ? point.getZ() : Math.max(z, point.getZ());
+			}
+		}
+
+		if (lineString.hasZ() && z != null) {
+			polylineOptions.zIndex(z.floatValue());
 		}
 
 		return polylineOptions;
@@ -204,11 +212,16 @@ public class GoogleMapShapeConverter {
 
 		if (!rings.isEmpty()) {
 
+			Double z = null;
+
 			// Add the polygon points
 			LineString polygonLineString = rings.get(0);
 			for (Point point : polygonLineString.getPoints()) {
 				LatLng latLng = toLatLng(point);
 				polygonOptions.add(latLng);
+				if (point.hasZ()) {
+					z = (z == null) ? point.getZ() : Math.max(z, point.getZ());
+				}
 			}
 
 			// Add the holes
@@ -218,8 +231,16 @@ public class GoogleMapShapeConverter {
 				for (Point point : hole.getPoints()) {
 					LatLng latLng = toLatLng(point);
 					holeLatLngs.add(latLng);
+					if (point.hasZ()) {
+						z = (z == null) ? point.getZ() : Math.max(z,
+								point.getZ());
+					}
 				}
 				polygonOptions.addHole(holeLatLngs);
+			}
+
+			if (polygon.hasZ() && z != null) {
+				polygonOptions.zIndex(z.floatValue());
 			}
 		}
 

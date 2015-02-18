@@ -28,7 +28,7 @@ import mil.nga.giat.geopackage.geom.LineString;
 import mil.nga.giat.geopackage.geom.Point;
 import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
-import mil.nga.giat.geopackage.io.GeoPackageFileUtils;
+import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.schema.columns.DataColumns;
 import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintType;
@@ -113,7 +113,7 @@ public class TestUtils {
 	 */
 	public static String getAssetFileInternalStorageLocation(Context context,
 			String assetPath) {
-		return GeoPackageFileUtils.getInternalFilePath(context, assetPath);
+		return GeoPackageIOUtils.getInternalFilePath(context, assetPath);
 	}
 
 	/**

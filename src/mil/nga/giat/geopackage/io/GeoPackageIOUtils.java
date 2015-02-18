@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.io;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,11 +11,11 @@ import java.io.OutputStream;
 import android.content.Context;
 
 /**
- * File utility methods
+ * Input / Output utility methods
  * 
  * @author osbornb
  */
-public class GeoPackageFileUtils {
+public class GeoPackageIOUtils {
 
 	/**
 	 * Get the file extension
@@ -109,6 +110,21 @@ public class GeoPackageFileUtils {
 		OutputStream to = new FileOutputStream(copyTo);
 
 		copyStream(copyFrom, to);
+	}
+
+	/**
+	 * Get the stream bytes
+	 * 
+	 * @param copyFrom
+	 * @throws IOException
+	 */
+	public static byte[] streamBytes(InputStream stream) throws IOException {
+
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+
+		copyStream(stream, bytes);
+
+		return bytes.toByteArray();
 	}
 
 	/**

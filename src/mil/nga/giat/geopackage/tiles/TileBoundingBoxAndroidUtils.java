@@ -77,9 +77,9 @@ public class TileBoundingBoxAndroidUtils {
 	 */
 	public static TileBoundingBox getBoundingBox(int x, int y, int zoom) {
 
-		int tilesPerSide = (int) Math.pow(2, zoom);
-		double tileWidthDegrees = 360.0 / tilesPerSide;
-		double tileHeightDegrees = 180.0 / tilesPerSide;
+		int tilesPerSide = tilesPerSide(zoom);
+		double tileWidthDegrees = tileWidthDegrees(tilesPerSide);
+		double tileHeightDegrees = tileHeightDegrees(tilesPerSide);
 
 		double minLon = -180.0 + (x * tileWidthDegrees);
 		double maxLon = minLon + tileWidthDegrees;
@@ -94,16 +94,84 @@ public class TileBoundingBoxAndroidUtils {
 	}
 
 	/**
+	 * Get the tile grid that includes the entire tile bounding box
+	 * 
+	 * @param boundingBox
+	 * @param zoom
+	 * @return
+	 */
+	public static TileGrid getTileGrid(TileBoundingBox boundingBox, int zoom) {
+
+		int tilesPerSide = tilesPerSide(zoom);
+		double tileWidthDegrees = tileWidthDegrees(tilesPerSide);
+		double tileHeightDegrees = tileHeightDegrees(tilesPerSide);
+
+		int minX = (int) ((boundingBox.getMinLongitude() + 180.0) / tileWidthDegrees);
+		int maxX = (int) ((boundingBox.getMaxLongitude() + 180.0) / tileWidthDegrees);
+		maxX = Math.min(maxX, tilesPerSide - 1);
+
+		int maxY = (int) ((90.0 - boundingBox.getMinLatitude()) / tileHeightDegrees);
+		int minY = (int) ((90.0 - boundingBox.getMaxLatitude()) / tileHeightDegrees);
+		maxY = Math.min(maxY, tilesPerSide - 1);
+
+		TileGrid grid = new TileGrid(minX, maxX, minY, maxY);
+
+		return grid;
+	}
+
+	/**
+	 * Get the tile width in degrees
+	 * 
+	 * @param tilesPerSide
+	 * @return
+	 */
+	public static double tileWidthDegrees(int tilesPerSide) {
+		return 360.0 / tilesPerSide;
+	}
+
+	/**
+	 * Get the tile height in degrees
+	 * 
+	 * @param tilesPerSide
+	 * @return
+	 */
+	public static double tileHeightDegrees(int tilesPerSide) {
+		return 180.0 / tilesPerSide;
+	}
+
+	/**
+	 * Get the tiles per side, width and height, at the zoom level
+	 * 
+	 * @param zoom
+	 * @return
+	 */
+	public static int tilesPerSide(int zoom) {
+		return (int) Math.pow(2, zoom);
+	}
+
+	/**
 	 * Get the longitude distance in the middle latitude
 	 * 
 	 * @param boundingBox
 	 * @return
 	 */
 	public static double getLongitudeDistance(TileBoundingBox boundingBox) {
-		LatLng leftMiddle = new LatLng(0, boundingBox.getMinLongitude());
-		LatLng middle = new LatLng(0, boundingBox.getMaxLongitude()
-				- boundingBox.getMinLongitude());
-		LatLng rightMiddle = new LatLng(0, boundingBox.getMaxLongitude());
+		return getLongitudeDistance(boundingBox.getMinLongitude(),
+				boundingBox.getMaxLongitude());
+	}
+
+	/**
+	 * Get the longitude distance in the middle latitude
+	 * 
+	 * @param minLongitude
+	 * @param maxLongitude
+	 * @return
+	 */
+	public static double getLongitudeDistance(double minLongitude,
+			double maxLongitude) {
+		LatLng leftMiddle = new LatLng(0, minLongitude);
+		LatLng middle = new LatLng(0, maxLongitude - minLongitude);
+		LatLng rightMiddle = new LatLng(0, maxLongitude);
 
 		List<LatLng> path = new ArrayList<LatLng>();
 		path.add(leftMiddle);
@@ -121,8 +189,21 @@ public class TileBoundingBoxAndroidUtils {
 	 * @return
 	 */
 	public static double getLatitudeDistance(TileBoundingBox boundingBox) {
-		LatLng lowerMiddle = new LatLng(boundingBox.getMinLatitude(), 0);
-		LatLng upperMiddle = new LatLng(boundingBox.getMaxLatitude(), 0);
+		return getLatitudeDistance(boundingBox.getMinLatitude(),
+				boundingBox.getMaxLatitude());
+	}
+
+	/**
+	 * Get the latitude distance in the middle longitude
+	 * 
+	 * @param minLatitude
+	 * @param maxLatitude
+	 * @return
+	 */
+	public static double getLatitudeDistance(double minLatitude,
+			double maxLatitude) {
+		LatLng lowerMiddle = new LatLng(minLatitude, 0);
+		LatLng upperMiddle = new LatLng(maxLatitude, 0);
 		double latDistance = SphericalUtil.computeDistanceBetween(lowerMiddle,
 				upperMiddle);
 		return latDistance;

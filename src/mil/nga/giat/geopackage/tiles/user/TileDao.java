@@ -113,8 +113,13 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		this.distanceConverter = distanceConverter;
 
 		// Set the min and max zoom levels
-		minZoom = tileMatrices.get(0).getZoomLevel();
-		maxZoom = tileMatrices.get(tileMatrices.size() - 1).getZoomLevel();
+		if (!tileMatrices.isEmpty()) {
+			minZoom = tileMatrices.get(0).getZoomLevel();
+			maxZoom = tileMatrices.get(tileMatrices.size() - 1).getZoomLevel();
+		}else{
+			minZoom = 0;
+			maxZoom = 0;
+		}
 
 		// Populate the zoom level to tile matrix and the sorted tile widths and
 		// heights

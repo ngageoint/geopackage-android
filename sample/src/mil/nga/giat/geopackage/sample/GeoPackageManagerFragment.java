@@ -16,6 +16,7 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
+import mil.nga.giat.geopackage.tiles.TileGenerator;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
@@ -196,6 +197,7 @@ public class GeoPackageManagerFragment extends Fragment {
 		adapter.add(getString(R.string.geopackage_rename_label));
 		adapter.add(getString(R.string.geopackage_copy_label));
 		adapter.add(getString(R.string.geopackage_export_label));
+		adapter.add(getString(R.string.geopackage_create_tiles_label));
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(database);
 		builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
@@ -218,6 +220,9 @@ public class GeoPackageManagerFragment extends Fragment {
 						break;
 					case 4:
 						exportDatabaseOption(database);
+						break;
+					case 5:
+						createTilesOption(database);
 						break;
 					default:
 					}
@@ -463,6 +468,71 @@ public class GeoPackageManagerFragment extends Fragment {
 						});
 
 		dialog.show();
+	}
+
+	/**
+	 * Create tiles option
+	 * 
+	 * @param database
+	 */
+	private void createTilesOption(final String database) {
+
+		CreateTilesTask createTilesTask = new CreateTilesTask();
+		createTilesTask.execute(database, "tile_test",
+				"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png", "1", "2");
+
+	}
+
+	/**
+	 * Create and download tiles in the background
+	 */
+	private class CreateTilesTask extends AsyncTask<String, Integer, String> {
+
+		public CreateTilesTask() {
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			GeoPackage geoPackage = null;
+			try {
+				String database = params[0];
+				String tableName = params[1];
+				String tileUrl = params[2];
+				int minZoom = Integer.valueOf(params[3]);
+				int maxZoom = Integer.valueOf(params[4]);
+
+				geoPackage = manager.open(database);
+
+				TileGenerator tileGenerator = new TileGenerator(getActivity(),
+						geoPackage, tableName, tileUrl, minZoom, maxZoom);
+				int count = tileGenerator.generateTiles();
+
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						update();
+					}
+				});
+			} catch (final Exception e) {
+				try {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							showMessage(
+									getString(R.string.geopackage_create_tiles_label),
+									e.getMessage());
+						}
+					});
+				} catch (Exception e2) {
+					// eat
+				}
+			} finally {
+				if (geoPackage != null) {
+					geoPackage.close();
+				}
+			}
+			return null;
+		}
 	}
 
 	/**

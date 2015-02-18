@@ -160,7 +160,7 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 		int count = deleteCascade(contents);
 
 		if (userTable) {
-			db.execSQL("DROP TABLE " + contents.getTableName());
+			db.execSQL("DROP TABLE IF EXISTS " + contents.getTableName());
 		}
 
 		return count;
@@ -255,6 +255,8 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 			Contents contents = queryForId(id);
 			if (contents != null) {
 				count = deleteCascade(contents, userTable);
+			} else if (userTable) {
+				db.execSQL("DROP TABLE IF EXISTS " + id);
 			}
 		}
 		return count;
