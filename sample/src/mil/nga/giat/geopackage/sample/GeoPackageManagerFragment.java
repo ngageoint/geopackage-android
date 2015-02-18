@@ -356,7 +356,8 @@ public class GeoPackageManagerFragment extends Fragment {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 								String value = input.getText().toString();
-								if (value != null && !value.equals(database)) {
+								if (value != null && !value.isEmpty()
+										&& !value.equals(database)) {
 									try {
 										if (manager.rename(database, value)) {
 											active.renameDatabase(database,
@@ -408,7 +409,8 @@ public class GeoPackageManagerFragment extends Fragment {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 								String value = input.getText().toString();
-								if (value != null && !value.equals(database)) {
+								if (value != null && !value.isEmpty()
+										&& !value.equals(database)) {
 									try {
 										if (manager.copy(database, value)) {
 											update();
@@ -460,7 +462,7 @@ public class GeoPackageManagerFragment extends Fragment {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 								String value = input.getText().toString();
-								if (value != null) {
+								if (value != null && !value.isEmpty()) {
 									try {
 										manager.exportGeoPackage(database,
 												value, directory);
@@ -962,7 +964,7 @@ public class GeoPackageManagerFragment extends Fragment {
 									int whichButton) {
 
 								String value = input.getText().toString();
-								if (value != null) {
+								if (value != null && !value.isEmpty()) {
 									try {
 										InputStream stream = getActivity()
 												.getContentResolver()
@@ -1023,7 +1025,43 @@ public class GeoPackageManagerFragment extends Fragment {
 	 * Create a new GeoPackage
 	 */
 	private void createGeoPackage() {
-		// TODO
+
+		final EditText input = new EditText(getActivity());
+
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
+				.setTitle(getString(R.string.geopackage_create_label))
+				.setView(input)
+				.setPositiveButton(getString(R.string.button_ok_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								String value = input.getText().toString();
+								if (value != null && !value.isEmpty()) {
+									try {
+										if (manager.create(value)) {
+											update();
+										} else {
+											showMessage(
+													getString(R.string.geopackage_create_label),
+													"Failed to create GeoPackage: "
+															+ value);
+										}
+									} catch (Exception e) {
+										showMessage("Create " + value,
+												e.getMessage());
+									}
+								}
+							}
+						})
+				.setNegativeButton(getString(R.string.button_cancel_label),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								dialog.cancel();
+							}
+						});
+
+		dialog.show();
 	}
 
 	/**

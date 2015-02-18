@@ -25,7 +25,6 @@ import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.j256.ormlite.android.AndroidConnectionSource;
 import com.j256.ormlite.dao.DaoManager;
@@ -126,7 +125,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		boolean created = false;
 
 		if (exists(database)) {
-			Log.w(TAG, "Database already exists and could not be created: "
+			throw new GeoPackageException("GeoPackage already exists: "
 					+ database);
 		} else {
 			SQLiteDatabase db = context.openOrCreateDatabase(database,

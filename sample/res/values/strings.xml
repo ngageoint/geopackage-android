@@ -29,6 +29,7 @@
     <string name ="geopackage_copy_suffix">_copy</string>
     <string name ="geopackage_export_label">Export</string>
     <string name ="geopackage_import_label">Import</string>
+    <string name ="geopackage_create_label">Create</string>
     <string name ="geopackage_create_tiles_label">Create Tiles</string>
     <string name ="geopackage_import_name_label">Name:</string>
     <string name ="table_image_description">Table Type</string>
