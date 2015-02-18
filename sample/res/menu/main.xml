@@ -27,14 +27,19 @@
     <group android:id="@+id/menu_group_list" >
         <item
             android:id="@+id/import_geopackage_url"
-            android:icon="@drawable/ic_action_download"
+            android:icon="@drawable/ic_import_url"
             android:showAsAction="always"
             android:title="@string/import_geopackage_url"/>
         <item
             android:id="@+id/import_geopackage_file"
-            android:icon="@drawable/ic_action_new"
+            android:icon="@drawable/ic_import_file"
             android:showAsAction="always"
             android:title="@string/import_geopackage_file"/>
+        <item
+            android:id="@+id/create_geopackage"
+            android:icon="@drawable/ic_create"
+            android:showAsAction="always"
+            android:title="@string/create_geopackage"/>
     </group>
 
 </menu>

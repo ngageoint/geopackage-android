@@ -774,6 +774,9 @@ public class GeoPackageManagerFragment extends Fragment {
 		case R.id.import_geopackage_file:
 			importGeopackageFromFile();
 			break;
+		case R.id.create_geopackage:
+			createGeoPackage();
+			break;
 		default:
 			handled = false;
 			break;
@@ -1014,6 +1017,13 @@ public class GeoPackageManagerFragment extends Fragment {
 						});
 
 		dialog.show();
+	}
+
+	/**
+	 * Create a new GeoPackage
+	 */
+	private void createGeoPackage() {
+		// TODO
 	}
 
 	/**
