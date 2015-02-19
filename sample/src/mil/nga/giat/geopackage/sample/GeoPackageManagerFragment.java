@@ -260,7 +260,9 @@ public class GeoPackageManagerFragment extends Fragment {
 					.getSpatialReferenceSystemDao();
 
 			List<SpatialReferenceSystem> srsList = srsDao.queryForAll();
-			databaseInfo.append("Feature Tables: ").append(
+			databaseInfo.append("Size: ")
+					.append(manager.readableSize(database));
+			databaseInfo.append("\n\nFeature Tables: ").append(
 					geoPackage.getFeatureTables().size());
 			databaseInfo.append("\nTile Tables: ").append(
 					geoPackage.getTileTables().size());

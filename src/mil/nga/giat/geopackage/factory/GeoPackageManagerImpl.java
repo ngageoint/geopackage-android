@@ -38,12 +38,6 @@ import com.j256.ormlite.support.ConnectionSource;
 class GeoPackageManagerImpl implements GeoPackageManager {
 
 	/**
-	 * Logger tag
-	 */
-	private static final String TAG = GeoPackageManagerImpl.class
-			.getSimpleName();
-
-	/**
 	 * Context
 	 */
 	private final Context context;
@@ -106,6 +100,29 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	@Override
 	public boolean exists(String database) {
 		return databaseSet().contains(database);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long size(String database) {
+		File dbFile = context.getDatabasePath(database);
+		if (!dbFile.exists()) {
+			throw new GeoPackageException("GeoPackage does not exist: "
+					+ database);
+		}
+		long size = dbFile.length();
+		return size;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String readableSize(String database) {
+		long size = size(database);
+		return GeoPackageIOUtils.formatBytes(size);
 	}
 
 	/**

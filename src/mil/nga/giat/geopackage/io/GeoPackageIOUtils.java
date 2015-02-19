@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 
 import android.content.Context;
 
@@ -146,6 +147,41 @@ public class GeoPackageIOUtils {
 		copyTo.flush();
 		copyTo.close();
 		copyFrom.close();
+	}
+
+	/**
+	 * Format the bytes into readable text
+	 * 
+	 * @param bytes
+	 * @return
+	 */
+	public static String formatBytes(long bytes) {
+
+		double value = bytes;
+		String unit = "B";
+
+		if (bytes >= 1024) {
+			int exponent = (int) (Math.log(bytes) / Math.log(1024));
+			exponent = Math.min(exponent, 4);
+			switch (exponent) {
+			case 1:
+				unit = "KB";
+				break;
+			case 2:
+				unit = "MB";
+				break;
+			case 3:
+				unit = "GB";
+				break;
+			case 4:
+				unit = "TB";
+				break;
+			}
+			value = bytes / Math.pow(1024, exponent);
+		}
+
+		DecimalFormat df = new DecimalFormat("#.##");
+		return df.format(value) + " " + unit;
 	}
 
 }

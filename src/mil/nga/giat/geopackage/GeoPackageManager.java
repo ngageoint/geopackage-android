@@ -43,6 +43,22 @@ public interface GeoPackageManager {
 	public boolean exists(String database);
 
 	/**
+	 * Size of the database in bytes
+	 * 
+	 * @param database
+	 * @return
+	 */
+	public long size(String database);
+
+	/**
+	 * Get a readable version of the database size
+	 * 
+	 * @param database
+	 * @return
+	 */
+	public String readableSize(String database);
+
+	/**
 	 * Delete a database
 	 * 
 	 * @param database
