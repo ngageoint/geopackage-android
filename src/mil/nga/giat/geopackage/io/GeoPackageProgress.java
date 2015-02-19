@@ -9,13 +9,6 @@ package mil.nga.giat.geopackage.io;
 public interface GeoPackageProgress {
 
 	/**
-	 * Is the process still active
-	 * 
-	 * @return true if active, false if cancelled
-	 */
-	public boolean isActive();
-
-	/**
 	 * Set the max progress value
 	 * 
 	 * @param max
@@ -28,5 +21,20 @@ public interface GeoPackageProgress {
 	 * @param progress
 	 */
 	public void addProgress(int progress);
+
+	/**
+	 * Is the process still active
+	 * 
+	 * @return true if active, false if cancelled
+	 */
+	public boolean isActive();
+
+	/**
+	 * Should the progress so far be deleted when cancelled ({@link #isActive()}
+	 * becomes false)
+	 * 
+	 * @return
+	 */
+	public boolean cleanupOnCancel();
 
 }

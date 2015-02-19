@@ -126,7 +126,7 @@ public class GeoPackageIOUtils {
 		copyStream(copyFrom, to, progress);
 
 		// Try to delete the file if progress was cancelled
-		if (progress != null && !progress.isActive()) {
+		if (progress != null && !progress.isActive() && progress.cleanupOnCancel()) {
 			copyTo.delete();
 		}
 	}

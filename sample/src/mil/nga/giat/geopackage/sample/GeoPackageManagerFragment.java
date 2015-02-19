@@ -742,14 +742,6 @@ public class GeoPackageManagerFragment extends Fragment {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean isActive() {
-			return !isCancelled();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public void setMax(int max) {
 			this.max = max;
 		}
@@ -761,6 +753,22 @@ public class GeoPackageManagerFragment extends Fragment {
 		public void addProgress(int progress) {
 			this.progress += progress;
 			publishProgress(this.progress);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isActive() {
+			return !isCancelled();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean cleanupOnCancel() {
+			return false;
 		}
 
 		/**
@@ -1187,14 +1195,6 @@ public class GeoPackageManagerFragment extends Fragment {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean isActive() {
-			return !isCancelled();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public void setMax(int max) {
 			this.max = max;
 		}
@@ -1209,6 +1209,22 @@ public class GeoPackageManagerFragment extends Fragment {
 				int total = (int) (this.progress / ((double) max) * 100);
 				publishProgress(total);
 			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isActive() {
+			return !isCancelled();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean cleanupOnCancel() {
+			return true;
 		}
 
 		/**

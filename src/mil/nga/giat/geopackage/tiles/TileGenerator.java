@@ -268,7 +268,8 @@ public class TileGenerator {
 			}
 
 			// Delete the table if cancelled
-			if (progress != null && !progress.isActive()) {
+			if (progress != null && !progress.isActive()
+					&& progress.cleanupOnCancel()) {
 				deleteTable(geoPackage, tableName);
 				count = 0;
 			}
@@ -336,11 +337,16 @@ public class TileGenerator {
 		// Download and create the tile and each coordinate
 		for (int x = tileGrid.getMinX(); x <= tileGrid.getMaxX(); x++) {
 
+			// Check if the progress has been cancelled
+			if (progress != null && !progress.isActive()) {
+				break;
+			}
+
 			for (int y = tileGrid.getMinY(); y <= tileGrid.getMaxY(); y++) {
 
 				// Check if the progress has been cancelled
 				if (progress != null && !progress.isActive()) {
-					return count;
+					break;
 				}
 
 				try {
