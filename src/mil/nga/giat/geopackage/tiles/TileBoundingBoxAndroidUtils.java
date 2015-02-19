@@ -107,11 +107,21 @@ public class TileBoundingBoxAndroidUtils {
 		double tileHeightDegrees = tileHeightDegrees(tilesPerSide);
 
 		int minX = (int) ((boundingBox.getMinLongitude() + 180.0) / tileWidthDegrees);
-		int maxX = (int) ((boundingBox.getMaxLongitude() + 180.0) / tileWidthDegrees);
+		double tempMaxX = (boundingBox.getMaxLongitude() + 180.0)
+				/ tileWidthDegrees;
+		int maxX = (int) tempMaxX;
+		if (tempMaxX % 1 == 0) {
+			maxX--;
+		}
 		maxX = Math.min(maxX, tilesPerSide - 1);
 
-		int maxY = (int) ((90.0 - boundingBox.getMinLatitude()) / tileHeightDegrees);
 		int minY = (int) ((90.0 - boundingBox.getMaxLatitude()) / tileHeightDegrees);
+		double tempMaxY = (90.0 - boundingBox.getMinLatitude())
+				/ tileHeightDegrees;
+		int maxY = (int) tempMaxY;
+		if (tempMaxY % 1 == 0) {
+			maxY--;
+		}
 		maxY = Math.min(maxY, tilesPerSide - 1);
 
 		TileGrid grid = new TileGrid(minX, maxX, minY, maxY);

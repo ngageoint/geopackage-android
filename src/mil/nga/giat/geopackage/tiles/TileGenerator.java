@@ -73,7 +73,7 @@ public class TileGenerator {
 	/**
 	 * Total tile count
 	 */
-	private final int tileCount;
+	private Integer tileCount;
 
 	/**
 	 * Tile grids by zoom level
@@ -119,17 +119,6 @@ public class TileGenerator {
 		this.tileUrl = tileUrl;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
-
-		// Get the tile grids and total tile count
-		int count = 0;
-		for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-			// Get the tile grid the includes the entire bounding box
-			TileGrid tileGrid = TileBoundingBoxAndroidUtils.getTileGrid(
-					boundingBox, zoom);
-			count += tileGrid.count();
-			tileGrids.put(zoom, tileGrid);
-		}
-		tileCount = count;
 	}
 
 	/**
@@ -177,6 +166,18 @@ public class TileGenerator {
 	 * @return
 	 */
 	public int getTileCount() {
+		if (tileCount == null) {
+			// Get the tile grids and total tile count
+			int count = 0;
+			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
+				// Get the tile grid the includes the entire bounding box
+				TileGrid tileGrid = TileBoundingBoxAndroidUtils.getTileGrid(
+						boundingBox, zoom);
+				count += tileGrid.count();
+				tileGrids.put(zoom, tileGrid);
+			}
+			tileCount = count;
+		}
 		return tileCount;
 	}
 
@@ -189,9 +190,11 @@ public class TileGenerator {
 	 */
 	public int generateTiles() throws SQLException, IOException {
 
+		int totalCount = getTileCount();
+
 		// Set the max progress count
 		if (progress != null) {
-			progress.setMax(tileCount);
+			progress.setMax(totalCount);
 		}
 
 		int count = 0;
