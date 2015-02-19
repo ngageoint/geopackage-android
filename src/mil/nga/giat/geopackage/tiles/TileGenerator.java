@@ -102,6 +102,16 @@ public class TileGenerator {
 	private GeoPackageProgress progress;
 
 	/**
+	 * True if the URL has x, y, or z variables
+	 */
+	private final boolean urlHasXYZ;
+
+	/**
+	 * True if the URL has bounding box variables
+	 */
+	private final boolean urlHasBoundingBox;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param context
@@ -119,6 +129,14 @@ public class TileGenerator {
 		this.tileUrl = tileUrl;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
+		this.urlHasXYZ = hasXYZ(tileUrl);
+		this.urlHasBoundingBox = hasBoundingBox(tileUrl);
+
+		if (!this.urlHasXYZ && !this.urlHasBoundingBox) {
+			throw new GeoPackageException(
+					"URL does not contain x,y,z or bounding box variables: "
+							+ tileUrl);
+		}
 	}
 
 	/**
@@ -401,6 +419,87 @@ public class TileGenerator {
 	}
 
 	/**
+	 * Replace x, y, and z in the url
+	 * 
+	 * @param url
+	 * @param z
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	private String replaceXYZ(String url, int z, int x, int y) {
+
+		url = url.replaceAll(
+				context.getString(R.string.tile_generator_variable_z),
+				String.valueOf(z));
+		url = url.replaceAll(
+				context.getString(R.string.tile_generator_variable_x),
+				String.valueOf(x));
+		url = url.replaceAll(
+				context.getString(R.string.tile_generator_variable_y),
+				String.valueOf(y));
+		return url;
+	}
+
+	/**
+	 * Determine if the url has x, y, or z variables
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private boolean hasXYZ(String url) {
+
+		String replacedUrl = replaceXYZ(url, 0, 0, 0);
+		boolean hasXYZ = !replacedUrl.equals(url);
+
+		return hasXYZ;
+	}
+
+	/**
+	 * Replace the bounding box coordinates in the url
+	 * 
+	 * @param url
+	 * @param z
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	private String replaceBoundingBox(String url, int z, int x, int y) {
+
+		TileBoundingBox boundingBox = TileBoundingBoxAndroidUtils
+				.getBoundingBox(x, y, z);
+
+		url = url.replaceAll(
+				context.getString(R.string.tile_generator_variable_min_lat),
+				String.valueOf(boundingBox.getMinLatitude()));
+		url = url.replaceAll(
+				context.getString(R.string.tile_generator_variable_max_lat),
+				String.valueOf(boundingBox.getMaxLatitude()));
+		url = url.replaceAll(
+				context.getString(R.string.tile_generator_variable_min_lon),
+				String.valueOf(boundingBox.getMinLongitude()));
+		url = url.replaceAll(
+				context.getString(R.string.tile_generator_variable_max_lon),
+				String.valueOf(boundingBox.getMinLongitude()));
+
+		return url;
+	}
+
+	/**
+	 * Determine if the url has bounding box variables
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private boolean hasBoundingBox(String url) {
+
+		String replacedUrl = replaceBoundingBox(url, 0, 0, 0);
+		boolean hasBoundingBox = !replacedUrl.equals(url);
+
+		return hasBoundingBox;
+	}
+
+	/**
 	 * Download the tile
 	 * 
 	 * @param z
@@ -414,10 +513,15 @@ public class TileGenerator {
 
 		String zoomUrl = tileUrl;
 
-		// TODO configure
-		zoomUrl = zoomUrl.replaceAll("\\{z\\}", String.valueOf(z));
-		zoomUrl = zoomUrl.replaceAll("\\{x\\}", String.valueOf(x));
-		zoomUrl = zoomUrl.replaceAll("\\{y\\}", String.valueOf(y));
+		// Replace x, y, and z
+		if (urlHasXYZ) {
+			zoomUrl = replaceXYZ(zoomUrl, z, x, y);
+		}
+
+		// Replace bounding box
+		if (urlHasBoundingBox) {
+			zoomUrl = replaceBoundingBox(zoomUrl, z, x, y);
+		}
 
 		URL url;
 		try {
