@@ -105,12 +105,30 @@ public class GeoPackageIOUtils {
 	 * @param copyTo
 	 * @throws IOException
 	 */
-	public static void copyFile(InputStream copyFrom, File copyTo)
+	public static void copyStream(InputStream copyFrom, File copyTo)
 			throws IOException {
+		copyStream(copyFrom, copyTo, null);
+	}
+
+	/**
+	 * Copy an input stream to a file location
+	 * 
+	 * @param copyFrom
+	 * @param copyTo
+	 * @param progress
+	 * @throws IOException
+	 */
+	public static void copyStream(InputStream copyFrom, File copyTo,
+			GeoPackageProgress progress) throws IOException {
 
 		OutputStream to = new FileOutputStream(copyTo);
 
-		copyStream(copyFrom, to);
+		copyStream(copyFrom, to, progress);
+
+		// Try to delete the file if progress was cancelled
+		if (progress != null && !progress.isActive()) {
+			copyTo.delete();
+		}
 	}
 
 	/**
@@ -137,11 +155,28 @@ public class GeoPackageIOUtils {
 	 */
 	public static void copyStream(InputStream copyFrom, OutputStream copyTo)
 			throws IOException {
+		copyStream(copyFrom, copyTo, null);
+	}
+
+	/**
+	 * Copy an input stream to an output stream
+	 * 
+	 * @param copyFrom
+	 * @param copyTo
+	 * @param progress
+	 * @throws IOException
+	 */
+	public static void copyStream(InputStream copyFrom, OutputStream copyTo,
+			GeoPackageProgress progress) throws IOException {
 
 		byte[] buffer = new byte[1024];
 		int length;
-		while ((length = copyFrom.read(buffer)) > 0) {
+		while ((progress == null || progress.isActive())
+				&& (length = copyFrom.read(buffer)) > 0) {
 			copyTo.write(buffer, 0, length);
+			if (progress != null) {
+				progress.addProgress(length);
+			}
 		}
 
 		copyTo.flush();

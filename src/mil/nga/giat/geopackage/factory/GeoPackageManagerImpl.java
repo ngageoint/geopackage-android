@@ -22,6 +22,7 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
+import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
@@ -210,7 +211,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	@Override
 	public boolean importGeoPackage(String database, InputStream stream,
 			boolean override) {
-		boolean success = importGeoPackage(database, override, stream);
+		boolean success = importGeoPackage(database, override, stream, null);
 		return success;
 	}
 
@@ -253,7 +254,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		boolean success = false;
 		try {
 			FileInputStream geoPackageStream = new FileInputStream(file);
-			success = importGeoPackage(database, override, geoPackageStream);
+			success = importGeoPackage(database, override, geoPackageStream,
+					null);
 		} catch (FileNotFoundException e) {
 			throw new GeoPackageException(
 					"Failed read or write GeoPackage file '" + file
@@ -268,7 +270,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 */
 	@Override
 	public boolean importGeoPackage(String name, URL url) {
-		return importGeoPackage(name, url, false);
+		return importGeoPackage(name, url, false, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean importGeoPackage(String name, URL url,
+			GeoPackageProgress progress) {
+		return importGeoPackage(name, url, false, progress);
 	}
 
 	/**
@@ -276,6 +287,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 */
 	@Override
 	public boolean importGeoPackage(String name, URL url, boolean override) {
+		return importGeoPackage(name, url, override, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean importGeoPackage(String name, URL url, boolean override,
+			GeoPackageProgress progress) {
 
 		boolean success = false;
 
@@ -291,8 +311,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 						+ connection.getResponseMessage());
 			}
 
+			int fileLength = connection.getContentLength();
+			if (fileLength != -1 && progress != null) {
+				progress.setMax(fileLength);
+			}
+
 			InputStream geoPackageStream = connection.getInputStream();
-			success = importGeoPackage(name, override, geoPackageStream);
+			success = importGeoPackage(name, override, geoPackageStream,
+					progress);
 		} catch (IOException e) {
 			throw new GeoPackageException("Failed to import GeoPackage " + name
 					+ " from URL: '" + url.toString() + "'", e);
@@ -393,10 +419,11 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 * @param database
 	 * @param override
 	 * @param geoPackageStream
+	 * @param progress
 	 * @return true if imported successfully
 	 */
 	private boolean importGeoPackage(String database, boolean override,
-			InputStream geoPackageStream) {
+			InputStream geoPackageStream, GeoPackageProgress progress) {
 
 		if (!override && exists(database)) {
 			throw new GeoPackageException(
@@ -409,45 +436,49 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			SQLiteDatabase db = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
 			db.close();
-			GeoPackageIOUtils.copyFile(geoPackageStream, newDbFile);
+			GeoPackageIOUtils.copyStream(geoPackageStream, newDbFile, progress);
 		} catch (IOException e) {
 			throw new GeoPackageException(
 					"Failed to import GeoPackage database: " + database, e);
 		}
 
-		// Verify that the database is valid
-		try {
-			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
-					Context.MODE_PRIVATE, null, new DatabaseErrorHandler() {
-						@Override
-						public void onCorruption(SQLiteDatabase dbObj) {
-						}
-					});
-			sqlite.close();
-		} catch (Exception e) {
-			delete(database);
-			throw new GeoPackageException("Invalid GeoPackage database file", e);
-		}
+		if (progress == null || progress.isActive()) {
 
-		GeoPackage geoPackage = open(database);
-		try {
-			if (!geoPackage.getSpatialReferenceSystemDao().isTableExists()
-					|| !geoPackage.getContentsDao().isTableExists()) {
+			// Verify that the database is valid
+			try {
+				SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
+						Context.MODE_PRIVATE, null, new DatabaseErrorHandler() {
+							@Override
+							public void onCorruption(SQLiteDatabase dbObj) {
+							}
+						});
+				sqlite.close();
+			} catch (Exception e) {
 				delete(database);
 				throw new GeoPackageException(
-						"Invalid GeoPackage database file. Does not contain required tables: "
-								+ SpatialReferenceSystem.TABLE_NAME + " & "
-								+ Contents.TABLE_NAME);
+						"Invalid GeoPackage database file", e);
 			}
-		} catch (SQLException e) {
-			delete(database);
-			throw new GeoPackageException(
-					"Invalid GeoPackage database file. Could not verify existence of required tables: "
-							+ SpatialReferenceSystem.TABLE_NAME
-							+ " & "
-							+ Contents.TABLE_NAME);
-		} finally {
-			geoPackage.close();
+
+			GeoPackage geoPackage = open(database);
+			try {
+				if (!geoPackage.getSpatialReferenceSystemDao().isTableExists()
+						|| !geoPackage.getContentsDao().isTableExists()) {
+					delete(database);
+					throw new GeoPackageException(
+							"Invalid GeoPackage database file. Does not contain required tables: "
+									+ SpatialReferenceSystem.TABLE_NAME + " & "
+									+ Contents.TABLE_NAME);
+				}
+			} catch (SQLException e) {
+				delete(database);
+				throw new GeoPackageException(
+						"Invalid GeoPackage database file. Could not verify existence of required tables: "
+								+ SpatialReferenceSystem.TABLE_NAME
+								+ " & "
+								+ Contents.TABLE_NAME);
+			} finally {
+				geoPackage.close();
+			}
 		}
 
 		return exists(database);

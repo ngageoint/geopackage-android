@@ -18,6 +18,8 @@ import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
+import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.tiles.TileGenerator;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -27,6 +29,7 @@ import mil.nga.giat.geopackage.user.UserTable;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -95,6 +98,11 @@ public class GeoPackageManagerFragment extends Fragment {
 	 * GeoPackage manager
 	 */
 	private GeoPackageManager manager;
+
+	/**
+	 * Progress dialog for network operations
+	 */
+	private ProgressDialog progressDialog;
 
 	/**
 	 * Constructor
@@ -842,9 +850,18 @@ public class GeoPackageManagerFragment extends Fragment {
 
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
-						DownloadTask downloadTask = new DownloadTask();
-						downloadTask.execute(nameInput.getText().toString(),
-								urlInput.getText().toString());
+
+						String database = nameInput.getText().toString();
+						String url = urlInput.getText().toString();
+
+						DownloadTask downloadTask = new DownloadTask(database,
+								url);
+
+						progressDialog = createDownloadProgressDialog(database,
+								url, downloadTask, null);
+						progressDialog.setIndeterminate(true);
+
+						downloadTask.execute(database, url);
 					}
 				}).setNegativeButton(getString(R.string.button_cancel_label),
 				new DialogInterface.OnClickListener() {
@@ -859,45 +876,158 @@ public class GeoPackageManagerFragment extends Fragment {
 	}
 
 	/**
+	 * Create a download progress dialog
+	 * 
+	 * @param database
+	 * @param url
+	 * @param downloadTask
+	 * @param suffix
+	 * @return
+	 */
+	private ProgressDialog createDownloadProgressDialog(String database,
+			String url, final DownloadTask downloadTask, String suffix) {
+		ProgressDialog dialog = new ProgressDialog(getActivity());
+		dialog.setMessage(getString(R.string.geopackage_import_label) + " "
+				+ database + "\n\n" + url + (suffix != null ? suffix : ""));
+		dialog.setCancelable(false);
+		dialog.setButton(ProgressDialog.BUTTON_NEGATIVE,
+				getString(R.string.button_cancel_label),
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						downloadTask.cancel(true);
+					}
+				});
+		return dialog;
+	}
+
+	/**
 	 * Download a GeoPackage from a URL in the background
 	 */
-	private class DownloadTask extends AsyncTask<String, Integer, String> {
+	private class DownloadTask extends AsyncTask<String, Integer, String>
+			implements GeoPackageProgress {
 
-		public DownloadTask() {
+		private Integer max = null;
+		private int progress = 0;
+		private final String database;
+		private final String url;
+
+		/**
+		 * Constructor
+		 * 
+		 * @param database
+		 * @param url
+		 */
+		public DownloadTask(String database, String url) {
+			this.database = database;
+			this.url = url;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isActive() {
+			return !isCancelled();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setMax(int max) {
+			this.max = max;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void addProgress(int progress) {
+			this.progress += progress;
+			if (max != null) {
+				int total = (int) (this.progress / ((double) max) * 100);
+				publishProgress(total);
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progressDialog.show();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onProgressUpdate(Integer... progress) {
+			super.onProgressUpdate(progress);
+
+			// If the indeterminate progress dialog is still showing, swap to a
+			// determinate horizontal bar
+			if (progressDialog.isIndeterminate()) {
+
+				String messageSuffix = "\n\n"
+						+ GeoPackageIOUtils.formatBytes(max);
+
+				ProgressDialog newProgressDialog = createDownloadProgressDialog(
+						database, url, this, messageSuffix);
+				newProgressDialog
+						.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				newProgressDialog.setIndeterminate(false);
+				newProgressDialog.setMax(100);
+
+				newProgressDialog.show();
+				progressDialog.dismiss();
+				progressDialog = newProgressDialog;
+			}
+
+			// Set the progress
+			progressDialog.setProgress(progress[0]);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onCancelled(String result) {
+			progressDialog.dismiss();
+			update();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPostExecute(String result) {
+			progressDialog.dismiss();
+			if (result != null) {
+				showMessage(getString(R.string.geopackage_import_label), result);
+			}
+			update();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				String name = params[0];
-				URL url = new URL(params[1]);
-				if (manager.importGeoPackage(name, url)) {
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							update();
-						}
-					});
-				} else {
-					throw new Exception("Failed to import GeoPackage '" + name
-							+ "' at url '" + url + "'");
+				URL theUrl = new URL(url);
+				if (!manager.importGeoPackage(database, theUrl, this)) {
+					return "Failed to import GeoPackage '" + database
+							+ "' at url '" + url + "'";
 				}
 			} catch (final Exception e) {
-				try {
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							showMessage(
-									getString(R.string.geopackage_import_label),
-									e.getMessage());
-						}
-					});
-				} catch (Exception e2) {
-					// eat
-				}
+				return e.toString();
 			}
 			return null;
 		}
+
 	}
 
 	/**

@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import mil.nga.giat.geopackage.io.GeoPackageProgress;
+
 /**
  * GeoPackage Database management
  * 
@@ -157,10 +159,33 @@ public interface GeoPackageManager {
 	 * 
 	 * @param name
 	 * @param url
+	 * @param progress
+	 * @return true if created successfully
+	 */
+	public boolean importGeoPackage(String name, URL url,
+			GeoPackageProgress progress);
+
+	/**
+	 * Import a GeoPackage file from a URL
+	 * 
+	 * @param name
+	 * @param url
 	 * @param override
 	 * @return true if created successfully
 	 */
 	public boolean importGeoPackage(String name, URL url, boolean override);
+
+	/**
+	 * Import a GeoPackage file from a URL
+	 * 
+	 * @param name
+	 * @param url
+	 * @param override
+	 * @param progress
+	 * @return true if created successfully
+	 */
+	public boolean importGeoPackage(String name, URL url, boolean override,
+			GeoPackageProgress progress);
 
 	/**
 	 * Export a GeoPackage database to a file
