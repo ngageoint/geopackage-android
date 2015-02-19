@@ -74,4 +74,13 @@ public class TileGrid {
 		this.maxY = maxY;
 	}
 
+	/**
+	 * Get the count of tiles in the grid
+	 * 
+	 * @return
+	 */
+	public int count() {
+		return ((maxX + 1) - minX) * ((maxY + 1) - minY);
+	}
+
 }

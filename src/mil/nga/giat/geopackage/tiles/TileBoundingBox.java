@@ -29,6 +29,13 @@ public class TileBoundingBox {
 
 	/**
 	 * Constructor
+	 */
+	public TileBoundingBox() {
+		this(-180.0, 180.0, -90.0, 90.0);
+	}
+
+	/**
+	 * Constructor
 	 * 
 	 * @param minLongitude
 	 * @param maxLongitude

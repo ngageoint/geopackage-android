@@ -20,6 +20,7 @@ import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
+import mil.nga.giat.geopackage.tiles.TileBoundingBox;
 import mil.nga.giat.geopackage.tiles.TileGenerator;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -32,6 +33,7 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -502,62 +504,151 @@ public class GeoPackageManagerFragment extends Fragment {
 	 */
 	private void createTilesOption(final String database) {
 
-		CreateTilesTask createTilesTask = new CreateTilesTask();
-		createTilesTask.execute(database, "tile_test",
-				"http://a.tile.openstreetmap.org/{z}/{x}/{y}.png", "1", "2");
+		String tableName = "tile_test";
+		String tileUrl = "http://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
+		int minZoom = 1;
+		int maxZoom = 2;
+		CompressFormat compressFormat = null;
+		Integer compressQuality = null;
+		TileBoundingBox boundingBox = new TileBoundingBox();
 
+		final CreateTilesTask createTilesTask = new CreateTilesTask();
+
+		GeoPackage geoPackage = manager.open(database);
+		TileGenerator tileGenerator = new TileGenerator(getActivity(),
+				geoPackage, tableName, tileUrl, minZoom, maxZoom);
+		tileGenerator.setCompressFormat(compressFormat);
+		tileGenerator.setCompressQuality(compressQuality);
+		tileGenerator.setTileBoundingBox(boundingBox);
+		tileGenerator.setProgress(createTilesTask);
+
+		createTilesTask.setTileGenerator(tileGenerator);
+
+		progressDialog = new ProgressDialog(getActivity());
+		progressDialog
+				.setMessage(getString(R.string.geopackage_create_tiles_label)
+						+ ": " + database + " - " + tableName);
+		progressDialog.setCancelable(false);
+		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		progressDialog.setIndeterminate(false);
+		progressDialog.setMax(tileGenerator.getTileCount());
+		progressDialog.setButton(ProgressDialog.BUTTON_NEGATIVE,
+				getString(R.string.button_cancel_label),
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						createTilesTask.cancel(true);
+					}
+				});
+
+		createTilesTask.execute();
 	}
 
 	/**
 	 * Create and download tiles in the background
 	 */
-	private class CreateTilesTask extends AsyncTask<String, Integer, String> {
+	private class CreateTilesTask extends AsyncTask<String, Integer, String>
+			implements GeoPackageProgress {
 
+		private Integer max = null;
+		private int progress = 0;
+		private TileGenerator tileGenerator;
+
+		/**
+		 * Constructor
+		 */
 		public CreateTilesTask() {
+		}
+
+		/**
+		 * Set the tile generator
+		 * 
+		 * @param tileGenerator
+		 */
+		public void setTileGenerator(TileGenerator tileGenerator) {
+			this.tileGenerator = tileGenerator;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isActive() {
+			return !isCancelled();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void setMax(int max) {
+			this.max = max;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void addProgress(int progress) {
+			this.progress += progress;
+			publishProgress(this.progress);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progressDialog.show();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onProgressUpdate(Integer... progress) {
+			super.onProgressUpdate(progress);
+			progressDialog.setProgress(progress[0]);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onCancelled(String result) {
+			tileGenerator.close();
+			progressDialog.dismiss();
+			update();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPostExecute(String result) {
+			tileGenerator.close();
+			progressDialog.dismiss();
+			if (result != null) {
+				showMessage(getString(R.string.geopackage_import_label), result);
+			}
+			update();
 		}
 
 		@Override
 		protected String doInBackground(String... params) {
-			GeoPackage geoPackage = null;
 			try {
-				String database = params[0];
-				String tableName = params[1];
-				String tileUrl = params[2];
-				int minZoom = Integer.valueOf(params[3]);
-				int maxZoom = Integer.valueOf(params[4]);
-
-				geoPackage = manager.open(database);
-
-				TileGenerator tileGenerator = new TileGenerator(getActivity(),
-						geoPackage, tableName, tileUrl, minZoom, maxZoom);
 				int count = tileGenerator.generateTiles();
-
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						update();
-					}
-				});
+				if (count < max) {
+					return "Fewer tiles were generated than expected. Expected: "
+							+ max + ", Actual: " + count;
+				}
 			} catch (final Exception e) {
-				try {
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							showMessage(
-									getString(R.string.geopackage_create_tiles_label),
-									e.getMessage());
-						}
-					});
-				} catch (Exception e2) {
-					// eat
-				}
-			} finally {
-				if (geoPackage != null) {
-					geoPackage.close();
-				}
+				return e.toString();
 			}
 			return null;
 		}
+
 	}
 
 	/**

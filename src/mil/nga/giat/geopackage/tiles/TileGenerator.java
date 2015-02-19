@@ -18,6 +18,7 @@ import mil.nga.giat.geopackage.core.contents.ContentsDataType;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
+import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -29,6 +30,7 @@ import mil.nga.giat.geopackage.tiles.user.TileTable;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.util.SparseArray;
 
 /**
  * Creates a set of tiles within a GeoPackage by downloading the tiles from a
@@ -69,6 +71,16 @@ public class TileGenerator {
 	private final int maxZoom;
 
 	/**
+	 * Total tile count
+	 */
+	private final int tileCount;
+
+	/**
+	 * Tile grids by zoom level
+	 */
+	private final SparseArray<TileGrid> tileGrids = new SparseArray<TileGrid>();
+
+	/**
 	 * Tile bounding box
 	 */
 	private TileBoundingBox boundingBox = new TileBoundingBox(-180.0, 180.0,
@@ -83,6 +95,11 @@ public class TileGenerator {
 	 * Compress quality
 	 */
 	private int compressQuality = 100;
+
+	/**
+	 * GeoPackage progress
+	 */
+	private GeoPackageProgress progress;
 
 	/**
 	 * Constructor
@@ -102,6 +119,17 @@ public class TileGenerator {
 		this.tileUrl = tileUrl;
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
+
+		// Get the tile grids and total tile count
+		int count = 0;
+		for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
+			// Get the tile grid the includes the entire bounding box
+			TileGrid tileGrid = TileBoundingBoxAndroidUtils.getTileGrid(
+					boundingBox, zoom);
+			count += tileGrid.count();
+			tileGrids.put(zoom, tileGrid);
+		}
+		tileCount = count;
 	}
 
 	/**
@@ -129,7 +157,27 @@ public class TileGenerator {
 	 * @param compressQuality
 	 */
 	public void setCompressQuality(Integer compressQuality) {
-		this.compressQuality = compressQuality;
+		if (compressQuality != null) {
+			this.compressQuality = compressQuality;
+		}
+	}
+
+	/**
+	 * Set the progress tracker
+	 * 
+	 * @param progress
+	 */
+	public void setProgress(GeoPackageProgress progress) {
+		this.progress = progress;
+	}
+
+	/**
+	 * Get the tile count of tiles to be generated
+	 * 
+	 * @return
+	 */
+	public int getTileCount() {
+		return tileCount;
 	}
 
 	/**
@@ -140,6 +188,11 @@ public class TileGenerator {
 	 * @throws IOException
 	 */
 	public int generateTiles() throws SQLException, IOException {
+
+		// Set the max progress count
+		if (progress != null) {
+			progress.setMax(tileCount);
+		}
 
 		int count = 0;
 
@@ -186,8 +239,17 @@ public class TileGenerator {
 			TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
 
 			// Create the new matrix tiles
-			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-				count += generateTiles(tileMatrixDao, tileDao, contents, zoom);
+			for (int zoom = minZoom; zoom <= maxZoom
+					&& (progress == null || progress.isActive()); zoom++) {
+				TileGrid tileGrid = tileGrids.get(zoom);
+				count += generateTiles(tileMatrixDao, tileDao, contents, zoom,
+						tileGrid);
+			}
+
+			// Delete the table if cancelled
+			if (progress != null && !progress.isActive()) {
+				deleteTable(geoPackage, tableName);
+				count = 0;
 			}
 		} catch (RuntimeException e) {
 			deleteTable(geoPackage, tableName);
@@ -201,6 +263,15 @@ public class TileGenerator {
 		}
 
 		return count;
+	}
+
+	/**
+	 * Close the GeoPackage
+	 */
+	public void close() {
+		if (geoPackage != null) {
+			geoPackage.close();
+		}
 	}
 
 	/**
@@ -224,12 +295,14 @@ public class TileGenerator {
 	 * @param tileDao
 	 * @param contents
 	 * @param zoomLevel
+	 * @param tileGrid
 	 * @return tile count
 	 * @throws SQLException
 	 * @throws IOException
 	 */
 	private int generateTiles(TileMatrixDao tileMatrixDao, TileDao tileDao,
-			Contents contents, int zoomLevel) throws SQLException, IOException {
+			Contents contents, int zoomLevel, TileGrid tileGrid)
+			throws SQLException, IOException {
 
 		int count = 0;
 
@@ -239,44 +312,54 @@ public class TileGenerator {
 		// Get the full sized matrix grid width and height
 		int matrixLength = TileBoundingBoxAndroidUtils.tilesPerSide(zoomLevel);
 
-		// Get the tile grid the includes the entire bounding box
-		TileGrid tileGrid = TileBoundingBoxAndroidUtils.getTileGrid(
-				boundingBox, zoomLevel);
-
 		// Download and create the tile and each coordinate
 		for (int x = tileGrid.getMinX(); x <= tileGrid.getMaxX(); x++) {
 
 			for (int y = tileGrid.getMinY(); y <= tileGrid.getMaxY(); y++) {
 
-				// Download the tile
-				byte[] tileBytes = downloadTile(zoomLevel, x, y);
-
-				Bitmap bitmap = null;
-
-				// Compress the image
-				if (compressFormat != null) {
-					bitmap = BitmapConverter.toBitmap(tileBytes);
-					tileBytes = BitmapConverter.toBytes(bitmap, compressFormat,
-							compressQuality);
+				// Check if the progress has been cancelled
+				if (progress != null && !progress.isActive()) {
+					return count;
 				}
 
-				// Create a new tile row
-				TileRow newRow = tileDao.newRow();
-				newRow.setZoomLevel(zoomLevel);
-				newRow.setTileColumn(x);
-				newRow.setTileRow(y);
-				newRow.setTileData(tileBytes);
-				tileDao.create(newRow);
+				try {
+					// Download the tile
+					byte[] tileBytes = downloadTile(zoomLevel, x, y);
 
-				count++;
+					Bitmap bitmap = null;
 
-				// Determine the tile width and height
-				if (tileWidth == null) {
-					if (bitmap == null) {
+					// Compress the image
+					if (compressFormat != null) {
 						bitmap = BitmapConverter.toBitmap(tileBytes);
+						tileBytes = BitmapConverter.toBytes(bitmap,
+								compressFormat, compressQuality);
 					}
-					tileWidth = bitmap.getWidth();
-					tileHeight = bitmap.getHeight();
+
+					// Create a new tile row
+					TileRow newRow = tileDao.newRow();
+					newRow.setZoomLevel(zoomLevel);
+					newRow.setTileColumn(x);
+					newRow.setTileRow(y);
+					newRow.setTileData(tileBytes);
+					tileDao.create(newRow);
+
+					count++;
+
+					// Determine the tile width and height
+					if (tileWidth == null) {
+						if (bitmap == null) {
+							bitmap = BitmapConverter.toBitmap(tileBytes);
+						}
+						tileWidth = bitmap.getWidth();
+						tileHeight = bitmap.getHeight();
+					}
+				} catch (Exception e) {
+					// Skip this tile, don't increase count
+				}
+
+				// Update the progress count, even on failures
+				if (progress != null) {
+					progress.addProgress(1);
 				}
 
 			}
