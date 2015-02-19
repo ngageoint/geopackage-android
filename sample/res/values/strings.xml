@@ -3,59 +3,91 @@
 
     <string name="app_name">GeoPackageSDKSample</string>
     <string name="app_label_name">GeoPackage</string>
-    
     <string name="title_map">Map</string>
     <string name="title_manager">Manager</string>
-    
     <string name="import_geopackage_url">Import URL</string>
     <string name="import_geopackage_file">Import File</string>
     <string name="create_geopackage">Create</string>
-    
     <string name="map_max_features">Max Features</string>
     <string name="map_max_features_message">Set the max number of features to draw on the map</string>
     <string name="map_type_normal">Normal</string>
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
     <string name="map_type_hybrid">Hybrid</string>
-    
-    <string name="import_url_name_label">Name</string>
-    <string name="import_url_label">URL</string>
+    <string name="import_url_name_label">Name: </string>
+    <string name="import_url_label">URL: </string>
     <string name="import_url_preloaded_label">Preloaded</string>
+    <string name="create_tiles_name_label">Name: </string>
+    <string name="create_tiles_url_label">URL: </string>
+    <string name="create_tiles_preloaded_label">Preloaded</string>
+    <string name="create_tiles_zoom_label">Zoom - </string>
+    <string name="create_tiles_min_zoom_label">Min: </string>
+    <string name="create_tiles_max_zoom_label">Max: </string>
+    <string name="create_tiles_latitude_label">Latitude - </string>
+    <string name="create_tiles_min_latitude_label">Min: </string>
+    <string name="create_tiles_max_latitude_label">Max: </string>
+    <string name="create_tiles_default_min_latitude">-90.0</string>
+    <string name="create_tiles_default_max_latitude">90.0</string>
+    <string name="create_tiles_longitude_label">Longitude - </string>
+    <string name="create_tiles_min_longitude_label">Min: </string>
+    <string name="create_tiles_max_longitude_label">Max: </string>
+    <string name="create_tiles_default_min_longitude">-180.0</string>
+    <string name="create_tiles_default_max_longitude">180.0</string>
+    <string name="geopackage_view_label">View</string>
+    <string name="geopackage_delete_label">Delete</string>
+    <string name="geopackage_rename_label">Rename</string>
+    <string name="geopackage_copy_label">Copy</string>
+    <string name="geopackage_copy_suffix">_copy</string>
+    <string name="geopackage_export_label">Export</string>
+    <string name="geopackage_import_label">Import</string>
+    <string name="geopackage_create_label">Create</string>
+    <string name="geopackage_create_tiles_label">Create Tiles</string>
+    <string name="geopackage_import_name_label">Name:</string>
+    <string name="table_image_description">Table Type</string>
+    <string name="geopackage_table_view_label">View</string>
+    <string name="geopackage_table_delete_label">Delete</string>
+    <string name="button_ok_label">OK</string>
+    <string name="button_cancel_label">Cancel</string>
 
-    <string name ="geopackage_view_label">View</string>
-    <string name ="geopackage_delete_label">Delete</string>
-    <string name ="geopackage_rename_label">Rename</string>
-    <string name ="geopackage_copy_label">Copy</string>
-    <string name ="geopackage_copy_suffix">_copy</string>
-    <string name ="geopackage_export_label">Export</string>
-    <string name ="geopackage_import_label">Import</string>
-    <string name ="geopackage_create_label">Create</string>
-    <string name ="geopackage_create_tiles_label">Create Tiles</string>
-    <string name ="geopackage_import_name_label">Name:</string>
-    <string name ="table_image_description">Table Type</string>
-    <string name ="geopackage_table_view_label">View</string>
-    <string name ="geopackage_table_delete_label">Delete</string>
-    
-    <string name ="button_ok_label">OK</string>
-    <string name ="button_cancel_label">Cancel</string>
-    
-    <string-array name="preloaded_url_labels">
-    	<item>GDAL Sample</item>
-    	<item>Simple Sewers</item>
-    	<item>Haiti</item>
-    	<item>Belgium Geonames</item>
+    <string-array name="preloaded_geopackage_url_labels">
+        <item>GDAL Sample</item>
+        <item>Simple Sewers</item>
+        <item>Haiti</item>
+        <item>Belgium Geonames</item>
     </string-array>
-    <string-array name="preloaded_urls">
-    	<item>http://www.geopackage.org/data/gdal_sample.gpkg</item>
-    	<item>http://www.geopackage.org/data/simple_sewer_features.gpkg</item>
-    	<item>http://www.geopackage.org/data/haiti-vectors-split.gpkg</item>
-    	<item>http://www.geopackage.org/data/geonames_belgium.gpkg</item>
+    <string-array name="preloaded_geopackage_urls">
+        <item>http://www.geopackage.org/data/gdal_sample.gpkg</item>
+        <item>http://www.geopackage.org/data/simple_sewer_features.gpkg</item>
+        <item>http://www.geopackage.org/data/haiti-vectors-split.gpkg</item>
+        <item>http://www.geopackage.org/data/geonames_belgium.gpkg</item>
     </string-array>
-    <string-array name="preloaded_url_names">
-    	<item>gdal_sample</item>
-    	<item>simple_sewer_features</item>
-    	<item>haiti-vectors-split</item>
-    	<item>geonames_belgium</item>
+    <string-array name="preloaded_geopackage_url_names">
+        <item>gdal_sample</item>
+        <item>simple_sewer_features</item>
+        <item>haiti-vectors-split</item>
+        <item>geonames_belgium</item>
     </string-array>
-    
+    <string-array name="preloaded_tile_url_labels">
+        <item>OpenStreetMap</item>
+    </string-array>
+    <string-array name="preloaded_tile_url_names">
+        <item>openstreetmap</item>
+    </string-array>
+    <string-array name="preloaded_tile_urls">
+        <item>http://a.tile.openstreetmap.org/{z}/{x}/{y}.png</item>
+    </string-array>
+
+    <integer-array name="preloaded_tile_url_min_zoom">
+        <item>0</item>
+    </integer-array>
+    <integer-array name="preloaded_tile_url_max_zoom">
+        <item>17</item>
+    </integer-array>
+    <integer-array name="preloaded_tile_url_default_min_zoom">
+        <item>1</item>
+    </integer-array>
+    <integer-array name="preloaded_tile_url_default_max_zoom">
+        <item>5</item>
+    </integer-array>
+
 </resources>

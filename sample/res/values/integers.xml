@@ -2,5 +2,9 @@
 <resources>
     
     <integer name="map_max_features_default">1000</integer>
+    <integer name="create_tiles_min_zoom_default">0</integer>
+    <integer name="create_tiles_max_zoom_default">21</integer>
+    <integer name="create_tiles_default_min_zoom_default">0</integer>
+    <integer name="create_tiles_default_max_zoom_default">5</integer>
     
 </resources>

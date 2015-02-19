@@ -38,6 +38,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -504,44 +505,212 @@ public class GeoPackageManagerFragment extends Fragment {
 	 */
 	private void createTilesOption(final String database) {
 
-		String tableName = "tile_test";
-		String tileUrl = "http://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
-		int minZoom = 1;
-		int maxZoom = 2;
-		CompressFormat compressFormat = null;
-		Integer compressQuality = null;
-		TileBoundingBox boundingBox = new TileBoundingBox();
+		LayoutInflater inflater = LayoutInflater.from(getActivity());
+		View createTilesView = inflater.inflate(R.layout.create_tiles, null);
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+		dialog.setView(createTilesView);
 
-		final CreateTilesTask createTilesTask = new CreateTilesTask();
+		final EditText nameInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_name_input);
+		final EditText urlInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_url_input);
+		final Button button = (Button) createTilesView
+				.findViewById(R.id.create_tiles_preloaded);
+		final EditText minZoomInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_min_zoom_input);
+		final EditText maxZoomInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_max_zoom_input);
+		final EditText minLatInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_min_latitude_input);
+		final EditText maxLatInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_max_latitude_input);
+		final EditText minLonInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_min_longitude_input);
+		final EditText maxLonInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_max_longitude_input);
 
-		GeoPackage geoPackage = manager.open(database);
-		TileGenerator tileGenerator = new TileGenerator(getActivity(),
-				geoPackage, tableName, tileUrl, minZoom, maxZoom);
-		tileGenerator.setCompressFormat(compressFormat);
-		tileGenerator.setCompressQuality(compressQuality);
-		tileGenerator.setTileBoundingBox(boundingBox);
-		tileGenerator.setProgress(createTilesTask);
+		int minZoom = getResources().getInteger(
+				R.integer.create_tiles_min_zoom_default);
+		int maxZoom = getResources().getInteger(
+				R.integer.create_tiles_max_zoom_default);
+		minZoomInput.setFilters(new InputFilter[] { new InputFilterMinMax(
+				minZoom, maxZoom) });
+		maxZoomInput.setFilters(new InputFilter[] { new InputFilterMinMax(
+				minZoom, maxZoom) });
 
-		createTilesTask.setTileGenerator(tileGenerator);
+		minZoomInput.setText(String.valueOf(getResources().getInteger(
+				R.integer.create_tiles_default_min_zoom_default)));
+		maxZoomInput.setText(String.valueOf(getResources().getInteger(
+				R.integer.create_tiles_default_max_zoom_default)));
 
-		progressDialog = new ProgressDialog(getActivity());
-		progressDialog
-				.setMessage(getString(R.string.geopackage_create_tiles_label)
-						+ ": " + database + " - " + tableName);
-		progressDialog.setCancelable(false);
-		progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-		progressDialog.setIndeterminate(false);
-		progressDialog.setMax(tileGenerator.getTileCount());
-		progressDialog.setButton(ProgressDialog.BUTTON_NEGATIVE,
-				getString(R.string.button_cancel_label),
+		minLatInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-90.0, 90.0) });
+		maxLatInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-90.0, 90.0) });
+
+		minLonInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-180.0, 180.0) });
+		maxLonInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-180.0, 180.0) });
+
+		button.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+						getActivity(), android.R.layout.select_dialog_item);
+				adapter.addAll(getResources().getStringArray(
+						R.array.preloaded_tile_url_labels));
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivity());
+				builder.setTitle(getString(R.string.create_tiles_preloaded_label));
+				builder.setAdapter(adapter,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int item) {
+								if (item >= 0) {
+									String[] urls = getResources()
+											.getStringArray(
+													R.array.preloaded_tile_urls);
+									String[] names = getResources()
+											.getStringArray(
+													R.array.preloaded_tile_url_names);
+									int[] minZooms = getResources()
+											.getIntArray(
+													R.array.preloaded_tile_url_min_zoom);
+									int[] maxZooms = getResources()
+											.getIntArray(
+													R.array.preloaded_tile_url_max_zoom);
+									int[] defaultMinZooms = getResources()
+											.getIntArray(
+													R.array.preloaded_tile_url_default_min_zoom);
+									int[] defaultMaxZooms = getResources()
+											.getIntArray(
+													R.array.preloaded_tile_url_default_max_zoom);
+									nameInput.setText(names[item]);
+									urlInput.setText(urls[item]);
+
+									int minZoom = minZooms[item];
+									int maxZoom = maxZooms[item];
+									minZoomInput
+											.setFilters(new InputFilter[] { new InputFilterMinMax(
+													minZoom, maxZoom) });
+									maxZoomInput
+											.setFilters(new InputFilter[] { new InputFilterMinMax(
+													minZoom, maxZoom) });
+
+									minZoomInput.setText(String
+											.valueOf(defaultMinZooms[item]));
+									maxZoomInput.setText(String
+											.valueOf(defaultMaxZooms[item]));
+								}
+							}
+						});
+
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+		});
+
+		dialog.setPositiveButton(
+				getString(R.string.geopackage_create_tiles_label),
 				new DialogInterface.OnClickListener() {
+
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						createTilesTask.cancel(true);
+					public void onClick(DialogInterface dialog, int id) {
+
+						String tableName = nameInput.getText().toString();
+						String tileUrl = urlInput.getText().toString();
+						int minZoom = Integer.valueOf(minZoomInput.getText()
+								.toString());
+						int maxZoom = Integer.valueOf(maxZoomInput.getText()
+								.toString());
+						double minLat = Double.valueOf(minLatInput.getText()
+								.toString());
+						double maxLat = Double.valueOf(maxLatInput.getText()
+								.toString());
+						double minLon = Double.valueOf(minLonInput.getText()
+								.toString());
+						double maxLon = Double.valueOf(maxLonInput.getText()
+								.toString());
+
+						if (minZoom > maxZoom) {
+							showMessage(
+									getString(R.string.geopackage_create_tiles_label),
+									getString(R.string.create_tiles_min_zoom_label)
+											+ " can not be larger than "
+											+ getString(R.string.create_tiles_max_zoom_label));
+						}
+
+						if (minLat > maxLat) {
+							showMessage(
+									getString(R.string.geopackage_create_tiles_label),
+									getString(R.string.create_tiles_min_latitude_label)
+											+ " can not be larger than "
+											+ getString(R.string.create_tiles_max_latitude_label));
+						}
+
+						if (minLon > maxLon) {
+							showMessage(
+									getString(R.string.geopackage_create_tiles_label),
+									getString(R.string.create_tiles_min_longitude_label)
+											+ " can not be larger than "
+											+ getString(R.string.create_tiles_max_longitude_label));
+						}
+
+						CompressFormat compressFormat = null;
+						Integer compressQuality = null;
+						TileBoundingBox boundingBox = new TileBoundingBox(
+								minLon, maxLon, minLat, maxLat);
+
+						final CreateTilesTask createTilesTask = new CreateTilesTask();
+
+						GeoPackage geoPackage = manager.open(database);
+						TileGenerator tileGenerator = new TileGenerator(
+								getActivity(), geoPackage, tableName, tileUrl,
+								minZoom, maxZoom);
+						tileGenerator.setCompressFormat(compressFormat);
+						tileGenerator.setCompressQuality(compressQuality);
+						tileGenerator.setTileBoundingBox(boundingBox);
+						tileGenerator.setProgress(createTilesTask);
+
+						createTilesTask.setTileGenerator(tileGenerator);
+
+						progressDialog = new ProgressDialog(getActivity());
+						progressDialog
+								.setMessage(getString(R.string.geopackage_create_tiles_label)
+										+ ": " + database + " - " + tableName);
+						progressDialog.setCancelable(false);
+						progressDialog
+								.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+						progressDialog.setIndeterminate(false);
+						progressDialog.setMax(tileGenerator.getTileCount());
+						progressDialog.setButton(
+								ProgressDialog.BUTTON_NEGATIVE,
+								getString(R.string.button_cancel_label),
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										createTilesTask.cancel(true);
+									}
+								});
+
+						createTilesTask.execute();
+					}
+				}).setNegativeButton(getString(R.string.button_cancel_label),
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
 					}
 				});
+		dialog.show();
 
-		createTilesTask.execute();
 	}
 
 	/**
@@ -911,7 +1080,7 @@ public class GeoPackageManagerFragment extends Fragment {
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 						getActivity(), android.R.layout.select_dialog_item);
 				adapter.addAll(getResources().getStringArray(
-						R.array.preloaded_url_labels));
+						R.array.preloaded_geopackage_url_labels));
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						getActivity());
 				builder.setTitle(getString(R.string.import_url_preloaded_label));
@@ -921,10 +1090,10 @@ public class GeoPackageManagerFragment extends Fragment {
 								if (item >= 0) {
 									String[] urls = getResources()
 											.getStringArray(
-													R.array.preloaded_urls);
+													R.array.preloaded_geopackage_urls);
 									String[] names = getResources()
 											.getStringArray(
-													R.array.preloaded_url_names);
+													R.array.preloaded_geopackage_url_names);
 									nameInput.setText(names[item]);
 									urlInput.setText(urls[item]);
 								}
