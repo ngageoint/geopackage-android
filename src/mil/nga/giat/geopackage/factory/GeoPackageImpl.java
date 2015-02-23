@@ -689,19 +689,6 @@ class GeoPackageImpl implements GeoPackage {
 	}
 
 	/**
-	 * Attempt to quietly delete the table
-	 * 
-	 * @param tableName
-	 */
-	private void deleteTableQuietly(String tableName) {
-		try {
-			deleteTable(tableName);
-		} catch (Exception e) {
-			// eat
-		}
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -843,6 +830,18 @@ class GeoPackageImpl implements GeoPackage {
 	public void deleteTable(String table) {
 		ContentsDao contentsDao = getContentsDao();
 		contentsDao.deleteTable(table);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void deleteTableQuietly(String tableName) {
+		try {
+			deleteTable(tableName);
+		} catch (Exception e) {
+			// eat
+		}
 	}
 
 	/**

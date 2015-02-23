@@ -350,4 +350,11 @@ public interface GeoPackage {
 	 */
 	public void deleteTable(String table);
 
+	/**
+	 * Attempt to delete the user table and all GeoPackage metadata quietly
+	 * 
+	 * @param tableName
+	 */
+	public void deleteTableQuietly(String tableName);
+
 }

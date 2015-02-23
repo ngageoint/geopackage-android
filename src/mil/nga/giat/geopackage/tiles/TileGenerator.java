@@ -20,6 +20,7 @@ import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
@@ -79,8 +80,8 @@ public class TileGenerator {
 	/**
 	 * Tile bounding box
 	 */
-	private BoundingBox boundingBox = new BoundingBox(-180.0, 180.0,
-			-90.0, 90.0);
+	private BoundingBox boundingBox = new BoundingBox(-180.0, 180.0, -90.0,
+			90.0);
 
 	/**
 	 * Compress format
@@ -188,10 +189,12 @@ public class TileGenerator {
 		if (tileCount == null) {
 			// Get the tile grids and total tile count
 			int count = 0;
+			BoundingBox mercatorBox = TileBoundingBoxAndroidUtils
+					.toWebMercator(boundingBox);
 			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
 				// Get the tile grid the includes the entire bounding box
 				TileGrid tileGrid = TileBoundingBoxAndroidUtils.getTileGrid(
-						boundingBox, zoom);
+						mercatorBox, zoom);
 				count += tileGrid.count();
 				tileGrids.put(zoom, tileGrid);
 			}
@@ -218,10 +221,23 @@ public class TileGenerator {
 
 		int count = 0;
 
-		// Create the tile table
-		TileMatrixSet tileMatrixSet = geoPackage.createTileTableWithMetadata(
-				tableName, boundingBox, (long) context.getResources()
-						.getInteger(R.integer.geopackage_srs_epsg_srs_id));
+		boolean update = false;
+
+		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+		TileMatrixSet tileMatrixSet = null;
+		if (!tileMatrixSetDao.isTableExists()
+				|| !tileMatrixSetDao.idExists(tableName)) {
+			// Create the tile table
+			tileMatrixSet = geoPackage.createTileTableWithMetadata(
+					tableName,
+					boundingBox,
+					(long) context.getResources().getInteger(
+							R.integer.geopackage_srs_epsg_srs_id));
+		} else {
+			// Retrieve the tile matrix set
+			tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
+			update = true;
+		}
 
 		// Download and create the tiles
 		try {
@@ -234,23 +250,23 @@ public class TileGenerator {
 					&& (progress == null || progress.isActive()); zoom++) {
 				TileGrid tileGrid = tileGrids.get(zoom);
 				count += generateTiles(tileMatrixDao, tileDao, contents, zoom,
-						tileGrid);
+						tileGrid, update);
 			}
 
 			// Delete the table if cancelled
 			if (progress != null && !progress.isActive()
 					&& progress.cleanupOnCancel()) {
-				deleteTable(geoPackage, tableName);
+				geoPackage.deleteTableQuietly(tableName);
 				count = 0;
 			}
 		} catch (RuntimeException e) {
-			deleteTable(geoPackage, tableName);
+			geoPackage.deleteTableQuietly(tableName);
 			throw e;
 		} catch (SQLException e) {
-			deleteTable(geoPackage, tableName);
+			geoPackage.deleteTableQuietly(tableName);
 			throw e;
 		} catch (IOException e) {
-			deleteTable(geoPackage, tableName);
+			geoPackage.deleteTableQuietly(tableName);
 			throw e;
 		}
 
@@ -267,20 +283,6 @@ public class TileGenerator {
 	}
 
 	/**
-	 * Attempt to queitly delete the table
-	 * 
-	 * @param geoPackage
-	 * @param tableName
-	 */
-	private void deleteTable(GeoPackage geoPackage, String tableName) {
-		try {
-			geoPackage.deleteTable(tableName);
-		} catch (Exception e2) {
-			// eat
-		}
-	}
-
-	/**
 	 * Generate the tiles for the zoom level
 	 * 
 	 * @param tileMatrixDao
@@ -288,12 +290,13 @@ public class TileGenerator {
 	 * @param contents
 	 * @param zoomLevel
 	 * @param tileGrid
+	 * @param update
 	 * @return tile count
 	 * @throws SQLException
 	 * @throws IOException
 	 */
 	private int generateTiles(TileMatrixDao tileMatrixDao, TileDao tileDao,
-			Contents contents, int zoomLevel, TileGrid tileGrid)
+			Contents contents, int zoomLevel, TileGrid tileGrid, boolean update)
 			throws SQLException, IOException {
 
 		int count = 0;
@@ -332,6 +335,11 @@ public class TileGenerator {
 							tileBytes = BitmapConverter.toBytes(bitmap,
 									compressFormat, compressQuality);
 						}
+					}
+
+					// If an update, delete an existing row
+					if (update) {
+						tileDao.deleteTile(x, y, zoomLevel);
 					}
 
 					// Create a new tile row
@@ -398,7 +406,8 @@ public class TileGenerator {
 					tileGrid.getMinY(), tileGrid.getMaxY() });
 
 			tileDao.delete(where.toString(), whereArgs);
-		} else {
+
+		} else if (!update) {
 
 			// Get the tile size
 			int tilesPerSide = TileBoundingBoxAndroidUtils

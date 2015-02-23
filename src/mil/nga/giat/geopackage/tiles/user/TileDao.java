@@ -116,7 +116,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		if (!tileMatrices.isEmpty()) {
 			minZoom = tileMatrices.get(0).getZoomLevel();
 			maxZoom = tileMatrices.get(tileMatrices.size() - 1).getZoomLevel();
-		}else{
+		} else {
 			minZoom = 0;
 			maxZoom = 0;
 		}
@@ -324,8 +324,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @return cursor from query or null if the zoom level tile ranges do not
 	 *         overlap the bounding box
 	 */
-	public TileCursor queryByBoundingBox(BoundingBox boundingBox,
-			long zoomLevel) {
+	public TileCursor queryByBoundingBox(BoundingBox boundingBox, long zoomLevel) {
 
 		TileCursor tileCursor = null;
 
@@ -600,9 +599,38 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		double maxLat = matrixMaxY - (tileHeight * row);
 		double minLat = maxLat - tileHeight;
 
-		BoundingBox boundingBox = new BoundingBox(minLon, maxLon,
-				minLat, maxLat);
+		BoundingBox boundingBox = new BoundingBox(minLon, maxLon, minLat,
+				maxLat);
 
 		return boundingBox;
 	}
+
+	/**
+	 * Delete a Tile
+	 * 
+	 * @param column
+	 * @param row
+	 * @param zoomLevel
+	 * @return number deleted, should be 0 or 1
+	 */
+	public int deleteTile(long column, long row, long zoomLevel) {
+
+		StringBuilder where = new StringBuilder();
+
+		where.append(buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel));
+
+		where.append(" AND ");
+		where.append(buildWhere(TileTable.COLUMN_TILE_COLUMN, column));
+
+		where.append(" AND ");
+		where.append(buildWhere(TileTable.COLUMN_TILE_ROW, row));
+
+		String[] whereArgs = buildWhereArgs(new Object[] { zoomLevel, column,
+				row });
+
+		int deleted = delete(where.toString(), whereArgs);
+
+		return deleted;
+	}
+
 }
