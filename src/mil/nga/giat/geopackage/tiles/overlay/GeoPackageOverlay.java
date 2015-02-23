@@ -2,8 +2,8 @@ package mil.nga.giat.geopackage.tiles.overlay;
 
 import java.io.IOException;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.io.BitmapConverter;
-import mil.nga.giat.geopackage.tiles.TileBoundingBox;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxAndroidUtils;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
@@ -80,7 +80,7 @@ public class GeoPackageOverlay implements TileProvider {
 		Tile tile = null;
 
 		// Get the bounding box of the requested tile
-		TileBoundingBox boundingBox = TileBoundingBoxAndroidUtils
+		BoundingBox boundingBox = TileBoundingBoxAndroidUtils
 				.getBoundingBox(x, y, zoom);
 
 		// Get the lon and lat size in meters
@@ -117,12 +117,12 @@ public class GeoPackageOverlay implements TileProvider {
 				Bitmap tileDataBitmap = tileRow.getTileDataBitmap();
 
 				// Get the bounding box of the tile
-				TileBoundingBox tileBoundingBox = tileDao.getBoundingBox(
+				BoundingBox tileBoundingBox = tileDao.getBoundingBox(
 						tileMatrix, tileRow);
 
 				// Get the bounding box where the requested image and tile
 				// overlap
-				TileBoundingBox overlap = TileBoundingBoxUtils.overlap(
+				BoundingBox overlap = TileBoundingBoxUtils.overlap(
 						boundingBox, tileBoundingBox);
 
 				// If the tile overlaps with the requested box

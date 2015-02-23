@@ -201,7 +201,7 @@ public class TestUtils {
 
 		FeatureTable table = buildFeatureTable(contents.getTableName(),
 				geometryColumn, geometryType);
-		geoPackage.createTable(table);
+		geoPackage.createFeatureTable(table);
 
 		double random = Math.random();
 

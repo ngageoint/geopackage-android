@@ -33,6 +33,17 @@
     <string name="create_tiles_max_longitude_label">Max: </string>
     <string name="create_tiles_default_min_longitude">-180.0</string>
     <string name="create_tiles_default_max_longitude">180.0</string>
+    <string name="create_features_name_label">Name: </string>
+    <string name="create_features_latitude_label">Latitude - </string>
+    <string name="create_features_min_latitude_label">Min: </string>
+    <string name="create_features_max_latitude_label">Max: </string>
+    <string name="create_features_default_min_latitude">-90.0</string>
+    <string name="create_features_default_max_latitude">90.0</string>
+    <string name="create_features_longitude_label">Longitude - </string>
+    <string name="create_features_min_longitude_label">Min: </string>
+    <string name="create_features_max_longitude_label">Max: </string>
+    <string name="create_features_default_min_longitude">-180.0</string>
+    <string name="create_features_default_max_longitude">180.0</string>
     <string name="geopackage_view_label">View</string>
     <string name="geopackage_delete_label">Delete</string>
     <string name="geopackage_rename_label">Rename</string>
@@ -41,6 +52,7 @@
     <string name="geopackage_export_label">Export</string>
     <string name="geopackage_import_label">Import</string>
     <string name="geopackage_create_label">Create</string>
+    <string name="geopackage_create_features_label">Create Features</string>
     <string name="geopackage_create_tiles_label">Create Tiles</string>
     <string name="geopackage_import_name_label">Name:</string>
     <string name="table_image_description">Table Type</string>

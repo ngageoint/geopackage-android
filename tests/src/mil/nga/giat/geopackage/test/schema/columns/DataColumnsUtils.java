@@ -258,7 +258,7 @@ public class DataColumnsUtils {
 			tileContents.setSrs(srs);
 
 			// Create the user tile table
-			geoPackage.createTable(TestUtils.buildTileTable(tileContents
+			geoPackage.createTileTable(TestUtils.buildTileTable(tileContents
 					.getTableName()));
 
 			contentsDao.create(tileContents);
@@ -313,7 +313,7 @@ public class DataColumnsUtils {
 			featureContents.setSrs(srs);
 
 			// Create the feature table
-			geoPackage.createTable(TestUtils.buildFeatureTable(
+			geoPackage.createFeatureTable(TestUtils.buildFeatureTable(
 					featureContents.getTableName(), "geom",
 					GeometryType.GEOMETRY));
 

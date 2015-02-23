@@ -1,5 +1,7 @@
 package mil.nga.giat.geopackage.tiles;
 
+import mil.nga.giat.geopackage.BoundingBox;
+
 /**
  * Tile Bounding Box utility methods
  * 
@@ -14,8 +16,8 @@ public class TileBoundingBoxUtils {
 	 * @param boundingBox2
 	 * @return
 	 */
-	public static TileBoundingBox overlap(TileBoundingBox boundingBox,
-			TileBoundingBox boundingBox2) {
+	public static BoundingBox overlap(BoundingBox boundingBox,
+			BoundingBox boundingBox2) {
 
 		double minLongitude = Math.max(boundingBox.getMinLongitude(),
 				boundingBox2.getMinLongitude());
@@ -26,10 +28,10 @@ public class TileBoundingBoxUtils {
 		double maxLatitude = Math.min(boundingBox.getMaxLatitude(),
 				boundingBox2.getMaxLatitude());
 
-		TileBoundingBox overlap = null;
+		BoundingBox overlap = null;
 
 		if (minLongitude < maxLongitude && minLatitude < maxLatitude) {
-			overlap = new TileBoundingBox(minLongitude, maxLongitude,
+			overlap = new BoundingBox(minLongitude, maxLongitude,
 					minLatitude, maxLatitude);
 		}
 
@@ -44,7 +46,7 @@ public class TileBoundingBoxUtils {
 	 * @param longitude
 	 * @return
 	 */
-	public static float getXPixel(long width, TileBoundingBox boundingBox,
+	public static float getXPixel(long width, BoundingBox boundingBox,
 			double longitude) {
 
 		double boxWidth = boundingBox.getMaxLongitude()
@@ -64,7 +66,7 @@ public class TileBoundingBoxUtils {
 	 * @param tileRowBoundingBox
 	 * @return
 	 */
-	public static float getYPixel(long height, TileBoundingBox boundingBox,
+	public static float getYPixel(long height, BoundingBox boundingBox,
 			double latitude) {
 
 		double boxHeight = boundingBox.getMaxLatitude()

@@ -394,7 +394,7 @@ public class TestSetupTeardown {
 
 		// Create the user tile table
 		TileTable tileTable = TestUtils.buildTileTable(contents.getTableName());
-		geoPackage.createTable(tileTable);
+		geoPackage.createTileTable(tileTable);
 
 		// Create the contents
 		contentsDao.create(contents);

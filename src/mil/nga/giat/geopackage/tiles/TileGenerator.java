@@ -8,24 +8,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
-import mil.nga.giat.geopackage.core.contents.ContentsDao;
-import mil.nga.giat.geopackage.core.contents.ContentsDataType;
-import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
-import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
-import mil.nga.giat.geopackage.tiles.user.TileColumn;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
@@ -85,7 +79,7 @@ public class TileGenerator {
 	/**
 	 * Tile bounding box
 	 */
-	private TileBoundingBox boundingBox = new TileBoundingBox(-180.0, 180.0,
+	private BoundingBox boundingBox = new BoundingBox(-180.0, 180.0,
 			-90.0, 90.0);
 
 	/**
@@ -151,7 +145,7 @@ public class TileGenerator {
 	 * 
 	 * @param boundingBox
 	 */
-	public void setTileBoundingBox(TileBoundingBox boundingBox) {
+	public void setTileBoundingBox(BoundingBox boundingBox) {
 		this.boundingBox = boundingBox;
 	}
 
@@ -224,46 +218,15 @@ public class TileGenerator {
 
 		int count = 0;
 
-		SpatialReferenceSystem srs = getSrs();
+		// Create the tile table
+		TileMatrixSet tileMatrixSet = geoPackage.createTileTableWithMetadata(
+				tableName, boundingBox, (long) context.getResources()
+						.getInteger(R.integer.geopackage_srs_epsg_srs_id));
 
-		// Get the DAOs
-		ContentsDao contentsDao = geoPackage.getContentsDao();
-		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
-		TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
-
-		// Create the Tile Matrix Set and Tile Matrix tables
-		geoPackage.createTileMatrixSetTable();
-		geoPackage.createTileMatrixTable();
-
-		// Create the user tile table
-		List<TileColumn> columns = TileTable.createRequiredColumns();
-		TileTable table = new TileTable(tableName, columns);
-		geoPackage.createTable(table);
-
+		// Download and create the tiles
 		try {
-			// Create the contents
-			Contents contents = new Contents();
-			contents.setTableName(tableName);
-			contents.setDataType(ContentsDataType.TILES);
-			contents.setIdentifier(tableName);
-			contents.setLastChange(new Date());
-			contents.setMinX(boundingBox.getMinLongitude());
-			contents.setMinY(boundingBox.getMinLatitude());
-			contents.setMaxX(boundingBox.getMaxLongitude());
-			contents.setMaxY(boundingBox.getMaxLatitude());
-			contents.setSrs(srs);
-			contentsDao.create(contents);
-
-			// Create new matrix tile set
-			TileMatrixSet tileMatrixSet = new TileMatrixSet();
-			tileMatrixSet.setContents(contents);
-			tileMatrixSet.setSrs(contents.getSrs());
-			tileMatrixSet.setMinX(contents.getMinX());
-			tileMatrixSet.setMinY(contents.getMinY());
-			tileMatrixSet.setMaxX(contents.getMaxX());
-			tileMatrixSet.setMaxY(contents.getMaxY());
-			tileMatrixSetDao.create(tileMatrixSet);
-
+			Contents contents = tileMatrixSet.getContents();
+			TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
 			TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
 
 			// Create the new matrix tiles
@@ -511,7 +474,7 @@ public class TileGenerator {
 	 */
 	private String replaceBoundingBox(String url, int z, int x, int y) {
 
-		TileBoundingBox boundingBox = TileBoundingBoxAndroidUtils
+		BoundingBox boundingBox = TileBoundingBoxAndroidUtils
 				.getWebMercatorBoundingBox(x, y, z);
 
 		url = url.replaceAll(
@@ -599,26 +562,6 @@ public class TileGenerator {
 		}
 
 		return bytes;
-	}
-
-	/**
-	 * Get the Spatial Reference System, EPSG
-	 * 
-	 * @return
-	 * @throws SQLException
-	 */
-	private SpatialReferenceSystem getSrs() throws SQLException {
-		SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
-				.queryForId(
-						(long) context.getResources().getInteger(
-								R.integer.geopackage_srs_epsg_srs_id));
-		if (srs == null) {
-			throw new GeoPackageException(
-					"EPSG Spatial Reference System could not be found. SRS ID: "
-							+ context.getResources().getInteger(
-									R.integer.geopackage_srs_epsg_srs_id));
-		}
-		return srs;
 	}
 
 }

@@ -295,6 +295,19 @@ public class ContentsDao extends BaseDaoImpl<Contents, String> {
 	}
 
 	/**
+	 * Delete the table
+	 * 
+	 * @param table
+	 */
+	public void deleteTable(String table) {
+		try {
+			deleteByIdCascade(table, true);
+		} catch (SQLException e) {
+			throw new GeoPackageException("Failed to delete table: " + table, e);
+		}
+	}
+
+	/**
 	 * Verify the tables are in the expected state for the Contents create
 	 * 
 	 * @param contents

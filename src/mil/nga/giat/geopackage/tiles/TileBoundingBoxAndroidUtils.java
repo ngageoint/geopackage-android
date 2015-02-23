@@ -3,6 +3,8 @@ package mil.nga.giat.geopackage.tiles;
 import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.giat.geopackage.BoundingBox;
+
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -32,7 +34,7 @@ public class TileBoundingBoxAndroidUtils {
 	 * @return
 	 */
 	public static Rect getRectangle(long width, long height,
-			TileBoundingBox boundingBox, TileBoundingBox boundingBoxSection) {
+			BoundingBox boundingBox, BoundingBox boundingBoxSection) {
 
 		RectF rectF = getFloatRectangle(width, height, boundingBox,
 				boundingBoxSection);
@@ -55,7 +57,7 @@ public class TileBoundingBoxAndroidUtils {
 	 * @return
 	 */
 	public static RectF getFloatRectangle(long width, long height,
-			TileBoundingBox boundingBox, TileBoundingBox boundingBoxSection) {
+			BoundingBox boundingBox, BoundingBox boundingBoxSection) {
 
 		float left = TileBoundingBoxUtils.getXPixel(width, boundingBox,
 				boundingBoxSection.getMinLongitude());
@@ -80,7 +82,7 @@ public class TileBoundingBoxAndroidUtils {
 	 * @param zoom
 	 * @return
 	 */
-	public static TileBoundingBox getBoundingBox(int x, int y, int zoom) {
+	public static BoundingBox getBoundingBox(int x, int y, int zoom) {
 
 		int tilesPerSide = tilesPerSide(zoom);
 		double tileWidthDegrees = tileWidthDegrees(tilesPerSide);
@@ -92,7 +94,7 @@ public class TileBoundingBoxAndroidUtils {
 		double maxLat = 90.0 - (y * tileHeightDegrees);
 		double minLat = maxLat - tileHeightDegrees;
 
-		TileBoundingBox box = new TileBoundingBox(minLon, maxLon, minLat,
+		BoundingBox box = new BoundingBox(minLon, maxLon, minLat,
 				maxLat);
 
 		return box;
@@ -107,7 +109,7 @@ public class TileBoundingBoxAndroidUtils {
 	 * @param zoom
 	 * @return
 	 */
-	public static TileBoundingBox getWebMercatorBoundingBox(int x, int y,
+	public static BoundingBox getWebMercatorBoundingBox(int x, int y,
 			int zoom) {
 
 		int tilesPerSide = tilesPerSide(zoom);
@@ -118,7 +120,7 @@ public class TileBoundingBoxAndroidUtils {
 		double minLat = HALF_WORLD_WIDTH - ((y + 1) * tileSize);
 		double maxLat = HALF_WORLD_WIDTH - (y * tileSize);
 
-		TileBoundingBox box = new TileBoundingBox(minLon, maxLon, minLat,
+		BoundingBox box = new BoundingBox(minLon, maxLon, minLat,
 				maxLat);
 
 		return box;
@@ -131,7 +133,7 @@ public class TileBoundingBoxAndroidUtils {
 	 * @param zoom
 	 * @return
 	 */
-	public static TileGrid getTileGrid(TileBoundingBox boundingBox, int zoom) {
+	public static TileGrid getTileGrid(BoundingBox boundingBox, int zoom) {
 
 		int tilesPerSide = tilesPerSide(zoom);
 		double tileWidthDegrees = tileWidthDegrees(tilesPerSide);
@@ -206,7 +208,7 @@ public class TileBoundingBoxAndroidUtils {
 	 * @param boundingBox
 	 * @return
 	 */
-	public static double getLongitudeDistance(TileBoundingBox boundingBox) {
+	public static double getLongitudeDistance(BoundingBox boundingBox) {
 		return getLongitudeDistance(boundingBox.getMinLongitude(),
 				boundingBox.getMaxLongitude());
 	}
@@ -239,7 +241,7 @@ public class TileBoundingBoxAndroidUtils {
 	 * @param boundingBox
 	 * @return
 	 */
-	public static double getLatitudeDistance(TileBoundingBox boundingBox) {
+	public static double getLatitudeDistance(BoundingBox boundingBox) {
 		return getLatitudeDistance(boundingBox.getMinLatitude(),
 				boundingBox.getMaxLatitude());
 	}

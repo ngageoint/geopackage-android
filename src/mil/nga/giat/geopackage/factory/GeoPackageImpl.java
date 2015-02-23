@@ -2,12 +2,15 @@ package mil.nga.giat.geopackage.factory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.core.contents.ContentsDataType;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemSfSql;
@@ -23,6 +26,7 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSql;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMm;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
+import mil.nga.giat.geopackage.features.user.FeatureColumn;
 import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
@@ -42,6 +46,7 @@ import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
+import mil.nga.giat.geopackage.tiles.user.TileColumn;
 import mil.nga.giat.geopackage.tiles.user.TileCursor;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
@@ -346,8 +351,63 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void createTable(FeatureTable table) {
+	public void createFeatureTable(FeatureTable table) {
 		tableCreator.createTable(table);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GeometryColumns createFeatureTableWithMetadata(
+			GeometryColumns geometryColumns, BoundingBox boundingBox, long srsId) {
+
+		// Get the SRS
+		SpatialReferenceSystem srs = getSrs(srsId);
+
+		// Create the Geometry Columns table
+		createGeometryColumnsTable();
+
+		// Create the user feature table
+		List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
+		columns.add(FeatureColumn.createPrimaryKeyColumn(0, "id"));
+		columns.add(FeatureColumn.createGeometryColumn(1,
+				geometryColumns.getColumnName(),
+				geometryColumns.getGeometryType(), false, null));
+		FeatureTable table = new FeatureTable(geometryColumns.getTableName(),
+				columns);
+		createFeatureTable(table);
+
+		try {
+			// Create the contents
+			Contents contents = new Contents();
+			contents.setTableName(geometryColumns.getTableName());
+			contents.setDataType(ContentsDataType.FEATURES);
+			contents.setIdentifier(geometryColumns.getTableName());
+			contents.setLastChange(new Date());
+			contents.setMinX(boundingBox.getMinLongitude());
+			contents.setMinY(boundingBox.getMinLatitude());
+			contents.setMaxX(boundingBox.getMaxLongitude());
+			contents.setMaxY(boundingBox.getMaxLatitude());
+			contents.setSrs(srs);
+			getContentsDao().create(contents);
+
+			// Create new geometry columns
+			geometryColumns.setContents(contents);
+			geometryColumns.setSrs(contents.getSrs());
+			getGeometryColumnsDao().create(geometryColumns);
+
+		} catch (RuntimeException e) {
+			deleteTableQuietly(geometryColumns.getTableName());
+			throw e;
+		} catch (SQLException e) {
+			deleteTableQuietly(geometryColumns.getTableName());
+			throw new GeoPackageException(
+					"Failed to create table and metadata: "
+							+ geometryColumns.getTableName(), e);
+		}
+
+		return geometryColumns;
 	}
 
 	/**
@@ -544,8 +604,101 @@ class GeoPackageImpl implements GeoPackage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void createTable(TileTable table) {
+	public void createTileTable(TileTable table) {
 		tableCreator.createTable(table);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public TileMatrixSet createTileTableWithMetadata(String tableName,
+			BoundingBox boundingBox, long srsId) {
+
+		TileMatrixSet tileMatrixSet = null;
+
+		// Get the SRS
+		SpatialReferenceSystem srs = getSrs(srsId);
+
+		// Create the Tile Matrix Set and Tile Matrix tables
+		createTileMatrixSetTable();
+		createTileMatrixTable();
+
+		// Create the user tile table
+		List<TileColumn> columns = TileTable.createRequiredColumns();
+		TileTable table = new TileTable(tableName, columns);
+		createTileTable(table);
+
+		try {
+			// Create the contents
+			Contents contents = new Contents();
+			contents.setTableName(tableName);
+			contents.setDataType(ContentsDataType.TILES);
+			contents.setIdentifier(tableName);
+			contents.setLastChange(new Date());
+			contents.setMinX(boundingBox.getMinLongitude());
+			contents.setMinY(boundingBox.getMinLatitude());
+			contents.setMaxX(boundingBox.getMaxLongitude());
+			contents.setMaxY(boundingBox.getMaxLatitude());
+			contents.setSrs(srs);
+			getContentsDao().create(contents);
+
+			// Create new matrix tile set
+			tileMatrixSet = new TileMatrixSet();
+			tileMatrixSet.setContents(contents);
+			tileMatrixSet.setSrs(contents.getSrs());
+			tileMatrixSet.setMinX(contents.getMinX());
+			tileMatrixSet.setMinY(contents.getMinY());
+			tileMatrixSet.setMaxX(contents.getMaxX());
+			tileMatrixSet.setMaxY(contents.getMaxY());
+			getTileMatrixSetDao().create(tileMatrixSet);
+
+		} catch (RuntimeException e) {
+			deleteTableQuietly(tableName);
+			throw e;
+		} catch (SQLException e) {
+			deleteTableQuietly(tableName);
+			throw new GeoPackageException(
+					"Failed to create table and metadata: " + tableName, e);
+		}
+
+		return tileMatrixSet;
+	}
+
+	/**
+	 * Get the Spatial Reference System by id
+	 * 
+	 * @param srsId
+	 * @return
+	 */
+	private SpatialReferenceSystem getSrs(long srsId) {
+		SpatialReferenceSystem srs;
+		try {
+			srs = getSpatialReferenceSystemDao().queryForId(srsId);
+		} catch (SQLException e1) {
+			throw new GeoPackageException(
+					"Failed to retrieve Spatial Reference System. SRS ID: "
+							+ srsId);
+		}
+		if (srs == null) {
+			throw new GeoPackageException(
+					"Spatial Reference System could not be found. SRS ID: "
+							+ srsId);
+		}
+		return srs;
+	}
+
+	/**
+	 * Attempt to quietly delete the table
+	 * 
+	 * @param tableName
+	 */
+	private void deleteTableQuietly(String tableName) {
+		try {
+			deleteTable(tableName);
+		} catch (Exception e) {
+			// eat
+		}
 	}
 
 	/**
@@ -689,11 +842,7 @@ class GeoPackageImpl implements GeoPackage {
 	@Override
 	public void deleteTable(String table) {
 		ContentsDao contentsDao = getContentsDao();
-		try {
-			contentsDao.deleteByIdCascade(table, true);
-		} catch (SQLException e) {
-			throw new GeoPackageException("Failed to delete table: " + table, e);
-		}
+		contentsDao.deleteTable(table);
 	}
 
 	/**

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
@@ -20,7 +21,7 @@ import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
-import mil.nga.giat.geopackage.tiles.TileBoundingBox;
+import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.tiles.TileGenerator;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
@@ -221,6 +222,7 @@ public class GeoPackageManagerFragment extends Fragment {
 		adapter.add(getString(R.string.geopackage_rename_label));
 		adapter.add(getString(R.string.geopackage_copy_label));
 		adapter.add(getString(R.string.geopackage_export_label));
+		adapter.add(getString(R.string.geopackage_create_features_label));
 		adapter.add(getString(R.string.geopackage_create_tiles_label));
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(database);
@@ -246,6 +248,9 @@ public class GeoPackageManagerFragment extends Fragment {
 						exportDatabaseOption(database);
 						break;
 					case 5:
+						createFeaturesOption(database);
+						break;
+					case 6:
 						createTilesOption(database);
 						break;
 					default:
@@ -499,6 +504,119 @@ public class GeoPackageManagerFragment extends Fragment {
 	}
 
 	/**
+	 * Create features option
+	 * 
+	 * @param database
+	 */
+	private void createFeaturesOption(final String database) {
+
+		LayoutInflater inflater = LayoutInflater.from(getActivity());
+		View createFeaturesView = inflater.inflate(R.layout.create_features,
+				null);
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+		dialog.setView(createFeaturesView);
+
+		final EditText nameInput = (EditText) createFeaturesView
+				.findViewById(R.id.create_features_name_input);
+		final EditText minLatInput = (EditText) createFeaturesView
+				.findViewById(R.id.create_features_min_latitude_input);
+		final EditText maxLatInput = (EditText) createFeaturesView
+				.findViewById(R.id.create_features_max_latitude_input);
+		final EditText minLonInput = (EditText) createFeaturesView
+				.findViewById(R.id.create_features_min_longitude_input);
+		final EditText maxLonInput = (EditText) createFeaturesView
+				.findViewById(R.id.create_features_max_longitude_input);
+
+		minLatInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-90.0, 90.0) });
+		maxLatInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-90.0, 90.0) });
+
+		minLonInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-180.0, 180.0) });
+		maxLonInput
+				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
+						-180.0, 180.0) });
+
+		dialog.setPositiveButton(
+				getString(R.string.geopackage_create_features_label),
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+
+						try {
+
+							String tableName = nameInput.getText().toString();
+							if (tableName == null || tableName.isEmpty()) {
+								throw new GeoPackageException(
+										getString(R.string.create_features_name_label)
+												+ " is required");
+							}
+							double minLat = Double.valueOf(minLatInput
+									.getText().toString());
+							double maxLat = Double.valueOf(maxLatInput
+									.getText().toString());
+							double minLon = Double.valueOf(minLonInput
+									.getText().toString());
+							double maxLon = Double.valueOf(maxLonInput
+									.getText().toString());
+
+							if (minLat > maxLat) {
+								throw new GeoPackageException(
+										getString(R.string.create_features_min_latitude_label)
+												+ " can not be larger than "
+												+ getString(R.string.create_features_max_latitude_label));
+							}
+
+							if (minLon > maxLon) {
+								throw new GeoPackageException(
+										getString(R.string.create_features_min_longitude_label)
+												+ " can not be larger than "
+												+ getString(R.string.create_features_max_longitude_label));
+							}
+
+							BoundingBox boundingBox = new BoundingBox(minLon,
+									maxLon, minLat, maxLat);
+
+							GeometryColumns geometryColumns = new GeometryColumns();
+							geometryColumns.setId(new TableColumnKey(tableName,
+									"geom"));
+							geometryColumns
+									.setGeometryType(GeometryType.GEOMETRY);
+							geometryColumns.setZ((byte) 0);
+							geometryColumns.setM((byte) 0);
+
+							GeoPackage geoPackage = manager.open(database);
+							try {
+								geoPackage.createFeatureTableWithMetadata(
+										geometryColumns, boundingBox, 4326);
+							} finally {
+								geoPackage.close();
+							}
+							update();
+
+						} catch (Exception e) {
+							showMessage(
+									getString(R.string.geopackage_create_features_label),
+									e.getMessage());
+						}
+					}
+				}).setNegativeButton(getString(R.string.button_cancel_label),
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+		dialog.show();
+	}
+
+	/**
 	 * Create tiles option
 	 * 
 	 * @param database
@@ -622,84 +740,116 @@ public class GeoPackageManagerFragment extends Fragment {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 
-						String tableName = nameInput.getText().toString();
-						String tileUrl = urlInput.getText().toString();
-						int minZoom = Integer.valueOf(minZoomInput.getText()
-								.toString());
-						int maxZoom = Integer.valueOf(maxZoomInput.getText()
-								.toString());
-						double minLat = Double.valueOf(minLatInput.getText()
-								.toString());
-						double maxLat = Double.valueOf(maxLatInput.getText()
-								.toString());
-						double minLon = Double.valueOf(minLonInput.getText()
-								.toString());
-						double maxLon = Double.valueOf(maxLonInput.getText()
-								.toString());
+						try {
 
-						if (minZoom > maxZoom) {
+							String tableName = nameInput.getText().toString();
+							if (tableName == null || tableName.isEmpty()) {
+								throw new GeoPackageException(
+										getString(R.string.create_tiles_name_label)
+												+ " is required");
+							}
+							String tileUrl = urlInput.getText().toString();
+							int minZoom = Integer.valueOf(minZoomInput
+									.getText().toString());
+							int maxZoom = Integer.valueOf(maxZoomInput
+									.getText().toString());
+							double minLat = Double.valueOf(minLatInput
+									.getText().toString());
+							double maxLat = Double.valueOf(maxLatInput
+									.getText().toString());
+							double minLon = Double.valueOf(minLonInput
+									.getText().toString());
+							double maxLon = Double.valueOf(maxLonInput
+									.getText().toString());
+
+							if (minZoom > maxZoom) {
+								throw new GeoPackageException(
+										getString(R.string.create_tiles_min_zoom_label)
+												+ " can not be larger than "
+												+ getString(R.string.create_tiles_max_zoom_label));
+							}
+
+							if (minLat > maxLat) {
+								throw new GeoPackageException(
+										getString(R.string.create_tiles_min_latitude_label)
+												+ " can not be larger than "
+												+ getString(R.string.create_tiles_max_latitude_label));
+							}
+
+							if (minLon > maxLon) {
+								throw new GeoPackageException(
+										getString(R.string.create_tiles_min_longitude_label)
+												+ " can not be larger than "
+												+ getString(R.string.create_tiles_max_longitude_label));
+							}
+
+							CompressFormat compressFormat = null;
+							Integer compressQuality = null;
+							BoundingBox boundingBox = new BoundingBox(minLon,
+									maxLon, minLat, maxLat);
+
+							// If not importing tiles, just create the table
+							if (tileUrl == null || tileUrl.isEmpty()) {
+								GeoPackage geoPackage = manager.open(database);
+								try {
+									geoPackage.createTileTableWithMetadata(
+											tableName, boundingBox, 4326);
+								} finally {
+									geoPackage.close();
+								}
+								update();
+							} else {
+								// Import tiles
+
+								final CreateTilesTask createTilesTask = new CreateTilesTask();
+
+								GeoPackage geoPackage = manager.open(database);
+								TileGenerator tileGenerator = new TileGenerator(
+										getActivity(), geoPackage, tableName,
+										tileUrl, minZoom, maxZoom);
+								tileGenerator.setCompressFormat(compressFormat);
+								tileGenerator
+										.setCompressQuality(compressQuality);
+								tileGenerator.setTileBoundingBox(boundingBox);
+								tileGenerator.setProgress(createTilesTask);
+
+								createTilesTask.setTileGenerator(tileGenerator);
+
+								progressDialog = new ProgressDialog(
+										getActivity());
+								progressDialog
+										.setMessage(getString(R.string.geopackage_create_tiles_label)
+												+ ": "
+												+ database
+												+ " - "
+												+ tableName);
+								progressDialog.setCancelable(false);
+								progressDialog
+										.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+								progressDialog.setIndeterminate(false);
+								progressDialog.setMax(tileGenerator
+										.getTileCount());
+								progressDialog
+										.setButton(
+												ProgressDialog.BUTTON_NEGATIVE,
+												getString(R.string.button_cancel_label),
+												new DialogInterface.OnClickListener() {
+													@Override
+													public void onClick(
+															DialogInterface dialog,
+															int which) {
+														createTilesTask
+																.cancel(true);
+													}
+												});
+
+								createTilesTask.execute();
+							}
+						} catch (Exception e) {
 							showMessage(
 									getString(R.string.geopackage_create_tiles_label),
-									getString(R.string.create_tiles_min_zoom_label)
-											+ " can not be larger than "
-											+ getString(R.string.create_tiles_max_zoom_label));
+									e.getMessage());
 						}
-
-						if (minLat > maxLat) {
-							showMessage(
-									getString(R.string.geopackage_create_tiles_label),
-									getString(R.string.create_tiles_min_latitude_label)
-											+ " can not be larger than "
-											+ getString(R.string.create_tiles_max_latitude_label));
-						}
-
-						if (minLon > maxLon) {
-							showMessage(
-									getString(R.string.geopackage_create_tiles_label),
-									getString(R.string.create_tiles_min_longitude_label)
-											+ " can not be larger than "
-											+ getString(R.string.create_tiles_max_longitude_label));
-						}
-
-						CompressFormat compressFormat = null;
-						Integer compressQuality = null;
-						TileBoundingBox boundingBox = new TileBoundingBox(
-								minLon, maxLon, minLat, maxLat);
-
-						final CreateTilesTask createTilesTask = new CreateTilesTask();
-
-						GeoPackage geoPackage = manager.open(database);
-						TileGenerator tileGenerator = new TileGenerator(
-								getActivity(), geoPackage, tableName, tileUrl,
-								minZoom, maxZoom);
-						tileGenerator.setCompressFormat(compressFormat);
-						tileGenerator.setCompressQuality(compressQuality);
-						tileGenerator.setTileBoundingBox(boundingBox);
-						tileGenerator.setProgress(createTilesTask);
-
-						createTilesTask.setTileGenerator(tileGenerator);
-
-						progressDialog = new ProgressDialog(getActivity());
-						progressDialog
-								.setMessage(getString(R.string.geopackage_create_tiles_label)
-										+ ": " + database + " - " + tableName);
-						progressDialog.setCancelable(false);
-						progressDialog
-								.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-						progressDialog.setIndeterminate(false);
-						progressDialog.setMax(tileGenerator.getTileCount());
-						progressDialog.setButton(
-								ProgressDialog.BUTTON_NEGATIVE,
-								getString(R.string.button_cancel_label),
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										createTilesTask.cancel(true);
-									}
-								});
-
-						createTilesTask.execute();
 					}
 				}).setNegativeButton(getString(R.string.button_cancel_label),
 				new DialogInterface.OnClickListener() {

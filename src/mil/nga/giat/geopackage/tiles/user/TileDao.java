@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
@@ -12,7 +13,6 @@ import mil.nga.giat.geopackage.geom.unit.CoordinateConverter;
 import mil.nga.giat.geopackage.geom.unit.DegreeConverter;
 import mil.nga.giat.geopackage.geom.unit.DistanceConverter;
 import mil.nga.giat.geopackage.geom.unit.MeterConverter;
-import mil.nga.giat.geopackage.tiles.TileBoundingBox;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.user.UserDao;
@@ -324,7 +324,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @return cursor from query or null if the zoom level tile ranges do not
 	 *         overlap the bounding box
 	 */
-	public TileCursor queryByBoundingBox(TileBoundingBox boundingBox,
+	public TileCursor queryByBoundingBox(BoundingBox boundingBox,
 			long zoomLevel) {
 
 		TileCursor tileCursor = null;
@@ -377,7 +377,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @return
 	 */
 	public TileMatrixRange getTileColumnRange(TileMatrix tileMatrix,
-			TileBoundingBox boundingBox) {
+			BoundingBox boundingBox) {
 		return getTileColumnRange(tileMatrix, boundingBox.getMinLongitude(),
 				boundingBox.getMaxLongitude());
 	}
@@ -460,7 +460,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @return
 	 */
 	public TileMatrixRange getTileRowRange(TileMatrix tileMatrix,
-			TileBoundingBox boundingBox) {
+			BoundingBox boundingBox) {
 		return getTileRowRange(tileMatrix, boundingBox.getMinLatitude(),
 				boundingBox.getMaxLatitude());
 	}
@@ -541,7 +541,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @param tileRow
 	 * @return
 	 */
-	public TileBoundingBox getBoundingBox(TileRow tileRow) {
+	public BoundingBox getBoundingBox(TileRow tileRow) {
 
 		// Get the tile matrix at the zoom level
 		TileMatrix tileMatrix = getTileMatrix(tileRow.getZoomLevel());
@@ -556,7 +556,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @param tileRow
 	 * @return
 	 */
-	public TileBoundingBox getBoundingBox(long zoomLevel, TileRow tileRow) {
+	public BoundingBox getBoundingBox(long zoomLevel, TileRow tileRow) {
 
 		// Get the tile matrix at the zoom level
 		TileMatrix tileMatrix = getTileMatrix(zoomLevel);
@@ -571,7 +571,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @param tileRow
 	 * @return
 	 */
-	public TileBoundingBox getBoundingBox(TileMatrix tileMatrix, TileRow tileRow) {
+	public BoundingBox getBoundingBox(TileMatrix tileMatrix, TileRow tileRow) {
 
 		long column = tileRow.getTileColumn();
 		long row = tileRow.getTileRow();
@@ -600,7 +600,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		double maxLat = matrixMaxY - (tileHeight * row);
 		double minLat = maxLat - tileHeight;
 
-		TileBoundingBox boundingBox = new TileBoundingBox(minLon, maxLon,
+		BoundingBox boundingBox = new BoundingBox(minLon, maxLon,
 				minLat, maxLat);
 
 		return boundingBox;

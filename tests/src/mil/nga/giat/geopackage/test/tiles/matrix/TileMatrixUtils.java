@@ -247,7 +247,7 @@ public class TileMatrixUtils {
 			contents.setSrs(srs);
 
 			// Create the user tile table
-			geoPackage.createTable(TestUtils.buildTileTable(contents
+			geoPackage.createTileTable(TestUtils.buildTileTable(contents
 					.getTableName()));
 
 			contentsDao.create(contents);

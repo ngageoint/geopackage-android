@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import junit.framework.TestCase;
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.test.TestConstants;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
-import mil.nga.giat.geopackage.tiles.TileBoundingBox;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
@@ -867,7 +867,7 @@ public class TileUtils {
 
 					long zoomLevel = dao.getZoomLevel(width, height);
 
-					TileBoundingBox boundingBox = new TileBoundingBox(-180.0,
+					BoundingBox boundingBox = new BoundingBox(-180.0,
 							180.0, -90.0, 90.0);
 					TileCursor cursor = dao.queryByBoundingBox(boundingBox,
 							zoomLevel);
@@ -885,7 +885,7 @@ public class TileUtils {
 					double minLon = ((maxLon + 180.0) * Math.random()) - 180.0;
 					double maxLat = (180.0 * Math.random()) - 90.0;
 					double minLat = ((maxLon + 90.0) * Math.random()) - 90.0;
-					boundingBox = new TileBoundingBox(minLon, maxLon, minLat,
+					boundingBox = new BoundingBox(minLon, maxLon, minLat,
 							maxLat);
 					cursor = dao.queryByBoundingBox(boundingBox, zoomLevel);
 					cursorCount = cursor != null ? cursor.getCount() : 0;

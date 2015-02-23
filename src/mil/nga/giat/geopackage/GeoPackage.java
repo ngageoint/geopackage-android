@@ -154,7 +154,18 @@ public interface GeoPackage {
 	 * 
 	 * @param table
 	 */
-	public void createTable(FeatureTable table);
+	public void createFeatureTable(FeatureTable table);
+
+	/**
+	 * Create a new feature table with GeoPackage metadata
+	 * 
+	 * @param geometryColumns
+	 * @param boundingBox
+	 * @param srsId
+	 * @return
+	 */
+	public GeometryColumns createFeatureTableWithMetadata(
+			GeometryColumns geometryColumns, BoundingBox boundingBox, long srsId);
 
 	/**
 	 * Get a Tile Matrix Set DAO
@@ -249,7 +260,18 @@ public interface GeoPackage {
 	 * 
 	 * @param table
 	 */
-	public void createTable(TileTable table);
+	public void createTileTable(TileTable table);
+
+	/**
+	 * Create a new tile table and the GeoPackage metadata
+	 * 
+	 * @param tableName
+	 * @param boundingBox
+	 * @param srsId
+	 * @return tile matrix set
+	 */
+	public TileMatrixSet createTileTableWithMetadata(String tableName,
+			BoundingBox boundingBox, long srsId);
 
 	/**
 	 * Get a Data Columns DAO

@@ -204,7 +204,7 @@ public class GeoPackageTableCreator {
 		// Verify the table does not already exist
 		if (GeoPackageDatabaseUtils.tableExists(db, table.getTableName())) {
 			throw new GeoPackageException(
-					"Feature Table already exists and can not be created: "
+					"Table already exists and can not be created: "
 							+ table.getTableName());
 		}
 

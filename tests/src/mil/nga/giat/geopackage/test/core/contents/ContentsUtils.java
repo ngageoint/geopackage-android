@@ -262,7 +262,7 @@ public class ContentsUtils {
 		contents.setSrs(srs);
 
 		// Create the feature table
-		geoPackage.createTable(TestUtils.buildFeatureTable(
+		geoPackage.createFeatureTable(TestUtils.buildFeatureTable(
 				contents.getTableName(), "geom", GeometryType.GEOMETRY));
 
 		geoPackage.createGeometryColumnsTable();

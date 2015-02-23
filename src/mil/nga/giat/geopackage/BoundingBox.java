@@ -1,11 +1,11 @@
-package mil.nga.giat.geopackage.tiles;
+package mil.nga.giat.geopackage;
 
 /**
- * Tile Bounding Box with longitude and latitude ranges in degrees
+ * Bounding Box with longitude and latitude ranges in degrees
  * 
  * @author osbornb
  */
-public class TileBoundingBox {
+public class BoundingBox {
 
 	/**
 	 * Min longitude in degrees
@@ -30,7 +30,7 @@ public class TileBoundingBox {
 	/**
 	 * Constructor
 	 */
-	public TileBoundingBox() {
+	public BoundingBox() {
 		this(-180.0, 180.0, -90.0, 90.0);
 	}
 
@@ -42,7 +42,7 @@ public class TileBoundingBox {
 	 * @param minLatitude
 	 * @param maxLatitude
 	 */
-	public TileBoundingBox(double minLongitude, double maxLongitude,
+	public BoundingBox(double minLongitude, double maxLongitude,
 			double minLatitude, double maxLatitude) {
 		this.minLongitude = minLongitude;
 		this.maxLongitude = maxLongitude;
