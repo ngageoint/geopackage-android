@@ -2,9 +2,11 @@ package mil.nga.giat.geopackage.tiles;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -126,7 +128,12 @@ public class TileGenerator {
 		this.context = context;
 		this.geoPackage = geoPackage;
 		this.tableName = tableName;
-		this.tileUrl = tileUrl;
+		try {
+			this.tileUrl = URLDecoder.decode(tileUrl, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new GeoPackageException("Failed to decode tile url: "
+					+ tileUrl, e);
+		}
 		this.minZoom = minZoom;
 		this.maxZoom = maxZoom;
 		this.urlHasXYZ = hasXYZ(tileUrl);
@@ -358,8 +365,10 @@ public class TileGenerator {
 					// Compress the image
 					if (compressFormat != null) {
 						bitmap = BitmapConverter.toBitmap(tileBytes);
-						tileBytes = BitmapConverter.toBytes(bitmap,
-								compressFormat, compressQuality);
+						if (bitmap != null) {
+							tileBytes = BitmapConverter.toBytes(bitmap,
+									compressFormat, compressQuality);
+						}
 					}
 
 					// Create a new tile row
@@ -377,8 +386,10 @@ public class TileGenerator {
 						if (bitmap == null) {
 							bitmap = BitmapConverter.toBitmap(tileBytes);
 						}
-						tileWidth = bitmap.getWidth();
-						tileHeight = bitmap.getHeight();
+						if (bitmap != null) {
+							tileWidth = bitmap.getWidth();
+							tileHeight = bitmap.getHeight();
+						}
 					}
 				} catch (Exception e) {
 					// Skip this tile, don't increase count
@@ -393,33 +404,61 @@ public class TileGenerator {
 
 		}
 
-		// Get the bounding box of the the middle coordinate
-		int middleRowAndColumn = matrixLength / 2;
-		TileBoundingBox boundingBox = TileBoundingBoxAndroidUtils
-				.getBoundingBox(middleRowAndColumn, middleRowAndColumn,
-						zoomLevel);
+		// If none of the tiles were translated into a bitmap with dimensions,
+		// delete them
+		if (tileWidth == null || tileHeight == null) {
+			count = 0;
 
-		// Get the distances from the middle bounding box
-		double longitudeDistance = TileBoundingBoxAndroidUtils
-				.getLongitudeDistance(boundingBox);
-		double latitudeDistance = TileBoundingBoxAndroidUtils
-				.getLatitudeDistance(boundingBox);
+			StringBuilder where = new StringBuilder();
 
-		// Calculate pixel sizes
-		double pixelXSize = longitudeDistance / tileWidth;
-		double pixelYSize = latitudeDistance / tileHeight;
+			where.append(tileDao.buildWhere(TileTable.COLUMN_ZOOM_LEVEL,
+					zoomLevel));
 
-		// Create the tile matrix for this zoom level
-		TileMatrix tileMatrix = new TileMatrix();
-		tileMatrix.setContents(contents);
-		tileMatrix.setZoomLevel(zoomLevel);
-		tileMatrix.setMatrixWidth(matrixLength);
-		tileMatrix.setMatrixHeight(matrixLength);
-		tileMatrix.setTileWidth(tileWidth);
-		tileMatrix.setTileHeight(tileHeight);
-		tileMatrix.setPixelXSize(pixelXSize);
-		tileMatrix.setPixelYSize(pixelYSize);
-		tileMatrixDao.create(tileMatrix);
+			where.append(" AND ");
+			where.append(tileDao.buildWhere(TileTable.COLUMN_TILE_COLUMN,
+					tileGrid.getMinX(), ">="));
+
+			where.append(" AND ");
+			where.append(tileDao.buildWhere(TileTable.COLUMN_TILE_COLUMN,
+					tileGrid.getMaxX(), "<="));
+
+			where.append(" AND ");
+			where.append(tileDao.buildWhere(TileTable.COLUMN_TILE_ROW,
+					tileGrid.getMinY(), ">="));
+
+			where.append(" AND ");
+			where.append(tileDao.buildWhere(TileTable.COLUMN_TILE_ROW,
+					tileGrid.getMaxY(), "<="));
+
+			String[] whereArgs = tileDao.buildWhereArgs(new Object[] {
+					zoomLevel, tileGrid.getMinX(), tileGrid.getMaxX(),
+					tileGrid.getMinY(), tileGrid.getMaxY() });
+
+			tileDao.delete(where.toString(), whereArgs);
+		} else {
+
+			// Get the tile size
+			int tilesPerSide = TileBoundingBoxAndroidUtils
+					.tilesPerSide(zoomLevel);
+			double tileSize = TileBoundingBoxAndroidUtils
+					.tileSize(tilesPerSide);
+
+			// Calculate pixel sizes
+			double pixelXSize = tileSize / tileWidth;
+			double pixelYSize = tileSize / tileHeight;
+
+			// Create the tile matrix for this zoom level
+			TileMatrix tileMatrix = new TileMatrix();
+			tileMatrix.setContents(contents);
+			tileMatrix.setZoomLevel(zoomLevel);
+			tileMatrix.setMatrixWidth(matrixLength);
+			tileMatrix.setMatrixHeight(matrixLength);
+			tileMatrix.setTileWidth(tileWidth);
+			tileMatrix.setTileHeight(tileHeight);
+			tileMatrix.setPixelXSize(pixelXSize);
+			tileMatrix.setPixelYSize(pixelYSize);
+			tileMatrixDao.create(tileMatrix);
+		}
 
 		return count;
 	}
@@ -473,7 +512,7 @@ public class TileGenerator {
 	private String replaceBoundingBox(String url, int z, int x, int y) {
 
 		TileBoundingBox boundingBox = TileBoundingBoxAndroidUtils
-				.getBoundingBox(x, y, z);
+				.getWebMercatorBoundingBox(x, y, z);
 
 		url = url.replaceAll(
 				context.getString(R.string.tile_generator_variable_min_lat),
@@ -486,7 +525,7 @@ public class TileGenerator {
 				String.valueOf(boundingBox.getMinLongitude()));
 		url = url.replaceAll(
 				context.getString(R.string.tile_generator_variable_max_lon),
-				String.valueOf(boundingBox.getMinLongitude()));
+				String.valueOf(boundingBox.getMaxLongitude()));
 
 		return url;
 	}

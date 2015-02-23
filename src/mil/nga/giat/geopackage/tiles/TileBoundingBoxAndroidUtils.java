@@ -17,6 +17,11 @@ import com.google.maps.android.SphericalUtil;
 public class TileBoundingBoxAndroidUtils {
 
 	/**
+	 * Half the world distance in either direction
+	 */
+	private static double HALF_WORLD_WIDTH = 20037508.34789244;
+
+	/**
 	 * Get a rectangle using the tile width, height, bounding box, and the
 	 * bounding box section within the outer box to build the rectangle from
 	 * 
@@ -94,6 +99,32 @@ public class TileBoundingBoxAndroidUtils {
 	}
 
 	/**
+	 * Get the Web Mercator tile bounding box from the Google Maps API tile
+	 * coordinates and zoom level
+	 * 
+	 * @param x
+	 * @param y
+	 * @param zoom
+	 * @return
+	 */
+	public static TileBoundingBox getWebMercatorBoundingBox(int x, int y,
+			int zoom) {
+
+		int tilesPerSide = tilesPerSide(zoom);
+		double tileSize = tileSize(tilesPerSide);
+
+		double minLon = (-1 * HALF_WORLD_WIDTH) + (x * tileSize);
+		double maxLon = (-1 * HALF_WORLD_WIDTH) + ((x + 1) * tileSize);
+		double minLat = HALF_WORLD_WIDTH - ((y + 1) * tileSize);
+		double maxLat = HALF_WORLD_WIDTH - (y * tileSize);
+
+		TileBoundingBox box = new TileBoundingBox(minLon, maxLon, minLat,
+				maxLat);
+
+		return box;
+	}
+
+	/**
 	 * Get the tile grid that includes the entire tile bounding box
 	 * 
 	 * @param boundingBox
@@ -127,6 +158,16 @@ public class TileBoundingBoxAndroidUtils {
 		TileGrid grid = new TileGrid(minX, maxX, minY, maxY);
 
 		return grid;
+	}
+
+	/**
+	 * Get the tile size in meters
+	 * 
+	 * @param tilesPerSide
+	 * @return
+	 */
+	public static double tileSize(int tilesPerSide) {
+		return (2 * HALF_WORLD_WIDTH) / tilesPerSide;
 	}
 
 	/**

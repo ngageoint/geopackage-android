@@ -67,22 +67,27 @@
         <item>haiti-vectors-split</item>
         <item>geonames_belgium</item>
     </string-array>
+    
     <string-array name="preloaded_tile_url_labels">
         <item>OpenStreetMap</item>
         <item>MapQuest-OSM</item>
         <item>MapQuest Open Aerial</item>
+        <item>nowCOAST</item>
     </string-array>
     <string-array name="preloaded_tile_url_names">
         <item>openstreetmap</item>
         <item>mapquest_osm</item>
         <item>mapquest_open_aerial</item>
+        <item>nowCOAST</item>
     </string-array>
     <string-array name="preloaded_tile_urls">
         <item>http://a.tile.openstreetmap.org/{z}/{x}/{y}.png</item>
         <item>http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png</item>
         <item>http://otile1.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png</item>
+        <item>http://nowcoast.noaa.gov/wms/com.esri.wms.Esrimap/obs?service=wms%26version=1.1.1%26request=GetMap%26format=jpeg%26BBOX={minLon},{minLat},{maxLon},{maxLat}%26SRS=EPSG:900913%26width=256%26height=256%26Layers=world_countries,RAS_GOES,RAS_RIDGE_NEXRAD</item>
     </string-array>
     <integer-array name="preloaded_tile_url_min_zoom">
+        <item>0</item>
         <item>0</item>
         <item>0</item>
         <item>0</item>
@@ -91,13 +96,16 @@
         <item>17</item>
         <item>21</item>
         <item>21</item>
+        <item>21</item>
     </integer-array>
     <integer-array name="preloaded_tile_url_default_min_zoom">
         <item>1</item>
         <item>0</item>
         <item>0</item>
+        <item>0</item>
     </integer-array>
     <integer-array name="preloaded_tile_url_default_max_zoom">
+        <item>5</item>
         <item>5</item>
         <item>5</item>
         <item>5</item>
