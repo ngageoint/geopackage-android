@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -338,6 +339,17 @@ public class GeoPackageMapFragment extends Fragment {
 				if (task.isCancelled()) {
 					break;
 				}
+			}
+
+			if (featuresLeft <= 0) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(getActivity(),
+								"Max Features Drawn: " + getMaxFeatures(),
+								Toast.LENGTH_SHORT).show();
+					}
+				});
 			}
 
 		}
