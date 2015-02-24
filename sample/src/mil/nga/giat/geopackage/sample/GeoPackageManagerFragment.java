@@ -53,6 +53,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 /**
@@ -629,6 +630,10 @@ public class GeoPackageManagerFragment extends Fragment {
 				.findViewById(R.id.load_tiles_min_zoom_input);
 		final EditText maxZoomInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_max_zoom_input);
+		final Spinner compressFormatInput = (Spinner) createTilesView
+				.findViewById(R.id.load_tiles_compress_format);
+		final EditText compressQualityInput = (EditText) createTilesView
+				.findViewById(R.id.load_tiles_compress_quality);
 		final EditText minLatInput = (EditText) createTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
 		final EditText maxLatInput = (EditText) createTilesView
@@ -644,7 +649,7 @@ public class GeoPackageManagerFragment extends Fragment {
 				maxLonInput, preloadedLocationsButton);
 
 		prepareTileLoadInputs(minZoomInput, maxZoomInput, preloadedUrlsButton,
-				nameInput, urlInput);
+				nameInput, urlInput, compressFormatInput, compressQualityInput);
 
 		dialog.setPositiveButton(
 				getString(R.string.geopackage_create_tiles_label),
@@ -691,6 +696,15 @@ public class GeoPackageManagerFragment extends Fragment {
 
 							CompressFormat compressFormat = null;
 							Integer compressQuality = null;
+							if (compressFormatInput.getSelectedItemPosition() > 0) {
+								compressFormat = CompressFormat
+										.valueOf(compressFormatInput
+												.getSelectedItem().toString());
+								compressQuality = Integer
+										.valueOf(compressQualityInput.getText()
+												.toString());
+							}
+
 							BoundingBox boundingBox = new BoundingBox(minLon,
 									maxLon, minLat, maxLat);
 
@@ -736,23 +750,32 @@ public class GeoPackageManagerFragment extends Fragment {
 	 * @param button
 	 * @param nameInput
 	 * @param urlInput
+	 * @param compressFormatInput
+	 * @param compressQualityInput
 	 */
 	private void prepareTileLoadInputs(final EditText minZoomInput,
 			final EditText maxZoomInput, Button button,
-			final EditText nameInput, final EditText urlInput) {
+			final EditText nameInput, final EditText urlInput,
+			final Spinner compressFormatInput,
+			final EditText compressQualityInput) {
 		int minZoom = getResources().getInteger(
-				R.integer.create_tiles_min_zoom_default);
+				R.integer.load_tiles_min_zoom_default);
 		int maxZoom = getResources().getInteger(
-				R.integer.create_tiles_max_zoom_default);
+				R.integer.load_tiles_max_zoom_default);
 		minZoomInput.setFilters(new InputFilter[] { new InputFilterMinMax(
 				minZoom, maxZoom) });
 		maxZoomInput.setFilters(new InputFilter[] { new InputFilterMinMax(
 				minZoom, maxZoom) });
 
 		minZoomInput.setText(String.valueOf(getResources().getInteger(
-				R.integer.create_tiles_default_min_zoom_default)));
+				R.integer.load_tiles_default_min_zoom_default)));
 		maxZoomInput.setText(String.valueOf(getResources().getInteger(
-				R.integer.create_tiles_default_max_zoom_default)));
+				R.integer.load_tiles_default_max_zoom_default)));
+
+		compressQualityInput
+				.setFilters(new InputFilter[] { new InputFilterMinMax(0, 100) });
+		compressQualityInput.setText(String.valueOf(getResources().getInteger(
+				R.integer.load_tiles_compress_quality_default)));
 
 		button.setOnClickListener(new View.OnClickListener() {
 
@@ -1275,34 +1298,38 @@ public class GeoPackageManagerFragment extends Fragment {
 	private void loadTilesTableOption(final GeoPackageTable table) {
 
 		LayoutInflater inflater = LayoutInflater.from(getActivity());
-		View createTilesView = inflater.inflate(R.layout.load_tiles, null);
+		View loadTilesView = inflater.inflate(R.layout.load_tiles, null);
 		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-		dialog.setView(createTilesView);
+		dialog.setView(loadTilesView);
 
-		final EditText urlInput = (EditText) createTilesView
+		final EditText urlInput = (EditText) loadTilesView
 				.findViewById(R.id.load_tiles_url_input);
-		final Button preloadedUrlsButton = (Button) createTilesView
+		final Button preloadedUrlsButton = (Button) loadTilesView
 				.findViewById(R.id.load_tiles_preloaded);
-		final EditText minZoomInput = (EditText) createTilesView
+		final EditText minZoomInput = (EditText) loadTilesView
 				.findViewById(R.id.load_tiles_min_zoom_input);
-		final EditText maxZoomInput = (EditText) createTilesView
+		final EditText maxZoomInput = (EditText) loadTilesView
 				.findViewById(R.id.load_tiles_max_zoom_input);
-		final EditText minLatInput = (EditText) createTilesView
+		final Spinner compressFormatInput = (Spinner) loadTilesView
+				.findViewById(R.id.load_tiles_compress_format);
+		final EditText compressQualityInput = (EditText) loadTilesView
+				.findViewById(R.id.load_tiles_compress_quality);
+		final EditText minLatInput = (EditText) loadTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
-		final EditText maxLatInput = (EditText) createTilesView
+		final EditText maxLatInput = (EditText) loadTilesView
 				.findViewById(R.id.bounding_box_max_latitude_input);
-		final EditText minLonInput = (EditText) createTilesView
+		final EditText minLonInput = (EditText) loadTilesView
 				.findViewById(R.id.bounding_box_min_longitude_input);
-		final EditText maxLonInput = (EditText) createTilesView
+		final EditText maxLonInput = (EditText) loadTilesView
 				.findViewById(R.id.bounding_box_max_longitude_input);
-		final Button preloadedLocationsButton = (Button) createTilesView
+		final Button preloadedLocationsButton = (Button) loadTilesView
 				.findViewById(R.id.bounding_box_preloaded);
 
 		prepareBoundingBoxInputs(minLatInput, maxLatInput, minLonInput,
 				maxLonInput, preloadedLocationsButton);
 
 		prepareTileLoadInputs(minZoomInput, maxZoomInput, preloadedUrlsButton,
-				null, urlInput);
+				null, urlInput, compressFormatInput, compressQualityInput);
 
 		dialog.setPositiveButton(
 				getString(R.string.geopackage_table_tiles_load_label),
@@ -1343,6 +1370,15 @@ public class GeoPackageManagerFragment extends Fragment {
 
 							CompressFormat compressFormat = null;
 							Integer compressQuality = null;
+							if (compressFormatInput.getSelectedItemPosition() > 0) {
+								compressFormat = CompressFormat
+										.valueOf(compressFormatInput
+												.getSelectedItem().toString());
+								compressQuality = Integer
+										.valueOf(compressQualityInput.getText()
+												.toString());
+							}
+							
 							BoundingBox boundingBox = new BoundingBox(minLon,
 									maxLon, minLat, maxLat);
 

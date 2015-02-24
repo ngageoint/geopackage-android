@@ -19,10 +19,19 @@
     <string name="import_url_preloaded_label">Preloaded</string>
     <string name="create_tiles_name_label">Name: </string>
     <string name="load_tiles_url_label">URL: </string>
-    <string name="load_tiles_preloaded_label">Preloaded URLs</string>
     <string name="load_tiles_zoom_label">Zoom - </string>
     <string name="load_tiles_min_zoom_label">Min: </string>
     <string name="load_tiles_max_zoom_label">Max: </string>
+    <string name="load_tiles_preloaded_label">Preloaded URLs</string>
+    <string name="load_tiles_compress_format_label">Compress Format: </string>
+    <array name="load_tiles_compress_formats">
+        <item>None</item>
+        <item>JPEG</item>
+        <item>PNG</item>
+        <item>WEBP</item>
+    </array>
+    <string name="load_tiles_compress_format_prompt">Compress Format</string>
+    <string name="load_tiles_compress_quality_label">Compress Quality: </string>
     <string name="create_features_name_label">Name: </string>
     <string name="bounding_box_min_latitude_label">Min Lat: </string>
     <string name="bounding_box_max_latitude_label">Max Lat: </string>

@@ -28,6 +28,8 @@ import mil.nga.giat.geopackage.tiles.user.TileTable;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory.Options;
 import android.util.SparseArray;
 
 /**
@@ -110,6 +112,11 @@ public class TileGenerator {
 	private final boolean urlHasBoundingBox;
 
 	/**
+	 * Compression options
+	 */
+	private Options options = null;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param context
@@ -179,6 +186,18 @@ public class TileGenerator {
 	 */
 	public void setProgress(GeoPackageProgress progress) {
 		this.progress = progress;
+	}
+
+	/**
+	 * Set the Bitmap Compress Config
+	 * 
+	 * @param config
+	 */
+	public void setBitmapCompressionConfig(Config config) {
+		if (options == null) {
+			options = new Options();
+		}
+		options.inPreferredConfig = config;
 	}
 
 	/**
@@ -331,7 +350,7 @@ public class TileGenerator {
 
 					// Compress the image
 					if (compressFormat != null) {
-						bitmap = BitmapConverter.toBitmap(tileBytes);
+						bitmap = BitmapConverter.toBitmap(tileBytes, options);
 						if (bitmap != null) {
 							tileBytes = BitmapConverter.toBytes(bitmap,
 									compressFormat, compressQuality);
@@ -356,7 +375,8 @@ public class TileGenerator {
 					// Determine the tile width and height
 					if (tileWidth == null) {
 						if (bitmap == null) {
-							bitmap = BitmapConverter.toBitmap(tileBytes);
+							bitmap = BitmapConverter.toBitmap(tileBytes,
+									options);
 						}
 						if (bitmap != null) {
 							tileWidth = bitmap.getWidth();
