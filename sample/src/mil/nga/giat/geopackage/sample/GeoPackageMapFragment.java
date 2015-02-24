@@ -137,6 +137,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	private Polygon polygon = null;
 
 	/**
+	 * Download Tiles menu
+	 */
+	private MenuItem downloadTilesMenu;
+
+	/**
 	 * Constructor
 	 */
 	public GeoPackageMapFragment() {
@@ -240,9 +245,10 @@ public class GeoPackageMapFragment extends Fragment implements
 
 		switch (item.getItemId()) {
 		case R.id.download_tiles:
+			downloadTilesMenu = item;
 			if (!downloadTiles) {
 				downloadTiles = true;
-				item.setIcon(R.drawable.ic_linestring);
+				downloadTilesMenu.setIcon(R.drawable.ic_linestring);
 			} else {
 				resetDownloadTiles(true);
 			}
@@ -278,6 +284,9 @@ public class GeoPackageMapFragment extends Fragment implements
 	private void resetDownloadTiles(boolean createTiles) {
 		downloadTiles = false;
 		map.getUiSettings().setScrollGesturesEnabled(true);
+		if (downloadTilesMenu != null) {
+			downloadTilesMenu.setIcon(R.drawable.ic_tiles);
+		}
 		if (polygon != null) {
 			if (createTiles) {
 				createTiles(polygon);
