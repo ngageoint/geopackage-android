@@ -1,9 +1,13 @@
 package mil.nga.giat.geopackage.sample;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.features.user.FeatureCursor;
@@ -16,23 +20,37 @@ import mil.nga.giat.geopackage.tiles.overlay.GoogleAPIGeoPackageOverlay;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.InflateException;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 /**
@@ -40,7 +58,8 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
  * 
  * @author osbornb
  */
-public class GeoPackageMapFragment extends Fragment {
+public class GeoPackageMapFragment extends Fragment implements
+		OnMapLongClickListener, ILoadTilesTask {
 
 	/**
 	 * Max features key for saving to preferences
@@ -93,6 +112,31 @@ public class GeoPackageMapFragment extends Fragment {
 	private Map<String, GeoPackage> geoPackages = new HashMap<String, GeoPackage>();
 
 	/**
+	 * Vibrator
+	 */
+	private Vibrator vibrator;
+
+	/**
+	 * Touchable map layout
+	 */
+	private TouchableMap touch;
+
+	/**
+	 * Download tiles mode
+	 */
+	private boolean downloadTiles = false;
+
+	/**
+	 * Bounding box starting corner
+	 */
+	private LatLng boundingBoxCorner = null;
+
+	/**
+	 * Bounding box polygon
+	 */
+	private Polygon polygon = null;
+
+	/**
 	 * Constructor
 	 */
 	public GeoPackageMapFragment() {
@@ -118,6 +162,9 @@ public class GeoPackageMapFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
+		vibrator = (Vibrator) getActivity().getSystemService(
+				Context.VIBRATOR_SERVICE);
+
 		if (view != null) {
 			ViewGroup parent = (ViewGroup) view.getParent();
 			if (parent != null) {
@@ -133,6 +180,9 @@ public class GeoPackageMapFragment extends Fragment {
 		map = ((MapFragment) getFragmentManager().findFragmentById(
 				R.id.fragment_map_view_ui)).getMap();
 
+		touch = new TouchableMap(getActivity());
+		touch.addView(view);
+
 		map.setMyLocationEnabled(true);
 
 		SharedPreferences settings = PreferenceManager
@@ -140,9 +190,21 @@ public class GeoPackageMapFragment extends Fragment {
 		int mapType = settings.getInt(MAP_TYPE_KEY, 1);
 		map.setMapType(mapType);
 
+		map.setOnMapLongClickListener(this);
+
 		manager = GeoPackageFactory.getManager(getActivity());
 		updateInBackground();
 
+		return touch;
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	public View getView() {
 		return view;
 	}
 
@@ -158,6 +220,15 @@ public class GeoPackageMapFragment extends Fragment {
 	}
 
 	/**
+	 * Handle the menu reset
+	 * 
+	 * @param menu
+	 */
+	public void handleMenu(Menu menu) {
+		resetDownloadTiles(false);
+	}
+
+	/**
 	 * Handle map menu clicks
 	 * 
 	 * @param item
@@ -168,6 +239,14 @@ public class GeoPackageMapFragment extends Fragment {
 		boolean handled = true;
 
 		switch (item.getItemId()) {
+		case R.id.download_tiles:
+			if (!downloadTiles) {
+				downloadTiles = true;
+				item.setIcon(R.drawable.ic_linestring);
+			} else {
+				resetDownloadTiles(true);
+			}
+			break;
 		case R.id.max_features:
 			setMaxFeatures();
 			break;
@@ -189,6 +268,24 @@ public class GeoPackageMapFragment extends Fragment {
 		}
 
 		return handled;
+	}
+
+	/**
+	 * Reset the download tiles state
+	 * 
+	 * @param createTiles
+	 */
+	private void resetDownloadTiles(boolean createTiles) {
+		downloadTiles = false;
+		map.getUiSettings().setScrollGesturesEnabled(true);
+		if (polygon != null) {
+			if (createTiles) {
+				createTiles(polygon);
+			}
+			polygon.remove();
+		}
+		boundingBoxCorner = null;
+		polygon = null;
 	}
 
 	/**
@@ -429,6 +526,285 @@ public class GeoPackageMapFragment extends Fragment {
 				map.addTileOverlay(overlayOptions);
 			}
 		});
+	}
+
+	@Override
+	public void onMapLongClick(LatLng point) {
+		// When downloading tiles, start a new polygon
+		if (downloadTiles) {
+			vibrator.vibrate(getActivity().getResources().getInteger(
+					R.integer.map_tiles_long_click_vibrate));
+
+			if (polygon != null) {
+				polygon.remove();
+			}
+			map.getUiSettings().setScrollGesturesEnabled(false);
+			boundingBoxCorner = point;
+			PolygonOptions polygonOptions = new PolygonOptions();
+			List<LatLng> points = getPolygonPoints(boundingBoxCorner,
+					boundingBoxCorner);
+			polygonOptions.addAll(points);
+			polygon = map.addPolygon(polygonOptions);
+		}
+	}
+
+	/**
+	 * Get a list of the polygon points for the bounding box
+	 * 
+	 * @param point1
+	 * @param point2
+	 * @return
+	 */
+	private List<LatLng> getPolygonPoints(LatLng point1, LatLng point2) {
+		List<LatLng> points = new ArrayList<LatLng>();
+		points.add(new LatLng(point1.latitude, point1.longitude));
+		points.add(new LatLng(point1.latitude, point2.longitude));
+		points.add(new LatLng(point2.latitude, point2.longitude));
+		points.add(new LatLng(point2.latitude, point1.longitude));
+		return points;
+	}
+
+	/**
+	 * Touchable map layout
+	 * 
+	 * @author osbornb
+	 */
+	public class TouchableMap extends FrameLayout {
+
+		public TouchableMap(Context context) {
+			super(context);
+		}
+
+		@Override
+		public boolean dispatchTouchEvent(MotionEvent ev) {
+			switch (ev.getAction()) {
+			case MotionEvent.ACTION_MOVE:
+			case MotionEvent.ACTION_UP:
+				if (downloadTiles && polygon != null) {
+					Point point = new Point((int) ev.getX(), (int) ev.getY());
+					LatLng latLng = map.getProjection().fromScreenLocation(
+							point);
+					List<LatLng> points = getPolygonPoints(boundingBoxCorner,
+							latLng);
+					polygon.setPoints(points);
+				}
+				break;
+			}
+			return super.dispatchTouchEvent(ev);
+		}
+
+	}
+
+	/**
+	 * Create tiles
+	 */
+	private void createTiles(Polygon polygon) {
+
+		LayoutInflater inflater = LayoutInflater.from(getActivity());
+		View createTilesView = inflater
+				.inflate(R.layout.map_create_tiles, null);
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+		dialog.setView(createTilesView);
+
+		final EditText geopackageInput = (EditText) createTilesView
+				.findViewById(R.id.map_create_tiles_geopackage_input);
+		final Button geopackagesButton = (Button) createTilesView
+				.findViewById(R.id.map_create_tiles_preloaded);
+		final EditText nameInput = (EditText) createTilesView
+				.findViewById(R.id.create_tiles_name_input);
+		final EditText urlInput = (EditText) createTilesView
+				.findViewById(R.id.load_tiles_url_input);
+		final Button preloadedUrlsButton = (Button) createTilesView
+				.findViewById(R.id.load_tiles_preloaded);
+		final EditText minZoomInput = (EditText) createTilesView
+				.findViewById(R.id.load_tiles_min_zoom_input);
+		final EditText maxZoomInput = (EditText) createTilesView
+				.findViewById(R.id.load_tiles_max_zoom_input);
+		final Spinner compressFormatInput = (Spinner) createTilesView
+				.findViewById(R.id.load_tiles_compress_format);
+		final EditText compressQualityInput = (EditText) createTilesView
+				.findViewById(R.id.load_tiles_compress_quality);
+		final EditText minLatInput = (EditText) createTilesView
+				.findViewById(R.id.bounding_box_min_latitude_input);
+		final EditText maxLatInput = (EditText) createTilesView
+				.findViewById(R.id.bounding_box_max_latitude_input);
+		final EditText minLonInput = (EditText) createTilesView
+				.findViewById(R.id.bounding_box_min_longitude_input);
+		final EditText maxLonInput = (EditText) createTilesView
+				.findViewById(R.id.bounding_box_max_longitude_input);
+		final Button preloadedLocationsButton = (Button) createTilesView
+				.findViewById(R.id.bounding_box_preloaded);
+
+		GeoPackageUtils
+				.prepareBoundingBoxInputs(getActivity(), minLatInput,
+						maxLatInput, minLonInput, maxLonInput,
+						preloadedLocationsButton);
+
+		GeoPackageUtils.prepareTileLoadInputs(getActivity(), minZoomInput,
+				maxZoomInput, preloadedUrlsButton, nameInput, urlInput,
+				compressFormatInput, compressQualityInput);
+
+		double minLat = 90.0;
+		double minLon = 180.0;
+		double maxLat = -90.0;
+		double maxLon = -180.0;
+		for (LatLng point : polygon.getPoints()) {
+			minLat = Math.min(minLat, point.latitude);
+			minLon = Math.min(minLon, point.longitude);
+			maxLat = Math.max(maxLat, point.latitude);
+			maxLon = Math.max(maxLon, point.longitude);
+		}
+		minLatInput.setText(String.valueOf(minLat));
+		maxLatInput.setText(String.valueOf(maxLat));
+		minLonInput.setText(String.valueOf(minLon));
+		maxLonInput.setText(String.valueOf(maxLon));
+
+		geopackagesButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+						getActivity(), android.R.layout.select_dialog_item);
+				final List<String> databases = manager.databases();
+				adapter.addAll(databases);
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivity());
+				builder.setTitle(getActivity()
+						.getString(
+								R.string.map_create_tiles_existing_geopackage_dialog_label));
+				builder.setAdapter(adapter,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int item) {
+								if (item >= 0) {
+									String database = databases.get(item);
+									geopackageInput.setText(database);
+								}
+							}
+						});
+
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+		});
+
+		dialog.setPositiveButton(
+				getString(R.string.geopackage_create_tiles_label),
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+
+						try {
+
+							String database = geopackageInput.getText()
+									.toString();
+							if (database == null || database.isEmpty()) {
+								throw new GeoPackageException(
+										getString(R.string.map_create_tiles_geopackage_label)
+												+ " is required");
+							}
+							String tableName = nameInput.getText().toString();
+							if (tableName == null || tableName.isEmpty()) {
+								throw new GeoPackageException(
+										getString(R.string.create_tiles_name_label)
+												+ " is required");
+							}
+							String tileUrl = urlInput.getText().toString();
+							int minZoom = Integer.valueOf(minZoomInput
+									.getText().toString());
+							int maxZoom = Integer.valueOf(maxZoomInput
+									.getText().toString());
+							double minLat = Double.valueOf(minLatInput
+									.getText().toString());
+							double maxLat = Double.valueOf(maxLatInput
+									.getText().toString());
+							double minLon = Double.valueOf(minLonInput
+									.getText().toString());
+							double maxLon = Double.valueOf(maxLonInput
+									.getText().toString());
+
+							if (minLat > maxLat) {
+								throw new GeoPackageException(
+										getString(R.string.bounding_box_min_latitude_label)
+												+ " can not be larger than "
+												+ getString(R.string.bounding_box_max_latitude_label));
+							}
+
+							if (minLon > maxLon) {
+								throw new GeoPackageException(
+										getString(R.string.bounding_box_min_longitude_label)
+												+ " can not be larger than "
+												+ getString(R.string.bounding_box_max_longitude_label));
+							}
+
+							CompressFormat compressFormat = null;
+							Integer compressQuality = null;
+							if (compressFormatInput.getSelectedItemPosition() > 0) {
+								compressFormat = CompressFormat
+										.valueOf(compressFormatInput
+												.getSelectedItem().toString());
+								compressQuality = Integer
+										.valueOf(compressQualityInput.getText()
+												.toString());
+							}
+
+							BoundingBox boundingBox = new BoundingBox(minLon,
+									maxLon, minLat, maxLat);
+
+							// Create the database if it doesn't exist
+							if (!manager.exists(database)) {
+								manager.create(database);
+							}
+
+							GeoPackageTable table = GeoPackageTable.createTile(
+									database, tableName, 0);
+							active.addTable(table);
+
+							// Load tiles
+							LoadTilesTask.loadTiles(getActivity(),
+									GeoPackageMapFragment.this, active,
+									database, tableName, tileUrl, minZoom,
+									maxZoom, compressFormat, compressQuality,
+									boundingBox);
+						} catch (Exception e) {
+							GeoPackageUtils
+									.showMessage(
+											getActivity(),
+											getString(R.string.geopackage_create_tiles_label),
+											e.getMessage());
+						}
+					}
+				}).setNegativeButton(getString(R.string.button_cancel_label),
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+		dialog.show();
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onLoadTilesCancelled(String result) {
+		if (active.isModified()) {
+			updateInBackground();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onLoadTilesPostExecute(String result) {
+		if (active.isModified()) {
+			updateInBackground();
+		}
+
 	}
 
 }

@@ -1,89 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:layout_height="match_parent" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/bounding_box_min_latitude_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/bounding_box_min_latitude_label" />
-
-        <EditText
-            android:id="@+id/bounding_box_min_latitude_input"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal|numberSigned"
-            android:text="@string/bounding_box_default_min_latitude" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/bounding_box_max_latitude_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/bounding_box_max_latitude_label" />
-
-        <EditText
-            android:id="@+id/bounding_box_max_latitude_input"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal|numberSigned"
-            android:text="@string/bounding_box_default_max_latitude" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/bounding_box_min_longitude_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/bounding_box_min_longitude_label" />
-
-        <EditText
-            android:id="@+id/bounding_box_min_longitude_input"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal|numberSigned"
-            android:text="@string/bounding_box_default_min_longitude" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/bounding_box_max_longitude_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/bounding_box_max_longitude_label" />
-
-        <EditText
-            android:id="@+id/bounding_box_max_longitude_input"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal|numberSigned"
-            android:text="@string/bounding_box_default_max_longitude" />
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/bounding_box_preloaded"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/bounding_box_preloaded_label" />
+        android:orientation="vertical"
+        android:scrollbars="vertical" >
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/bounding_box_min_latitude_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bounding_box_min_latitude_label" />
+
+            <EditText
+                android:id="@+id/bounding_box_min_latitude_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="@string/bounding_box_default_min_latitude" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/bounding_box_max_latitude_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bounding_box_max_latitude_label" />
+
+            <EditText
+                android:id="@+id/bounding_box_max_latitude_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="@string/bounding_box_default_max_latitude" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/bounding_box_min_longitude_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bounding_box_min_longitude_label" />
+
+            <EditText
+                android:id="@+id/bounding_box_min_longitude_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="@string/bounding_box_default_min_longitude" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/bounding_box_max_longitude_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bounding_box_max_longitude_label" />
+
+            <EditText
+                android:id="@+id/bounding_box_max_longitude_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:text="@string/bounding_box_default_max_longitude" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/bounding_box_preloaded"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/bounding_box_preloaded_label" />
+    </LinearLayout>
+
+</ScrollView>

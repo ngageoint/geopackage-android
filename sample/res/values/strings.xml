@@ -8,6 +8,7 @@
     <string name="import_geopackage_url">Import URL</string>
     <string name="import_geopackage_file">Import File</string>
     <string name="create_geopackage">Create</string>
+    <string name="map_download_tiles">Download Tiles</string>
     <string name="map_max_features">Max Features</string>
     <string name="map_max_features_message">Set the max number of features to draw on the map</string>
     <string name="map_type_normal">Normal</string>
@@ -32,6 +33,9 @@
     </array>
     <string name="load_tiles_compress_format_prompt">Compress Format</string>
     <string name="load_tiles_compress_quality_label">Compress Quality: </string>
+    <string name="map_create_tiles_geopackage_label">GeoPackage: </string>
+    <string name="map_create_tiles_existing_geopackage_label">Existing</string>
+    <string name="map_create_tiles_existing_geopackage_dialog_label">GeoPackages</string>
     <string name="create_features_name_label">Name: </string>
     <string name="bounding_box_min_latitude_label">Min Lat: </string>
     <string name="bounding_box_max_latitude_label">Max Lat: </string>
