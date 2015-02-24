@@ -22,12 +22,6 @@
             android:inputType="textUri" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/load_tiles_preloaded"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/load_tiles_preloaded_label" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -65,6 +59,12 @@
             android:layout_height="wrap_content"
             android:inputType="number" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/load_tiles_preloaded"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/load_tiles_preloaded_label" />
 
     <include
         android:id="@+id/load_tiles_bounding_box"

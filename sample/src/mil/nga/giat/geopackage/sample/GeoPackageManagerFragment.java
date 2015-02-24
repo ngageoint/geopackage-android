@@ -526,8 +526,11 @@ public class GeoPackageManagerFragment extends Fragment {
 				.findViewById(R.id.bounding_box_min_longitude_input);
 		final EditText maxLonInput = (EditText) createFeaturesView
 				.findViewById(R.id.bounding_box_max_longitude_input);
+		final Button preloadedLocationsButton = (Button) createFeaturesView
+				.findViewById(R.id.bounding_box_preloaded);
 
-		prepareLatLonInputs(minLatInput, maxLatInput, minLonInput, maxLonInput);
+		prepareBoundingBoxInputs(minLatInput, maxLatInput, minLonInput,
+				maxLonInput, preloadedLocationsButton);
 
 		dialog.setPositiveButton(
 				getString(R.string.geopackage_create_features_label),
@@ -620,7 +623,7 @@ public class GeoPackageManagerFragment extends Fragment {
 				.findViewById(R.id.create_tiles_name_input);
 		final EditText urlInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_url_input);
-		final Button button = (Button) createTilesView
+		final Button preloadedUrlsButton = (Button) createTilesView
 				.findViewById(R.id.load_tiles_preloaded);
 		final EditText minZoomInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_min_zoom_input);
@@ -634,11 +637,14 @@ public class GeoPackageManagerFragment extends Fragment {
 				.findViewById(R.id.bounding_box_min_longitude_input);
 		final EditText maxLonInput = (EditText) createTilesView
 				.findViewById(R.id.bounding_box_max_longitude_input);
+		final Button preloadedLocationsButton = (Button) createTilesView
+				.findViewById(R.id.bounding_box_preloaded);
 
-		prepareLatLonInputs(minLatInput, maxLatInput, minLonInput, maxLonInput);
+		prepareBoundingBoxInputs(minLatInput, maxLatInput, minLonInput,
+				maxLonInput, preloadedLocationsButton);
 
-		prepareTileLoadInputs(minZoomInput, maxZoomInput, button, nameInput,
-				urlInput);
+		prepareTileLoadInputs(minZoomInput, maxZoomInput, preloadedUrlsButton,
+				nameInput, urlInput);
 
 		dialog.setPositiveButton(
 				getString(R.string.geopackage_create_tiles_label),
@@ -816,9 +822,11 @@ public class GeoPackageManagerFragment extends Fragment {
 	 * @param maxLatInput
 	 * @param minLonInput
 	 * @param maxLonInput
+	 * @param preloadedButton
 	 */
-	private void prepareLatLonInputs(EditText minLatInput,
-			EditText maxLatInput, EditText minLonInput, EditText maxLonInput) {
+	private void prepareBoundingBoxInputs(final EditText minLatInput,
+			final EditText maxLatInput, final EditText minLonInput,
+			final EditText maxLonInput, Button preloadedButton) {
 		minLatInput
 				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
 						-90.0, 90.0) });
@@ -832,6 +840,40 @@ public class GeoPackageManagerFragment extends Fragment {
 		maxLonInput
 				.setFilters(new InputFilter[] { new InputFilterDecimalMinMax(
 						-180.0, 180.0) });
+
+		preloadedButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+						getActivity(), android.R.layout.select_dialog_item);
+				adapter.addAll(getResources().getStringArray(
+						R.array.preloaded_bounding_box_labels));
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivity());
+				builder.setTitle(getString(R.string.bounding_box_preloaded_label));
+				builder.setAdapter(adapter,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int item) {
+								if (item >= 0) {
+									String[] locations = getResources()
+											.getStringArray(
+													R.array.preloaded_bounding_box_locations);
+									String location = locations[item];
+									String[] locationParts = location
+											.split(",");
+									minLonInput.setText(locationParts[0].trim());
+									minLatInput.setText(locationParts[1].trim());
+									maxLonInput.setText(locationParts[2].trim());
+									maxLatInput.setText(locationParts[3].trim());
+								}
+							}
+						});
+
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+		});
 	}
 
 	/**
@@ -992,7 +1034,7 @@ public class GeoPackageManagerFragment extends Fragment {
 		protected String doInBackground(String... params) {
 			try {
 				int count = tileGenerator.generateTiles();
-				if(count > 0){
+				if (count > 0) {
 					active.setModified(true);
 				}
 				if (count < max) {
@@ -1239,7 +1281,7 @@ public class GeoPackageManagerFragment extends Fragment {
 
 		final EditText urlInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_url_input);
-		final Button button = (Button) createTilesView
+		final Button preloadedUrlsButton = (Button) createTilesView
 				.findViewById(R.id.load_tiles_preloaded);
 		final EditText minZoomInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_min_zoom_input);
@@ -1253,11 +1295,14 @@ public class GeoPackageManagerFragment extends Fragment {
 				.findViewById(R.id.bounding_box_min_longitude_input);
 		final EditText maxLonInput = (EditText) createTilesView
 				.findViewById(R.id.bounding_box_max_longitude_input);
+		final Button preloadedLocationsButton = (Button) createTilesView
+				.findViewById(R.id.bounding_box_preloaded);
 
-		prepareLatLonInputs(minLatInput, maxLatInput, minLonInput, maxLonInput);
+		prepareBoundingBoxInputs(minLatInput, maxLatInput, minLonInput,
+				maxLonInput, preloadedLocationsButton);
 
-		prepareTileLoadInputs(minZoomInput, maxZoomInput, button, null,
-				urlInput);
+		prepareTileLoadInputs(minZoomInput, maxZoomInput, preloadedUrlsButton,
+				null, urlInput);
 
 		dialog.setPositiveButton(
 				getString(R.string.geopackage_table_tiles_load_label),

@@ -19,21 +19,20 @@
     <string name="import_url_preloaded_label">Preloaded</string>
     <string name="create_tiles_name_label">Name: </string>
     <string name="load_tiles_url_label">URL: </string>
-    <string name="load_tiles_preloaded_label">Preloaded</string>
+    <string name="load_tiles_preloaded_label">Preloaded URLs</string>
     <string name="load_tiles_zoom_label">Zoom - </string>
     <string name="load_tiles_min_zoom_label">Min: </string>
     <string name="load_tiles_max_zoom_label">Max: </string>
     <string name="create_features_name_label">Name: </string>
-    <string name="bounding_box_latitude_label">Latitude - </string>
-    <string name="bounding_box_min_latitude_label">Min: </string>
-    <string name="bounding_box_max_latitude_label">Max: </string>
+    <string name="bounding_box_min_latitude_label">Min Lat: </string>
+    <string name="bounding_box_max_latitude_label">Max Lat: </string>
     <string name="bounding_box_default_min_latitude">-90.0</string>
     <string name="bounding_box_default_max_latitude">90.0</string>
-    <string name="bounding_box_longitude_label">Longitude - </string>
-    <string name="bounding_box_min_longitude_label">Min: </string>
-    <string name="bounding_box_max_longitude_label">Max: </string>
+    <string name="bounding_box_min_longitude_label">Min Lon: </string>
+    <string name="bounding_box_max_longitude_label">Max Lon: </string>
     <string name="bounding_box_default_min_longitude">-180.0</string>
     <string name="bounding_box_default_max_longitude">180.0</string>
+    <string name="bounding_box_preloaded_label">Preloaded Locations</string>
     <string name="geopackage_view_label">View</string>
     <string name="geopackage_delete_label">Delete</string>
     <string name="geopackage_rename_label">Rename</string>
@@ -114,4 +113,13 @@
         <item>5</item>
     </integer-array>
 
+    <string-array name="preloaded_bounding_box_labels">
+        <item>NGA</item>
+        <item>BIT Systems</item>
+    </string-array>
+    <string-array name="preloaded_bounding_box_locations">
+        <item>-77.202143,38.748123,-77.186146,38.759038</item>
+        <item>-104.803478,39.719140,-104.801516,39.720635</item>
+    </string-array>
+    
 </resources>
