@@ -14,6 +14,7 @@ import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
+import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
@@ -254,9 +255,40 @@ public class TileGenerator {
 					(long) context.getResources().getInteger(
 							R.integer.geopackage_srs_epsg_srs_id));
 		} else {
+			update = true;
 			// Retrieve the tile matrix set
 			tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
-			update = true;
+			Contents contents = tileMatrixSet.getContents();
+
+			boolean expandBoundingBox = false;
+			if (boundingBox.getMinLongitude() < tileMatrixSet.getMinX()) {
+				tileMatrixSet.setMinX(boundingBox.getMinLongitude());
+				contents.setMinX(tileMatrixSet.getMinX());
+				expandBoundingBox = true;
+			}
+			if (boundingBox.getMaxLongitude() > tileMatrixSet.getMaxX()) {
+				tileMatrixSet.setMaxX(boundingBox.getMaxLongitude());
+				contents.setMaxX(tileMatrixSet.getMaxX());
+				expandBoundingBox = true;
+			}
+			if (boundingBox.getMinLatitude() < tileMatrixSet.getMinY()) {
+				tileMatrixSet.setMinY(boundingBox.getMinLatitude());
+				contents.setMinY(tileMatrixSet.getMinY());
+				expandBoundingBox = true;
+			}
+			if (boundingBox.getMaxLatitude() > tileMatrixSet.getMaxY()) {
+				tileMatrixSet.setMaxY(boundingBox.getMaxLatitude());
+				contents.setMaxY(tileMatrixSet.getMaxY());
+				expandBoundingBox = true;
+			}
+
+			// Update the tile matrix set
+			if (expandBoundingBox) {
+				tileMatrixSetDao.update(tileMatrixSet);
+				ContentsDao contentsDao = geoPackage.getContentsDao();
+				contentsDao.update(contents);
+			}
+
 		}
 
 		// Download and create the tiles
