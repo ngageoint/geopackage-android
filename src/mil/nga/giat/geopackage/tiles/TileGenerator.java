@@ -19,6 +19,7 @@ import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
+import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
@@ -407,29 +408,39 @@ public class TileGenerator {
 
 			tileDao.delete(where.toString(), whereArgs);
 
-		} else if (!update) {
+		} else {
 
-			// Get the tile size
-			int tilesPerSide = TileBoundingBoxAndroidUtils
-					.tilesPerSide(zoomLevel);
-			double tileSize = TileBoundingBoxAndroidUtils
-					.tileSize(tilesPerSide);
+			// Check if the tile matrix already exists
+			boolean create = true;
+			if (update) {
+				create = !tileMatrixDao.idExists(new TileMatrixKey(tableName,
+						zoomLevel));
+			}
 
-			// Calculate pixel sizes
-			double pixelXSize = tileSize / tileWidth;
-			double pixelYSize = tileSize / tileHeight;
+			// Create the tile matrix
+			if (create) {
+				// Get the tile size
+				int tilesPerSide = TileBoundingBoxAndroidUtils
+						.tilesPerSide(zoomLevel);
+				double tileSize = TileBoundingBoxAndroidUtils
+						.tileSize(tilesPerSide);
 
-			// Create the tile matrix for this zoom level
-			TileMatrix tileMatrix = new TileMatrix();
-			tileMatrix.setContents(contents);
-			tileMatrix.setZoomLevel(zoomLevel);
-			tileMatrix.setMatrixWidth(matrixLength);
-			tileMatrix.setMatrixHeight(matrixLength);
-			tileMatrix.setTileWidth(tileWidth);
-			tileMatrix.setTileHeight(tileHeight);
-			tileMatrix.setPixelXSize(pixelXSize);
-			tileMatrix.setPixelYSize(pixelYSize);
-			tileMatrixDao.create(tileMatrix);
+				// Calculate pixel sizes
+				double pixelXSize = tileSize / tileWidth;
+				double pixelYSize = tileSize / tileHeight;
+
+				// Create the tile matrix for this zoom level
+				TileMatrix tileMatrix = new TileMatrix();
+				tileMatrix.setContents(contents);
+				tileMatrix.setZoomLevel(zoomLevel);
+				tileMatrix.setMatrixWidth(matrixLength);
+				tileMatrix.setMatrixHeight(matrixLength);
+				tileMatrix.setTileWidth(tileWidth);
+				tileMatrix.setTileHeight(tileHeight);
+				tileMatrix.setPixelXSize(pixelXSize);
+				tileMatrix.setPixelYSize(pixelYSize);
+				tileMatrixDao.create(tileMatrix);
+			}
 		}
 
 		return count;
