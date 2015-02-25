@@ -9,9 +9,11 @@ import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.tiles.TileGenerator;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.AsyncTask;
+import android.os.PowerManager;
 
 /**
  * Load tiles task
@@ -48,8 +50,8 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 		}
 
 		ProgressDialog progressDialog = new ProgressDialog(activity);
-		final LoadTilesTask loadTilesTask = new LoadTilesTask(callback,
-				progressDialog, active);
+		final LoadTilesTask loadTilesTask = new LoadTilesTask(activity,
+				callback, progressDialog, active);
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 		GeoPackage geoPackage = manager.open(database);
@@ -82,22 +84,26 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 		loadTilesTask.execute();
 	}
 
+	private Activity activity;
 	private Integer max = null;
 	private int progress = 0;
 	private TileGenerator tileGenerator;
 	private ILoadTilesTask callback;
 	private ProgressDialog progressDialog;
 	private GeoPackageDatabases active;
+	private PowerManager.WakeLock wakeLock;
 
 	/**
 	 * Constructor
 	 * 
+	 * @param activity
 	 * @param callback
 	 * @param progressDialog
 	 * @param active
 	 */
-	public LoadTilesTask(ILoadTilesTask callback,
+	public LoadTilesTask(Activity activity, ILoadTilesTask callback,
 			ProgressDialog progressDialog, GeoPackageDatabases active) {
+		this.activity = activity;
 		this.callback = callback;
 		this.progressDialog = progressDialog;
 		this.active = active;
@@ -152,6 +158,11 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 	protected void onPreExecute() {
 		super.onPreExecute();
 		progressDialog.show();
+		PowerManager pm = (PowerManager) activity
+				.getSystemService(Context.POWER_SERVICE);
+		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass()
+				.getName());
+		wakeLock.acquire();
 	}
 
 	/**
@@ -169,6 +180,7 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 	@Override
 	protected void onCancelled(String result) {
 		tileGenerator.close();
+		wakeLock.release();
 		progressDialog.dismiss();
 		callback.onLoadTilesCancelled(result);
 	}
@@ -179,6 +191,7 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 	@Override
 	protected void onPostExecute(String result) {
 		tileGenerator.close();
+		wakeLock.release();
 		progressDialog.dismiss();
 		callback.onLoadTilesPostExecute(result);
 	}

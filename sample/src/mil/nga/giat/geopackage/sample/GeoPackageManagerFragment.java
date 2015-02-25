@@ -31,6 +31,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap.CompressFormat;
@@ -38,6 +39,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -174,7 +176,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 			update();
 		}
 	}
-	
+
 	/**
 	 * Update the listing of databases and tables
 	 */
@@ -1272,6 +1274,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 		private int progress = 0;
 		private final String database;
 		private final String url;
+		private PowerManager.WakeLock wakeLock;
 
 		/**
 		 * Constructor
@@ -1327,6 +1330,11 @@ public class GeoPackageManagerFragment extends Fragment implements
 		protected void onPreExecute() {
 			super.onPreExecute();
 			progressDialog.show();
+			PowerManager pm = (PowerManager) getActivity().getSystemService(
+					Context.POWER_SERVICE);
+			wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+					getClass().getName());
+			wakeLock.acquire();
 		}
 
 		/**
@@ -1364,6 +1372,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 		 */
 		@Override
 		protected void onCancelled(String result) {
+			wakeLock.release();
 			progressDialog.dismiss();
 			update();
 		}
@@ -1373,6 +1382,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 		 */
 		@Override
 		protected void onPostExecute(String result) {
+			wakeLock.release();
 			progressDialog.dismiss();
 			if (result != null) {
 				GeoPackageUtils.showMessage(getActivity(),
