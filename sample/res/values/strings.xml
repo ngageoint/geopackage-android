@@ -8,9 +8,15 @@
     <string name="import_geopackage_url">Import URL</string>
     <string name="import_geopackage_file">Import File</string>
     <string name="create_geopackage">Create</string>
+    <string name="map_features">Features</string>
     <string name="map_bounding_box">Bounding Box</string>
     <string name="map_download_tiles">Download Tiles</string>
     <string name="map_clear_bounding_box">Clear Bounding Box</string>
+    <string name="map_edit_point">Points</string>
+    <string name="map_edit_linestring">Linestrings</string>
+    <string name="map_edit_polygon">Polygons</string>
+    <string name="map_edit_accept">Accept</string>
+    <string name="map_edit_clear">Clear</string>
     <string name="map_max_features">Max Features</string>
     <string name="map_max_features_message">Set the max number of features to draw on the map</string>
     <string name="map_type_normal">Normal</string>

@@ -30,9 +30,9 @@
             android:layout_marginTop="2dp"
             android:background="#B3FFFFFF"
             android:contentDescription="@string/map_download_tiles"
-            android:src="@drawable/ic_download_tiles"
             android:scaleX=".77"
-            android:scaleY=".77" />
+            android:scaleY=".77"
+            android:src="@drawable/ic_download_tiles" />
 
         <ImageButton
             android:id="@+id/mapLoadTilesClearButton"
@@ -43,9 +43,85 @@
             android:layout_marginTop="2dp"
             android:background="#B3FFFFFF"
             android:contentDescription="@string/map_clear_bounding_box"
-            android:src="@drawable/ic_clear"
             android:scaleX=".77"
-            android:scaleY=".77" />
+            android:scaleY=".77"
+            android:src="@drawable/ic_clear" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/mapFeaturesButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible" >
+
+        <ImageButton
+            android:id="@+id/mapEditPointButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:background="#B3FFFFFF"
+            android:contentDescription="@string/map_edit_point"
+            android:scaleX=".77"
+            android:scaleY=".77"
+            android:src="@drawable/ic_edit_point" />
+
+        <ImageButton
+            android:id="@+id/mapEditLinestringButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:background="#B3FFFFFF"
+            android:contentDescription="@string/map_edit_linestring"
+            android:scaleX=".77"
+            android:scaleY=".77"
+            android:src="@drawable/ic_edit_linestring" />
+
+        <ImageButton
+            android:id="@+id/mapEditPolygonButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:background="#B3FFFFFF"
+            android:contentDescription="@string/map_edit_polygon"
+            android:scaleX=".77"
+            android:scaleY=".77"
+            android:src="@drawable/ic_edit_polygon" />
+
+        <ImageButton
+            android:id="@+id/mapEditAcceptButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="1dp"
+            android:layout_marginTop="2dp"
+            android:background="#B3FFFFFF"
+            android:contentDescription="@string/map_edit_accept"
+            android:scaleX=".77"
+            android:scaleY=".77"
+            android:src="@drawable/ic_accept" />
+
+        <ImageButton
+            android:id="@+id/mapEditClearButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="1dp"
+            android:layout_marginTop="2dp"
+            android:background="#B3FFFFFF"
+            android:contentDescription="@string/map_edit_clear"
+            android:scaleX=".77"
+            android:scaleY=".77"
+            android:src="@drawable/ic_clear" />
     </LinearLayout>
 
 </RelativeLayout>
