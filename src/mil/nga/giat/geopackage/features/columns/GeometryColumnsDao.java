@@ -178,4 +178,29 @@ public class GeometryColumnsDao extends
 		return updated;
 	}
 
+	/**
+	 * Query for the table name
+	 * 
+	 * @param tableName
+	 * @return
+	 * @throws SQLException
+	 */
+	public GeometryColumns queryForTableName(String tableName)
+			throws SQLException {
+		GeometryColumns geometryColumns = null;
+		if (tableName != null) {
+			List<GeometryColumns> results = queryForEq(
+					GeometryColumns.COLUMN_TABLE_NAME, tableName);
+			if (!results.isEmpty()) {
+				if (results.size() > 1) {
+					throw new SQLException("More than one "
+							+ GeometryColumns.class.getSimpleName()
+							+ " returned for Table Name: " + tableName);
+				}
+				geometryColumns = results.get(0);
+			}
+		}
+		return geometryColumns;
+	}
+
 }

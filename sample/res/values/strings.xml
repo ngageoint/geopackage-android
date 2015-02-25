@@ -61,8 +61,36 @@
     <string name="geopackage_import_name_label">Name:</string>
     <string name="table_image_description">Table Type</string>
     <string name="geopackage_table_view_label">View</string>
+    <string name="geopackage_table_edit_label">Edit</string>
     <string name="geopackage_table_delete_label">Delete</string>
     <string name="geopackage_table_tiles_load_label">Load Tiles</string>
+    <string name="edit_contents_identifier_label">Identifier: </string>
+    <string name="edit_contents_description_label">Description: </string>
+    <string name="edit_contents_min_y_label">Min Y: </string>
+    <string name="edit_contents_max_y_label">Max Y: </string>
+    <string name="edit_contents_min_x_label">Min X: </string>
+    <string name="edit_contents_max_x_label">Max X: </string>
+    <string name="edit_features_z_label">Z: </string>
+    <string name="edit_features_m_label">M: </string>
+    <string name="edit_features_geometry_type_label">Geometry Type: </string>
+    <array name="edit_features_geometry_types">
+        <item>GEOMETRY</item>
+        <item>POINT</item>
+        <item>LINESTRING</item>
+        <item>POLYGON</item>
+        <item>MULTIPOINT</item>
+        <item>MULTILINESTRING</item>
+        <item>MULTIPOLYGON</item>
+        <item>GEOMETRYCOLLECTION</item>
+        <item>CIRCULARSTRING</item>
+        <item>COMPOUNDCURVE</item>
+        <item>CURVEPOLYGON</item>
+        <item>MULTICURVE</item>
+        <item>MULTISURFACE</item>
+        <item>CURVE</item>
+        <item>SURFACE</item>
+    </array>
+    <string name="edit_features_geometry_type_prompt">Geometry Type</string>
     <string name="button_ok_label">OK</string>
     <string name="button_cancel_label">Cancel</string>
 

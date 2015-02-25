@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.Date;
 
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
@@ -245,6 +246,8 @@ public class TileGenerator {
 		boolean update = false;
 
 		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+		ContentsDao contentsDao = geoPackage.getContentsDao();
+
 		TileMatrixSet tileMatrixSet = null;
 		if (!tileMatrixSetDao.isTableExists()
 				|| !tileMatrixSetDao.idExists(tableName)) {
@@ -285,7 +288,6 @@ public class TileGenerator {
 			// Update the tile matrix set
 			if (expandBoundingBox) {
 				tileMatrixSetDao.update(tileMatrixSet);
-				ContentsDao contentsDao = geoPackage.getContentsDao();
 				contentsDao.update(contents);
 			}
 
@@ -310,6 +312,10 @@ public class TileGenerator {
 					&& progress.cleanupOnCancel()) {
 				geoPackage.deleteTableQuietly(tableName);
 				count = 0;
+			} else {
+				// Update the contents last modified date
+				contents.setLastChange(new Date());
+				contentsDao.update(contents);
 			}
 		} catch (RuntimeException e) {
 			geoPackage.deleteTableQuietly(tableName);
