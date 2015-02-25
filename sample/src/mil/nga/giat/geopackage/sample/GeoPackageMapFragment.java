@@ -42,12 +42,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -59,7 +62,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
  * @author osbornb
  */
 public class GeoPackageMapFragment extends Fragment implements
-		OnMapLongClickListener, ILoadTilesTask {
+		OnMapLongClickListener, OnMapClickListener, ILoadTilesTask {
 
 	/**
 	 * Max features key for saving to preferences
@@ -97,6 +100,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	private static View view;
 
 	/**
+	 * Load tiles view
+	 */
+	private static View loadTilesView;
+
+	/**
 	 * GeoPackage manager
 	 */
 	private GeoPackageManager manager;
@@ -129,7 +137,12 @@ public class GeoPackageMapFragment extends Fragment implements
 	/**
 	 * Bounding box starting corner
 	 */
-	private LatLng boundingBoxCorner = null;
+	private LatLng boundingBoxStartCorner = null;
+
+	/**
+	 * Bounding box ending corner
+	 */
+	private LatLng boundingBoxEndCorner = null;
 
 	/**
 	 * Bounding box polygon
@@ -137,9 +150,14 @@ public class GeoPackageMapFragment extends Fragment implements
 	private Polygon polygon = null;
 
 	/**
-	 * Download Tiles menu
+	 * True when drawing a shape
 	 */
-	private MenuItem downloadTilesMenu;
+	private boolean drawing = false;
+
+	/**
+	 * Bounding Box menu item
+	 */
+	private MenuItem boundingBoxMenuItem;
 
 	/**
 	 * Constructor
@@ -184,6 +202,23 @@ public class GeoPackageMapFragment extends Fragment implements
 		}
 		map = ((MapFragment) getFragmentManager().findFragmentById(
 				R.id.fragment_map_view_ui)).getMap();
+		loadTilesView = view.findViewById(R.id.mapLoadTilesButtons);
+		ImageButton loadTilesButton = (ImageButton) loadTilesView
+				.findViewById(R.id.mapLoadTilesButton);
+		loadTilesButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				createTiles();
+			}
+		});
+		ImageButton loadTilesClearButton = (ImageButton) loadTilesView
+				.findViewById(R.id.mapLoadTilesClearButton);
+		loadTilesClearButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				clearBoundingBox();
+			}
+		});
 
 		touch = new TouchableMap(getActivity());
 		touch.addView(view);
@@ -196,6 +231,7 @@ public class GeoPackageMapFragment extends Fragment implements
 		map.setMapType(mapType);
 
 		map.setOnMapLongClickListener(this);
+		map.setOnMapClickListener(this);
 
 		manager = GeoPackageFactory.getManager(getActivity());
 		updateInBackground();
@@ -230,7 +266,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * @param menu
 	 */
 	public void handleMenu(Menu menu) {
-		resetDownloadTiles(false);
+		resetDownloadTiles();
 	}
 
 	/**
@@ -244,13 +280,14 @@ public class GeoPackageMapFragment extends Fragment implements
 		boolean handled = true;
 
 		switch (item.getItemId()) {
-		case R.id.download_tiles:
-			downloadTilesMenu = item;
+		case R.id.map_bounding_box:
+			boundingBoxMenuItem = item;
 			if (!downloadTiles) {
 				downloadTiles = true;
-				downloadTilesMenu.setIcon(R.drawable.ic_linestring);
+				loadTilesView.setVisibility(View.VISIBLE);
+				boundingBoxMenuItem.setIcon(R.drawable.ic_linestring); // TODO
 			} else {
-				resetDownloadTiles(true);
+				resetDownloadTiles();
 			}
 			break;
 		case R.id.max_features:
@@ -278,23 +315,27 @@ public class GeoPackageMapFragment extends Fragment implements
 
 	/**
 	 * Reset the download tiles state
-	 * 
-	 * @param createTiles
 	 */
-	private void resetDownloadTiles(boolean createTiles) {
+	private void resetDownloadTiles() {
 		downloadTiles = false;
-		map.getUiSettings().setScrollGesturesEnabled(true);
-		if (downloadTilesMenu != null) {
-			downloadTilesMenu.setIcon(R.drawable.ic_tiles);
+		loadTilesView.setVisibility(View.INVISIBLE);
+		if (boundingBoxMenuItem != null) {
+			boundingBoxMenuItem.setIcon(R.drawable.ic_tiles); // TODO
 		}
+		clearBoundingBox();
+	}
+
+	/**
+	 * Turn off the loading of tiles
+	 */
+	private void clearBoundingBox() {
 		if (polygon != null) {
-			if (createTiles) {
-				createTiles(polygon);
-			}
 			polygon.remove();
 		}
-		boundingBoxCorner = null;
+		boundingBoxStartCorner = null;
+		boundingBoxEndCorner = null;
 		polygon = null;
+		setDrawing(false);
 	}
 
 	/**
@@ -539,22 +580,101 @@ public class GeoPackageMapFragment extends Fragment implements
 
 	@Override
 	public void onMapLongClick(LatLng point) {
-		// When downloading tiles, start a new polygon
+
 		if (downloadTiles) {
+
 			vibrator.vibrate(getActivity().getResources().getInteger(
 					R.integer.map_tiles_long_click_vibrate));
 
-			if (polygon != null) {
-				polygon.remove();
+			// Check to see if editing any of the bounding box corners
+			if (polygon != null && boundingBoxEndCorner != null) {
+				Projection projection = map.getProjection();
+
+				double allowableScreenPercentage = (getActivity()
+						.getResources()
+						.getInteger(
+								R.integer.map_tiles_long_click_screen_percentage) / 100.0);
+				Point screenPoint = projection.toScreenLocation(point);
+
+				if (isWithinDistance(projection, screenPoint,
+						boundingBoxEndCorner, allowableScreenPercentage)) {
+					setDrawing(true);
+				} else if (isWithinDistance(projection, screenPoint,
+						boundingBoxStartCorner, allowableScreenPercentage)) {
+					LatLng temp = boundingBoxStartCorner;
+					boundingBoxStartCorner = boundingBoxEndCorner;
+					boundingBoxEndCorner = temp;
+					setDrawing(true);
+				} else {
+					LatLng corner1 = new LatLng(
+							boundingBoxStartCorner.latitude,
+							boundingBoxEndCorner.longitude);
+					LatLng corner2 = new LatLng(boundingBoxEndCorner.latitude,
+							boundingBoxStartCorner.longitude);
+					if (isWithinDistance(projection, screenPoint, corner1,
+							allowableScreenPercentage)) {
+						boundingBoxStartCorner = corner2;
+						boundingBoxEndCorner = corner1;
+						setDrawing(true);
+					} else if (isWithinDistance(projection, screenPoint,
+							corner2, allowableScreenPercentage)) {
+						boundingBoxStartCorner = corner1;
+						boundingBoxEndCorner = corner2;
+						setDrawing(true);
+					}
+				}
 			}
-			map.getUiSettings().setScrollGesturesEnabled(false);
-			boundingBoxCorner = point;
-			PolygonOptions polygonOptions = new PolygonOptions();
-			List<LatLng> points = getPolygonPoints(boundingBoxCorner,
-					boundingBoxCorner);
-			polygonOptions.addAll(points);
-			polygon = map.addPolygon(polygonOptions);
+
+			// Start drawing a new polygon
+			if (!drawing) {
+				if (polygon != null) {
+					polygon.remove();
+				}
+				boundingBoxStartCorner = point;
+				boundingBoxEndCorner = point;
+				PolygonOptions polygonOptions = new PolygonOptions();
+				List<LatLng> points = getPolygonPoints(boundingBoxStartCorner,
+						boundingBoxEndCorner);
+				polygonOptions.addAll(points);
+				polygon = map.addPolygon(polygonOptions);
+				setDrawing(true);
+			}
 		}
+	}
+
+	/**
+	 * Set the drawing value
+	 * 
+	 * @param drawing
+	 */
+	private void setDrawing(boolean drawing) {
+		this.drawing = drawing;
+		map.getUiSettings().setScrollGesturesEnabled(!drawing);
+	}
+
+	/**
+	 * Check if the point is within clicking distance to the lat lng corner
+	 * 
+	 * @param projection
+	 * @param point
+	 * @param corner
+	 * @param allowableScreenPercentage
+	 * @return
+	 */
+	private boolean isWithinDistance(Projection projection, Point point,
+			LatLng latLng, double allowableScreenPercentage) {
+		Point point2 = projection.toScreenLocation(latLng);
+		double distance = Math.sqrt(Math.pow(point.x - point2.x, 2)
+				+ Math.pow(point.y - point2.y, 2));
+
+		boolean withinDistance = distance
+				/ Math.min(view.getWidth(), view.getHeight()) <= allowableScreenPercentage;
+		return withinDistance;
+	}
+
+	@Override
+	public void onMapClick(LatLng point) {
+
 	}
 
 	/**
@@ -589,13 +709,19 @@ public class GeoPackageMapFragment extends Fragment implements
 			switch (ev.getAction()) {
 			case MotionEvent.ACTION_MOVE:
 			case MotionEvent.ACTION_UP:
-				if (downloadTiles && polygon != null) {
-					Point point = new Point((int) ev.getX(), (int) ev.getY());
-					LatLng latLng = map.getProjection().fromScreenLocation(
-							point);
-					List<LatLng> points = getPolygonPoints(boundingBoxCorner,
-							latLng);
-					polygon.setPoints(points);
+				if (downloadTiles) {
+					if (drawing && polygon != null) {
+						Point point = new Point((int) ev.getX(),
+								(int) ev.getY());
+						boundingBoxEndCorner = map.getProjection()
+								.fromScreenLocation(point);
+						List<LatLng> points = getPolygonPoints(
+								boundingBoxStartCorner, boundingBoxEndCorner);
+						polygon.setPoints(points);
+					}
+					if (ev.getAction() == MotionEvent.ACTION_UP) {
+						setDrawing(false);
+					}
 				}
 				break;
 			}
@@ -607,7 +733,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	/**
 	 * Create tiles
 	 */
-	private void createTiles(Polygon polygon) {
+	private void createTiles() {
 
 		LayoutInflater inflater = LayoutInflater.from(getActivity());
 		View createTilesView = inflater
@@ -653,20 +779,22 @@ public class GeoPackageMapFragment extends Fragment implements
 				maxZoomInput, preloadedUrlsButton, nameInput, urlInput,
 				compressFormatInput, compressQualityInput);
 
-		double minLat = 90.0;
-		double minLon = 180.0;
-		double maxLat = -90.0;
-		double maxLon = -180.0;
-		for (LatLng point : polygon.getPoints()) {
-			minLat = Math.min(minLat, point.latitude);
-			minLon = Math.min(minLon, point.longitude);
-			maxLat = Math.max(maxLat, point.latitude);
-			maxLon = Math.max(maxLon, point.longitude);
+		if (polygon != null) {
+			double minLat = 90.0;
+			double minLon = 180.0;
+			double maxLat = -90.0;
+			double maxLon = -180.0;
+			for (LatLng point : polygon.getPoints()) {
+				minLat = Math.min(minLat, point.latitude);
+				minLon = Math.min(minLon, point.longitude);
+				maxLat = Math.max(maxLat, point.latitude);
+				maxLon = Math.max(maxLon, point.longitude);
+			}
+			minLatInput.setText(String.valueOf(minLat));
+			maxLatInput.setText(String.valueOf(maxLat));
+			minLonInput.setText(String.valueOf(minLon));
+			maxLonInput.setText(String.valueOf(maxLon));
 		}
-		minLatInput.setText(String.valueOf(minLat));
-		maxLatInput.setText(String.valueOf(maxLat));
-		minLonInput.setText(String.valueOf(minLon));
-		maxLonInput.setText(String.valueOf(maxLon));
 
 		geopackagesButton.setOnClickListener(new View.OnClickListener() {
 

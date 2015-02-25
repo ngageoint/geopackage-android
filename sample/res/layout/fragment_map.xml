@@ -11,4 +11,37 @@
         android:layout_alignParentTop="true"
         class="com.google.android.gms.maps.MapFragment" />
 
+    <LinearLayout
+        android:id="@+id/mapLoadTilesButtons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible" >
+
+        <ImageButton
+            android:id="@+id/mapLoadTilesButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:background="#eeeeee"
+            android:contentDescription="@string/map_download_tiles"
+            android:src="@drawable/ic_tiles" />
+
+        <ImageButton
+            android:id="@+id/mapLoadTilesClearButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:background="#eeeeee"
+            android:contentDescription="@string/map_clear_bounding_box"
+            android:src="@drawable/ic_point" />
+    </LinearLayout>
+
 </RelativeLayout>

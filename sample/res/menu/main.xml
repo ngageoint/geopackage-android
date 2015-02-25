@@ -3,10 +3,11 @@
     tools:context="mil.nga.giat.geopackage.sample.MainActivity" >
 
     <group android:id="@+id/menu_group_map" >
-        <item android:id="@+id/download_tiles"
-        	android:icon="@drawable/ic_tiles"
-	        android:title="@string/map_download_tiles"
-	        android:showAsAction="always" />
+        <item
+            android:id="@+id/map_bounding_box"
+            android:icon="@drawable/ic_tiles"
+            android:showAsAction="always"
+            android:title="@string/map_bounding_box"/>
         <item
             android:id="@+id/max_features"
             android:showAsAction="never"

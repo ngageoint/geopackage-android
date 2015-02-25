@@ -8,5 +8,6 @@
     <integer name="load_tiles_default_max_zoom_default">5</integer>
     <integer name="load_tiles_compress_quality_default">100</integer>
     <integer name="map_tiles_long_click_vibrate">50</integer>
+    <integer name="map_tiles_long_click_screen_percentage">5</integer>
     
 </resources>
