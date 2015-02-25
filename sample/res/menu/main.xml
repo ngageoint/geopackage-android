@@ -5,7 +5,7 @@
     <group android:id="@+id/menu_group_map" >
         <item
             android:id="@+id/map_bounding_box"
-            android:icon="@drawable/ic_tiles"
+            android:icon="@drawable/ic_bounding_box"
             android:showAsAction="always"
             android:title="@string/map_bounding_box"/>
         <item

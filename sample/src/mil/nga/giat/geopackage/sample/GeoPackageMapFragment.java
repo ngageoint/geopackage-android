@@ -285,7 +285,7 @@ public class GeoPackageMapFragment extends Fragment implements
 			if (!boundingBoxMode) {
 				boundingBoxMode = true;
 				loadTilesView.setVisibility(View.VISIBLE);
-				boundingBoxMenuItem.setIcon(R.drawable.ic_linestring); // TODO
+				boundingBoxMenuItem.setIcon(R.drawable.ic_bounding_box_active);
 			} else {
 				resetDownloadTiles();
 			}
@@ -320,7 +320,7 @@ public class GeoPackageMapFragment extends Fragment implements
 		boundingBoxMode = false;
 		loadTilesView.setVisibility(View.INVISIBLE);
 		if (boundingBoxMenuItem != null) {
-			boundingBoxMenuItem.setIcon(R.drawable.ic_tiles); // TODO
+			boundingBoxMenuItem.setIcon(R.drawable.ic_bounding_box);
 		}
 		clearBoundingBox();
 	}
