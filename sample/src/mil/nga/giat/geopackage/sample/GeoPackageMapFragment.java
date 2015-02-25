@@ -130,9 +130,9 @@ public class GeoPackageMapFragment extends Fragment implements
 	private TouchableMap touch;
 
 	/**
-	 * Download tiles mode
+	 * Bounding box mode
 	 */
-	private boolean downloadTiles = false;
+	private boolean boundingBoxMode = false;
 
 	/**
 	 * Bounding box starting corner
@@ -282,8 +282,8 @@ public class GeoPackageMapFragment extends Fragment implements
 		switch (item.getItemId()) {
 		case R.id.map_bounding_box:
 			boundingBoxMenuItem = item;
-			if (!downloadTiles) {
-				downloadTiles = true;
+			if (!boundingBoxMode) {
+				boundingBoxMode = true;
 				loadTilesView.setVisibility(View.VISIBLE);
 				boundingBoxMenuItem.setIcon(R.drawable.ic_linestring); // TODO
 			} else {
@@ -317,7 +317,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Reset the download tiles state
 	 */
 	private void resetDownloadTiles() {
-		downloadTiles = false;
+		boundingBoxMode = false;
 		loadTilesView.setVisibility(View.INVISIBLE);
 		if (boundingBoxMenuItem != null) {
 			boundingBoxMenuItem.setIcon(R.drawable.ic_tiles); // TODO
@@ -581,7 +581,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	@Override
 	public void onMapLongClick(LatLng point) {
 
-		if (downloadTiles) {
+		if (boundingBoxMode) {
 
 			vibrator.vibrate(getActivity().getResources().getInteger(
 					R.integer.map_tiles_long_click_vibrate));
@@ -709,7 +709,7 @@ public class GeoPackageMapFragment extends Fragment implements
 			switch (ev.getAction()) {
 			case MotionEvent.ACTION_MOVE:
 			case MotionEvent.ACTION_UP:
-				if (downloadTiles) {
+				if (boundingBoxMode) {
 					if (drawing && polygon != null) {
 						Point point = new Point((int) ev.getX(),
 								(int) ev.getY());
