@@ -928,9 +928,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	@Override
 	public void onLoadTilesCancelled(String result) {
-		if (active.isModified()) {
-			updateInBackground();
-		}
+		loadTilesFinished();
 	}
 
 	/**
@@ -938,10 +936,21 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	@Override
 	public void onLoadTilesPostExecute(String result) {
+		loadTilesFinished();
+	}
+
+	/**
+	 * When loading tiles is finished
+	 */
+	private void loadTilesFinished() {
 		if (active.isModified()) {
 			updateInBackground();
+			if (polygon != null) {
+				PolygonOptions polygonOptions = new PolygonOptions();
+				polygonOptions.addAll(polygon.getPoints());
+				polygon = map.addPolygon(polygonOptions);
+			}
 		}
-
 	}
 
 }
