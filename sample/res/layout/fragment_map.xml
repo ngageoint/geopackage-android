@@ -26,22 +26,26 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:background="#eeeeee"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:background="#B3FFFFFF"
             android:contentDescription="@string/map_download_tiles"
-            android:src="@drawable/ic_tiles" />
+            android:src="@drawable/ic_download_tiles"
+            android:scaleX=".77"
+            android:scaleY=".77" />
 
         <ImageButton
             android:id="@+id/mapLoadTilesClearButton"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="5dp"
-            android:background="#eeeeee"
+            android:layout_marginLeft="1dp"
+            android:layout_marginTop="2dp"
+            android:background="#B3FFFFFF"
             android:contentDescription="@string/map_clear_bounding_box"
-            android:src="@drawable/ic_point" />
+            android:src="@drawable/ic_clear"
+            android:scaleX=".77"
+            android:scaleY=".77" />
     </LinearLayout>
 
 </RelativeLayout>
