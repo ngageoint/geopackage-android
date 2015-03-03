@@ -1,0 +1,167 @@
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj
+END
+proj.pc.in
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/proj.pc.in
+END
+mkinstalldirs
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/mkinstalldirs
+END
+configure
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/configure
+END
+Makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/Makefile.in
+END
+makefile.vc
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/makefile.vc
+END
+AUTHORS
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/AUTHORS
+END
+configure.in
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/configure.in
+END
+depcomp
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/depcomp
+END
+ChangeLog
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/ChangeLog
+END
+config.guess
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/config.guess
+END
+nmake.opt
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/nmake.opt
+END
+config.sub
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/config.sub
+END
+ltmain.sh
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/ltmain.sh
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/README
+END
+fixtimes.sh
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/fixtimes.sh
+END
+proj.spec
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/proj.spec
+END
+libtool
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/libtool
+END
+ltconfig
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/ltconfig
+END
+INSTALL
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/INSTALL
+END
+COPYING
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/COPYING
+END
+missing
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/missing
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/Makefile.am
+END
+autogen.sh
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/autogen.sh
+END
+NEWS
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/NEWS
+END
+aclocal.m4
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/aclocal.m4
+END
+HOWTO-RELEASE
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/HOWTO-RELEASE
+END
+install-sh
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/install-sh
+END

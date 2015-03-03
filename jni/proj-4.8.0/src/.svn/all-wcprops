@@ -1,0 +1,1061 @@
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src
+END
+PJ_wag7.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_wag7.c
+END
+PJ_eqc.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_eqc.c
+END
+PJ_putp2.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_putp2.c
+END
+pj_tsfn.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_tsfn.c
+END
+pj_transform.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_transform.c
+END
+PJ_tcea.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_tcea.c
+END
+pj_pr_list.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_pr_list.c
+END
+adjlon.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/adjlon.c
+END
+PJ_putp6.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_putp6.c
+END
+pj_log.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_log.c
+END
+pj_gauss.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_gauss.c
+END
+pj_geocent.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_geocent.c
+END
+PJ_merc.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_merc.c
+END
+pj_ell_set.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_ell_set.c
+END
+PJ_urm5.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_urm5.c
+END
+PJ_somerc.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_somerc.c
+END
+mk_cheby.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/mk_cheby.c
+END
+geod_for.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/geod_for.c
+END
+nad_init.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/nad_init.c
+END
+pj_mlfn.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_mlfn.c
+END
+PJ_mill.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_mill.c
+END
+biveval.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/biveval.c
+END
+gen_cheb.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/gen_cheb.c
+END
+PJ_nell_h.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_nell_h.c
+END
+pj_units.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_units.c
+END
+PJ_moll.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_moll.c
+END
+PJ_airy.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_airy.c
+END
+pj_qsfn.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_qsfn.c
+END
+dmstor.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/dmstor.c
+END
+pj_release.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_release.c
+END
+proj_etmerc.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj_etmerc.c
+END
+PJ_isea.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_isea.c
+END
+proj.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj.c
+END
+PJ_bacon.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_bacon.c
+END
+PJ_vandg4.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_vandg4.c
+END
+cs2cs.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/cs2cs.c
+END
+nad_cvt.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/nad_cvt.c
+END
+PJ_eck3.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_eck3.c
+END
+PJ_cass.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_cass.c
+END
+PJ_geos.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_geos.c
+END
+pj_datums.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_datums.c
+END
+PJ_gnom.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_gnom.c
+END
+PJ_larr.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_larr.c
+END
+geod_inv.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/geod_inv.c
+END
+PJ_boggs.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_boggs.c
+END
+PJ_lcc.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_lcc.c
+END
+PJ_lcca.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_lcca.c
+END
+pj_init.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_init.c
+END
+projects.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/projects.h
+END
+PJ_natearth.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_natearth.c
+END
+pj_malloc.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_malloc.c
+END
+nad_list.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/nad_list.h
+END
+PJ_tcc.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_tcc.c
+END
+PJ_sts.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_sts.c
+END
+PJ_robin.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_robin.c
+END
+makefile.vc
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/makefile.vc
+END
+PJ_putp3.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_putp3.c
+END
+PJ_gall.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_gall.c
+END
+pj_fwd.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_fwd.c
+END
+proj_config.h.in
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj_config.h.in
+END
+pj_gridlist.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_gridlist.c
+END
+PJ_poly.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_poly.c
+END
+PJ_nsper.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_nsper.c
+END
+pj_open_lib.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_open_lib.c
+END
+pj_apply_gridshift.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_apply_gridshift.c
+END
+PJ_gins8.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_gins8.c
+END
+PJ_goode.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_goode.c
+END
+geodesic.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/geodesic.h
+END
+org_proj4_Projections.h
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/org_proj4_Projections.h
+END
+geod_set.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/geod_set.c
+END
+PJ_collg.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_collg.c
+END
+PJ_lsat.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_lsat.c
+END
+PJ_gstmerc.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_gstmerc.c
+END
+PJ_rpoly.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_rpoly.c
+END
+PJ_aitoff.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_aitoff.c
+END
+PJ_aeqd.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_aeqd.c
+END
+PJ_nzmg.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_nzmg.c
+END
+pj_list.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_list.c
+END
+proj_rouss.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj_rouss.c
+END
+PJ_tpeqd.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_tpeqd.c
+END
+PJ_bipc.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_bipc.c
+END
+proj_api.h
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj_api.h
+END
+p_series.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/p_series.c
+END
+pj_list.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_list.h
+END
+jniproj.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/jniproj.c
+END
+geod.c
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/geod.c
+END
+PJ_eck4.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_eck4.c
+END
+PJ_mbtfpp.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_mbtfpp.c
+END
+PJ_mbt_fps.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_mbt_fps.c
+END
+geocent.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/geocent.c
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/Makefile.am
+END
+geocent.h
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/geocent.h
+END
+pj_factors.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_factors.c
+END
+PJ_igh.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_igh.c
+END
+Makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/Makefile.in
+END
+PJ_chamb.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_chamb.c
+END
+PJ_nocol.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_nocol.c
+END
+PJ_imw_p.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_imw_p.c
+END
+PJ_fouc_s.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_fouc_s.c
+END
+PJ_denoy.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_denoy.c
+END
+PJ_loxim.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_loxim.c
+END
+PJ_wink1.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_wink1.c
+END
+bch2bps.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/bch2bps.c
+END
+PJ_healpix.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_healpix.c
+END
+bchgen.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/bchgen.c
+END
+PJ_sconics.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_sconics.c
+END
+pj_mutex.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_mutex.c
+END
+pj_msfn.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_msfn.c
+END
+multistresstest.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/multistresstest.c
+END
+PJ_tmerc.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_tmerc.c
+END
+PJ_lagrng.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_lagrng.c
+END
+PJ_crast.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_crast.c
+END
+pj_strerrno.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_strerrno.c
+END
+proj_config.h.wince
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj_config.h.wince
+END
+rtodms.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/rtodms.c
+END
+PJ_vandg2.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_vandg2.c
+END
+emess.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/emess.c
+END
+PJ_eck1.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_eck1.c
+END
+PJ_cc.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_cc.c
+END
+PJ_eck5.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_eck5.c
+END
+emess.h
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/emess.h
+END
+PJ_mbtfpq.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_mbtfpq.c
+END
+PJ_nell.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_nell.c
+END
+vector1.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/vector1.c
+END
+PJ_putp4p.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_putp4p.c
+END
+PJ_fahey.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_fahey.c
+END
+PJ_krovak.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_krovak.c
+END
+pj_ctx.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_ctx.c
+END
+PJ_wag2.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_wag2.c
+END
+pj_latlong.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_latlong.c
+END
+pj_gridinfo.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_gridinfo.c
+END
+nad_intr.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/nad_intr.c
+END
+aasincos.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/aasincos.c
+END
+PJ_august.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_august.c
+END
+PJ_hammer.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_hammer.c
+END
+pj_deriv.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_deriv.c
+END
+org_proj4_PJ.h
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/org_proj4_PJ.h
+END
+hypot.c
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/hypot.c
+END
+PJ_hatano.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_hatano.c
+END
+PJ_eqdc.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_eqdc.c
+END
+PJ_mod_ster.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_mod_ster.c
+END
+PJ_putp5.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_putp5.c
+END
+pj_apply_vgridshift.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_apply_vgridshift.c
+END
+pj_ellps.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_ellps.c
+END
+PJ_stere.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_stere.c
+END
+runmultistresstest.sh
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/runmultistresstest.sh
+END
+PJ_labrd.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_labrd.c
+END
+pj_errno.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_errno.c
+END
+PJ_wink2.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_wink2.c
+END
+PJ_lask.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_lask.c
+END
+PJ_ortho.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_ortho.c
+END
+proj.def
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj.def
+END
+PJ_vandg.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_vandg.c
+END
+pj_utils.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_utils.c
+END
+pj_auth.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_auth.c
+END
+PJ_bonne.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_bonne.c
+END
+pj_phi2.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_phi2.c
+END
+PJ_omerc.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_omerc.c
+END
+PJ_ocea.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_ocea.c
+END
+PJ_urmfps.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_urmfps.c
+END
+proj_mdist.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/proj_mdist.c
+END
+PJ_sterea.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_sterea.c
+END
+nad2bin.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/nad2bin.c
+END
+PJ_eck2.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_eck2.c
+END
+PJ_ob_tran.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_ob_tran.c
+END
+pj_datum_set.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_datum_set.c
+END
+PJ_aea.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_aea.c
+END
+pj_initcache.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_initcache.c
+END
+PJ_cea.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_cea.c
+END
+pj_inv.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_inv.c
+END
+pj_zpoly1.c
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_zpoly1.c
+END
+pj_param.c
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/pj_param.c
+END
+PJ_wag3.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_wag3.c
+END
+PJ_gn_sinu.c
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_gn_sinu.c
+END
+PJ_laea.c
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_laea.c
+END
+PJ_oea.c
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/src/PJ_oea.c
+END

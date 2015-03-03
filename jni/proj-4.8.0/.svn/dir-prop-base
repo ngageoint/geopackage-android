@@ -1,0 +1,15 @@
+K 10
+svn:ignore
+V 100
+*~
+*.manifest
+*.swp
+autom4te.cache
+config.log
+config.status
+config.cache
+Makefile
+proj.pc
+nbproject
+
+END

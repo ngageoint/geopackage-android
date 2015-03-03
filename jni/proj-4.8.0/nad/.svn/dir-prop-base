@@ -1,0 +1,21 @@
+K 10
+svn:ignore
+V 96
+WI
+prvi
+WO
+alaska
+FL
+README.NADUS
+stpaul
+stgeorge
+TN
+conus
+MD
+hawaii
+stlrnc
+null
+Makefile
+*.lla
+
+END

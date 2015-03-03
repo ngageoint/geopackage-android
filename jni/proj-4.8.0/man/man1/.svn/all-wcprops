@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/man/man1
+END
+Makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/man/man1/Makefile.in
+END
+nad2nad.1
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/man/man1/nad2nad.1
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/man/man1/Makefile.am
+END
+proj.1
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/man/man1/proj.1
+END
+cs2cs.1
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/man/man1/cs2cs.1
+END
+geod.1
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/man/man1/geod.1
+END

@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap
+END
+Makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/Makefile.in
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/Makefile.am
+END
+doxygen.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/doxygen.cfg
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/README
+END
+build.xml
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/build.xml
+END

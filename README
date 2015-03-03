@@ -1,0 +1,19 @@
+
+
+--- Assets ---
+
+The SDK sql assets must be linked when using the library.
+Link (or copy) the assets/sql directory from the SDK to your project assets directory.
+
+
+--- Sample Application ---
+
+Add the GeoPackageSDKSample project under sample.
+Link the assets directory (from sample/assets: ln -s ../../assets/sql sql)
+
+
+--- Tests ---
+
+To run tests, change AndroidManifest.xml android.library to true.
+Add the GeoPackageSDKTests project under tests.
+Run the project as Android JUnits

@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4
+END
+Projections.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/Projections.java
+END
+LatLong.java
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/LatLong.java
+END
+Makefile.in
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/Makefile.in
+END
+Others.java
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/Others.java
+END
+package-info.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/package-info.java
+END
+Proj4Factory.java
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/Proj4Factory.java
+END
+ProjectionData.java
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/ProjectionData.java
+END
+PJException.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/PJException.java
+END
+Makefile.am
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/Makefile.am
+END
+PJ.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/PJ.java
+END
+Proj4.java
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/metacrs/!svn/ver/2190/proj/tags/4.8.0/proj/jniwrap/org/proj4/Proj4.java
+END

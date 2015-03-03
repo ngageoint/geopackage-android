@@ -1,0 +1,27 @@
+K 10
+svn:ignore
+V 151
+*~
+*.lo
+*.la
+proj.dll
+*.lib
+*.pdb
+*.exp
+*.opt
+*.obj
+*.exe
+.libs
+.deps
+*.manifest
+*.swp
+nad2nad
+nad2bin
+proj
+geod
+stamp-h*
+proj_config.h
+cs2cs
+Makefile
+
+END
