@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="bounding_box_draw_color">#FF2F4F4F</color>
+    <color name="bounding_box_draw_color">#FF000000</color>
     <color name="bounding_box_draw_fill_color">#0F000000</color>
     <item name="marker_color" type="dimen" format="float">240.0</item>
-    <color name="polyline_color">#FF2F4F4F</color>
-    <color name="polygon_color">#FF2F4F4F</color>
+    <color name="polyline_color">#FF000000</color>
+    <color name="polygon_color">#FF000000</color>
     <color name="polygon_fill_color">#0F000000</color>
     <item name="marker_edit_color" type="dimen" format="float">120.0</item>
     <item name="shape_edit_icon_anchor_width" type="dimen" format="float">0.5</item>
