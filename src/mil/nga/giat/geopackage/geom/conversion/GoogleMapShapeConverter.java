@@ -877,6 +877,8 @@ public class GoogleMapShapeConverter {
 
 		if (shape instanceof LatLng) {
 			addedShape = addLatLngToMap(map, (LatLng) shape);
+		} else if (shape instanceof MarkerOptions) {
+			addedShape = addMarkerOptionsToMap(map, (MarkerOptions) shape);
 		} else if (shape instanceof PolylineOptions) {
 			addedShape = addPolylineToMap(map, (PolylineOptions) shape);
 		} else if (shape instanceof PolygonOptions) {
@@ -911,6 +913,17 @@ public class GoogleMapShapeConverter {
 	 */
 	public Marker addLatLngToMap(GoogleMap map, LatLng latLng) {
 		return addLatLngToMap(map, latLng, new MarkerOptions());
+	}
+
+	/**
+	 * Add MarkerOptions to the map
+	 * 
+	 * @param map
+	 * @param options
+	 * @return
+	 */
+	public Marker addMarkerOptionsToMap(GoogleMap map, MarkerOptions options) {
+		return map.addMarker(options);
 	}
 
 	/**
@@ -959,7 +972,11 @@ public class GoogleMapShapeConverter {
 	public List<Marker> addLatLngsToMap(GoogleMap map, MultiLatLng latLngs) {
 		List<Marker> markers = new ArrayList<Marker>();
 		for (LatLng latLng : latLngs.getLatLngs()) {
-			Marker marker = addLatLngToMap(map, latLng);
+			MarkerOptions markerOptions = new MarkerOptions();
+			if (latLngs.getMarkerOptions() != null) {
+				markerOptions.icon(latLngs.getMarkerOptions().getIcon());
+			}
+			Marker marker = addLatLngToMap(map, latLng, markerOptions);
 			markers.add(marker);
 		}
 		return markers;
@@ -976,6 +993,9 @@ public class GoogleMapShapeConverter {
 			MultiPolylineOptions polylines) {
 		List<Polyline> polylineList = new ArrayList<Polyline>();
 		for (PolylineOptions polylineOption : polylines.getPolylineOptions()) {
+			if (polylines.getOptions() != null) {
+				polylineOption.color(polylines.getOptions().getColor());
+			}
 			Polyline polyline = addPolylineToMap(map, polylineOption);
 			polylineList.add(polyline);
 		}
@@ -995,6 +1015,11 @@ public class GoogleMapShapeConverter {
 		for (PolygonOptions polygonOption : polygons.getPolygonOptions()) {
 			com.google.android.gms.maps.model.Polygon polygon = addPolygonToMap(
 					map, polygonOption);
+			if (polygons.getOptions() != null) {
+				polygonOption.fillColor(polygons.getOptions().getFillColor());
+				polygonOption.strokeColor(polygons.getOptions()
+						.getStrokeColor());
+			}
 			polygonList.add(polygon);
 		}
 		return polygonList;

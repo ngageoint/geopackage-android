@@ -18,6 +18,9 @@ import mil.nga.giat.geopackage.geom.Geometry;
 import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.LineString;
 import mil.nga.giat.geopackage.geom.conversion.GoogleMapShapeConverter;
+import mil.nga.giat.geopackage.geom.conversion.MultiLatLng;
+import mil.nga.giat.geopackage.geom.conversion.MultiPolygonOptions;
+import mil.nga.giat.geopackage.geom.conversion.MultiPolylineOptions;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.tiles.overlay.GoogleAPIGeoPackageOverlay;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
@@ -34,6 +37,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.text.InputType;
+import android.util.TypedValue;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,6 +61,7 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -206,14 +211,9 @@ public class GeoPackageMapFragment extends Fragment implements
 	private Map<String, Long> editFeatureIds = new HashMap<String, Long>();
 
 	/**
-	 * Mapping between marker ids and feature polylines
+	 * Mapping between marker ids and feature objects
 	 */
-	private Map<String, Polyline> editFeaturePolylines = new HashMap<String, Polyline>();
-
-	/**
-	 * Mapping between marker ids and feature polygons
-	 */
-	private Map<String, Polygon> editFeaturePolygons = new HashMap<String, Polygon>();
+	private Map<String, Object> editFeatureObjects = new HashMap<String, Object>();
 
 	/**
 	 * Edit points type
@@ -828,8 +828,7 @@ public class GeoPackageMapFragment extends Fragment implements
 		editFeaturesDatabase = null;
 		editFeaturesTable = null;
 		editFeatureIds.clear();
-		editFeaturePolylines.clear();
-		editFeaturePolygons.clear();
+		editFeatureObjects.clear();
 		clearEditFeatures();
 		updateInBackground();
 	}
@@ -1098,7 +1097,8 @@ public class GeoPackageMapFragment extends Fragment implements
 
 					if (geometry != null) {
 						count++;
-						final Object shape = converter.toShape(geometry);
+						final Object shape = prepareShapeOptions(
+								converter.toShape(geometry), editable, true);
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -1122,6 +1122,120 @@ public class GeoPackageMapFragment extends Fragment implements
 	}
 
 	/**
+	 * Prepare the shape options
+	 * 
+	 * @param shape
+	 * @param editable
+	 * @param topLevel
+	 */
+	private Object prepareShapeOptions(Object shape, boolean editable,
+			boolean topLevel) {
+
+		Object prepared = shape;
+
+		if (shape instanceof LatLng) {
+			LatLng latLng = (LatLng) shape;
+			MarkerOptions markerOptions = getMarkerOptions(editable, topLevel);
+			markerOptions.position(latLng);
+			prepared = markerOptions;
+		} else if (shape instanceof PolylineOptions) {
+			PolylineOptions polylineOptions = (PolylineOptions) shape;
+			setPolylineOptions(editable, polylineOptions);
+		} else if (shape instanceof PolygonOptions) {
+			PolygonOptions polygonOptions = (PolygonOptions) shape;
+			setPolygonOptions(editable, polygonOptions);
+		} else if (shape instanceof MultiLatLng) {
+			MultiLatLng multiLatLng = (MultiLatLng) shape;
+			MarkerOptions markerOptions = getMarkerOptions(editable, false);
+			multiLatLng.setMarkerOptions(markerOptions);
+		} else if (shape instanceof MultiPolylineOptions) {
+			MultiPolylineOptions multiPolylineOptions = (MultiPolylineOptions) shape;
+			PolylineOptions polylineOptions = new PolylineOptions();
+			setPolylineOptions(editable, polylineOptions);
+			multiPolylineOptions.setOptions(polylineOptions);
+		} else if (shape instanceof MultiPolygonOptions) {
+			MultiPolygonOptions multiPolygonOptions = (MultiPolygonOptions) shape;
+			PolygonOptions polygonOptions = new PolygonOptions();
+			setPolygonOptions(editable, polygonOptions);
+			multiPolygonOptions.setOptions(polygonOptions);
+		} else if (shape instanceof List<?>) {
+			@SuppressWarnings("unchecked")
+			List<Object> shapes = (List<Object>) shape;
+			for (int i = 0; i < shapes.size(); i++) {
+				shapes.set(i,
+						prepareShapeOptions(shapes.get(i), editable, false));
+			}
+		}
+
+		return prepared;
+	}
+
+	/**
+	 * Get marker options
+	 * 
+	 * @param editable
+	 * @param clickable
+	 * @return
+	 */
+	private MarkerOptions getMarkerOptions(boolean editable, boolean clickable) {
+		MarkerOptions markerOptions = new MarkerOptions();
+		TypedValue typedValue = new TypedValue();
+		if (editable) {
+			if (clickable) {
+				getResources().getValue(R.dimen.marker_edit_color, typedValue,
+						true);
+			} else {
+				getResources().getValue(R.dimen.marker_edit_read_only_color,
+						typedValue, true);
+			}
+
+		} else {
+			getResources().getValue(R.dimen.marker_color, typedValue, true);
+		}
+		markerOptions.icon(BitmapDescriptorFactory.defaultMarker(typedValue
+				.getFloat()));
+		return markerOptions;
+	}
+
+	/**
+	 * Set the Polyline Option attributes
+	 * 
+	 * @param editable
+	 * @param polylineOptions
+	 */
+	private void setPolylineOptions(boolean editable,
+			PolylineOptions polylineOptions) {
+		if (editable) {
+			polylineOptions.color(getResources().getColor(
+					R.color.polyline_edit_color));
+		} else {
+			polylineOptions.color(getResources().getColor(
+					R.color.polyline_color));
+		}
+	}
+
+	/**
+	 * Set the Polygon Option attributes
+	 * 
+	 * @param editable
+	 * @param polygonOptions
+	 */
+	private void setPolygonOptions(boolean editable,
+			PolygonOptions polygonOptions) {
+		if (editable) {
+			polygonOptions.strokeColor(getResources().getColor(
+					R.color.polygon_edit_color));
+			polygonOptions.fillColor(getResources().getColor(
+					R.color.polygon_edit_fill_color));
+		} else {
+			polygonOptions.strokeColor(getResources().getColor(
+					R.color.polygon_color));
+			polygonOptions.fillColor(getResources().getColor(
+					R.color.polygon_fill_color));
+		}
+	}
+
+	/**
 	 * Add editable shape
 	 * 
 	 * @param row
@@ -1132,23 +1246,99 @@ public class GeoPackageMapFragment extends Fragment implements
 		if (shape instanceof Marker) {
 			Marker marker = (Marker) shape;
 			editFeatureIds.put(marker.getId(), row.getId());
+		} else {
+			Marker marker = getMarker(shape);
+			if (marker != null) {
+				editFeatureIds.put(marker.getId(), row.getId());
+				editFeatureObjects.put(marker.getId(), shape);
+			}
+		}
+	}
+
+	/**
+	 * Get the first marker of the shape or create one at the location
+	 * 
+	 * @param shape
+	 * @return
+	 */
+	private Marker getMarker(Object shape) {
+
+		Marker marker = null;
+
+		if (shape instanceof Marker) {
+			marker = (Marker) shape;
+			TypedValue typedValue = new TypedValue();
+			getResources()
+					.getValue(R.dimen.marker_edit_color, typedValue, true);
+			marker.setIcon(BitmapDescriptorFactory.defaultMarker(typedValue
+					.getFloat()));
 		} else if (shape instanceof Polyline) {
 			Polyline polyline = (Polyline) shape;
-			MarkerOptions polylineMarkerOptions = new MarkerOptions();
-			polylineMarkerOptions.position(polyline.getPoints().get(0));
-			Marker polylineMarker = map.addMarker(polylineMarkerOptions);
-			editFeatureIds.put(polylineMarker.getId(), row.getId());
-			editFeaturePolylines.put(polylineMarker.getId(), polyline);
+			LatLng latLng = polyline.getPoints().get(0);
+			marker = createEditMarker(latLng);
 		} else if (shape instanceof Polygon) {
 			Polygon polygon = (Polygon) shape;
-			MarkerOptions polygonMarkerOptions = new MarkerOptions();
-			polygonMarkerOptions.position(polygon.getPoints().get(0));
-			Marker polygonMarker = map.addMarker(polygonMarkerOptions);
-			editFeatureIds.put(polygonMarker.getId(), row.getId());
-			editFeaturePolygons.put(polygonMarker.getId(), polygon);
+			LatLng latLng = polygon.getPoints().get(0);
+			marker = createEditMarker(latLng);
+		} else if (shape instanceof List<?>) {
+			@SuppressWarnings("unchecked")
+			List<Object> shapes = (List<Object>) shape;
+			for (Object listShape : shapes) {
+				marker = getMarker(listShape);
+				if (marker != null) {
+					break;
+				}
+			}
 		}
-		// Currently not supporting multi type geometries
 
+		return marker;
+	}
+
+	/**
+	 * Create an edit marker to edit polylines and polygons
+	 * 
+	 * @param latLng
+	 * @return
+	 */
+	private Marker createEditMarker(LatLng latLng) {
+		MarkerOptions markerOptions = new MarkerOptions();
+		markerOptions.position(latLng);
+		markerOptions.icon(BitmapDescriptorFactory
+				.fromResource(R.drawable.ic_shape_edit));
+		TypedValue typedValueWidth = new TypedValue();
+		getResources().getValue(R.dimen.shape_edit_icon_anchor_width,
+				typedValueWidth, true);
+		TypedValue typedValueHeight = new TypedValue();
+		getResources().getValue(R.dimen.shape_edit_icon_anchor_height,
+				typedValueHeight, true);
+		markerOptions.anchor(typedValueWidth.getFloat(),
+				typedValueHeight.getFloat());
+		Marker marker = map.addMarker(markerOptions);
+		return marker;
+	}
+
+	/**
+	 * Remove the feature shape from the map
+	 * 
+	 * @param shape
+	 */
+	private void removeFeature(Object shape) {
+		if (shape instanceof Marker) {
+			Marker marker = (Marker) shape;
+			marker.remove();
+		} else if (shape instanceof Polyline) {
+			Polyline polyline = (Polyline) shape;
+			polyline.remove();
+		} else if (shape instanceof Polygon) {
+			Polygon polygon = (Polygon) shape;
+			polygon.remove();
+		} else if (shape instanceof List<?>) {
+			@SuppressWarnings("unchecked")
+			List<Object> shapes = (List<Object>) shape;
+			for (Object listShape : shapes) {
+				removeFeature(listShape);
+			}
+		}
 	}
 
 	/**
@@ -1232,6 +1422,10 @@ public class GeoPackageMapFragment extends Fragment implements
 				boundingBoxStartCorner = point;
 				boundingBoxEndCorner = point;
 				PolygonOptions polygonOptions = new PolygonOptions();
+				polygonOptions.strokeColor(getResources().getColor(
+						R.color.bounding_box_draw_color));
+				polygonOptions.fillColor(getResources().getColor(
+						R.color.bounding_box_draw_fill_color));
 				List<LatLng> points = getPolygonPoints(boundingBoxStartCorner,
 						boundingBoxEndCorner);
 				polygonOptions.addAll(points);
@@ -1254,11 +1448,34 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Add edit point
 	 * 
 	 * @param point
+	 * @param editType
 	 */
 	private void addEditPoint(LatLng point) {
 		MarkerOptions markerOptions = new MarkerOptions();
 		markerOptions.position(point);
 		markerOptions.draggable(true);
+		switch (editFeatureType) {
+		case POINT:
+			TypedValue typedValue = new TypedValue();
+			getResources().getValue(R.dimen.marker_create_color, typedValue,
+					true);
+			markerOptions.icon(BitmapDescriptorFactory.defaultMarker(typedValue
+					.getFloat()));
+			break;
+		case LINESTRING:
+		case POLYGON:
+			markerOptions.icon(BitmapDescriptorFactory
+					.fromResource(R.drawable.ic_shape_draw));
+			TypedValue typedValueWidth = new TypedValue();
+			getResources().getValue(R.dimen.shape_draw_icon_anchor_width,
+					typedValueWidth, true);
+			TypedValue typedValueHeight = new TypedValue();
+			getResources().getValue(R.dimen.shape_draw_icon_anchor_height,
+					typedValueHeight, true);
+			markerOptions.anchor(typedValueWidth.getFloat(),
+					typedValueHeight.getFloat());
+			break;
+		}
 		Marker marker = map.addMarker(markerOptions);
 		editPoints.put(marker.getId(), marker);
 	}
@@ -1286,6 +1503,8 @@ public class GeoPackageMapFragment extends Fragment implements
 					editLinestring.setPoints(points);
 				} else {
 					PolylineOptions polylineOptions = new PolylineOptions();
+					polylineOptions.color(getResources().getColor(
+							R.color.polyline_draw_color));
 					polylineOptions.addAll(points);
 					editLinestring = map.addPolyline(polylineOptions);
 				}
@@ -1306,6 +1525,10 @@ public class GeoPackageMapFragment extends Fragment implements
 					editPolygon.setPoints(points);
 				} else {
 					PolygonOptions polygonOptions = new PolygonOptions();
+					polygonOptions.strokeColor(getResources().getColor(
+							R.color.polygon_draw_color));
+					polygonOptions.fillColor(getResources().getColor(
+							R.color.polygon_draw_fill_color));
 					polygonOptions.addAll(points);
 					editPolygon = map.addPolygon(polygonOptions);
 				}
@@ -1494,16 +1717,10 @@ public class GeoPackageMapFragment extends Fragment implements
 										featureDao.delete(featureRow);
 										marker.remove();
 
-										Polyline polyline = editFeaturePolylines
+										Object featureObject = editFeatureObjects
 												.remove(marker.getId());
-										if (polyline != null) {
-											polyline.remove();
-										}
-
-										Polygon polygon = editFeaturePolygons
-												.remove(marker.getId());
-										if (polygon != null) {
-											polygon.remove();
+										if (featureObject != null) {
+											removeFeature(featureObject);
 										}
 
 										active.setModified(true);
@@ -1819,6 +2036,8 @@ public class GeoPackageMapFragment extends Fragment implements
 			updateInBackground();
 			if (boundingBox != null) {
 				PolygonOptions polygonOptions = new PolygonOptions();
+				polygonOptions.fillColor(boundingBox.getFillColor());
+				polygonOptions.strokeColor(boundingBox.getStrokeColor());
 				polygonOptions.addAll(boundingBox.getPoints());
 				boundingBox = map.addPolygon(polygonOptions);
 			}
