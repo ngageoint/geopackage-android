@@ -206,6 +206,16 @@ public class GeoPackageMapFragment extends Fragment implements
 	private Map<String, Long> editFeatureIds = new HashMap<String, Long>();
 
 	/**
+	 * Mapping between marker ids and feature polylines
+	 */
+	private Map<String, Polyline> editFeaturePolylines = new HashMap<String, Polyline>();
+
+	/**
+	 * Mapping between marker ids and feature polygons
+	 */
+	private Map<String, Polygon> editFeaturePolygons = new HashMap<String, Polygon>();
+
+	/**
 	 * Edit points type
 	 */
 	private EditType editFeatureType = null;
@@ -818,6 +828,8 @@ public class GeoPackageMapFragment extends Fragment implements
 		editFeaturesDatabase = null;
 		editFeaturesTable = null;
 		editFeatureIds.clear();
+		editFeaturePolylines.clear();
+		editFeaturePolygons.clear();
 		clearEditFeatures();
 		updateInBackground();
 	}
@@ -1126,14 +1138,14 @@ public class GeoPackageMapFragment extends Fragment implements
 			polylineMarkerOptions.position(polyline.getPoints().get(0));
 			Marker polylineMarker = map.addMarker(polylineMarkerOptions);
 			editFeatureIds.put(polylineMarker.getId(), row.getId());
-			// TODO save the polyline
+			editFeaturePolylines.put(polylineMarker.getId(), polyline);
 		} else if (shape instanceof Polygon) {
 			Polygon polygon = (Polygon) shape;
 			MarkerOptions polygonMarkerOptions = new MarkerOptions();
 			polygonMarkerOptions.position(polygon.getPoints().get(0));
 			Marker polygonMarker = map.addMarker(polygonMarkerOptions);
 			editFeatureIds.put(polygonMarker.getId(), row.getId());
-			// TODO save the polygon
+			editFeaturePolygons.put(polygonMarker.getId(), polygon);
 		}
 		// Currently not supporting multi type geometries
 
@@ -1401,8 +1413,6 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	private void editMarkerClick(final Marker marker) {
 
-		// TODO determine if this is a polyline or polygon
-
 		LatLng position = marker.getPosition();
 		String message = editFeatureType.name();
 		if (editFeatureType != EditType.POINT) {
@@ -1483,6 +1493,19 @@ public class GeoPackageMapFragment extends Fragment implements
 									try {
 										featureDao.delete(featureRow);
 										marker.remove();
+
+										Polyline polyline = editFeaturePolylines
+												.remove(marker.getId());
+										if (polyline != null) {
+											polyline.remove();
+										}
+
+										Polygon polygon = editFeaturePolygons
+												.remove(marker.getId());
+										if (polygon != null) {
+											polygon.remove();
+										}
+
 										active.setModified(true);
 									} catch (Exception e) {
 										if (GeoPackageUtils
