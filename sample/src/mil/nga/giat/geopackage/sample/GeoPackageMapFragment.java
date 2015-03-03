@@ -126,6 +126,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	private static View editFeaturesView;
 
 	/**
+	 * Edit features polygon hole view
+	 */
+	private static View editFeaturesPolygonHoleView;
+
+	/**
 	 * GeoPackage manager
 	 */
 	private GeoPackageManager manager;
@@ -225,7 +230,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	private enum EditType {
 
-		POINT, LINESTRING, POLYGON;
+		POINT, LINESTRING, POLYGON, POLYGON_HOLE;
 
 	}
 
@@ -233,6 +238,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Map of edit point marker ids and markers
 	 */
 	private Map<String, Marker> editPoints = new LinkedHashMap<String, Marker>();
+
+	/**
+	 * Map of edit point hole marker ids and markers
+	 */
+	private Map<String, Marker> editHolePoints = new LinkedHashMap<String, Marker>();
 
 	/**
 	 * Edit linestring
@@ -243,6 +253,16 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Edit polygon
 	 */
 	private Polygon editPolygon;
+
+	/**
+	 * Edit hole polygon
+	 */
+	private Polygon editHolePolygon;
+
+	/**
+	 * List of hold polygons
+	 */
+	private List<List<LatLng>> holePolygons = new ArrayList<List<LatLng>>();
 
 	/**
 	 * Edit point button
@@ -268,6 +288,21 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Edit clear button
 	 */
 	private ImageButton editClearButton;
+
+	/**
+	 * Edit polygon holes button
+	 */
+	private ImageButton editPolygonHolesButton;
+
+	/**
+	 * Edit accept button
+	 */
+	private ImageButton editAcceptPolygonHolesButton;
+
+	/**
+	 * Edit clear button
+	 */
+	private ImageButton editClearPolygonHolesButton;
 
 	/**
 	 * Constructor
@@ -365,6 +400,8 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	private void setEditFeaturesView() {
 		editFeaturesView = view.findViewById(R.id.mapFeaturesButtons);
+		editFeaturesPolygonHoleView = view
+				.findViewById(R.id.mapFeaturesPolygonHoleButtons);
 
 		editPointButton = (ImageButton) editFeaturesView
 				.findViewById(R.id.mapEditPointButton);
@@ -411,6 +448,7 @@ public class GeoPackageMapFragment extends Fragment implements
 						}
 						break;
 					case POLYGON:
+					case POLYGON_HOLE:
 						if (editPoints.size() >= 3) {
 							accept = true;
 						}
@@ -433,6 +471,49 @@ public class GeoPackageMapFragment extends Fragment implements
 				}
 			}
 		});
+
+		editPolygonHolesButton = (ImageButton) editFeaturesPolygonHoleView
+				.findViewById(R.id.mapEditPolygonHoleButton);
+		editPolygonHolesButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				if (editFeatureType != EditType.POLYGON_HOLE) {
+					editFeatureType = EditType.POLYGON_HOLE;
+					editPolygonHolesButton
+							.setImageResource(R.drawable.ic_edit_polygon_hole_active);
+				} else {
+					editFeatureType = EditType.POLYGON;
+					editPolygonHolesButton
+							.setImageResource(R.drawable.ic_edit_polygon_hole);
+				}
+
+			}
+		});
+
+		editAcceptPolygonHolesButton = (ImageButton) editFeaturesPolygonHoleView
+				.findViewById(R.id.mapEditPolygonHoleAcceptButton);
+		editAcceptPolygonHolesButton
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View arg0) {
+						if (editHolePoints.size() >= 3) {
+							List<LatLng> latLngPoints = getLatLngPoints(editHolePoints);
+							holePolygons.add(latLngPoints);
+							clearEditHoleFeatures();
+							updateEditState(false);
+						}
+					}
+				});
+
+		editClearPolygonHolesButton = (ImageButton) editFeaturesPolygonHoleView
+				.findViewById(R.id.mapEditPolygonHoleClearButton);
+		editClearPolygonHolesButton
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View arg0) {
+						clearEditHoleFeatures();
+					}
+				});
 
 	}
 
@@ -513,9 +594,12 @@ public class GeoPackageMapFragment extends Fragment implements
 				editLinestringButton
 						.setImageResource(R.drawable.ic_edit_linestring_active);
 				break;
+			case POLYGON_HOLE:
+				editFeatureType = EditType.POLYGON;
 			case POLYGON:
 				editPolygonButton
 						.setImageResource(R.drawable.ic_edit_polygon_active);
+				editFeaturesPolygonHoleView.setVisibility(View.VISIBLE);
 				break;
 			}
 		}
@@ -564,6 +648,7 @@ public class GeoPackageMapFragment extends Fragment implements
 				break;
 
 			case POLYGON:
+			case POLYGON_HOLE:
 
 				mil.nga.giat.geopackage.geom.Polygon polygon = converter
 						.toPolygon(editPolygon);
@@ -866,11 +951,33 @@ public class GeoPackageMapFragment extends Fragment implements
 			editPolygon.remove();
 			editPolygon = null;
 		}
+		holePolygons.clear();
 		editPointButton.setImageResource(R.drawable.ic_edit_point);
 		editLinestringButton.setImageResource(R.drawable.ic_edit_linestring);
 		editPolygonButton.setImageResource(R.drawable.ic_edit_polygon);
+		editFeaturesPolygonHoleView.setVisibility(View.INVISIBLE);
 		editAcceptButton.setImageResource(R.drawable.ic_accept);
 		editClearButton.setImageResource(R.drawable.ic_clear);
+		editPolygonHolesButton
+				.setImageResource(R.drawable.ic_edit_polygon_hole);
+		clearEditHoleFeatures();
+	}
+
+	/**
+	 * Clear the edit hole features
+	 */
+	private void clearEditHoleFeatures() {
+
+		for (Marker editMarker : editHolePoints.values()) {
+			editMarker.remove();
+		}
+		editHolePoints.clear();
+		if (editHolePolygon != null) {
+			editHolePolygon.remove();
+			editHolePolygon = null;
+		}
+		editAcceptPolygonHolesButton.setImageResource(R.drawable.ic_accept);
+		editClearPolygonHolesButton.setImageResource(R.drawable.ic_clear);
 	}
 
 	/**
@@ -1466,18 +1573,32 @@ public class GeoPackageMapFragment extends Fragment implements
 		case POLYGON:
 			markerOptions.icon(BitmapDescriptorFactory
 					.fromResource(R.drawable.ic_shape_draw));
-			TypedValue typedValueWidth = new TypedValue();
+			TypedValue drawWidth = new TypedValue();
 			getResources().getValue(R.dimen.shape_draw_icon_anchor_width,
-					typedValueWidth, true);
-			TypedValue typedValueHeight = new TypedValue();
+					drawWidth, true);
+			TypedValue drawHeight = new TypedValue();
 			getResources().getValue(R.dimen.shape_draw_icon_anchor_height,
-					typedValueHeight, true);
-			markerOptions.anchor(typedValueWidth.getFloat(),
-					typedValueHeight.getFloat());
+					drawHeight, true);
+			markerOptions.anchor(drawHeight.getFloat(), drawHeight.getFloat());
+			break;
+		case POLYGON_HOLE:
+			markerOptions.icon(BitmapDescriptorFactory
+					.fromResource(R.drawable.ic_shape_hole_draw));
+			TypedValue holeWidth = new TypedValue();
+			getResources().getValue(R.dimen.shape_draw_icon_anchor_width,
+					holeWidth, true);
+			TypedValue holeHeight = new TypedValue();
+			getResources().getValue(R.dimen.shape_draw_icon_anchor_height,
+					holeHeight, true);
+			markerOptions.anchor(holeWidth.getFloat(), holeHeight.getFloat());
 			break;
 		}
 		Marker marker = map.addMarker(markerOptions);
-		editPoints.put(marker.getId(), marker);
+		if (editFeatureType == EditType.POLYGON_HOLE) {
+			editHolePoints.put(marker.getId(), marker);
+		} else {
+			editPoints.put(marker.getId(), marker);
+		}
 	}
 
 	/**
@@ -1490,7 +1611,9 @@ public class GeoPackageMapFragment extends Fragment implements
 		switch (editFeatureType) {
 
 		case POINT:
-			accept = true;
+			if (!editPoints.isEmpty()) {
+				accept = true;
+			}
 			break;
 
 		case LINESTRING:
@@ -1498,7 +1621,7 @@ public class GeoPackageMapFragment extends Fragment implements
 			if (editPoints.size() >= 2) {
 				accept = true;
 
-				List<LatLng> points = getEditLatLngPoints();
+				List<LatLng> points = getLatLngPoints(editPoints);
 				if (editLinestring != null) {
 					editLinestring.setPoints(points);
 				} else {
@@ -1516,13 +1639,15 @@ public class GeoPackageMapFragment extends Fragment implements
 			break;
 
 		case POLYGON:
+		case POLYGON_HOLE:
 
 			if (editPoints.size() >= 3) {
 				accept = true;
 
-				List<LatLng> points = getEditLatLngPoints();
+				List<LatLng> points = getLatLngPoints(editPoints);
 				if (editPolygon != null) {
 					editPolygon.setPoints(points);
+					editPolygon.setHoles(holePolygons);
 				} else {
 					PolygonOptions polygonOptions = new PolygonOptions();
 					polygonOptions.strokeColor(getResources().getColor(
@@ -1530,6 +1655,9 @@ public class GeoPackageMapFragment extends Fragment implements
 					polygonOptions.fillColor(getResources().getColor(
 							R.color.polygon_draw_fill_color));
 					polygonOptions.addAll(points);
+					for (List<LatLng> hole : holePolygons) {
+						polygonOptions.addHole(hole);
+					}
 					editPolygon = map.addPolygon(polygonOptions);
 				}
 			} else if (editPolygon != null) {
@@ -1537,13 +1665,61 @@ public class GeoPackageMapFragment extends Fragment implements
 				editPolygon = null;
 			}
 
+			if (editFeatureType == EditType.POLYGON_HOLE) {
+
+				if (editPoints.size() >= 3) {
+					accept = true;
+				}
+
+				if (!editHolePoints.isEmpty()) {
+					editClearPolygonHolesButton
+							.setImageResource(R.drawable.ic_clear_active);
+				} else {
+					editClearPolygonHolesButton
+							.setImageResource(R.drawable.ic_clear);
+				}
+
+				if (editHolePoints.size() >= 3) {
+
+					editAcceptPolygonHolesButton
+							.setImageResource(R.drawable.ic_accept_active);
+
+					List<LatLng> points = getLatLngPoints(editHolePoints);
+					if (editHolePolygon != null) {
+						editHolePolygon.setPoints(points);
+					} else {
+						PolygonOptions polygonOptions = new PolygonOptions();
+						polygonOptions.strokeColor(getResources().getColor(
+								R.color.polygon_hole_draw_color));
+						polygonOptions.fillColor(getResources().getColor(
+								R.color.polygon_hole_draw_fill_color));
+						polygonOptions.addAll(points);
+						editHolePolygon = map.addPolygon(polygonOptions);
+					}
+
+				} else {
+					editAcceptPolygonHolesButton
+							.setImageResource(R.drawable.ic_accept);
+					if (editHolePolygon != null) {
+						editHolePolygon.remove();
+						editHolePolygon = null;
+					}
+				}
+			}
+
 			break;
 		}
 
 		if (numberPointsChanged) {
-			editClearButton.setImageResource(R.drawable.ic_clear_active);
+			if (!editPoints.isEmpty()) {
+				editClearButton.setImageResource(R.drawable.ic_clear_active);
+			} else {
+				editClearButton.setImageResource(R.drawable.ic_clear);
+			}
 			if (accept) {
 				editAcceptButton.setImageResource(R.drawable.ic_accept_active);
+			} else {
+				editAcceptButton.setImageResource(R.drawable.ic_accept);
 			}
 		}
 	}
@@ -1551,11 +1727,12 @@ public class GeoPackageMapFragment extends Fragment implements
 	/**
 	 * Get a list of points as LatLng
 	 * 
+	 * @param markers
 	 * @return
 	 */
-	private List<LatLng> getEditLatLngPoints() {
+	private List<LatLng> getLatLngPoints(Map<String, Marker> markers) {
 		List<LatLng> points = new ArrayList<LatLng>();
-		for (Marker editPoint : editPoints.values()) {
+		for (Marker editPoint : markers.values()) {
 			points.add(editPoint.getPosition());
 		}
 		return points;
@@ -1606,7 +1783,12 @@ public class GeoPackageMapFragment extends Fragment implements
 			} else {
 				Marker editPoint = editPoints.get(marker.getId());
 				if (editPoint != null) {
-					editMarkerClick(marker);
+					editMarkerClick(marker, editPoints);
+				} else {
+					editPoint = editHolePoints.get(marker.getId());
+					if (editPoint != null) {
+						editMarkerClick(marker, editHolePoints);
+					}
 				}
 			}
 		}
@@ -1633,8 +1815,10 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Edit marker click
 	 * 
 	 * @param marker
+	 * @param points
 	 */
-	private void editMarkerClick(final Marker marker) {
+	private void editMarkerClick(final Marker marker,
+			final Map<String, Marker> points) {
 
 		LatLng position = marker.getPosition();
 		String message = editFeatureType.name();
@@ -1656,7 +1840,7 @@ public class GeoPackageMapFragment extends Fragment implements
 							public void onClick(DialogInterface dialog,
 									int which) {
 
-								editPoints.remove(marker.getId());
+								points.remove(marker.getId());
 								marker.remove();
 
 								updateEditState(true);

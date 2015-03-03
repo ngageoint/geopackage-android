@@ -17,8 +17,12 @@
     <item name="marker_create_color" type="dimen" format="float">0.0</item>
     <item name="shape_draw_icon_anchor_width" type="dimen" format="float">0.5</item>
     <item name="shape_draw_icon_anchor_height" type="dimen" format="float">0.5</item>
+    <item name="shape_hole_draw_icon_anchor_width" type="dimen" format="float">0.5</item>
+    <item name="shape_hole_draw_icon_anchor_height" type="dimen" format="float">0.5</item>
     <color name="polyline_draw_color">#FFFF0000</color>
     <color name="polygon_draw_color">#FFFF0000</color>
     <color name="polygon_draw_fill_color">#50FF0000</color>
+    <color name="polygon_hole_draw_color">#FFFF0000</color>
+    <color name="polygon_hole_draw_fill_color">#50FFFFFF</color>
     
 </resources>
