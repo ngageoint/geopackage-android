@@ -15,21 +15,17 @@
             android:orientation="horizontal" >
 
             <TextView
-                android:id="@+id/create_features_name_label"
+                android:id="@+id/edit_features_selection_geopackage_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_features_name_label" />
+                android:text="@string/edit_features_selection_geopackage_label" />
 
-            <EditText
-                android:id="@+id/create_features_name_input"
-                android:layout_width="fill_parent"
+            <Spinner
+                android:id="@+id/edit_features_selection_geopackage"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="text" />
+                android:prompt="@string/edit_features_selection_geopackage_prompt" />
         </LinearLayout>
-
-        <include
-            android:id="@+id/create_features_bounding_box"
-            layout="@layout/bounding_box" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,17 +33,16 @@
             android:orientation="horizontal" >
 
             <TextView
-                android:id="@+id/create_features_geometry_type_label"
+                android:id="@+id/edit_features_selection_features_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/edit_features_geometry_type_label" />
+                android:text="@string/edit_features_selection_features_label" />
 
             <Spinner
-                android:id="@+id/create_features_geometry_type"
+                android:id="@+id/edit_features_selection_features"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/edit_features_geometry_types"
-                android:prompt="@string/edit_features_geometry_type_prompt" />
+                android:prompt="@string/edit_features_selection_features_prompt" />
         </LinearLayout>
     </LinearLayout>
 

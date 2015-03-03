@@ -346,47 +346,47 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a {@link MultiPoint} to a list of {@link LatLng}
+	 * Convert a {@link MultiPoint} to a {@link MultiLatLng}
 	 * 
 	 * @param multiPoint
 	 * @return
 	 */
-	public List<LatLng> toLatLngs(MultiPoint multiPoint) {
+	public MultiLatLng toLatLngs(MultiPoint multiPoint) {
 
-		List<LatLng> points = new ArrayList<LatLng>();
+		MultiLatLng multiLatLng = new MultiLatLng();
 
 		for (Point point : multiPoint.getPoints()) {
 			LatLng latLng = toLatLng(point);
-			points.add(latLng);
+			multiLatLng.add(latLng);
 		}
 
-		return points;
+		return multiLatLng;
 	}
 
 	/**
-	 * Convert a list of {@link LatLng} to a {@link MultiPoint}
+	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
 	 * 
-	 * @param latLngList
+	 * @param latLngs
 	 * @return
 	 */
-	public MultiPoint toMultiPoint(List<LatLng> latLngList) {
-		return toMultiPoint(latLngList, false, false);
+	public MultiPoint toMultiPoint(MultiLatLng latLngs) {
+		return toMultiPoint(latLngs, false, false);
 	}
 
 	/**
-	 * Convert a list of {@link LatLng} to a {@link MultiPoint}
+	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
 	 * 
-	 * @param latLngList
+	 * @param latLngs
 	 * @param hasZ
 	 * @param hasM
 	 * @return
 	 */
-	public MultiPoint toMultiPoint(List<LatLng> latLngList, boolean hasZ,
+	public MultiPoint toMultiPoint(MultiLatLng latLngs, boolean hasZ,
 			boolean hasM) {
 
 		MultiPoint multiPoint = new MultiPoint(hasZ, hasM);
 
-		for (LatLng latLng : latLngList) {
+		for (LatLng latLng : latLngs.getLatLngs()) {
 			Point point = toPoint(latLng);
 			multiPoint.addPoint(point);
 		}
@@ -395,14 +395,14 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a {@link MultiLineString} to a list of {@link PolylineOptions}
+	 * Convert a {@link MultiLineString} to a {@link MultiPolylineOptions}
 	 * 
 	 * @param multiLineString
 	 * @return
 	 */
-	public List<PolylineOptions> toPolylines(MultiLineString multiLineString) {
+	public MultiPolylineOptions toPolylines(MultiLineString multiLineString) {
 
-		List<PolylineOptions> polylines = new ArrayList<PolylineOptions>();
+		MultiPolylineOptions polylines = new MultiPolylineOptions();
 
 		for (LineString lineString : multiLineString.getLineStrings()) {
 			PolylineOptions polyline = toPolyline(lineString);
@@ -444,30 +444,32 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a list of {@link PolylineOptions} to a {@link MultiLineString}
+	 * Convert a {@link MultiPolylineOptions} to a {@link MultiLineString}
 	 * 
-	 * @param polylineList
+	 * @param multiPolylineOptions
 	 * @return
 	 */
 	public MultiLineString toMultiLineStringFromOptions(
-			List<PolylineOptions> polylineList) {
-		return toMultiLineStringFromOptions(polylineList, false, false);
+			MultiPolylineOptions multiPolylineOptions) {
+		return toMultiLineStringFromOptions(multiPolylineOptions, false, false);
 	}
 
 	/**
-	 * Convert a list of {@link PolylineOptions} to a {@link MultiLineString}
+	 * Convert a {@link MultiPolylineOptions} to a {@link MultiLineString}
 	 * 
-	 * @param polylineList
+	 * @param multiPolylineOptions
 	 * @param hasZ
 	 * @param hasM
 	 * @return
 	 */
 	public MultiLineString toMultiLineStringFromOptions(
-			List<PolylineOptions> polylineList, boolean hasZ, boolean hasM) {
+			MultiPolylineOptions multiPolylineOptions, boolean hasZ,
+			boolean hasM) {
 
 		MultiLineString multiLineString = new MultiLineString(hasZ, hasM);
 
-		for (PolylineOptions polyline : polylineList) {
+		for (PolylineOptions polyline : multiPolylineOptions
+				.getPolylineOptions()) {
 			LineString lineString = toLineString(polyline);
 			multiLineString.addLineString(lineString);
 		}
@@ -476,14 +478,14 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a {@link MultiPolygon} to a list of {@link PolygonOptions}
+	 * Convert a {@link MultiPolygon} to a {@link MultiPolygonOptions}
 	 * 
 	 * @param multiPolygon
 	 * @return
 	 */
-	public List<PolygonOptions> toPolygons(MultiPolygon multiPolygon) {
+	public MultiPolygonOptions toPolygons(MultiPolygon multiPolygon) {
 
-		List<PolygonOptions> polygons = new ArrayList<PolygonOptions>();
+		MultiPolygonOptions polygons = new MultiPolygonOptions();
 
 		for (Polygon polygon : multiPolygon.getPolygons()) {
 			PolygonOptions polygonOptions = toPolygon(polygon);
@@ -527,30 +529,31 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a list of {@link PolygonOptions} to a {@link MultiPolygon}
+	 * Convert a {@link MultiPolygonOptions} to a {@link MultiPolygon}
 	 * 
-	 * @param polygonList
+	 * @param multiPolygonOptions
 	 * @return
 	 */
 	public MultiPolygon toMultiPolygonFromOptions(
-			List<PolygonOptions> polygonList) {
-		return toMultiPolygonFromOptions(polygonList, false, false);
+			MultiPolygonOptions multiPolygonOptions) {
+		return toMultiPolygonFromOptions(multiPolygonOptions, false, false);
 	}
 
 	/**
 	 * Convert a list of {@link PolygonOptions} to a {@link MultiPolygon}
 	 * 
-	 * @param polygonList
+	 * @param multiPolygonOptions
 	 * @param hasZ
 	 * @param hasM
 	 * @return
 	 */
 	public MultiPolygon toMultiPolygonFromOptions(
-			List<PolygonOptions> polygonList, boolean hasZ, boolean hasM) {
+			MultiPolygonOptions multiPolygonOptions, boolean hasZ, boolean hasM) {
 
 		MultiPolygon multiPolygon = new MultiPolygon(hasZ, hasM);
 
-		for (PolygonOptions mapPolygon : polygonList) {
+		for (PolygonOptions mapPolygon : multiPolygonOptions
+				.getPolygonOptions()) {
 			Polygon polygon = toPolygon(mapPolygon);
 			multiPolygon.addPolygon(polygon);
 		}
@@ -559,14 +562,14 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a {@link CompoundCurve} to a list of {@link PolylineOptions}
+	 * Convert a {@link CompoundCurve} to a {@link MultiPolylineOptions}
 	 * 
 	 * @param compoundCurve
 	 * @return
 	 */
-	public List<PolylineOptions> toPolylines(CompoundCurve compoundCurve) {
+	public MultiPolylineOptions toPolylines(CompoundCurve compoundCurve) {
 
-		List<PolylineOptions> polylines = new ArrayList<PolylineOptions>();
+		MultiPolylineOptions polylines = new MultiPolylineOptions();
 
 		for (LineString lineString : compoundCurve.getLineStrings()) {
 			PolylineOptions polyline = toPolyline(lineString);
@@ -608,30 +611,32 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a list of {@link PolylineOptions} to a {@link CompoundCurve}
+	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
 	 * 
-	 * @param polylineList
+	 * @param multiPolylineOptions
 	 * @return
 	 */
 	public CompoundCurve toCompoundCurveWithOptions(
-			List<PolylineOptions> polylineList) {
-		return toCompoundCurveWithOptions(polylineList, false, false);
+			MultiPolylineOptions multiPolylineOptions) {
+		return toCompoundCurveWithOptions(multiPolylineOptions, false, false);
 	}
 
 	/**
-	 * Convert a list of {@link PolylineOptions} to a {@link CompoundCurve}
+	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
 	 * 
-	 * @param polylineList
+	 * @param multiPolylineOptions
 	 * @param hasZ
 	 * @param hasM
 	 * @return
 	 */
 	public CompoundCurve toCompoundCurveWithOptions(
-			List<PolylineOptions> polylineList, boolean hasZ, boolean hasM) {
+			MultiPolylineOptions multiPolylineOptions, boolean hasZ,
+			boolean hasM) {
 
 		CompoundCurve compoundCurve = new CompoundCurve(hasZ, hasM);
 
-		for (PolylineOptions polyline : polylineList) {
+		for (PolylineOptions polyline : multiPolylineOptions
+				.getPolylineOptions()) {
 			LineString lineString = toLineString(polyline);
 			compoundCurve.addLineString(lineString);
 		}
@@ -640,14 +645,14 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a {@link PolyhedralSurface} to a list of {@link PolygonOptions}
+	 * Convert a {@link PolyhedralSurface} to a {@link MultiPolygonOptions}
 	 * 
 	 * @param polyhedralSurface
 	 * @return
 	 */
-	public List<PolygonOptions> toPolygons(PolyhedralSurface polyhedralSurface) {
+	public MultiPolygonOptions toPolygons(PolyhedralSurface polyhedralSurface) {
 
-		List<PolygonOptions> polygons = new ArrayList<PolygonOptions>();
+		MultiPolygonOptions polygons = new MultiPolygonOptions();
 
 		for (Polygon polygon : polyhedralSurface.getPolygons()) {
 			PolygonOptions polygonOptions = toPolygon(polygon);
@@ -691,30 +696,31 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a list of {@link PolygonOptions} to a {@link PolyhedralSurface}
+	 * Convert a {@link MultiPolygonOptions} to a {@link PolyhedralSurface}
 	 * 
-	 * @param polygonList
+	 * @param multiPolygonOptions
 	 * @return
 	 */
 	public PolyhedralSurface toPolyhedralSurfaceWithOptions(
-			List<PolygonOptions> polygonList) {
-		return toPolyhedralSurfaceWithOptions(polygonList, false, false);
+			MultiPolygonOptions multiPolygonOptions) {
+		return toPolyhedralSurfaceWithOptions(multiPolygonOptions, false, false);
 	}
 
 	/**
-	 * Convert a list of {@link PolygonOptions} to a {@link PolyhedralSurface}
+	 * Convert a {@link MultiPolygonOptions} to a {@link PolyhedralSurface}
 	 * 
-	 * @param polygonList
+	 * @param multiPolygonOptions
 	 * @param hasZ
 	 * @param hasM
 	 * @return
 	 */
 	public PolyhedralSurface toPolyhedralSurfaceWithOptions(
-			List<PolygonOptions> polygonList, boolean hasZ, boolean hasM) {
+			MultiPolygonOptions multiPolygonOptions, boolean hasZ, boolean hasM) {
 
 		PolyhedralSurface polyhedralSurface = new PolyhedralSurface(hasZ, hasM);
 
-		for (PolygonOptions mapPolygon : polygonList) {
+		for (PolygonOptions mapPolygon : multiPolygonOptions
+				.getPolygonOptions()) {
 			Polygon polygon = toPolygon(mapPolygon);
 			polyhedralSurface.addPolygon(polygon);
 		}
@@ -859,6 +865,44 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
+	 * Add a shape to the map
+	 * 
+	 * @param map
+	 * @param shape
+	 * @return
+	 */
+	public Object addShapeToMap(GoogleMap map, Object shape) {
+
+		Object addedShape = null;
+
+		if (shape instanceof LatLng) {
+			addedShape = addLatLngToMap(map, (LatLng) shape);
+		} else if (shape instanceof PolylineOptions) {
+			addedShape = addPolylineToMap(map, (PolylineOptions) shape);
+		} else if (shape instanceof PolygonOptions) {
+			addedShape = addPolygonToMap(map, (PolygonOptions) shape);
+		} else if (shape instanceof MultiLatLng) {
+			addedShape = addLatLngsToMap(map, (MultiLatLng) shape);
+		} else if (shape instanceof MultiPolylineOptions) {
+			addedShape = addPolylinesToMap(map, (MultiPolylineOptions) shape);
+		} else if (shape instanceof MultiPolygonOptions) {
+			addedShape = addPolygonsToMap(map, (MultiPolygonOptions) shape);
+		} else if (shape instanceof List<?>) {
+			List<Object> addedShapeList = new ArrayList<Object>();
+			List<?> shapeList = (List<?>) shape;
+			for (Object shapeListItem : shapeList) {
+				addedShapeList.add(addShapeToMap(map, shapeListItem));
+			}
+			addedShape = addedShapeList;
+		} else {
+			throw new GeoPackageException("Unsupported Shape Type: "
+					+ shape.getClass().toString());
+		}
+
+		return addedShape;
+	}
+
+	/**
 	 * Add a LatLng to the map
 	 * 
 	 * @param map
@@ -912,9 +956,9 @@ public class GoogleMapShapeConverter {
 	 * @param latLngs
 	 * @return
 	 */
-	public List<Marker> addLatLngsToMap(GoogleMap map, List<LatLng> latLngs) {
+	public List<Marker> addLatLngsToMap(GoogleMap map, MultiLatLng latLngs) {
 		List<Marker> markers = new ArrayList<Marker>();
-		for (LatLng latLng : latLngs) {
+		for (LatLng latLng : latLngs.getLatLngs()) {
 			Marker marker = addLatLngToMap(map, latLng);
 			markers.add(marker);
 		}
@@ -925,13 +969,13 @@ public class GoogleMapShapeConverter {
 	 * Add a list of Polylines to the map
 	 * 
 	 * @param map
-	 * @param latLngs
+	 * @param polylines
 	 * @return
 	 */
 	public List<Polyline> addPolylinesToMap(GoogleMap map,
-			List<PolylineOptions> polylines) {
+			MultiPolylineOptions polylines) {
 		List<Polyline> polylineList = new ArrayList<Polyline>();
-		for (PolylineOptions polylineOption : polylines) {
+		for (PolylineOptions polylineOption : polylines.getPolylineOptions()) {
 			Polyline polyline = addPolylineToMap(map, polylineOption);
 			polylineList.add(polyline);
 		}
@@ -942,13 +986,13 @@ public class GoogleMapShapeConverter {
 	 * Add a list of Polygons to the map
 	 * 
 	 * @param map
-	 * @param latLngs
+	 * @param polygons
 	 * @return
 	 */
 	public List<com.google.android.gms.maps.model.Polygon> addPolygonsToMap(
-			GoogleMap map, List<PolygonOptions> polygons) {
+			GoogleMap map, MultiPolygonOptions polygons) {
 		List<com.google.android.gms.maps.model.Polygon> polygonList = new ArrayList<com.google.android.gms.maps.model.Polygon>();
-		for (PolygonOptions polygonOption : polygons) {
+		for (PolygonOptions polygonOption : polygons.getPolygonOptions()) {
 			com.google.android.gms.maps.model.Polygon polygon = addPolygonToMap(
 					map, polygonOption);
 			polygonList.add(polygon);

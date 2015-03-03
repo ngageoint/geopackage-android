@@ -554,6 +554,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 				.findViewById(R.id.bounding_box_max_longitude_input);
 		final Button preloadedLocationsButton = (Button) createFeaturesView
 				.findViewById(R.id.bounding_box_preloaded);
+		final Spinner geometryTypeSpinner = (Spinner) createFeaturesView
+				.findViewById(R.id.create_features_geometry_type);
 
 		GeoPackageUtils
 				.prepareBoundingBoxInputs(getActivity(), minLatInput,
@@ -601,11 +603,14 @@ public class GeoPackageManagerFragment extends Fragment implements
 							BoundingBox boundingBox = new BoundingBox(minLon,
 									maxLon, minLat, maxLat);
 
+							GeometryType geometryType = GeometryType
+									.fromName(geometryTypeSpinner
+											.getSelectedItem().toString());
+
 							GeometryColumns geometryColumns = new GeometryColumns();
 							geometryColumns.setId(new TableColumnKey(tableName,
 									"geom"));
-							geometryColumns
-									.setGeometryType(GeometryType.GEOMETRY);
+							geometryColumns.setGeometryType(geometryType);
 							geometryColumns.setZ((byte) 0);
 							geometryColumns.setM((byte) 0);
 

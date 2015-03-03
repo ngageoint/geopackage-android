@@ -205,4 +205,18 @@ public class GeoPackageUtils {
 		});
 	}
 
+	/**
+	 * Determine if the exception is caused from a missing function or module in
+	 * SQLite versions 4.2.0 and later. Lollipop uses version 3.8.4.3 so these
+	 * are not supported in Android.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	public static boolean isFutureSQLiteException(Exception e) {
+		String message = e.getMessage();
+		return message.contains("no such function: ST_IsEmpty")
+				|| message.contains("no such module: rtree");
+	}
+
 }

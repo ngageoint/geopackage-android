@@ -24,6 +24,9 @@ import mil.nga.giat.geopackage.geom.PolyhedralSurface;
 import mil.nga.giat.geopackage.geom.TIN;
 import mil.nga.giat.geopackage.geom.Triangle;
 import mil.nga.giat.geopackage.geom.conversion.GoogleMapShapeConverter;
+import mil.nga.giat.geopackage.geom.conversion.MultiLatLng;
+import mil.nga.giat.geopackage.geom.conversion.MultiPolygonOptions;
+import mil.nga.giat.geopackage.geom.conversion.MultiPolylineOptions;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -311,12 +314,12 @@ public class GoogleMapShapeConverterUtils {
 	private static void convertMultiPoint(GoogleMapShapeConverter converter,
 			MultiPoint multiPoint) {
 
-		List<LatLng> latLngs = converter.toLatLngs(multiPoint);
+		MultiLatLng latLngs = converter.toLatLngs(multiPoint);
 		TestCase.assertNotNull(latLngs);
-		TestCase.assertFalse(latLngs.isEmpty());
+		TestCase.assertFalse(latLngs.getLatLngs().isEmpty());
 
 		List<Point> points = multiPoint.getPoints();
-		comparePointsAndLatLngs(points, latLngs);
+		comparePointsAndLatLngs(points, latLngs.getLatLngs());
 
 		MultiPoint multiPoint2 = converter.toMultiPoint(latLngs);
 		comparePoints(multiPoint.getPoints(), multiPoint2.getPoints());
@@ -331,13 +334,13 @@ public class GoogleMapShapeConverterUtils {
 	private static void convertMultiLineString(
 			GoogleMapShapeConverter converter, MultiLineString multiLineString) {
 
-		List<PolylineOptions> polylines = converter
-				.toPolylines(multiLineString);
+		MultiPolylineOptions polylines = converter.toPolylines(multiLineString);
 		TestCase.assertNotNull(polylines);
-		TestCase.assertFalse(polylines.isEmpty());
+		TestCase.assertFalse(polylines.getPolylineOptions().isEmpty());
 
 		List<LineString> lineStrings = multiLineString.getLineStrings();
-		compareLineStringsAndPolylines(lineStrings, polylines);
+		compareLineStringsAndPolylines(lineStrings,
+				polylines.getPolylineOptions());
 
 		MultiLineString multiLineString2 = converter
 				.toMultiLineStringFromOptions(polylines);
@@ -385,12 +388,12 @@ public class GoogleMapShapeConverterUtils {
 	private static void convertMultiPolygon(GoogleMapShapeConverter converter,
 			MultiPolygon multiPolygon) {
 
-		List<PolygonOptions> mapPolygons = converter.toPolygons(multiPolygon);
+		MultiPolygonOptions mapPolygons = converter.toPolygons(multiPolygon);
 		TestCase.assertNotNull(mapPolygons);
-		TestCase.assertFalse(mapPolygons.isEmpty());
+		TestCase.assertFalse(mapPolygons.getPolygonOptions().isEmpty());
 
 		List<Polygon> polygons = multiPolygon.getPolygons();
-		comparePolygonsAndMapPolygons(polygons, mapPolygons);
+		comparePolygonsAndMapPolygons(polygons, mapPolygons.getPolygonOptions());
 
 		MultiPolygon multiPolygon2 = converter
 				.toMultiPolygonFromOptions(mapPolygons);
@@ -438,12 +441,13 @@ public class GoogleMapShapeConverterUtils {
 	private static void convertCompoundCurve(GoogleMapShapeConverter converter,
 			CompoundCurve compoundCurve) {
 
-		List<PolylineOptions> polylines = converter.toPolylines(compoundCurve);
+		MultiPolylineOptions polylines = converter.toPolylines(compoundCurve);
 		TestCase.assertNotNull(polylines);
-		TestCase.assertFalse(polylines.isEmpty());
+		TestCase.assertFalse(polylines.getPolylineOptions().isEmpty());
 
 		List<LineString> lineStrings = compoundCurve.getLineStrings();
-		compareLineStringsAndPolylines(lineStrings, polylines);
+		compareLineStringsAndPolylines(lineStrings,
+				polylines.getPolylineOptions());
 
 		CompoundCurve compoundCurve2 = converter
 				.toCompoundCurveWithOptions(polylines);
@@ -459,13 +463,13 @@ public class GoogleMapShapeConverterUtils {
 	private static void convertMultiPolygon(GoogleMapShapeConverter converter,
 			PolyhedralSurface polyhedralSurface) {
 
-		List<PolygonOptions> mapPolygons = converter
+		MultiPolygonOptions mapPolygons = converter
 				.toPolygons(polyhedralSurface);
 		TestCase.assertNotNull(mapPolygons);
-		TestCase.assertFalse(mapPolygons.isEmpty());
+		TestCase.assertFalse(mapPolygons.getPolygonOptions().isEmpty());
 
 		List<Polygon> polygons = polyhedralSurface.getPolygons();
-		comparePolygonsAndMapPolygons(polygons, mapPolygons);
+		comparePolygonsAndMapPolygons(polygons, mapPolygons.getPolygonOptions());
 
 		PolyhedralSurface polyhedralSurface2 = converter
 				.toPolyhedralSurfaceWithOptions(mapPolygons);
