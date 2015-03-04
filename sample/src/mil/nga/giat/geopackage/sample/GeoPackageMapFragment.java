@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.sample;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,6 +23,7 @@ import mil.nga.giat.geopackage.geom.conversion.MultiLatLng;
 import mil.nga.giat.geopackage.geom.conversion.MultiPolygonOptions;
 import mil.nga.giat.geopackage.geom.conversion.MultiPolylineOptions;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.util.GeometryPrinter;
 import mil.nga.giat.geopackage.tiles.overlay.GoogleAPIGeoPackageOverlay;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import android.app.AlertDialog;
@@ -1871,81 +1873,169 @@ public class GeoPackageMapFragment extends Fragment implements
 		final FeatureRow featureRow = featureDao.queryForIdRow(featureId);
 
 		if (featureRow != null) {
-			GeoPackageGeometryData geomData = featureRow.getGeometry();
+			final GeoPackageGeometryData geomData = featureRow.getGeometry();
 			final GeometryType geometryType = geomData.getGeometry()
 					.getGeometryType();
 
-			LatLng position = marker.getPosition();
-			AlertDialog deleteDialog = new AlertDialog.Builder(getActivity())
-					.setCancelable(false)
-					.setTitle(
-							getString(R.string.edit_features_delete_label)
-									+ " " + geometryType.getName())
-					.setMessage(
-							getString(R.string.edit_features_delete_label)
-									+ " " + geometryType.getName() + " from "
-									+ editFeaturesDatabase + " - "
-									+ editFeaturesTable + " (lat="
-									+ position.latitude + ", lon="
-									+ position.longitude + ") ?")
-					.setPositiveButton(
-							getString(R.string.edit_features_delete_label),
+			final LatLng position = marker.getPosition();
 
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									try {
-										featureDao.delete(featureRow);
-										marker.remove();
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+					getActivity(), android.R.layout.select_dialog_item);
+			adapter.add(getString(R.string.edit_features_info_label));
+			adapter.add(getString(R.string.edit_features_edit_label));
+			adapter.add(getString(R.string.edit_features_delete_label));
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			DecimalFormat formatter = new DecimalFormat("0.0###");
+			final String title = geometryType.getName() + "\n(lat="
+					+ formatter.format(position.latitude) + ", lon="
+					+ formatter.format(position.longitude) + ")";
+			builder.setTitle(title);
+			builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					geoPackage.close();
+				}
+			});
+			builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
 
-										Object featureObject = editFeatureObjects
-												.remove(marker.getId());
-										if (featureObject != null) {
-											removeFeature(featureObject);
-										}
+					if (item >= 0) {
+						switch (item) {
+						case 0:
+							infoExistingFeatureOption(title, geomData);
+							geoPackage.close();
+							break;
+						case 1:
 
-										active.setModified(true);
-									} catch (Exception e) {
-										if (GeoPackageUtils
-												.isFutureSQLiteException(e)) {
-											GeoPackageUtils
-													.showMessage(
-															getActivity(),
-															getString(R.string.edit_features_delete_label)
-																	+ " "
-																	+ geometryType
-																			.getName(),
-															"GeoPackage was created using a more recent SQLite version unsupported by Android");
-										} else {
-											GeoPackageUtils
-													.showMessage(
-															getActivity(),
-															getString(R.string.edit_features_delete_label)
-																	+ " "
-																	+ geometryType
-																			.getName(),
-															e.getMessage());
-										}
-									} finally {
-										geoPackage.close();
-									}
-								}
-							})
+							geoPackage.close();
+							break;
+						case 2:
+							deleteExistingFeatureOption(title, geoPackage,
+									featureDao, featureRow, marker, position,
+									geometryType);
+							break;
+						default:
+						}
+					}
+				}
+			});
 
-					.setNegativeButton(getString(R.string.button_cancel_label),
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									geoPackage.close();
-									dialog.dismiss();
-								}
-							}).create();
-			deleteDialog.show();
+			AlertDialog alert = builder.create();
+			alert.show();
+
 		} else {
 			geoPackage.close();
 		}
+	}
+
+	/**
+	 * Info existing feature option
+	 * 
+	 * @param title
+	 * @param marker
+	 */
+	private void infoExistingFeatureOption(String title,
+			GeoPackageGeometryData geomData) {
+
+		String message = GeometryPrinter.getGeometryString(geomData
+				.getGeometry());
+
+		AlertDialog viewDialog = new AlertDialog.Builder(getActivity())
+				.setTitle(title)
+				.setPositiveButton(getString(R.string.button_ok_label),
+
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				}).setMessage(message).create();
+		viewDialog.show();
+	}
+
+	/**
+	 * Delete existing feature options
+	 * 
+	 * @param title
+	 * @param geoPackage
+	 * @param featureDao
+	 * @param featureRow
+	 * @param marker
+	 * @param position
+	 * @param geometryType
+	 */
+	private void deleteExistingFeatureOption(final String title,
+			final GeoPackage geoPackage, final FeatureDao featureDao,
+			final FeatureRow featureRow, final Marker marker,
+			final LatLng position, final GeometryType geometryType) {
+
+		AlertDialog deleteDialog = new AlertDialog.Builder(getActivity())
+				.setCancelable(false)
+				.setTitle(
+						getString(R.string.edit_features_delete_label) + " "
+								+ title)
+				.setMessage(
+						getString(R.string.edit_features_delete_label) + " "
+								+ geometryType.getName() + " from "
+								+ editFeaturesDatabase + " - "
+								+ editFeaturesTable + " (lat="
+								+ position.latitude + ", lon="
+								+ position.longitude + ") ?")
+				.setPositiveButton(
+						getString(R.string.edit_features_delete_label),
+
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								try {
+									featureDao.delete(featureRow);
+									marker.remove();
+
+									Object featureObject = editFeatureObjects
+											.remove(marker.getId());
+									if (featureObject != null) {
+										removeFeature(featureObject);
+									}
+
+									active.setModified(true);
+								} catch (Exception e) {
+									if (GeoPackageUtils
+											.isFutureSQLiteException(e)) {
+										GeoPackageUtils
+												.showMessage(
+														getActivity(),
+														getString(R.string.edit_features_delete_label)
+																+ " "
+																+ geometryType
+																		.getName(),
+														"GeoPackage was created using a more recent SQLite version unsupported by Android");
+									} else {
+										GeoPackageUtils
+												.showMessage(
+														getActivity(),
+														getString(R.string.edit_features_delete_label)
+																+ " "
+																+ geometryType
+																		.getName(),
+														e.getMessage());
+									}
+								} finally {
+									geoPackage.close();
+								}
+							}
+						})
+
+				.setNegativeButton(getString(R.string.button_cancel_label),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								geoPackage.close();
+								dialog.dismiss();
+							}
+						}).create();
+		deleteDialog.show();
 	}
 
 	/**

@@ -105,6 +105,8 @@
     <string name="edit_features_selection_features_label">Features: </string>
     <string name="edit_features_selection_features_prompt">Features</string>
     <string name="edit_features_save_label">Save</string>
+    <string name="edit_features_info_label">Info</string>
+    <string name="edit_features_edit_label">Edit</string>
     <string name="edit_features_delete_label">Delete</string>
     <string name="edit_features_clear_validation_label">Unsaved Edits</string>
     <string name="edit_features_clear_validation_message">All unsaved feature edits will be lost</string>
