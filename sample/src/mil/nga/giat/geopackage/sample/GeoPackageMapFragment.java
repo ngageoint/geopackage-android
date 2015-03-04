@@ -449,7 +449,7 @@ public class GeoPackageMapFragment extends Fragment implements
 						break;
 					case POLYGON:
 					case POLYGON_HOLE:
-						if (editPoints.size() >= 3) {
+						if (editPoints.size() >= 3 && editHolePoints.isEmpty()) {
 							accept = true;
 						}
 						break;
@@ -500,7 +500,7 @@ public class GeoPackageMapFragment extends Fragment implements
 							List<LatLng> latLngPoints = getLatLngPoints(editHolePoints);
 							holePolygons.add(latLngPoints);
 							clearEditHoleFeatures();
-							updateEditState(false);
+							updateEditState(true);
 						}
 					}
 				});
@@ -512,6 +512,7 @@ public class GeoPackageMapFragment extends Fragment implements
 					@Override
 					public void onClick(View arg0) {
 						clearEditHoleFeatures();
+						updateEditState(true);
 					}
 				});
 
@@ -1667,11 +1668,8 @@ public class GeoPackageMapFragment extends Fragment implements
 
 			if (editFeatureType == EditType.POLYGON_HOLE) {
 
-				if (editPoints.size() >= 3) {
-					accept = true;
-				}
-
 				if (!editHolePoints.isEmpty()) {
+					accept = false;
 					editClearPolygonHolesButton
 							.setImageResource(R.drawable.ic_clear_active);
 				} else {
