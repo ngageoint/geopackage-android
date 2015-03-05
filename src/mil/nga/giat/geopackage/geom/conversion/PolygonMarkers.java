@@ -18,7 +18,7 @@ public class PolygonMarkers {
 
 	private List<Marker> markers = new ArrayList<Marker>();
 
-	private List<List<Marker>> holes = new ArrayList<List<Marker>>();
+	private List<PolygonHoleMarkers> holes = new ArrayList<PolygonHoleMarkers>();
 
 	public Polygon getPolygon() {
 		return polygon;
@@ -40,15 +40,15 @@ public class PolygonMarkers {
 		this.markers = markers;
 	}
 
-	public void addHole(List<Marker> hole) {
+	public void addHole(PolygonHoleMarkers hole) {
 		holes.add(hole);
 	}
 
-	public List<List<Marker>> getHoles() {
+	public List<PolygonHoleMarkers> getHoles() {
 		return holes;
 	}
 
-	public void setHoles(List<List<Marker>> holes) {
+	public void setHoles(List<PolygonHoleMarkers> holes) {
 		this.holes = holes;
 	}
 
@@ -63,8 +63,9 @@ public class PolygonMarkers {
 			polygon.setPoints(points);
 
 			List<List<LatLng>> holePointList = new ArrayList<List<LatLng>>();
-			for (List<Marker> hole : holes) {
-				List<LatLng> holePoints = converter.getPointsFromMarkers(hole);
+			for (PolygonHoleMarkers hole : holes) {
+				List<LatLng> holePoints = converter.getPointsFromMarkers(hole
+						.getMarkers());
 				holePointList.add(holePoints);
 			}
 			polygon.setHoles(holePointList);
@@ -81,11 +82,36 @@ public class PolygonMarkers {
 		for (Marker marker : markers) {
 			marker.remove();
 		}
-		for (List<Marker> hole : holes) {
-			for (Marker marker : hole) {
-				marker.remove();
+		for (PolygonHoleMarkers hole : holes) {
+			hole.remove();
+		}
+	}
+
+	/**
+	 * Is it valid
+	 * 
+	 * @return
+	 */
+	public boolean isValid() {
+		boolean valid = markers.isEmpty() || markers.size() >= 3;
+		if (valid) {
+			for (PolygonHoleMarkers hole : holes) {
+				valid = hole.isValid();
+				if (!valid) {
+					break;
+				}
 			}
 		}
+		return valid;
+	}
+
+	/**
+	 * Is it deleted
+	 * 
+	 * @return
+	 */
+	public boolean isDeleted() {
+		return markers.isEmpty();
 	}
 
 }

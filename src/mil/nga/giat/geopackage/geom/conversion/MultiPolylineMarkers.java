@@ -42,4 +42,36 @@ public class MultiPolylineMarkers {
 		}
 	}
 
+	/**
+	 * Is it valid
+	 * 
+	 * @return
+	 */
+	public boolean isValid() {
+		boolean valid = true;
+		for (PolylineMarkers polyline : polylineMarkers) {
+			valid = polyline.isValid();
+			if (!valid) {
+				break;
+			}
+		}
+		return valid;
+	}
+
+	/**
+	 * Is it deleted
+	 * 
+	 * @return
+	 */
+	public boolean isDeleted() {
+		boolean deleted = true;
+		for (PolylineMarkers polyline : polylineMarkers) {
+			deleted = polyline.isDeleted();
+			if (!deleted) {
+				break;
+			}
+		}
+		return deleted;
+	}
+
 }

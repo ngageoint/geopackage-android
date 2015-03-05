@@ -42,4 +42,36 @@ public class MultiPolygonMarkers {
 		}
 	}
 
+	/**
+	 * Is it valid
+	 * 
+	 * @return
+	 */
+	public boolean isValid() {
+		boolean valid = true;
+		for (PolygonMarkers polygon : polygonMarkers) {
+			valid = polygon.isValid();
+			if (!valid) {
+				break;
+			}
+		}
+		return valid;
+	}
+
+	/**
+	 * Is it deleted
+	 * 
+	 * @return
+	 */
+	public boolean isDeleted() {
+		boolean deleted = true;
+		for (PolygonMarkers polygon : polygonMarkers) {
+			deleted = polygon.isDeleted();
+			if (!deleted) {
+				break;
+			}
+		}
+		return deleted;
+	}
+
 }

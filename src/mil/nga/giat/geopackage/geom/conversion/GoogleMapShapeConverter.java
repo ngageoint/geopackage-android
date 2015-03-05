@@ -190,12 +190,51 @@ public class GoogleMapShapeConverter {
 
 		LineString lineString = new LineString(hasZ, hasM);
 
-		for (LatLng latLng : latLngs) {
-			Point point = toPoint(latLng, hasZ, hasM);
-			lineString.addPoint(point);
-		}
+		populateLineString(lineString, latLngs);
 
 		return lineString;
+	}
+
+	/**
+	 * Convert a list of {@link LatLng} to a {@link CircularString}
+	 * 
+	 * @param latLngs
+	 * @return
+	 */
+	public CircularString toCircularString(List<LatLng> latLngs) {
+		return toCircularString(latLngs, false, false);
+	}
+
+	/**
+	 * Convert a list of {@link LatLng} to a {@link CircularString}
+	 * 
+	 * @param latLngs
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public CircularString toCircularString(List<LatLng> latLngs, boolean hasZ,
+			boolean hasM) {
+
+		CircularString circularString = new CircularString(hasZ, hasM);
+
+		populateLineString(circularString, latLngs);
+
+		return circularString;
+	}
+
+	/**
+	 * Convert a list of {@link LatLng} to a {@link LineString}
+	 * 
+	 * @param lineString
+	 * @param latLngs
+	 */
+	public void populateLineString(LineString lineString, List<LatLng> latLngs) {
+
+		for (LatLng latLng : latLngs) {
+			Point point = toPoint(latLng, lineString.hasZ(), lineString.hasM());
+			lineString.addPoint(point);
+		}
 	}
 
 	/**
@@ -332,14 +371,16 @@ public class GoogleMapShapeConverter {
 		polygon.addRing(polygonLineString);
 
 		// Add the holes
-		for (List<LatLng> hole : holes) {
+		if (holes != null) {
+			for (List<LatLng> hole : holes) {
 
-			LineString holeLineString = new LineString(hasZ, hasM);
-			for (LatLng latLng : hole) {
-				Point point = toPoint(latLng);
-				holeLineString.addPoint(point);
+				LineString holeLineString = new LineString(hasZ, hasM);
+				for (LatLng latLng : hole) {
+					Point point = toPoint(latLng);
+					holeLineString.addPoint(point);
+				}
+				polygon.addRing(holeLineString);
 			}
-			polygon.addRing(holeLineString);
 		}
 
 		return polygon;
@@ -383,10 +424,33 @@ public class GoogleMapShapeConverter {
 	 */
 	public MultiPoint toMultiPoint(MultiLatLng latLngs, boolean hasZ,
 			boolean hasM) {
+		return toMultiPoint(latLngs.getLatLngs(), hasZ, hasM);
+	}
+
+	/**
+	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
+	 * 
+	 * @param latLngs
+	 * @return
+	 */
+	public MultiPoint toMultiPoint(List<LatLng> latLngs) {
+		return toMultiPoint(latLngs, false, false);
+	}
+
+	/**
+	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
+	 * 
+	 * @param latLngs
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public MultiPoint toMultiPoint(List<LatLng> latLngs, boolean hasZ,
+			boolean hasM) {
 
 		MultiPoint multiPoint = new MultiPoint(hasZ, hasM);
 
-		for (LatLng latLng : latLngs.getLatLngs()) {
+		for (LatLng latLng : latLngs) {
 			Point point = toPoint(latLng);
 			multiPoint.addPoint(point);
 		}
@@ -444,6 +508,69 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
+	 * Convert a list of List<LatLng> to a {@link MultiLineString}
+	 * 
+	 * @param polylineList
+	 * @return
+	 */
+	public MultiLineString toMultiLineStringFromList(
+			List<List<LatLng>> polylineList) {
+		return toMultiLineStringFromList(polylineList, false, false);
+	}
+
+	/**
+	 * Convert a list of List<LatLng> to a {@link MultiLineString}
+	 * 
+	 * @param polylineList
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public MultiLineString toMultiLineStringFromList(
+			List<List<LatLng>> polylineList, boolean hasZ, boolean hasM) {
+
+		MultiLineString multiLineString = new MultiLineString(hasZ, hasM);
+
+		for (List<LatLng> polyline : polylineList) {
+			LineString lineString = toLineString(polyline);
+			multiLineString.addLineString(lineString);
+		}
+
+		return multiLineString;
+	}
+
+	/**
+	 * Convert a list of List<LatLng> to a {@link CompoundCurve}
+	 * 
+	 * @param polylineList
+	 * @return
+	 */
+	public CompoundCurve toCompoundCurveFromList(List<List<LatLng>> polylineList) {
+		return toCompoundCurveFromList(polylineList, false, false);
+	}
+
+	/**
+	 * Convert a list of List<LatLng> to a {@link CompoundCurve}
+	 * 
+	 * @param polylineList
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public CompoundCurve toCompoundCurveFromList(
+			List<List<LatLng>> polylineList, boolean hasZ, boolean hasM) {
+
+		CompoundCurve compoundCurve = new CompoundCurve(hasZ, hasM);
+
+		for (List<LatLng> polyline : polylineList) {
+			LineString lineString = toLineString(polyline);
+			compoundCurve.addLineString(lineString);
+		}
+
+		return compoundCurve;
+	}
+
+	/**
 	 * Convert a {@link MultiPolylineOptions} to a {@link MultiLineString}
 	 * 
 	 * @param multiPolylineOptions
@@ -478,6 +605,40 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
+	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
+	 * 
+	 * @param multiPolylineOptions
+	 * @return
+	 */
+	public CompoundCurve toCompoundCurveFromOptions(
+			MultiPolylineOptions multiPolylineOptions) {
+		return toCompoundCurveFromOptions(multiPolylineOptions, false, false);
+	}
+
+	/**
+	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
+	 * 
+	 * @param multiPolylineOptions
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public CompoundCurve toCompoundCurveFromOptions(
+			MultiPolylineOptions multiPolylineOptions, boolean hasZ,
+			boolean hasM) {
+
+		CompoundCurve compoundCurve = new CompoundCurve(hasZ, hasM);
+
+		for (PolylineOptions polyline : multiPolylineOptions
+				.getPolylineOptions()) {
+			LineString lineString = toLineString(polyline);
+			compoundCurve.addLineString(lineString);
+		}
+
+		return compoundCurve;
+	}
+
+	/**
 	 * Convert a {@link MultiPolygon} to a {@link MultiPolygonOptions}
 	 * 
 	 * @param multiPolygon
@@ -496,7 +657,8 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a list of {@link Polygon} to a {@link MultiPolygon}
+	 * Convert a list of {@link com.google.android.gms.maps.model.Polygon} to a
+	 * {@link MultiPolygon}
 	 * 
 	 * @param polygonList
 	 * @return
@@ -507,7 +669,8 @@ public class GoogleMapShapeConverter {
 	}
 
 	/**
-	 * Convert a list of {@link Polygon} to a {@link MultiPolygon}
+	 * Convert a list of {@link com.google.android.gms.maps.model.Polygon} to a
+	 * {@link MultiPolygon}
 	 * 
 	 * @param polygonList
 	 * @param hasZ
@@ -522,6 +685,36 @@ public class GoogleMapShapeConverter {
 
 		for (com.google.android.gms.maps.model.Polygon mapPolygon : polygonList) {
 			Polygon polygon = toPolygon(mapPolygon);
+			multiPolygon.addPolygon(polygon);
+		}
+
+		return multiPolygon;
+	}
+
+	/**
+	 * Convert a list of {@link Polygon} to a {@link MultiPolygon}
+	 * 
+	 * @param polygonList
+	 * @return
+	 */
+	public MultiPolygon createMultiPolygon(List<Polygon> polygonList) {
+		return createMultiPolygon(polygonList, false, false);
+	}
+
+	/**
+	 * Convert a list of {@link Polygon} to a {@link MultiPolygon}
+	 * 
+	 * @param polygonList
+	 * @param hasZ
+	 * @param hasM
+	 * @return
+	 */
+	public MultiPolygon createMultiPolygon(List<Polygon> polygonList,
+			boolean hasZ, boolean hasM) {
+
+		MultiPolygon multiPolygon = new MultiPolygon(hasZ, hasM);
+
+		for (Polygon polygon : polygonList) {
 			multiPolygon.addPolygon(polygon);
 		}
 
@@ -1331,7 +1524,9 @@ public class GoogleMapShapeConverter {
 		for (List<LatLng> holes : polygon.getHoles()) {
 			List<Marker> holeMarkers = addPointsToMapAsMarkers(map, holes,
 					polygonMarkerHoleOptions, true);
-			polygonMarkers.addHole(holeMarkers);
+			PolygonHoleMarkers polygonHoleMarkers = new PolygonHoleMarkers();
+			polygonHoleMarkers.setMarkers(holeMarkers);
+			polygonMarkers.addHole(polygonHoleMarkers);
 		}
 
 		return polygonMarkers;
@@ -1407,8 +1602,292 @@ public class GoogleMapShapeConverter {
 	 * @return
 	 */
 	public Geometry toGeometry(GoogleMapShape shape) {
-		// TODO
-		return null;
-	}
 
+		Geometry geometry = null;
+		Object shapeObject = shape.getShape();
+
+		switch (shape.getGeometryType()) {
+
+		case POINT:
+			LatLng point = null;
+			switch (shape.getShapeType()) {
+			case LAT_LNG:
+				point = (LatLng) shapeObject;
+				break;
+			case MARKER_OPTIONS:
+				MarkerOptions markerOptions = (MarkerOptions) shapeObject;
+				point = markerOptions.getPosition();
+				break;
+			case MARKER:
+				Marker marker = (Marker) shapeObject;
+				point = marker.getPosition();
+				break;
+			default:
+				throw new GeoPackageException("Not a valid "
+						+ shape.getGeometryType().getName() + " shape type: "
+						+ shape.getShapeType());
+			}
+			if (point != null) {
+				geometry = toPoint(point);
+			}
+
+			break;
+		case LINESTRING:
+		case CIRCULARSTRING:
+			List<LatLng> lineStringPoints = null;
+			switch (shape.getShapeType()) {
+			case POLYLINE_OPTIONS:
+				PolylineOptions polylineOptions = (PolylineOptions) shapeObject;
+				lineStringPoints = polylineOptions.getPoints();
+				break;
+			case POLYLINE:
+				Polyline polyline = (Polyline) shapeObject;
+				lineStringPoints = polyline.getPoints();
+				break;
+			case POLYLINE_MARKERS:
+				PolylineMarkers polylineMarkers = (PolylineMarkers) shapeObject;
+				if (!polylineMarkers.isValid()) {
+					throw new GeoPackageException(
+							PolylineMarkers.class.getSimpleName()
+									+ " is not valid to create "
+									+ shape.getGeometryType().getName());
+				}
+				if (!polylineMarkers.isDeleted()) {
+					lineStringPoints = getPointsFromMarkers(polylineMarkers
+							.getMarkers());
+				}
+				break;
+			default:
+				throw new GeoPackageException("Not a valid "
+						+ shape.getGeometryType().getName() + " shape type: "
+						+ shape.getShapeType());
+			}
+			if (lineStringPoints != null) {
+				switch (shape.getGeometryType()) {
+				case LINESTRING:
+					geometry = toLineString(lineStringPoints);
+					break;
+				case CIRCULARSTRING:
+					geometry = toCircularString(lineStringPoints);
+					break;
+				default:
+					throw new GeoPackageException("Unhandled "
+							+ shape.getGeometryType().getName());
+				}
+			}
+
+			break;
+		case POLYGON:
+			List<LatLng> polygonPoints = null;
+			List<List<LatLng>> holePointList = null;
+			switch (shape.getShapeType()) {
+			case POLYGON_OPTIONS:
+				PolygonOptions polygonOptions = (PolygonOptions) shapeObject;
+				polygonPoints = polygonOptions.getPoints();
+				holePointList = polygonOptions.getHoles();
+				break;
+			case POLYGON:
+				com.google.android.gms.maps.model.Polygon polygon = (com.google.android.gms.maps.model.Polygon) shapeObject;
+				polygonPoints = polygon.getPoints();
+				holePointList = polygon.getHoles();
+				break;
+			case POLYGON_MARKERS:
+				PolygonMarkers polygonMarkers = (PolygonMarkers) shapeObject;
+				if (!polygonMarkers.isValid()) {
+					throw new GeoPackageException(
+							PolygonMarkers.class.getSimpleName()
+									+ " is not valid to create "
+									+ shape.getGeometryType().getName());
+				}
+				if (!polygonMarkers.isDeleted()) {
+					polygonPoints = getPointsFromMarkers(polygonMarkers
+							.getMarkers());
+					holePointList = new ArrayList<List<LatLng>>();
+					for (PolygonHoleMarkers hole : polygonMarkers.getHoles()) {
+						if (!hole.isDeleted()) {
+							List<LatLng> holePoints = getPointsFromMarkers(hole
+									.getMarkers());
+							holePointList.add(holePoints);
+						}
+					}
+				}
+				break;
+			default:
+				throw new GeoPackageException("Not a valid "
+						+ shape.getGeometryType().getName() + " shape type: "
+						+ shape.getShapeType());
+			}
+			if (polygonPoints != null) {
+				geometry = toPolygon(polygonPoints, holePointList);
+			}
+
+			break;
+		case MULTIPOINT:
+			List<LatLng> multiPoints = null;
+			switch (shape.getShapeType()) {
+			case MULTI_LAT_LNG:
+				MultiLatLng multiLatLng = (MultiLatLng) shapeObject;
+				multiPoints = multiLatLng.getLatLngs();
+				break;
+			case MULTI_MARKER:
+				MultiMarker multiMarker = (MultiMarker) shapeObject;
+				multiPoints = getPointsFromMarkers(multiMarker.getMarkers());
+				break;
+			default:
+				throw new GeoPackageException("Not a valid "
+						+ shape.getGeometryType().getName() + " shape type: "
+						+ shape.getShapeType());
+			}
+			if (multiPoints != null) {
+				geometry = toMultiPoint(multiPoints);
+			}
+
+			break;
+		case MULTILINESTRING:
+		case COMPOUNDCURVE:
+			switch (shape.getShapeType()) {
+			case MULTI_POLYLINE_OPTIONS:
+				MultiPolylineOptions multiPolylineOptions = (MultiPolylineOptions) shapeObject;
+				switch (shape.getGeometryType()) {
+				case MULTILINESTRING:
+					geometry = toMultiLineStringFromOptions(multiPolylineOptions);
+					break;
+				case COMPOUNDCURVE:
+					geometry = toCompoundCurveFromOptions(multiPolylineOptions);
+					break;
+				default:
+					throw new GeoPackageException("Unhandled "
+							+ shape.getGeometryType().getName());
+				}
+				break;
+			case MULTI_POLYLINE:
+				MultiPolyline multiPolyline = (MultiPolyline) shapeObject;
+				switch (shape.getGeometryType()) {
+				case MULTILINESTRING:
+					geometry = toMultiLineString(multiPolyline.getPolylines());
+					break;
+				case COMPOUNDCURVE:
+					geometry = toCompoundCurve(multiPolyline.getPolylines());
+					break;
+				default:
+					throw new GeoPackageException("Unhandled "
+							+ shape.getGeometryType().getName());
+				}
+				break;
+			case MULTI_POLYLINE_MARKERS:
+				MultiPolylineMarkers multiPolylineMarkers = (MultiPolylineMarkers) shapeObject;
+				if (!multiPolylineMarkers.isValid()) {
+					throw new GeoPackageException(
+							MultiPolylineMarkers.class.getSimpleName()
+									+ " is not valid to create "
+									+ shape.getGeometryType().getName());
+				}
+				if (!multiPolylineMarkers.isDeleted()) {
+					List<List<LatLng>> multiPolylineMarkersList = new ArrayList<List<LatLng>>();
+					for (PolylineMarkers polylineMarkers : multiPolylineMarkers
+							.getPolylineMarkers()) {
+						if (!polylineMarkers.isDeleted()) {
+							multiPolylineMarkersList
+									.add(getPointsFromMarkers(polylineMarkers
+											.getMarkers()));
+						}
+					}
+					switch (shape.getGeometryType()) {
+					case MULTILINESTRING:
+						geometry = toMultiLineStringFromList(multiPolylineMarkersList);
+						break;
+					case COMPOUNDCURVE:
+						geometry = toCompoundCurveFromList(multiPolylineMarkersList);
+						break;
+					default:
+						throw new GeoPackageException("Unhandled "
+								+ shape.getGeometryType().getName());
+					}
+				}
+				break;
+			default:
+				throw new GeoPackageException("Not a valid "
+						+ shape.getGeometryType().getName() + " shape type: "
+						+ shape.getShapeType());
+			}
+
+			break;
+		case MULTIPOLYGON:
+			switch (shape.getShapeType()) {
+			case MULTI_POLYGON_OPTIONS:
+				MultiPolygonOptions multiPolygonOptions = (MultiPolygonOptions) shapeObject;
+				geometry = toMultiPolygonFromOptions(multiPolygonOptions);
+				break;
+			case MULTI_POLYGON:
+				mil.nga.giat.geopackage.geom.conversion.MultiPolygon multiPolygon = (mil.nga.giat.geopackage.geom.conversion.MultiPolygon) shapeObject;
+				geometry = toMultiPolygon(multiPolygon.getPolygons());
+				break;
+			case MULTI_POLYGON_MARKERS:
+				MultiPolygonMarkers multiPolygonMarkers = (MultiPolygonMarkers) shapeObject;
+				if (!multiPolygonMarkers.isValid()) {
+					throw new GeoPackageException(
+							MultiPolygonMarkers.class.getSimpleName()
+									+ " is not valid to create "
+									+ shape.getGeometryType().getName());
+				}
+				if (!multiPolygonMarkers.isDeleted()) {
+					List<Polygon> multiPolygonMarkersList = new ArrayList<Polygon>();
+					for (PolygonMarkers polygonMarkers : multiPolygonMarkers
+							.getPolygonMarkers()) {
+
+						if (!polygonMarkers.isDeleted()) {
+
+							List<LatLng> multiPolygonPoints = getPointsFromMarkers(polygonMarkers
+									.getMarkers());
+							List<List<LatLng>> multiPolygonHolePoints = new ArrayList<List<LatLng>>();
+							for (PolygonHoleMarkers hole : polygonMarkers
+									.getHoles()) {
+								if (!hole.isDeleted()) {
+									List<LatLng> holePoints = getPointsFromMarkers(hole
+											.getMarkers());
+									multiPolygonHolePoints.add(holePoints);
+								}
+							}
+
+							multiPolygonMarkersList
+									.add(toPolygon(multiPolygonPoints,
+											multiPolygonHolePoints));
+						}
+
+					}
+					geometry = createMultiPolygon(multiPolygonMarkersList);
+				}
+				break;
+			default:
+				throw new GeoPackageException("Not a valid "
+						+ shape.getGeometryType().getName() + " shape type: "
+						+ shape.getShapeType());
+			}
+			break;
+
+		case POLYHEDRALSURFACE:
+		case TIN:
+		case TRIANGLE:
+			throw new GeoPackageException("Unsupported GeoPackage type: "
+					+ shape.getGeometryType());
+		case GEOMETRYCOLLECTION:
+			@SuppressWarnings("unchecked")
+			List<GoogleMapShape> shapeList = (List<GoogleMapShape>) shapeObject;
+			GeometryCollection<Geometry> geometryCollection = new GeometryCollection<Geometry>(
+					false, false);
+			for (GoogleMapShape shapeListItem : shapeList) {
+				Geometry subGeometry = toGeometry(shapeListItem);
+				if (subGeometry != null) {
+					geometryCollection.addGeometry(subGeometry);
+				}
+			}
+			if (geometryCollection.numGeometries() > 0) {
+				geometry = geometryCollection;
+			}
+			break;
+		default:
+		}
+
+		return geometry;
+	}
 }
