@@ -5,6 +5,7 @@ import java.util.List;
 import mil.nga.giat.geopackage.geom.CircularString;
 import mil.nga.giat.geopackage.geom.CompoundCurve;
 import mil.nga.giat.geopackage.geom.Geometry;
+import mil.nga.giat.geopackage.geom.GeometryCollection;
 import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.geom.LineString;
 import mil.nga.giat.geopackage.geom.MultiLineString;
@@ -67,6 +68,21 @@ public class GeometryPrinter {
 			break;
 		case TRIANGLE:
 			addPolygonMessage(message, (Triangle) geometry);
+			break;
+		case GEOMETRYCOLLECTION:
+			@SuppressWarnings("unchecked")
+			GeometryCollection<Geometry> geomCollection = (GeometryCollection<Geometry>) geometry;
+			message.append("Geometries: " + geomCollection.numGeometries());
+			List<Geometry> geometries = geomCollection.getGeometries();
+			for (int i = 0; i < geometries.size(); i++) {
+				Geometry subGeometry = geometries.get(i);
+				message.append("\n\n");
+				message.append(Geometry.class.getSimpleName() + " " + (i + 1));
+				message.append("\n");
+				message.append(subGeometry.getGeometryType().getName());
+				message.append("\n");
+				message.append(getGeometryString(subGeometry));
+			}
 			break;
 		default:
 		}

@@ -22,7 +22,10 @@ import mil.nga.giat.geopackage.geom.conversion.GoogleMapShape;
 import mil.nga.giat.geopackage.geom.conversion.GoogleMapShapeConverter;
 import mil.nga.giat.geopackage.geom.conversion.GoogleMapShapeType;
 import mil.nga.giat.geopackage.geom.conversion.MultiLatLng;
+import mil.nga.giat.geopackage.geom.conversion.MultiMarker;
+import mil.nga.giat.geopackage.geom.conversion.MultiPolygon;
 import mil.nga.giat.geopackage.geom.conversion.MultiPolygonOptions;
+import mil.nga.giat.geopackage.geom.conversion.MultiPolyline;
 import mil.nga.giat.geopackage.geom.conversion.MultiPolylineOptions;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.geom.util.GeometryPrinter;
@@ -1593,12 +1596,8 @@ public class GeoPackageMapFragment extends Fragment implements
 		switch (shape.getShapeType()) {
 
 		case MARKER:
-			marker = (Marker) shape.getShape();
-			TypedValue typedValue = new TypedValue();
-			getResources()
-					.getValue(R.dimen.marker_edit_color, typedValue, true);
-			marker.setIcon(BitmapDescriptorFactory.defaultMarker(typedValue
-					.getFloat()));
+			Marker shapeMarker = (Marker) shape.getShape();
+			marker = createEditMarker(shapeMarker.getPosition());
 			break;
 
 		case POLYLINE:
@@ -1611,6 +1610,26 @@ public class GeoPackageMapFragment extends Fragment implements
 			Polygon polygon = (Polygon) shape.getShape();
 			LatLng polygonPoint = polygon.getPoints().get(0);
 			marker = createEditMarker(polygonPoint);
+			break;
+
+		case MULTI_MARKER:
+			MultiMarker multiMarker = (MultiMarker) shape.getShape();
+			marker = createEditMarker(multiMarker.getMarkers().get(0)
+					.getPosition());
+			break;
+
+		case MULTI_POLYLINE:
+			MultiPolyline multiPolyline = (MultiPolyline) shape.getShape();
+			LatLng multiPolylinePoint = multiPolyline.getPolylines().get(0)
+					.getPoints().get(0);
+			marker = createEditMarker(multiPolylinePoint);
+			break;
+
+		case MULTI_POLYGON:
+			MultiPolygon multiPolygon = (MultiPolygon) shape.getShape();
+			LatLng multiPolygonPoint = multiPolygon.getPolygons().get(0)
+					.getPoints().get(0);
+			marker = createEditMarker(multiPolygonPoint);
 			break;
 
 		case COLLECTION:
