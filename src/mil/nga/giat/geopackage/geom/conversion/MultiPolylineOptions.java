@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 /**
- * Multiple Polyline object
+ * Multiple Polyline Options object
  * 
  * @author osbornb
  */

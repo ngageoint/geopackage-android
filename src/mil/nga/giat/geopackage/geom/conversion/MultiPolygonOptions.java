@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 /**
- * Multiple Polygon object
+ * Multiple Polygon Options object
  * 
  * @author osbornb
  */

@@ -734,48 +734,72 @@ public class GoogleMapShapeConverter {
 	 * @param geometry
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public Object toShape(Geometry geometry) {
 
-		Object shape = null;
+	@SuppressWarnings("unchecked")
+	public GoogleMapShape toShape(Geometry geometry) {
+
+		GoogleMapShape shape = null;
 
 		GeometryType geometryType = geometry.getGeometryType();
 		switch (geometryType) {
 		case POINT:
-			shape = toLatLng((Point) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.LAT_LNG, toLatLng((Point) geometry));
 			break;
 		case LINESTRING:
-			shape = toPolyline((LineString) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYLINE_OPTIONS,
+					toPolyline((LineString) geometry));
 			break;
 		case POLYGON:
-			shape = toPolygon((Polygon) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYGON_OPTIONS,
+					toPolygon((Polygon) geometry));
 			break;
 		case MULTIPOINT:
-			shape = toLatLngs((MultiPoint) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_LAT_LNG,
+					toLatLngs((MultiPoint) geometry));
 			break;
 		case MULTILINESTRING:
-			shape = toPolylines((MultiLineString) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYLINE_OPTIONS,
+					toPolylines((MultiLineString) geometry));
 			break;
 		case MULTIPOLYGON:
-			shape = toPolygons((MultiPolygon) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYGON_OPTIONS,
+					toPolygons((MultiPolygon) geometry));
 			break;
 		case CIRCULARSTRING:
-			shape = toPolyline((CircularString) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYLINE_OPTIONS,
+					toPolyline((CircularString) geometry));
 			break;
 		case COMPOUNDCURVE:
-			shape = toPolylines((CompoundCurve) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYLINE_OPTIONS,
+					toPolylines((CompoundCurve) geometry));
 			break;
 		case POLYHEDRALSURFACE:
-			shape = toPolygons((PolyhedralSurface) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYGON_OPTIONS,
+					toPolygons((PolyhedralSurface) geometry));
 			break;
 		case TIN:
-			shape = toPolygons((TIN) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYGON_OPTIONS,
+					toPolygons((TIN) geometry));
 			break;
 		case TRIANGLE:
-			shape = toPolygon((Triangle) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYGON_OPTIONS,
+					toPolygon((Triangle) geometry));
 			break;
 		case GEOMETRYCOLLECTION:
-			shape = toShapes((GeometryCollection<Geometry>) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.COLLECTION,
+					toShapes((GeometryCollection<Geometry>) geometry));
 			break;
 		default:
 			throw new GeoPackageException("Unsupported Geometry Type: "
@@ -791,12 +815,13 @@ public class GoogleMapShapeConverter {
 	 * @param geometryCollection
 	 * @return
 	 */
-	public List<Object> toShapes(GeometryCollection<Geometry> geometryCollection) {
+	public List<GoogleMapShape> toShapes(
+			GeometryCollection<Geometry> geometryCollection) {
 
-		List<Object> shapes = new ArrayList<Object>();
+		List<GoogleMapShape> shapes = new ArrayList<GoogleMapShape>();
 
 		for (Geometry geometry : geometryCollection.getGeometries()) {
-			Object shape = toShape(geometry);
+			GoogleMapShape shape = toShape(geometry);
 			shapes.add(shape);
 		}
 
@@ -811,50 +836,70 @@ public class GoogleMapShapeConverter {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public Object addToMap(GoogleMap map, Geometry geometry) {
+	public GoogleMapShape addToMap(GoogleMap map, Geometry geometry) {
 
-		Object shape = null;
+		GoogleMapShape shape = null;
 
 		GeometryType geometryType = geometry.getGeometryType();
 		switch (geometryType) {
 		case POINT:
-			shape = addLatLngToMap(map, toLatLng((Point) geometry));
+			shape = new GoogleMapShape(geometryType, GoogleMapShapeType.MARKER,
+					addLatLngToMap(map, toLatLng((Point) geometry)));
 			break;
 		case LINESTRING:
-			shape = addPolylineToMap(map, toPolyline((LineString) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYLINE, addPolylineToMap(map,
+							toPolyline((LineString) geometry)));
 			break;
 		case POLYGON:
-			shape = addPolygonToMap(map, toPolygon((Polygon) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYGON, addPolygonToMap(map,
+							toPolygon((Polygon) geometry)));
 			break;
 		case MULTIPOINT:
-			shape = addLatLngsToMap(map, toLatLngs((MultiPoint) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_MARKER, addLatLngsToMap(map,
+							toLatLngs((MultiPoint) geometry)));
 			break;
 		case MULTILINESTRING:
-			shape = addPolylinesToMap(map,
-					toPolylines((MultiLineString) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYLINE, addPolylinesToMap(map,
+							toPolylines((MultiLineString) geometry)));
 			break;
 		case MULTIPOLYGON:
-			shape = addPolygonsToMap(map, toPolygons((MultiPolygon) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYGON, addPolygonsToMap(map,
+							toPolygons((MultiPolygon) geometry)));
 			break;
 		case CIRCULARSTRING:
-			shape = addPolylineToMap(map, toPolyline((CircularString) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYLINE, addPolylineToMap(map,
+							toPolyline((CircularString) geometry)));
 			break;
 		case COMPOUNDCURVE:
-			shape = addPolylinesToMap(map,
-					toPolylines((CompoundCurve) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYLINE, addPolylinesToMap(map,
+							toPolylines((CompoundCurve) geometry)));
 			break;
 		case POLYHEDRALSURFACE:
-			shape = addPolygonsToMap(map,
-					toPolygons((PolyhedralSurface) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYGON, addPolygonsToMap(map,
+							toPolygons((PolyhedralSurface) geometry)));
 			break;
 		case TIN:
-			shape = addPolygonsToMap(map, toPolygons((TIN) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.MULTI_POLYGON, addPolygonsToMap(map,
+							toPolygons((TIN) geometry)));
 			break;
 		case TRIANGLE:
-			shape = addPolygonToMap(map, toPolygon((Triangle) geometry));
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.POLYGON, addPolygonToMap(map,
+							toPolygon((Triangle) geometry)));
 			break;
 		case GEOMETRYCOLLECTION:
-			shape = addToMap(map, (GeometryCollection<Geometry>) geometry);
+			shape = new GoogleMapShape(geometryType,
+					GoogleMapShapeType.COLLECTION, addToMap(map,
+							(GeometryCollection<Geometry>) geometry));
 			break;
 		default:
 			throw new GeoPackageException("Unsupported Geometry Type: "
@@ -871,34 +916,62 @@ public class GoogleMapShapeConverter {
 	 * @param shape
 	 * @return
 	 */
-	public Object addShapeToMap(GoogleMap map, Object shape) {
+	public GoogleMapShape addShapeToMap(GoogleMap map, GoogleMapShape shape) {
 
-		Object addedShape = null;
+		GoogleMapShape addedShape = null;
 
-		if (shape instanceof LatLng) {
-			addedShape = addLatLngToMap(map, (LatLng) shape);
-		} else if (shape instanceof MarkerOptions) {
-			addedShape = addMarkerOptionsToMap(map, (MarkerOptions) shape);
-		} else if (shape instanceof PolylineOptions) {
-			addedShape = addPolylineToMap(map, (PolylineOptions) shape);
-		} else if (shape instanceof PolygonOptions) {
-			addedShape = addPolygonToMap(map, (PolygonOptions) shape);
-		} else if (shape instanceof MultiLatLng) {
-			addedShape = addLatLngsToMap(map, (MultiLatLng) shape);
-		} else if (shape instanceof MultiPolylineOptions) {
-			addedShape = addPolylinesToMap(map, (MultiPolylineOptions) shape);
-		} else if (shape instanceof MultiPolygonOptions) {
-			addedShape = addPolygonsToMap(map, (MultiPolygonOptions) shape);
-		} else if (shape instanceof List<?>) {
-			List<Object> addedShapeList = new ArrayList<Object>();
-			List<?> shapeList = (List<?>) shape;
-			for (Object shapeListItem : shapeList) {
+		switch (shape.getShapeType()) {
+
+		case LAT_LNG:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MARKER, addLatLngToMap(map,
+							(LatLng) shape.getShape()));
+			break;
+		case MARKER_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MARKER, addMarkerOptionsToMap(map,
+							(MarkerOptions) shape.getShape()));
+			break;
+		case POLYLINE_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.POLYLINE, addPolylineToMap(map,
+							(PolylineOptions) shape.getShape()));
+			break;
+		case POLYGON_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.POLYGON, addPolygonToMap(map,
+							(PolygonOptions) shape.getShape()));
+			break;
+		case MULTI_LAT_LNG:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MULTI_MARKER, addLatLngsToMap(map,
+							(MultiLatLng) shape.getShape()));
+			break;
+		case MULTI_POLYLINE_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MULTI_POLYLINE, addPolylinesToMap(map,
+							(MultiPolylineOptions) shape.getShape()));
+			break;
+		case MULTI_POLYGON_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MULTI_POLYGON, addPolygonsToMap(map,
+							(MultiPolygonOptions) shape.getShape()));
+			break;
+		case COLLECTION:
+			List<GoogleMapShape> addedShapeList = new ArrayList<GoogleMapShape>();
+			@SuppressWarnings("unchecked")
+			List<GoogleMapShape> shapeList = (List<GoogleMapShape>) shape
+					.getShape();
+			for (GoogleMapShape shapeListItem : shapeList) {
 				addedShapeList.add(addShapeToMap(map, shapeListItem));
 			}
-			addedShape = addedShapeList;
-		} else {
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.COLLECTION, addedShapeList);
+			break;
+		default:
 			throw new GeoPackageException("Unsupported Shape Type: "
-					+ shape.getClass().toString());
+					+ shape.getShapeType());
+
 		}
 
 		return addedShape;
@@ -969,17 +1042,21 @@ public class GoogleMapShapeConverter {
 	 * @param latLngs
 	 * @return
 	 */
-	public List<Marker> addLatLngsToMap(GoogleMap map, MultiLatLng latLngs) {
-		List<Marker> markers = new ArrayList<Marker>();
+	public MultiMarker addLatLngsToMap(GoogleMap map, MultiLatLng latLngs) {
+		MultiMarker multiMarker = new MultiMarker();
 		for (LatLng latLng : latLngs.getLatLngs()) {
 			MarkerOptions markerOptions = new MarkerOptions();
 			if (latLngs.getMarkerOptions() != null) {
 				markerOptions.icon(latLngs.getMarkerOptions().getIcon());
+				markerOptions.anchor(latLngs.getMarkerOptions().getAnchorU(),
+						markerOptions.getAnchorV());
+				markerOptions.draggable(latLngs.getMarkerOptions()
+						.isDraggable());
 			}
 			Marker marker = addLatLngToMap(map, latLng, markerOptions);
-			markers.add(marker);
+			multiMarker.add(marker);
 		}
-		return markers;
+		return multiMarker;
 	}
 
 	/**
@@ -989,17 +1066,17 @@ public class GoogleMapShapeConverter {
 	 * @param polylines
 	 * @return
 	 */
-	public List<Polyline> addPolylinesToMap(GoogleMap map,
+	public MultiPolyline addPolylinesToMap(GoogleMap map,
 			MultiPolylineOptions polylines) {
-		List<Polyline> polylineList = new ArrayList<Polyline>();
+		MultiPolyline multiPolyline = new MultiPolyline();
 		for (PolylineOptions polylineOption : polylines.getPolylineOptions()) {
 			if (polylines.getOptions() != null) {
 				polylineOption.color(polylines.getOptions().getColor());
 			}
 			Polyline polyline = addPolylineToMap(map, polylineOption);
-			polylineList.add(polyline);
+			multiPolyline.add(polyline);
 		}
-		return polylineList;
+		return multiPolyline;
 	}
 
 	/**
@@ -1009,9 +1086,9 @@ public class GoogleMapShapeConverter {
 	 * @param polygons
 	 * @return
 	 */
-	public List<com.google.android.gms.maps.model.Polygon> addPolygonsToMap(
+	public mil.nga.giat.geopackage.geom.conversion.MultiPolygon addPolygonsToMap(
 			GoogleMap map, MultiPolygonOptions polygons) {
-		List<com.google.android.gms.maps.model.Polygon> polygonList = new ArrayList<com.google.android.gms.maps.model.Polygon>();
+		mil.nga.giat.geopackage.geom.conversion.MultiPolygon multiPolygon = new mil.nga.giat.geopackage.geom.conversion.MultiPolygon();
 		for (PolygonOptions polygonOption : polygons.getPolygonOptions()) {
 			com.google.android.gms.maps.model.Polygon polygon = addPolygonToMap(
 					map, polygonOption);
@@ -1020,9 +1097,9 @@ public class GoogleMapShapeConverter {
 				polygonOption.strokeColor(polygons.getOptions()
 						.getStrokeColor());
 			}
-			polygonList.add(polygon);
+			multiPolygon.add(polygon);
 		}
-		return polygonList;
+		return multiPolygon;
 	}
 
 	/**
@@ -1033,17 +1110,305 @@ public class GoogleMapShapeConverter {
 	 * @param geometryCollection
 	 * @return
 	 */
-	public List<Object> addToMap(GoogleMap map,
+	public List<GoogleMapShape> addToMap(GoogleMap map,
 			GeometryCollection<Geometry> geometryCollection) {
 
-		List<Object> shapes = new ArrayList<Object>();
+		List<GoogleMapShape> shapes = new ArrayList<GoogleMapShape>();
 
 		for (Geometry geometry : geometryCollection.getGeometries()) {
-			Object shape = addToMap(map, geometry);
+			GoogleMapShape shape = addToMap(map, geometry);
 			shapes.add(shape);
 		}
 
 		return shapes;
+	}
+
+	/**
+	 * Add a shape to the map as markers
+	 * 
+	 * @param map
+	 * @param shape
+	 * @param markerOptions
+	 * @param polylineMarkerOptions
+	 * @param polygonMarkerOptions
+	 * @param polygonMarkerHoleOptions
+	 * @param globalPolylineOptions
+	 * @param globalPolygonOptions
+	 * @return
+	 */
+	public GoogleMapShape addShapeToMapAsMarkers(GoogleMap map,
+			GoogleMapShape shape, MarkerOptions markerOptions,
+			MarkerOptions polylineMarkerOptions,
+			MarkerOptions polygonMarkerOptions,
+			MarkerOptions polygonMarkerHoleOptions,
+			PolylineOptions globalPolylineOptions,
+			PolygonOptions globalPolygonOptions) {
+
+		GoogleMapShape addedShape = null;
+
+		switch (shape.getShapeType()) {
+
+		case LAT_LNG:
+			if (markerOptions == null) {
+				markerOptions = new MarkerOptions();
+			}
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MARKER, addLatLngToMap(map,
+							(LatLng) shape.getShape(), markerOptions));
+			break;
+		case MARKER_OPTIONS:
+			MarkerOptions shapeMarkerOptions = (MarkerOptions) shape.getShape();
+			if (markerOptions != null) {
+				shapeMarkerOptions.icon(markerOptions.getIcon());
+				shapeMarkerOptions.anchor(markerOptions.getAnchorU(),
+						markerOptions.getAnchorV());
+				shapeMarkerOptions.draggable(markerOptions.isDraggable());
+			}
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MARKER, addMarkerOptionsToMap(map,
+							shapeMarkerOptions));
+			break;
+		case POLYLINE_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.POLYLINE_MARKERS,
+					addPolylineToMapAsMarkers(map,
+							(PolylineOptions) shape.getShape(),
+							polylineMarkerOptions, globalPolylineOptions));
+			break;
+		case POLYGON_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.POLYGON_MARKERS,
+					addPolygonToMapAsMarkers(map,
+							(PolygonOptions) shape.getShape(),
+							polygonMarkerOptions, polygonMarkerHoleOptions,
+							globalPolygonOptions));
+			break;
+		case MULTI_LAT_LNG:
+			MultiLatLng multiLatLng = (MultiLatLng) shape.getShape();
+			if (markerOptions != null) {
+				multiLatLng.setMarkerOptions(markerOptions);
+			}
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MULTI_MARKER, addLatLngsToMap(map,
+							multiLatLng));
+			break;
+		case MULTI_POLYLINE_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MULTI_POLYLINE_MARKERS,
+					addMultiPolylineToMapAsMarkers(map,
+							(MultiPolylineOptions) shape.getShape(),
+							polylineMarkerOptions, globalPolylineOptions));
+			break;
+		case MULTI_POLYGON_OPTIONS:
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.MULTI_POLYGON_MARKERS,
+					addMultiPolygonToMapAsMarkers(map,
+							(MultiPolygonOptions) shape.getShape(),
+							polygonMarkerOptions, polygonMarkerHoleOptions,
+							globalPolygonOptions));
+			break;
+		case COLLECTION:
+			List<GoogleMapShape> addedShapeList = new ArrayList<GoogleMapShape>();
+			@SuppressWarnings("unchecked")
+			List<GoogleMapShape> shapeList = (List<GoogleMapShape>) shape
+					.getShape();
+			for (GoogleMapShape shapeListItem : shapeList) {
+				addedShapeList.add(addShapeToMapAsMarkers(map, shapeListItem,
+						markerOptions, polylineMarkerOptions,
+						polygonMarkerOptions, polygonMarkerHoleOptions,
+						globalPolylineOptions, globalPolygonOptions));
+			}
+			addedShape = new GoogleMapShape(shape.getGeometryType(),
+					GoogleMapShapeType.COLLECTION, addedShapeList);
+			break;
+		default:
+			throw new GeoPackageException("Unsupported Shape Type: "
+					+ shape.getShapeType());
+
+		}
+
+		return addedShape;
+	}
+
+	/**
+	 * Add the list of points as markers
+	 * 
+	 * @param map
+	 * @param points
+	 * @param customMarkerOptions
+	 * @param ignoreIdenticalEnds
+	 * @return
+	 */
+	public List<Marker> addPointsToMapAsMarkers(GoogleMap map,
+			List<LatLng> points, MarkerOptions customMarkerOptions,
+			boolean ignoreIdenticalEnds) {
+
+		List<Marker> markers = new ArrayList<Marker>();
+		for (int i = 0; i < points.size(); i++) {
+			LatLng latLng = points.get(i);
+
+			if (i + 1 == points.size() && ignoreIdenticalEnds) {
+				LatLng firstLatLng = points.get(0);
+				if (latLng.latitude == firstLatLng.latitude
+						&& latLng.longitude == firstLatLng.longitude) {
+					break;
+				}
+			}
+
+			MarkerOptions markerOptions = new MarkerOptions();
+			if (customMarkerOptions != null) {
+				markerOptions.icon(customMarkerOptions.getIcon());
+				markerOptions.anchor(customMarkerOptions.getAnchorU(),
+						customMarkerOptions.getAnchorV());
+				markerOptions.draggable(customMarkerOptions.isDraggable());
+			}
+			Marker marker = addLatLngToMap(map, latLng, markerOptions);
+			markers.add(marker);
+		}
+		return markers;
+	}
+
+	/**
+	 * Add a Polyline to the map as markers
+	 * 
+	 * @param map
+	 * @param polylineOptions
+	 * @param polylineMarkerOptions
+	 * @param globalPolylineOptions
+	 * @return
+	 */
+	public PolylineMarkers addPolylineToMapAsMarkers(GoogleMap map,
+			PolylineOptions polylineOptions,
+			MarkerOptions polylineMarkerOptions,
+			PolylineOptions globalPolylineOptions) {
+
+		PolylineMarkers polylineMarkers = new PolylineMarkers();
+
+		if (globalPolylineOptions != null) {
+			polylineOptions.color(globalPolylineOptions.getColor());
+		}
+
+		Polyline polyline = addPolylineToMap(map, polylineOptions);
+		polylineMarkers.setPolyline(polyline);
+
+		List<Marker> markers = addPointsToMapAsMarkers(map,
+				polylineOptions.getPoints(), polylineMarkerOptions, false);
+		polylineMarkers.setMarkers(markers);
+
+		return polylineMarkers;
+	}
+
+	/**
+	 * Add a Polygon to the map as markers
+	 * 
+	 * @param map
+	 * @param polygonOptions
+	 * @param polygonMarkerOptions
+	 * @param polygonMarkerHoleOptions
+	 * @param globalPolygonOptions
+	 * @return
+	 */
+	public PolygonMarkers addPolygonToMapAsMarkers(GoogleMap map,
+			PolygonOptions polygonOptions, MarkerOptions polygonMarkerOptions,
+			MarkerOptions polygonMarkerHoleOptions,
+			PolygonOptions globalPolygonOptions) {
+
+		PolygonMarkers polygonMarkers = new PolygonMarkers();
+
+		if (globalPolygonOptions != null) {
+			polygonOptions.fillColor(globalPolygonOptions.getFillColor());
+			polygonOptions.strokeColor(globalPolygonOptions.getStrokeColor());
+		}
+
+		com.google.android.gms.maps.model.Polygon polygon = addPolygonToMap(
+				map, polygonOptions);
+		polygonMarkers.setPolygon(polygon);
+
+		List<Marker> markers = addPointsToMapAsMarkers(map,
+				polygon.getPoints(), polygonMarkerOptions, true);
+		polygonMarkers.setMarkers(markers);
+
+		for (List<LatLng> holes : polygon.getHoles()) {
+			List<Marker> holeMarkers = addPointsToMapAsMarkers(map, holes,
+					polygonMarkerHoleOptions, true);
+			polygonMarkers.addHole(holeMarkers);
+		}
+
+		return polygonMarkers;
+	}
+
+	/**
+	 * Add a MultiPolylineOptions to the map as markers
+	 * 
+	 * @param map
+	 * @param multiPolyline
+	 * @param polylineMarkerOptions
+	 * @param globalPolylineOptions
+	 * @return
+	 */
+	public MultiPolylineMarkers addMultiPolylineToMapAsMarkers(GoogleMap map,
+			MultiPolylineOptions multiPolyline,
+			MarkerOptions polylineMarkerOptions,
+			PolylineOptions globalPolylineOptions) {
+		MultiPolylineMarkers polylines = new MultiPolylineMarkers();
+		for (PolylineOptions polylineOptions : multiPolyline
+				.getPolylineOptions()) {
+			PolylineMarkers polylineMarker = addPolylineToMapAsMarkers(map,
+					polylineOptions, polylineMarkerOptions,
+					globalPolylineOptions);
+			polylines.add(polylineMarker);
+		}
+		return polylines;
+	}
+
+	/**
+	 * Add a MultiPolygonOptions to the map as markers
+	 * 
+	 * @param map
+	 * @param multiPolygon
+	 * @param polygonMarkerOptions
+	 * @param polygonMarkerHoleOptions
+	 * @param globalPolygonOptions
+	 * @return
+	 */
+	public MultiPolygonMarkers addMultiPolygonToMapAsMarkers(GoogleMap map,
+			MultiPolygonOptions multiPolygon,
+			MarkerOptions polygonMarkerOptions,
+			MarkerOptions polygonMarkerHoleOptions,
+			PolygonOptions globalPolygonOptions) {
+		MultiPolygonMarkers multiPolygonMarkers = new MultiPolygonMarkers();
+		for (PolygonOptions polygon : multiPolygon.getPolygonOptions()) {
+			PolygonMarkers polygonMarker = addPolygonToMapAsMarkers(map,
+					polygon, polygonMarkerOptions, polygonMarkerHoleOptions,
+					globalPolygonOptions);
+			multiPolygonMarkers.add(polygonMarker);
+		}
+		return multiPolygonMarkers;
+	}
+
+	/**
+	 * Get a list of points as LatLng from a list of Markers
+	 * 
+	 * @param markers
+	 * @return
+	 */
+	public List<LatLng> getPointsFromMarkers(List<Marker> markers) {
+		List<LatLng> points = new ArrayList<LatLng>();
+		for (Marker marker : markers) {
+			points.add(marker.getPosition());
+		}
+		return points;
+	}
+
+	/**
+	 * Convert a GoogleMapShape to a Geometry
+	 * 
+	 * @param shape
+	 * @return
+	 */
+	public Geometry toGeometry(GoogleMapShape shape) {
+		// TODO
+		return null;
 	}
 
 }

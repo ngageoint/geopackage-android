@@ -214,9 +214,13 @@ public class GeoPackageUtils {
 	 * @return
 	 */
 	public static boolean isFutureSQLiteException(Exception e) {
+		boolean isFuture = false;
 		String message = e.getMessage();
-		return message.contains("no such function: ST_IsEmpty")
-				|| message.contains("no such module: rtree");
+		if (message != null) {
+			isFuture = message.contains("no such function: ST_IsEmpty")
+					|| message.contains("no such module: rtree");
+		}
+		return isFuture;
 	}
 
 }
