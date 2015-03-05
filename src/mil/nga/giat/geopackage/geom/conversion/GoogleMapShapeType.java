@@ -1,5 +1,10 @@
 package mil.nga.giat.geopackage.geom.conversion;
 
+/**
+ * Enumeration of Map shape types for handling geometry hierarchies
+ * 
+ * @author osbornb
+ */
 public enum GoogleMapShapeType {
 
 	LAT_LNG,
