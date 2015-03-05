@@ -12,7 +12,7 @@ import com.google.android.gms.maps.model.Polygon;
  * 
  * @author osbornb
  */
-public class PolygonMarkers {
+public class PolygonMarkers implements ShapeWithChildrenMarkers {
 
 	private Polygon polygon;
 
@@ -32,6 +32,10 @@ public class PolygonMarkers {
 		markers.add(marker);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public List<Marker> getMarkers() {
 		return markers;
 	}
@@ -57,18 +61,24 @@ public class PolygonMarkers {
 	 */
 	public void update() {
 		if (polygon != null) {
-			GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
+			if (isDeleted()) {
+				remove();
+			} else {
+				GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
 
-			List<LatLng> points = converter.getPointsFromMarkers(markers);
-			polygon.setPoints(points);
+				List<LatLng> points = converter.getPointsFromMarkers(markers);
+				polygon.setPoints(points);
 
-			List<List<LatLng>> holePointList = new ArrayList<List<LatLng>>();
-			for (PolygonHoleMarkers hole : holes) {
-				List<LatLng> holePoints = converter.getPointsFromMarkers(hole
-						.getMarkers());
-				holePointList.add(holePoints);
+				List<List<LatLng>> holePointList = new ArrayList<List<LatLng>>();
+				for (PolygonHoleMarkers hole : holes) {
+					if (!hole.isDeleted()) {
+						List<LatLng> holePoints = converter
+								.getPointsFromMarkers(hole.getMarkers());
+						holePointList.add(holePoints);
+					}
+				}
+				polygon.setHoles(holePointList);
 			}
-			polygon.setHoles(holePointList);
 		}
 	}
 
@@ -78,6 +88,7 @@ public class PolygonMarkers {
 	public void remove() {
 		if (polygon != null) {
 			polygon.remove();
+			polygon = null;
 		}
 		for (Marker marker : markers) {
 			marker.remove();
@@ -112,6 +123,35 @@ public class PolygonMarkers {
 	 */
 	public boolean isDeleted() {
 		return markers.isEmpty();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void delete(Marker marker) {
+		if (markers.remove(marker)) {
+			marker.remove();
+			update();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addNew(Marker marker) {
+		GoogleMapShapeMarkers.addMarkerAsPolygon(marker, markers);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ShapeMarkers createChild() {
+		PolygonHoleMarkers hole = new PolygonHoleMarkers(this);
+		holes.add(hole);
+		return hole;
 	}
 
 }

@@ -12,7 +12,7 @@ import com.google.android.gms.maps.model.Polyline;
  * 
  * @author osbornb
  */
-public class PolylineMarkers {
+public class PolylineMarkers implements ShapeMarkers {
 
 	private Polyline polyline;
 
@@ -30,6 +30,10 @@ public class PolylineMarkers {
 		markers.add(marker);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public List<Marker> getMarkers() {
 		return markers;
 	}
@@ -43,9 +47,13 @@ public class PolylineMarkers {
 	 */
 	public void update() {
 		if (polyline != null) {
-			List<LatLng> points = new GoogleMapShapeConverter()
-					.getPointsFromMarkers(markers);
-			polyline.setPoints(points);
+			if (isDeleted()) {
+				remove();
+			} else {
+				List<LatLng> points = new GoogleMapShapeConverter()
+						.getPointsFromMarkers(markers);
+				polyline.setPoints(points);
+			}
 		}
 	}
 
@@ -55,6 +63,7 @@ public class PolylineMarkers {
 	public void remove() {
 		if (polyline != null) {
 			polyline.remove();
+			polyline = null;
 		}
 		for (Marker marker : markers) {
 			marker.remove();
@@ -77,6 +86,25 @@ public class PolylineMarkers {
 	 */
 	public boolean isDeleted() {
 		return markers.isEmpty();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void delete(Marker marker) {
+		if (markers.remove(marker)) {
+			marker.remove();
+			update();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addNew(Marker marker) {
+		GoogleMapShapeMarkers.addMarkerAsPolyline(marker, markers);
 	}
 
 }

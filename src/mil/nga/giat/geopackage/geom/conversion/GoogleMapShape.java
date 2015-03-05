@@ -148,4 +148,41 @@ public class GoogleMapShape {
 
 	}
 
+	/**
+	 * Determines if the shape is in a valid state
+	 */
+	public boolean isValid() {
+
+		boolean valid = true;
+
+		switch (shapeType) {
+
+		case POLYLINE_MARKERS:
+			valid = ((PolylineMarkers) shape).isValid();
+			break;
+		case POLYGON_MARKERS:
+			valid = ((PolygonMarkers) shape).isValid();
+			break;
+		case MULTI_POLYLINE_MARKERS:
+			valid = ((MultiPolylineMarkers) shape).isValid();
+			break;
+		case MULTI_POLYGON_MARKERS:
+			valid = ((MultiPolygonMarkers) shape).isValid();
+			break;
+		case COLLECTION:
+			@SuppressWarnings("unchecked")
+			List<GoogleMapShape> shapeList = (List<GoogleMapShape>) shape;
+			for (GoogleMapShape shapeListItem : shapeList) {
+				valid = shapeListItem.isValid();
+				if (!valid) {
+					break;
+				}
+			}
+			break;
+		default:
+		}
+
+		return valid;
+	}
+
 }

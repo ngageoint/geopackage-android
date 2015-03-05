@@ -110,6 +110,9 @@
     <string name="edit_features_delete_label">Delete</string>
     <string name="edit_features_clear_validation_label">Unsaved Edits</string>
     <string name="edit_features_clear_validation_message">All unsaved feature edits will be lost</string>
+    <string name="edit_features_shape_point_delete_label">Delete</string>
+    <string name="edit_features_shape_add_points_label">Add Points</string>
+    <string name="edit_features_shape_add_hole_label">Add Hole</string>
     <string name="button_ok_label">OK</string>
     <string name="button_cancel_label">Cancel</string>
 

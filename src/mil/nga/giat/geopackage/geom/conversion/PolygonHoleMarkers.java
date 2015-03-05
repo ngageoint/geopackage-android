@@ -10,14 +10,29 @@ import com.google.android.gms.maps.model.Marker;
  * 
  * @author osbornb
  */
-public class PolygonHoleMarkers {
+public class PolygonHoleMarkers implements ShapeMarkers {
+
+	final private PolygonMarkers parentPolygon;
 
 	private List<Marker> markers = new ArrayList<Marker>();
+
+	/**
+	 * Constructor
+	 * 
+	 * @param polygonMarkers
+	 */
+	public PolygonHoleMarkers(PolygonMarkers polygonMarkers) {
+		parentPolygon = polygonMarkers;
+	}
 
 	public void add(Marker marker) {
 		markers.add(marker);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public List<Marker> getMarkers() {
 		return markers;
 	}
@@ -51,6 +66,25 @@ public class PolygonHoleMarkers {
 	 */
 	public boolean isDeleted() {
 		return markers.isEmpty();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void delete(Marker marker) {
+		if (markers.remove(marker)) {
+			marker.remove();
+			parentPolygon.update();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addNew(Marker marker) {
+		GoogleMapShapeMarkers.addMarkerAsPolygon(marker, markers);
 	}
 
 }

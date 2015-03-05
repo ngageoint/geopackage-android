@@ -10,7 +10,7 @@ import com.google.android.gms.maps.model.Marker;
  * 
  * @author osbornb
  */
-public class MultiMarker {
+public class MultiMarker implements ShapeMarkers {
 
 	private List<Marker> markers = new ArrayList<Marker>();
 
@@ -18,6 +18,10 @@ public class MultiMarker {
 		markers.add(marker);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public List<Marker> getMarkers() {
 		return markers;
 	}
@@ -33,6 +37,24 @@ public class MultiMarker {
 		for (Marker marker : markers) {
 			marker.remove();
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void delete(Marker marker) {
+		if (markers.remove(marker)) {
+			marker.remove();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addNew(Marker marker) {
+		add(marker);
 	}
 
 }
