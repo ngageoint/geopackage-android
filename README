@@ -1,3 +1,21 @@
+----------------
+Temporary README
+----------------
+For tracking information
+
+
+--- Dependencies ---
+
+OrmLite:
+http://ormlite.com/
+Open Source License
+ormlite-android-4.48.jar
+ormlite-core-4.48.jar
+
+Proj4J:
+http://trac.osgeo.org/proj4j/
+Apache License, Version 2.0
+src/org/osgeo/proj4j/
 
 
 --- Assets ---
