@@ -1382,6 +1382,10 @@ public class GeoPackageManagerFragment extends Fragment implements
 		case R.id.create_geopackage:
 			createGeoPackage();
 			break;
+		case R.id.clear_selected_tables:
+			active.removeAll();
+			update();
+			break;
 		default:
 			handled = false;
 			break;

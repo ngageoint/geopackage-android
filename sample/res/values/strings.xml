@@ -8,6 +8,7 @@
     <string name="import_geopackage_url">Import URL</string>
     <string name="import_geopackage_file">Import File</string>
     <string name="create_geopackage">Create</string>
+    <string name="clear_selected_tables">Deselect All</string>
     <string name="map_features">Features</string>
     <string name="map_bounding_box">Bounding Box</string>
     <string name="map_download_tiles">Download Tiles</string>

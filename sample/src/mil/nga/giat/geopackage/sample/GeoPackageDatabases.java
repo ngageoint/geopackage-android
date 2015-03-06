@@ -130,6 +130,17 @@ public class GeoPackageDatabases {
 	}
 
 	/**
+	 * Remove all databases
+	 */
+	public void removeAll() {
+		Set<String> allDatabases = new HashSet<String>();
+		allDatabases.addAll(databases.keySet());
+		for (String database : allDatabases) {
+			removeDatabase(database);
+		}
+	}
+
+	/**
 	 * Remove a database
 	 * 
 	 * @param database
