@@ -14,6 +14,9 @@ With: <string name="projection_epsg_$1">
 Replace: \s*<>
 With: </string>
 
+EPSG Projections modified after file pull:
+projection_epsg_27700
+
 -->
 <resources>
 
