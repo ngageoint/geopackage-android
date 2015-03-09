@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage.geom.unit;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.geom.Point;
 
 import org.osgeo.proj4j.CoordinateTransform;
@@ -85,6 +86,29 @@ public class ProjectionTransform {
 		}
 
 		return to;
+	}
+
+	/**
+	 * Transform the bounding box
+	 * 
+	 * @param boundingBox
+	 * @return
+	 */
+	public BoundingBox transform(BoundingBox boundingBox) {
+
+		ProjCoordinate lowerLeft = new ProjCoordinate(
+				boundingBox.getMinLongitude(), boundingBox.getMinLatitude());
+		ProjCoordinate upperRight = new ProjCoordinate(
+				boundingBox.getMaxLongitude(), boundingBox.getMaxLatitude());
+
+		ProjCoordinate projectedLowerLeft = transform(lowerLeft);
+		ProjCoordinate projectedUpperRight = transform(upperRight);
+
+		BoundingBox projectedBoundingBox = new BoundingBox(
+				projectedLowerLeft.x, projectedUpperRight.x,
+				projectedLowerLeft.y, projectedUpperRight.y);
+
+		return projectedBoundingBox;
 	}
 
 	/**

@@ -9,6 +9,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
@@ -41,6 +43,12 @@ import android.util.SparseArray;
  * @author osbornb
  */
 public class TileGenerator {
+
+	/**
+	 * URL EPSG pattern for finding the EPSG code in a url
+	 */
+	private static final Pattern URL_EPSG_PATTERN = Pattern.compile(
+			"EPSG:(\\d+)", Pattern.CASE_INSENSITIVE);
 
 	/**
 	 * Context
@@ -114,6 +122,11 @@ public class TileGenerator {
 	private final boolean urlHasBoundingBox;
 
 	/**
+	 * Projection EPSG
+	 */
+	private Long epsg;
+
+	/**
 	 * Compression options
 	 */
 	private Options options = null;
@@ -143,6 +156,13 @@ public class TileGenerator {
 		this.maxZoom = maxZoom;
 		this.urlHasXYZ = hasXYZ(tileUrl);
 		this.urlHasBoundingBox = hasBoundingBox(tileUrl);
+		if (urlHasBoundingBox) {
+			Matcher matcher = URL_EPSG_PATTERN.matcher(tileUrl);
+			if (matcher.find()) {
+				String epsgString = matcher.group(1);
+				epsg = Long.valueOf(epsgString);
+			}
+		}
 
 		if (!this.urlHasXYZ && !this.urlHasBoundingBox) {
 			throw new GeoPackageException(
@@ -550,8 +570,22 @@ public class TileGenerator {
 	 */
 	private String replaceBoundingBox(String url, int z, int x, int y) {
 
-		BoundingBox boundingBox = TileBoundingBoxUtils
-				.getWebMercatorBoundingBox(x, y, z);
+		BoundingBox boundingBox = TileBoundingBoxUtils.getProjectedBoundingBox(
+				epsg, x, y, z);
+
+		url = replaceBoundingBox(url, boundingBox);
+
+		return url;
+	}
+
+	/**
+	 * Replace the url parts with the bounding box
+	 * 
+	 * @param url
+	 * @param boundingBox
+	 * @return
+	 */
+	private String replaceBoundingBox(String url, BoundingBox boundingBox) {
 
 		url = url.replaceAll(
 				context.getString(R.string.tile_generator_variable_min_lat),
@@ -577,7 +611,7 @@ public class TileGenerator {
 	 */
 	private boolean hasBoundingBox(String url) {
 
-		String replacedUrl = replaceBoundingBox(url, 0, 0, 0);
+		String replacedUrl = replaceBoundingBox(url, boundingBox);
 		boolean hasBoundingBox = !replacedUrl.equals(url);
 
 		return hasBoundingBox;

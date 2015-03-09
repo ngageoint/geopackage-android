@@ -2,6 +2,7 @@ package mil.nga.giat.geopackage.tiles;
 
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.geom.Point;
+import mil.nga.giat.geopackage.geom.unit.Projection;
 import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
 import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
 import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
@@ -19,6 +20,12 @@ public class TileBoundingBoxUtils {
 	private static ProjectionTransform toWebMercator = ProjectionFactory
 			.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
 			.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+
+	/**
+	 * Web mercator projection
+	 */
+	private static Projection webMercator = ProjectionFactory
+			.getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
 
 	/**
 	 * Get the overlapping bounding box between the two bounding boxes
@@ -144,6 +151,29 @@ public class TileBoundingBoxUtils {
 		BoundingBox box = new BoundingBox(minLon, maxLon, minLat, maxLat);
 
 		return box;
+	}
+
+	/**
+	 * Get the Projected tile bounding box from the Google Maps API tile
+	 * coordinates and zoom level
+	 * 
+	 * @param x
+	 * @param y
+	 * @param zoom
+	 * @return
+	 */
+	public static BoundingBox getProjectedBoundingBox(Long projectionEpsg,
+			int x, int y, int zoom) {
+
+		BoundingBox boundingBox = getWebMercatorBoundingBox(x, y, zoom);
+
+		if (projectionEpsg != null) {
+			ProjectionTransform transform = webMercator
+					.getTransformation(projectionEpsg);
+			boundingBox = transform.transform(boundingBox);
+		}
+
+		return boundingBox;
 	}
 
 	/**
