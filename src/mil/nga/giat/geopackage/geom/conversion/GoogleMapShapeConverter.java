@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.geom.CircularString;
 import mil.nga.giat.geopackage.geom.CompoundCurve;
 import mil.nga.giat.geopackage.geom.Geometry;
@@ -18,8 +19,9 @@ import mil.nga.giat.geopackage.geom.Polygon;
 import mil.nga.giat.geopackage.geom.PolyhedralSurface;
 import mil.nga.giat.geopackage.geom.TIN;
 import mil.nga.giat.geopackage.geom.Triangle;
-import mil.nga.giat.geopackage.geom.unit.CoordinateConverter;
-import mil.nga.giat.geopackage.geom.unit.DegreeConverter;
+import mil.nga.giat.geopackage.geom.unit.Projection;
+import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
+import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -38,24 +40,46 @@ import com.google.android.gms.maps.model.PolylineOptions;
 public class GoogleMapShapeConverter {
 
 	/**
-	 * Coordinate converter
+	 * Projection
 	 */
-	private final CoordinateConverter coordinateConverter;
+	private final Projection projection;
 
 	/**
-	 * Constructor, uses default {@link DegreeConverter}
+	 * Transformation to WGS 84
 	 */
-	public GoogleMapShapeConverter() {
-		this(new DegreeConverter());
+	private final ProjectionTransform toWgs84;
+
+	/**
+	 * Transformation from WGS 84
+	 */
+	private final ProjectionTransform fromWgs84;
+
+	/**
+	 * Constructor with specified projection, see
+	 * {@link FeatureDao#getProjection}
+	 * 
+	 * @param projection
+	 */
+	public GoogleMapShapeConverter(Projection projection) {
+		this.projection = projection;
+		if (projection != null) {
+			toWgs84 = projection
+					.getTransformation(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+			fromWgs84 = toWgs84.getToProjection().getTransformation(
+					projection.getEpsg());
+		} else {
+			toWgs84 = null;
+			fromWgs84 = null;
+		}
 	}
 
 	/**
-	 * Constructor with specified coordinate converter
+	 * Get the projection
 	 * 
-	 * @param coordinateConverter
+	 * @return
 	 */
-	public GoogleMapShapeConverter(CoordinateConverter coordinateConverter) {
-		this.coordinateConverter = coordinateConverter;
+	public Projection getProjection() {
+		return projection;
 	}
 
 	/**
@@ -65,9 +89,10 @@ public class GoogleMapShapeConverter {
 	 * @return
 	 */
 	public LatLng toLatLng(Point point) {
-		double latitude = coordinateConverter.toDegrees(point.getY());
-		double longitude = coordinateConverter.toDegrees(point.getX());
-		LatLng latLng = new LatLng(latitude, longitude);
+		if (toWgs84 != null) {
+			point = toWgs84.transform(point);
+		}
+		LatLng latLng = new LatLng(point.getY(), point.getX());
 		return latLng;
 	}
 
@@ -90,9 +115,12 @@ public class GoogleMapShapeConverter {
 	 * @return
 	 */
 	public Point toPoint(LatLng latLng, boolean hasZ, boolean hasM) {
-		double y = coordinateConverter.degreesToUnits(latLng.latitude);
-		double x = coordinateConverter.degreesToUnits(latLng.longitude);
+		double y = latLng.latitude;
+		double x = latLng.longitude;
 		Point point = new Point(hasZ, hasM, x, y);
+		if (fromWgs84 != null) {
+			point = fromWgs84.transform(point);
+		}
 		return point;
 	}
 
@@ -1490,7 +1518,7 @@ public class GoogleMapShapeConverter {
 			MarkerOptions polylineMarkerOptions,
 			PolylineOptions globalPolylineOptions) {
 
-		PolylineMarkers polylineMarkers = new PolylineMarkers();
+		PolylineMarkers polylineMarkers = new PolylineMarkers(this);
 
 		if (globalPolylineOptions != null) {
 			polylineOptions.color(globalPolylineOptions.getColor());
@@ -1523,7 +1551,7 @@ public class GoogleMapShapeConverter {
 			MarkerOptions polygonMarkerHoleOptions,
 			PolygonOptions globalPolygonOptions) {
 
-		PolygonMarkers polygonMarkers = new PolygonMarkers();
+		PolygonMarkers polygonMarkers = new PolygonMarkers(this);
 
 		if (globalPolygonOptions != null) {
 			polygonOptions.fillColor(globalPolygonOptions.getFillColor());

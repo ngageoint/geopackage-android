@@ -211,11 +211,11 @@ public class TileGenerator {
 		if (tileCount == null) {
 			// Get the tile grids and total tile count
 			int count = 0;
-			BoundingBox mercatorBox = TileBoundingBoxAndroidUtils
+			BoundingBox mercatorBox = TileBoundingBoxUtils
 					.toWebMercator(boundingBox);
 			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
 				// Get the tile grid the includes the entire bounding box
-				TileGrid tileGrid = TileBoundingBoxAndroidUtils.getTileGrid(
+				TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
 						mercatorBox, zoom);
 				count += tileGrid.count();
 				tileGrids.put(zoom, tileGrid);
@@ -363,7 +363,7 @@ public class TileGenerator {
 		Integer tileHeight = null;
 
 		// Get the full sized matrix grid width and height
-		int matrixLength = TileBoundingBoxAndroidUtils.tilesPerSide(zoomLevel);
+		int matrixLength = TileBoundingBoxUtils.tilesPerSide(zoomLevel);
 
 		// Download and create the tile and each coordinate
 		for (int x = tileGrid.getMinX(); x <= tileGrid.getMaxX(); x++) {
@@ -478,10 +478,8 @@ public class TileGenerator {
 			// Create the tile matrix
 			if (create) {
 				// Get the tile size
-				int tilesPerSide = TileBoundingBoxAndroidUtils
-						.tilesPerSide(zoomLevel);
-				double tileSize = TileBoundingBoxAndroidUtils
-						.tileSize(tilesPerSide);
+				int tilesPerSide = TileBoundingBoxUtils.tilesPerSide(zoomLevel);
+				double tileSize = TileBoundingBoxUtils.tileSize(tilesPerSide);
 
 				// Calculate pixel sizes
 				double pixelXSize = tileSize / tileWidth;
@@ -552,7 +550,7 @@ public class TileGenerator {
 	 */
 	private String replaceBoundingBox(String url, int z, int x, int y) {
 
-		BoundingBox boundingBox = TileBoundingBoxAndroidUtils
+		BoundingBox boundingBox = TileBoundingBoxUtils
 				.getWebMercatorBoundingBox(x, y, z);
 
 		url = url.replaceAll(

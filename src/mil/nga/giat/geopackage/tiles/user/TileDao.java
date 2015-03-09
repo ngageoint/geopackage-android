@@ -9,10 +9,10 @@ import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.geom.unit.CoordinateConverter;
-import mil.nga.giat.geopackage.geom.unit.DegreeConverter;
-import mil.nga.giat.geopackage.geom.unit.DistanceConverter;
-import mil.nga.giat.geopackage.geom.unit.MeterConverter;
+import mil.nga.giat.geopackage.geom.unit.Projection;
+import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
+import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
+import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.user.UserDao;
@@ -72,14 +72,14 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	private final double matrixHeight;
 
 	/**
-	 * Coordinate converter
+	 * Projection
 	 */
-	private final CoordinateConverter coordinateConverter;
+	private Projection projection;
 
 	/**
-	 * Distance converter
+	 * Transformation to WGS 84
 	 */
-	private final DistanceConverter distanceConverter;
+	private ProjectionTransform toWgs84;
 
 	/**
 	 * Constructor
@@ -88,13 +88,9 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * @param tileMatrixSet
 	 * @param tileMatrices
 	 * @param table
-	 * @param coordinateConverter
-	 * @param distanceConverter
 	 */
 	public TileDao(SQLiteDatabase db, TileMatrixSet tileMatrixSet,
-			List<TileMatrix> tileMatrices, TileTable table,
-			CoordinateConverter coordinateConverter,
-			DistanceConverter distanceConverter) {
+			List<TileMatrix> tileMatrices, TileTable table) {
 		super(db, table);
 
 		this.tileMatrixSet = tileMatrixSet;
@@ -102,15 +98,9 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		this.widths = new double[tileMatrices.size()];
 		this.heights = new double[tileMatrices.size()];
 
-		// Set the coordinate converters
-		if (coordinateConverter == null) {
-			coordinateConverter = new DegreeConverter();
-		}
-		this.coordinateConverter = coordinateConverter;
-		if (distanceConverter == null) {
-			distanceConverter = new MeterConverter();
-		}
-		this.distanceConverter = distanceConverter;
+		projection = ProjectionFactory.getProjection(tileMatrixSet.getSrsId());
+		toWgs84 = projection
+				.getTransformation(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
 		// Set the min and max zoom levels
 		if (!tileMatrices.isEmpty()) {
@@ -126,18 +116,18 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		for (int i = 0; i < tileMatrices.size(); i++) {
 			TileMatrix tileMatrix = tileMatrices.get(i);
 			zoomLevelToTileMatrix.put(tileMatrix.getZoomLevel(), tileMatrix);
-			widths[tileMatrices.size() - i - 1] = distanceConverter
+			widths[tileMatrices.size() - i - 1] = projection
 					.toMeters(tileMatrix.getPixelXSize()
 							* tileMatrix.getTileWidth());
-			heights[tileMatrices.size() - i - 1] = distanceConverter
+			heights[tileMatrices.size() - i - 1] = projection
 					.toMeters(tileMatrix.getPixelYSize()
 							* tileMatrix.getTileHeight());
 		}
 
 		// Set the matrix width and height
-		matrixWidth = distanceConverter.toMeters(tileMatrixSet.getMaxX()
+		matrixWidth = projection.toMeters(tileMatrixSet.getMaxX()
 				- tileMatrixSet.getMinX());
-		matrixHeight = distanceConverter.toMeters(tileMatrixSet.getMaxY()
+		matrixHeight = projection.toMeters(tileMatrixSet.getMaxY()
 				- tileMatrixSet.getMinY());
 
 		if (tileMatrixSet.getContents() == null) {
@@ -207,12 +197,13 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		return maxZoom;
 	}
 
-	public CoordinateConverter getCoordinateConverter() {
-		return coordinateConverter;
-	}
-
-	public DistanceConverter getDistanceConverter() {
-		return distanceConverter;
+	/**
+	 * Get the projection
+	 * 
+	 * @return
+	 */
+	public Projection getProjection() {
+		return projection;
 	}
 
 	/**
@@ -425,8 +416,8 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 */
 	public long getTileColumn(TileMatrix tileMatrix, double longitude) {
 
-		double minX = coordinateConverter.toDegrees(tileMatrixSet.getMinX());
-		double maxX = coordinateConverter.toDegrees(tileMatrixSet.getMaxX());
+		double minX = toWgs84.transformLongitude(tileMatrixSet.getMinX());
+		double maxX = toWgs84.transformLongitude(tileMatrixSet.getMaxX());
 
 		long tileId;
 		if (longitude < minX) {
@@ -508,8 +499,8 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 */
 	public long getTileRow(TileMatrix tileMatrix, double latitude) {
 
-		double minY = coordinateConverter.toDegrees(tileMatrixSet.getMinY());
-		double maxY = coordinateConverter.toDegrees(tileMatrixSet.getMaxY());
+		double minY = toWgs84.transformLatitude(tileMatrixSet.getMinY());
+		double maxY = toWgs84.transformLatitude(tileMatrixSet.getMaxY());
 
 		long tileId;
 		if (latitude <= minY) {
@@ -576,10 +567,8 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		long row = tileRow.getTileRow();
 
 		// Get the tile width in degrees
-		double matrixMinX = coordinateConverter.toDegrees(tileMatrixSet
-				.getMinX());
-		double matrixMaxX = coordinateConverter.toDegrees(tileMatrixSet
-				.getMaxX());
+		double matrixMinX = toWgs84.transformLongitude(tileMatrixSet.getMinX());
+		double matrixMaxX = toWgs84.transformLongitude(tileMatrixSet.getMaxX());
 		double matrixWidth = matrixMaxX - matrixMinX;
 		double tileWidth = matrixWidth / tileMatrix.getMatrixWidth();
 
@@ -588,10 +577,8 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		double maxLon = minLon + tileWidth;
 
 		// Get the tile height in degrees
-		double matrixMinY = coordinateConverter.toDegrees(tileMatrixSet
-				.getMinY());
-		double matrixMaxY = coordinateConverter.toDegrees(tileMatrixSet
-				.getMaxY());
+		double matrixMinY = toWgs84.transformLatitude(tileMatrixSet.getMinY());
+		double matrixMaxY = toWgs84.transformLatitude(tileMatrixSet.getMaxY());
 		double matrixHeight = matrixMaxY - matrixMinY;
 		double tileHeight = matrixHeight / tileMatrix.getMatrixHeight();
 

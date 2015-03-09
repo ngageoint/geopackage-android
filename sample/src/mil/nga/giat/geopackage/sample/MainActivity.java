@@ -1,5 +1,7 @@
 package mil.nga.giat.geopackage.sample;
 
+import mil.nga.giat.geopackage.geom.unit.AndroidProjectionParameterRetriever;
+import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -70,6 +72,10 @@ public class MainActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// Initialize the projection factory
+		AndroidProjectionParameterRetriever projectionRetriever = new AndroidProjectionParameterRetriever(this);
+		ProjectionFactory.initialize(projectionRetriever);
+		
 		// if (savedInstanceState != null) {
 		// mapFragment = (GeoPackageMapFragment) getFragmentManager()
 		// .getFragment(savedInstanceState, "mapFragment");

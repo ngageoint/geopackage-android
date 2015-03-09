@@ -14,9 +14,20 @@ import com.google.android.gms.maps.model.Polyline;
  */
 public class PolylineMarkers implements ShapeMarkers {
 
+	private final GoogleMapShapeConverter converter;
+
 	private Polyline polyline;
 
 	private List<Marker> markers = new ArrayList<Marker>();
+
+	/**
+	 * Constructor
+	 * 
+	 * @param converter
+	 */
+	public PolylineMarkers(GoogleMapShapeConverter converter) {
+		this.converter = converter;
+	}
 
 	public Polyline getPolyline() {
 		return polyline;
@@ -50,8 +61,7 @@ public class PolylineMarkers implements ShapeMarkers {
 			if (isDeleted()) {
 				remove();
 			} else {
-				List<LatLng> points = new GoogleMapShapeConverter()
-						.getPointsFromMarkers(markers);
+				List<LatLng> points = converter.getPointsFromMarkers(markers);
 				polyline.setPoints(points);
 			}
 		}

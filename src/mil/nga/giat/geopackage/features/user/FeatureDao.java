@@ -5,6 +5,8 @@ import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.geopackage.geom.unit.Projection;
+import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
 import mil.nga.giat.geopackage.user.UserDao;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -20,6 +22,11 @@ public class FeatureDao extends
 	 * Geometry Columns
 	 */
 	private final GeometryColumns geometryColumns;
+
+	/**
+	 * Projection
+	 */
+	private Projection projection;
 
 	/**
 	 * Constructor
@@ -44,6 +51,17 @@ public class FeatureDao extends
 					+ SpatialReferenceSystem.class.getSimpleName());
 		}
 
+		projection = ProjectionFactory
+				.getProjection(geometryColumns.getSrsId());
+	}
+
+	/**
+	 * Get the projection
+	 * 
+	 * @return
+	 */
+	public Projection getProjection() {
+		return projection;
 	}
 
 	/**

@@ -48,8 +48,6 @@ public class GoogleMapShapeConverterUtils {
 	 */
 	public static void testShapes(GeoPackage geoPackage) throws SQLException {
 
-		GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
-
 		GeometryColumnsDao geometryColumnsDao = geoPackage
 				.getGeometryColumnsDao();
 
@@ -59,6 +57,9 @@ public class GoogleMapShapeConverterUtils {
 			for (GeometryColumns geometryColumns : results) {
 
 				FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+
+				GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+						dao.getProjection());
 
 				// Query for all
 				FeatureCursor cursor = dao.queryForAll();

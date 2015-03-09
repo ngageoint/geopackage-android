@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mil.nga.giat.geopackage.BoundingBox;
-import mil.nga.giat.geopackage.geom.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
@@ -17,11 +16,6 @@ import com.google.maps.android.SphericalUtil;
  * @author osbornb
  */
 public class TileBoundingBoxAndroidUtils {
-
-	/**
-	 * Half the world distance in either direction
-	 */
-	private static double HALF_WORLD_WIDTH = 20037508.34789244;
 
 	/**
 	 * Get a rectangle using the tile width, height, bounding box, and the
@@ -71,174 +65,6 @@ public class TileBoundingBoxAndroidUtils {
 		RectF rect = new RectF(left, top, right, bottom);
 
 		return rect;
-	}
-
-	/**
-	 * Get the tile bounding box from the Google Maps API tile coordinates and
-	 * zoom level
-	 * 
-	 * @param x
-	 * @param y
-	 * @param zoom
-	 * @return
-	 */
-	public static BoundingBox getBoundingBox(int x, int y, int zoom) {
-
-		int tilesPerSide = tilesPerSide(zoom);
-		double tileWidthDegrees = tileWidthDegrees(tilesPerSide);
-		double tileHeightDegrees = tileHeightDegrees(tilesPerSide);
-
-		double minLon = -180.0 + (x * tileWidthDegrees);
-		double maxLon = minLon + tileWidthDegrees;
-
-		double maxLat = 90.0 - (y * tileHeightDegrees);
-		double minLat = maxLat - tileHeightDegrees;
-
-		BoundingBox box = new BoundingBox(minLon, maxLon, minLat, maxLat);
-
-		return box;
-	}
-
-	/**
-	 * Get the Web Mercator tile bounding box from the Google Maps API tile
-	 * coordinates and zoom level
-	 * 
-	 * @param x
-	 * @param y
-	 * @param zoom
-	 * @return
-	 */
-	public static BoundingBox getWebMercatorBoundingBox(int x, int y, int zoom) {
-
-		int tilesPerSide = tilesPerSide(zoom);
-		double tileSize = tileSize(tilesPerSide);
-
-		double minLon = (-1 * HALF_WORLD_WIDTH) + (x * tileSize);
-		double maxLon = (-1 * HALF_WORLD_WIDTH) + ((x + 1) * tileSize);
-		double minLat = HALF_WORLD_WIDTH - ((y + 1) * tileSize);
-		double maxLat = HALF_WORLD_WIDTH - (y * tileSize);
-
-		BoundingBox box = new BoundingBox(minLon, maxLon, minLat, maxLat);
-
-		return box;
-	}
-
-	/**
-	 * Get the tile grid that includes the entire tile bounding box
-	 * 
-	 * @param boundingBox
-	 * @param zoom
-	 * @return
-	 */
-	public static TileGrid getTileGrid(BoundingBox boundingBox, int zoom) {
-
-		int tilesPerSide = tilesPerSide(zoom);
-		double tileSize = tileSize(tilesPerSide);
-
-		int minX = (int) ((boundingBox.getMinLongitude() + HALF_WORLD_WIDTH) / tileSize);
-		double tempMaxX = (boundingBox.getMaxLongitude() + HALF_WORLD_WIDTH)
-				/ tileSize;
-		int maxX = (int) tempMaxX;
-		if (tempMaxX % 1 == 0) {
-			maxX--;
-		}
-		maxX = Math.min(maxX, tilesPerSide - 1);
-
-		int minY = (int) (((boundingBox.getMaxLatitude() - HALF_WORLD_WIDTH) * -1) / tileSize);
-		double tempMaxY = ((boundingBox.getMinLatitude() - HALF_WORLD_WIDTH) * -1)
-				/ tileSize;
-		int maxY = (int) tempMaxY;
-		if (tempMaxY % 1 == 0) {
-			maxY--;
-		}
-		maxX = Math.min(maxX, tilesPerSide - 1);
-
-		TileGrid grid = new TileGrid(minX, maxX, minY, maxY);
-
-		return grid;
-	}
-
-	/**
-	 * Convert the bounding box coordinates to a new web mercator bounding box
-	 * 
-	 * @param boundingBox
-	 */
-	public static BoundingBox toWebMercator(BoundingBox boundingBox) {
-
-		Point lowerLeftPoint = new Point(false, false,
-				boundingBox.getMinLongitude(), boundingBox.getMinLatitude());
-		Point upperRightPoint = new Point(false, false,
-				boundingBox.getMaxLongitude(), boundingBox.getMaxLatitude());
-
-		toWebMercator(lowerLeftPoint);
-		toWebMercator(upperRightPoint);
-
-		BoundingBox mercatorBox = new BoundingBox(lowerLeftPoint.getX(),
-				upperRightPoint.getX(), lowerLeftPoint.getY(),
-				upperRightPoint.getY());
-
-		return mercatorBox;
-	}
-
-	/**
-	 * Convert the Point to web mercator
-	 * 
-	 * @param point
-	 */
-	private static void toWebMercator(Point point) {
-		if ((Math.abs(point.getX()) > 180 || Math.abs(point.getY()) > 90))
-			return;
-
-		double num = point.getX() * 0.017453292519943295;
-		double x = 6378137.0 * num;
-		double a = point.getY() * 0.017453292519943295;
-
-		point.setX(x);
-		double y = 3189068.5 * Math.log((1.0 + Math.sin(a))
-				/ (1.0 - Math.sin(a)));
-		y = Math.max(-HALF_WORLD_WIDTH, y);
-		y = Math.min(HALF_WORLD_WIDTH, y);
-		point.setY(y);
-	}
-
-	/**
-	 * Get the tile size in meters
-	 * 
-	 * @param tilesPerSide
-	 * @return
-	 */
-	public static double tileSize(int tilesPerSide) {
-		return (2 * HALF_WORLD_WIDTH) / tilesPerSide;
-	}
-
-	/**
-	 * Get the tile width in degrees
-	 * 
-	 * @param tilesPerSide
-	 * @return
-	 */
-	public static double tileWidthDegrees(int tilesPerSide) {
-		return 360.0 / tilesPerSide;
-	}
-
-	/**
-	 * Get the tile height in degrees
-	 * 
-	 * @param tilesPerSide
-	 * @return
-	 */
-	public static double tileHeightDegrees(int tilesPerSide) {
-		return 180.0 / tilesPerSide;
-	}
-
-	/**
-	 * Get the tiles per side, width and height, at the zoom level
-	 * 
-	 * @param zoom
-	 * @return
-	 */
-	public static int tilesPerSide(int zoom) {
-		return (int) Math.pow(2, zoom);
 	}
 
 	/**

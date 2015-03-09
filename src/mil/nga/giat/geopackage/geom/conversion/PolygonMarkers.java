@@ -14,11 +14,22 @@ import com.google.android.gms.maps.model.Polygon;
  */
 public class PolygonMarkers implements ShapeWithChildrenMarkers {
 
+	private final GoogleMapShapeConverter converter;
+
 	private Polygon polygon;
 
 	private List<Marker> markers = new ArrayList<Marker>();
 
 	private List<PolygonHoleMarkers> holes = new ArrayList<PolygonHoleMarkers>();
+
+	/**
+	 * Constructor
+	 * 
+	 * @param converter
+	 */
+	public PolygonMarkers(GoogleMapShapeConverter converter) {
+		this.converter = converter;
+	}
 
 	public Polygon getPolygon() {
 		return polygon;
@@ -64,7 +75,6 @@ public class PolygonMarkers implements ShapeWithChildrenMarkers {
 			if (isDeleted()) {
 				remove();
 			} else {
-				GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
 
 				List<LatLng> points = converter.getPointsFromMarkers(markers);
 				polygon.setPoints(points);

@@ -672,7 +672,8 @@ public class GeoPackageMapFragment extends Fragment implements
 					final FeatureRow featureRow = featureDao
 							.queryForIdRow(featureId);
 					Geometry geometry = featureRow.getGeometry().getGeometry();
-					GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
+					GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+							featureDao.getProjection());
 					GoogleMapShape shape = converter.toShape(geometry);
 
 					editFeatureMarker.remove();
@@ -716,7 +717,8 @@ public class GeoPackageMapFragment extends Fragment implements
 			if (geomData != null) {
 				Geometry geometry = geomData.getGeometry();
 				if (geometry != null) {
-					GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
+					GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+							featureDao.getProjection());
 					GoogleMapShape shape = converter.toShape(geometry);
 					prepareShapeOptions(shape, true, true);
 					GoogleMapShape mapShape = converter.addShapeToMap(map,
@@ -801,7 +803,8 @@ public class GeoPackageMapFragment extends Fragment implements
 			FeatureDao featureDao = geoPackage.getFeatureDao(editFeaturesTable);
 			long srsId = featureDao.getGeometryColumns().getSrsId();
 
-			GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
+			GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+					featureDao.getProjection());
 
 			switch (editFeatureType) {
 			case POINT:
@@ -1487,7 +1490,8 @@ public class GeoPackageMapFragment extends Fragment implements
 		FeatureCursor cursor = featureDao.queryForAll();
 		try {
 
-			final GoogleMapShapeConverter converter = new GoogleMapShapeConverter();
+			final GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+					featureDao.getProjection());
 
 			while (!task.isCancelled() && count < maxFeatures
 					&& cursor.moveToNext()) {

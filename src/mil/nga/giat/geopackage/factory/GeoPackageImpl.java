@@ -31,8 +31,6 @@ import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.features.user.FeatureTableReader;
-import mil.nga.giat.geopackage.geom.unit.CoordinateConverter;
-import mil.nga.giat.geopackage.geom.unit.DistanceConverter;
 import mil.nga.giat.geopackage.metadata.Metadata;
 import mil.nga.giat.geopackage.metadata.MetadataDao;
 import mil.nga.giat.geopackage.metadata.reference.MetadataReference;
@@ -494,16 +492,6 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public TileDao getTileDao(TileMatrixSet tileMatrixSet) {
-		return getTileDao(tileMatrixSet, null, null);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TileDao getTileDao(TileMatrixSet tileMatrixSet,
-			CoordinateConverter coordinateConverter,
-			DistanceConverter distanceConverter) {
 
 		if (tileMatrixSet == null) {
 			throw new GeoPackageException("Non null "
@@ -537,7 +525,7 @@ class GeoPackageImpl implements GeoPackage {
 				tileMatrixSet.getTableName());
 		final TileTable tileTable = tableReader.readTable(database);
 		TileDao dao = new TileDao(database, tileMatrixSet, tileMatrices,
-				tileTable, coordinateConverter, distanceConverter);
+				tileTable);
 
 		// Register the table to wrap cursors with the tile cursor
 		cursorFactory.registerTable(tileMatrixSet.getTableName(),
@@ -557,16 +545,6 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public TileDao getTileDao(Contents contents) {
-		return getTileDao(contents, null, null);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TileDao getTileDao(Contents contents,
-			CoordinateConverter coordinateConverter,
-			DistanceConverter distanceConverter) {
 
 		if (contents == null) {
 			throw new GeoPackageException("Non null "
@@ -589,16 +567,6 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public TileDao getTileDao(String tableName) {
-		return getTileDao(tableName, null, null);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public TileDao getTileDao(String tableName,
-			CoordinateConverter coordinateConverter,
-			DistanceConverter distanceConverter) {
 
 		TileMatrixSetDao dao = getTileMatrixSetDao();
 		List<TileMatrixSet> tileMatrixSetList;

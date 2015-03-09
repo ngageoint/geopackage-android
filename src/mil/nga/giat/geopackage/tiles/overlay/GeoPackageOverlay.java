@@ -80,7 +80,7 @@ public class GeoPackageOverlay implements TileProvider {
 		Tile tile = null;
 
 		// Get the bounding box of the requested tile
-		BoundingBox boundingBox = TileBoundingBoxAndroidUtils
+		BoundingBox boundingBox = TileBoundingBoxUtils
 				.getBoundingBox(x, y, zoom);
 
 		// Get the lon and lat size in meters
