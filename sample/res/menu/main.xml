@@ -4,6 +4,11 @@
 
     <group android:id="@+id/menu_group_map" >
         <item
+            android:id="@+id/map_zoom"
+            android:icon="@drawable/ic_zoom"
+            android:showAsAction="always"
+            android:title="@string/map_zoom"/>
+        <item
             android:id="@+id/map_features"
             android:icon="@drawable/ic_features"
             android:showAsAction="always"

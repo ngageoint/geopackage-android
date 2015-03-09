@@ -338,6 +338,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	private ImageButton editClearPolygonHolesButton;
 
 	/**
+	 * Bounding box around the features on the map
+	 */
+	private BoundingBox featuresBoundingBox;
+
+	/**
 	 * Constructor
 	 */
 	public GeoPackageMapFragment() {
@@ -942,6 +947,9 @@ public class GeoPackageMapFragment extends Fragment implements
 		boolean handled = true;
 
 		switch (item.getItemId()) {
+		case R.id.map_zoom:
+			zoomToFeatures();
+			break;
 		case R.id.map_features:
 			editFeaturesMenuItem = item;
 			if (!editFeaturesMode) {
@@ -1072,7 +1080,7 @@ public class GeoPackageMapFragment extends Fragment implements
 							editFeaturesMenuItem
 									.setIcon(R.drawable.ic_features_active);
 
-							updateInBackground(true);
+							updateInBackground(false);
 
 						} catch (Exception e) {
 							GeoPackageUtils
@@ -1238,7 +1246,7 @@ public class GeoPackageMapFragment extends Fragment implements
 									Editor editor = settings.edit();
 									editor.putInt(MAX_FEATURES_KEY, maxFeature);
 									editor.commit();
-									updateInBackground(true);
+									updateInBackground(false);
 								}
 							}
 						})
@@ -1288,6 +1296,7 @@ public class GeoPackageMapFragment extends Fragment implements
 			}
 		}
 		geoPackages.clear();
+		featuresBoundingBox = null;
 		updateTask = new MapUpdateTask();
 		updateTask.zoom = zoom;
 		updateTask.execute();
@@ -1376,8 +1385,6 @@ public class GeoPackageMapFragment extends Fragment implements
 				}
 			}
 			boolean featuresAdded = false;
-			BoundingBox featuresBoundingBox = new BoundingBox(180, -180, 90,
-					-90);
 			for (Map.Entry<String, List<String>> databaseFeatures : featureTables
 					.entrySet()) {
 
@@ -1388,7 +1395,7 @@ public class GeoPackageMapFragment extends Fragment implements
 				for (String features : databaseFeatures.getValue()) {
 					int count = displayFeatures(task,
 							databaseFeatures.getKey(), features, featuresLeft,
-							editFeaturesMode, featuresBoundingBox);
+							editFeaturesMode);
 					if (count > 0) {
 						featuresAdded = true;
 					}
@@ -1403,37 +1410,8 @@ public class GeoPackageMapFragment extends Fragment implements
 				}
 			}
 
-			if (featuresAdded && zoom && featuresBoundingBox != null) {
-				final LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-				boundsBuilder.include(new LatLng(featuresBoundingBox
-						.getMinLatitude(), featuresBoundingBox
-						.getMinLongitude()));
-				boundsBuilder.include(new LatLng(featuresBoundingBox
-						.getMinLatitude(), featuresBoundingBox
-						.getMaxLongitude()));
-				boundsBuilder.include(new LatLng(featuresBoundingBox
-						.getMaxLatitude(), featuresBoundingBox
-						.getMinLongitude()));
-				boundsBuilder.include(new LatLng(featuresBoundingBox
-						.getMaxLatitude(), featuresBoundingBox
-						.getMaxLongitude()));
-
-				View view = getView();
-				int minViewLength = Math.min(view.getWidth(), view.getHeight());
-				float paddingPercentage = getActivity().getResources()
-						.getInteger(
-								R.integer.map_features_zoom_padding_percentage) * .01f;
-				final int padding = (int) Math.floor(minViewLength
-						* paddingPercentage);
-
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						map.animateCamera(CameraUpdateFactory.newLatLngBounds(
-								boundsBuilder.build(), padding));
-					}
-				});
-
+			if (featuresAdded && zoom) {
+				zoomToFeatures();
 			}
 
 			if (featuresLeft <= 0) {
@@ -1452,6 +1430,42 @@ public class GeoPackageMapFragment extends Fragment implements
 	}
 
 	/**
+	 * Zoom to features on the map
+	 */
+	private void zoomToFeatures() {
+
+		BoundingBox bbox = featuresBoundingBox;
+
+		if (bbox != null) {
+
+			final LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+			boundsBuilder.include(new LatLng(bbox.getMinLatitude(), bbox
+					.getMinLongitude()));
+			boundsBuilder.include(new LatLng(bbox.getMinLatitude(), bbox
+					.getMaxLongitude()));
+			boundsBuilder.include(new LatLng(bbox.getMaxLatitude(), bbox
+					.getMinLongitude()));
+			boundsBuilder.include(new LatLng(bbox.getMaxLatitude(), bbox
+					.getMaxLongitude()));
+
+			View view = getView();
+			int minViewLength = Math.min(view.getWidth(), view.getHeight());
+			float paddingPercentage = getActivity().getResources().getInteger(
+					R.integer.map_features_zoom_padding_percentage) * .01f;
+			final int padding = (int) Math.floor(minViewLength
+					* paddingPercentage);
+
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					map.animateCamera(CameraUpdateFactory.newLatLngBounds(
+							boundsBuilder.build(), padding));
+				}
+			});
+		}
+	}
+
+	/**
 	 * Display features
 	 * 
 	 * @param task
@@ -1459,12 +1473,10 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * @param features
 	 * @param maxFeatures
 	 * @param editable
-	 * @param featuresBoundingBox
 	 * @return count of features added
 	 */
 	private int displayFeatures(MapUpdateTask task, String database,
-			String features, int maxFeatures, final boolean editable,
-			BoundingBox featuresBoundingBox) {
+			String features, int maxFeatures, final boolean editable) {
 
 		int count = 0;
 
@@ -1490,7 +1502,11 @@ public class GeoPackageMapFragment extends Fragment implements
 						count++;
 						final GoogleMapShape shape = converter
 								.toShape(geometry);
-						shape.boundingBox(featuresBoundingBox);
+						if (featuresBoundingBox != null) {
+							shape.boundingBox(featuresBoundingBox);
+						} else {
+							featuresBoundingBox = shape.boundingBox();
+						}
 						prepareShapeOptions(shape, editable, true);
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
