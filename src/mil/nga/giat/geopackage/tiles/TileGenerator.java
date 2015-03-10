@@ -18,6 +18,9 @@ import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.geom.unit.Projection;
+import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
+import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
@@ -93,8 +96,9 @@ public class TileGenerator {
 	/**
 	 * Tile bounding box
 	 */
-	private BoundingBox boundingBox = new BoundingBox(-180.0, 180.0, -90.0,
-			90.0);
+	private BoundingBox boundingBox = new BoundingBox(-180.0, 180.0,
+			ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE,
+			ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
 
 	/**
 	 * Compress format
@@ -122,9 +126,9 @@ public class TileGenerator {
 	private final boolean urlHasBoundingBox;
 
 	/**
-	 * Projection EPSG
+	 * Projection
 	 */
-	private Long epsg;
+	private Projection projection;
 
 	/**
 	 * Compression options
@@ -160,7 +164,8 @@ public class TileGenerator {
 			Matcher matcher = URL_EPSG_PATTERN.matcher(tileUrl);
 			if (matcher.find()) {
 				String epsgString = matcher.group(1);
-				epsg = Long.valueOf(epsgString);
+				long epsg = Long.valueOf(epsgString);
+				projection = ProjectionFactory.getProjection(epsg);
 			}
 		}
 
@@ -178,6 +183,10 @@ public class TileGenerator {
 	 */
 	public void setTileBoundingBox(BoundingBox boundingBox) {
 		this.boundingBox = boundingBox;
+		this.boundingBox.setMinLatitude(Math.max(boundingBox.getMinLatitude(),
+				ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE));
+		this.boundingBox.setMaxLatitude(Math.min(boundingBox.getMaxLatitude(),
+				ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE));
 	}
 
 	/**
@@ -571,7 +580,7 @@ public class TileGenerator {
 	private String replaceBoundingBox(String url, int z, int x, int y) {
 
 		BoundingBox boundingBox = TileBoundingBoxUtils.getProjectedBoundingBox(
-				epsg, x, y, z);
+				projection, x, y, z);
 
 		url = replaceBoundingBox(url, boundingBox);
 

@@ -926,6 +926,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 							tileMatrix.getTableName());
 					info.append("\nZoom Level: ").append(
 							tileMatrix.getZoomLevel());
+					info.append("\nTiles: ").append(
+							tileDao.count(tileMatrix.getZoomLevel()));
 					info.append("\nMatrix Width: ").append(
 							tileMatrix.getMatrixWidth());
 					info.append("\nMatrix Height: ").append(

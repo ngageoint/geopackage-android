@@ -5,14 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.geom.unit.Projection;
-import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
 import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
-import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.user.UserDao;
@@ -62,24 +59,9 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	private final double[] heights;
 
 	/**
-	 * Matrix width in meters
-	 */
-	private final double matrixWidth;
-
-	/**
-	 * Matrix height in meters
-	 */
-	private final double matrixHeight;
-
-	/**
 	 * Projection
 	 */
 	private Projection projection;
-
-	/**
-	 * Transformation to WGS 84
-	 */
-	private ProjectionTransform toWgs84;
 
 	/**
 	 * Constructor
@@ -98,9 +80,8 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		this.widths = new double[tileMatrices.size()];
 		this.heights = new double[tileMatrices.size()];
 
-		projection = ProjectionFactory.getProjection(tileMatrixSet.getSrsId());
-		toWgs84 = projection
-				.getTransformation(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+		projection = ProjectionFactory.getProjection(tileMatrixSet.getSrs()
+				.getOrganizationCoordsysId());
 
 		// Set the min and max zoom levels
 		if (!tileMatrices.isEmpty()) {
@@ -124,12 +105,6 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 							* tileMatrix.getTileHeight());
 		}
 
-		// Set the matrix width and height
-		matrixWidth = projection.toMeters(tileMatrixSet.getMaxX()
-				- tileMatrixSet.getMinX());
-		matrixHeight = projection.toMeters(tileMatrixSet.getMaxY()
-				- tileMatrixSet.getMinY());
-
 		if (tileMatrixSet.getContents() == null) {
 			throw new GeoPackageException(TileMatrixSet.class.getSimpleName()
 					+ " " + tileMatrixSet.getId() + " has null "
@@ -141,6 +116,30 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 					+ SpatialReferenceSystem.class.getSimpleName());
 		}
 
+	}
+
+	/**
+	 * Adjust the tile matrix lengths if needed. Check if the tile matrix width
+	 * and height need to expand to account for pixel * number of pixels fitting
+	 * into the tile matrix lengths
+	 */
+	public void adjustTileMatrixLengths() {
+		double tileMatrixWidth = tileMatrixSet.getMaxX()
+				- tileMatrixSet.getMinX();
+		double tileMatrixHeight = tileMatrixSet.getMaxY()
+				- tileMatrixSet.getMinY();
+		for (TileMatrix tileMatrix : tileMatrices) {
+			int tempMatrixWidth = (int) (tileMatrixWidth / (tileMatrix
+					.getPixelXSize() * tileMatrix.getTileWidth()));
+			int tempMatrixHeight = (int) (tileMatrixHeight / (tileMatrix
+					.getPixelYSize() * tileMatrix.getTileHeight()));
+			if (tempMatrixWidth > tileMatrix.getMatrixWidth()) {
+				tileMatrix.setMatrixWidth(tempMatrixWidth);
+			}
+			if (tempMatrixHeight > tileMatrix.getMatrixHeight()) {
+				tileMatrix.setMatrixHeight(tempMatrixHeight);
+			}
+		}
 	}
 
 	/**
@@ -279,53 +278,84 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	/**
 	 * Get the zoom level for the provided width and height in the default units
 	 * 
-	 * @param width
-	 *            in meters
-	 * @param height
+	 * @param length
 	 *            in meters
 	 * @return
 	 */
-	public long getZoomLevel(double width, double height) {
+	public Long getZoomLevel(double length) {
+
+		Long zoomLevel = null;
 
 		// Find where the width and height fit in
-		int widthIndex = Arrays.binarySearch(widths, width);
+		int widthIndex = Arrays.binarySearch(widths, length);
 		if (widthIndex < 0) {
-			widthIndex = (widthIndex * -1) - 2;
+			widthIndex = (widthIndex + 1) * -1;
 		}
-		int heightIndex = Arrays.binarySearch(heights, height);
+		int heightIndex = Arrays.binarySearch(heights, length);
 		if (heightIndex < 0) {
-			heightIndex = (heightIndex * -1) - 2;
+			heightIndex = (heightIndex + 1) * -1;
 		}
 
-		// Use one zoom size smaller if possible
-		int index = Math.min(widthIndex, heightIndex);
-		index = Math.max(0, index);
+		// Find the closest width or verify it isn't too small or large
+		if (widthIndex == 0) {
+			if (length < widths[widthIndex] * .51) {
+				widthIndex = -1;
+			}
+		} else if (widthIndex == widths.length) {
+			if (length >= widths[widthIndex - 1] / .51) {
+				widthIndex = -1;
+			}else{
+				widthIndex = widthIndex - 1;
+			}
+		} else if (length - widths[widthIndex - 1] < widths[widthIndex]
+				- length) {
+			widthIndex--;
+		}
 
-		TileMatrix tileMatrix = tileMatrices.get(tileMatrices.size() - index
-				- 1);
+		// Find the closest height or verify it isn't too small or large
+		if (heightIndex == 0) {
+			if (length < heights[heightIndex] * .51) {
+				heightIndex = -1;
+			}
+		} else if (heightIndex == heights.length) {
+			if (length >= heights[heightIndex - 1] / .51) {
+				heightIndex = -1;
+			}else{
+				heightIndex = heightIndex - 1;
+			}
+		} else if (length - heights[heightIndex - 1] < heights[heightIndex]
+				- length) {
+			heightIndex--;
+		}
 
-		return tileMatrix.getZoomLevel();
+		if (widthIndex >= 0 && heightIndex >= 0) {
+
+			// Use one zoom size smaller if possible
+			int index = Math.min(widthIndex, heightIndex);
+			if (index >= 0) {
+
+				TileMatrix tileMatrix = tileMatrices.get(tileMatrices.size()
+						- index - 1);
+				zoomLevel = tileMatrix.getZoomLevel();
+			}
+		}
+
+		return zoomLevel;
 	}
 
 	/**
-	 * Query by bounding box and zoom level
+	 * Query by range and zoom level
 	 * 
-	 * @param boundingBox
+	 * @param columnRange
+	 * @param rowRange
 	 * @param zoomLevel
 	 * @return cursor from query or null if the zoom level tile ranges do not
 	 *         overlap the bounding box
 	 */
-	public TileCursor queryByBoundingBox(BoundingBox boundingBox, long zoomLevel) {
+	public TileCursor queryByRange(TileMatrixRange columnRange,
+			TileMatrixRange rowRange, long zoomLevel) {
 
 		TileCursor tileCursor = null;
-
-		// Get the tile matrix at the zoom level
-		TileMatrix tileMatrix = getTileMatrix(zoomLevel);
-
-		// Find the column and row ranges including in the bounding box
-		TileMatrixRange columnRange = getTileColumnRange(tileMatrix,
-				boundingBox);
-		TileMatrixRange rowRange = getTileRowRange(tileMatrix, boundingBox);
 
 		if (columnRange != null && rowRange != null) {
 
@@ -360,239 +390,6 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	}
 
 	/**
-	 * Get the tile column range
-	 * 
-	 * @param tileMatrix
-	 * @param boundingBox
-	 * @return
-	 */
-	public TileMatrixRange getTileColumnRange(TileMatrix tileMatrix,
-			BoundingBox boundingBox) {
-		return getTileColumnRange(tileMatrix, boundingBox.getMinLongitude(),
-				boundingBox.getMaxLongitude());
-	}
-
-	/**
-	 * Get the tile getTileColumnRange range
-	 * 
-	 * @param tileMatrix
-	 * @param minLongitude
-	 *            in degrees
-	 * @param maxLongitude
-	 *            in degrees
-	 * @return
-	 */
-	public TileMatrixRange getTileColumnRange(TileMatrix tileMatrix,
-			double minLongitude, double maxLongitude) {
-
-		TileMatrixRange range = null;
-
-		long minColumn = getTileColumn(tileMatrix, minLongitude);
-		long maxColumn = getTileColumn(tileMatrix, maxLongitude);
-
-		if (minColumn < tileMatrix.getMatrixWidth() && maxColumn >= 0) {
-
-			if (minColumn < 0) {
-				minColumn = 0;
-			}
-			if (maxColumn >= tileMatrix.getMatrixWidth()) {
-				maxColumn = tileMatrix.getMatrixWidth() - 1;
-			}
-
-			range = new TileMatrixRange(minColumn, maxColumn);
-		}
-
-		return range;
-	}
-
-	/**
-	 * Get the tile column of the longitude in degrees
-	 * 
-	 * @param tileMatrix
-	 * @param longitude
-	 *            in degrees
-	 * @return tile column if in the range, -1 if before,
-	 *         {@link TileMatrix#getMatrixWidth()} if after
-	 */
-	public long getTileColumn(TileMatrix tileMatrix, double longitude) {
-
-		double minX = toWgs84.transformLongitude(tileMatrixSet.getMinX());
-		double maxX = toWgs84.transformLongitude(tileMatrixSet.getMaxX());
-
-		long tileId;
-		if (longitude < minX) {
-			tileId = -1;
-		} else if (longitude >= maxX) {
-			tileId = tileMatrix.getMatrixWidth();
-		} else {
-			double tileWidth = getTileWidth(tileMatrix);
-			tileId = (long) ((longitude - minX) / tileWidth);
-		}
-
-		return tileId;
-	}
-
-	/**
-	 * Get the tile width in meters
-	 * 
-	 * @param tileMatrix
-	 * @return
-	 */
-	public double getTileWidth(TileMatrix tileMatrix) {
-		return matrixWidth / tileMatrix.getMatrixWidth();
-	}
-
-	/**
-	 * Get the tile row range
-	 * 
-	 * @param tileMatrix
-	 * @param boundingBox
-	 * @return
-	 */
-	public TileMatrixRange getTileRowRange(TileMatrix tileMatrix,
-			BoundingBox boundingBox) {
-		return getTileRowRange(tileMatrix, boundingBox.getMinLatitude(),
-				boundingBox.getMaxLatitude());
-	}
-
-	/**
-	 * Get the tile row range
-	 * 
-	 * @param tileMatrix
-	 * @param minLatitude
-	 *            in degrees
-	 * @param maxLatitude
-	 *            in degrees
-	 * @return
-	 */
-	public TileMatrixRange getTileRowRange(TileMatrix tileMatrix,
-			double minLatitude, double maxLatitude) {
-
-		TileMatrixRange range = null;
-
-		long maxRow = getTileRow(tileMatrix, minLatitude);
-		long minRow = getTileRow(tileMatrix, maxLatitude);
-
-		if (minRow < tileMatrix.getMatrixHeight() && maxRow >= 0) {
-
-			if (minRow < 0) {
-				minRow = 0;
-			}
-			if (maxRow >= tileMatrix.getMatrixHeight()) {
-				maxRow = tileMatrix.getMatrixHeight() - 1;
-			}
-
-			range = new TileMatrixRange(minRow, maxRow);
-		}
-
-		return range;
-	}
-
-	/**
-	 * Get the tile row of the latitude in degrees
-	 * 
-	 * @param tileMatrix
-	 * @param latitude
-	 *            in degrees
-	 * @return tile row if in the range, -1 if before,
-	 *         {@link TileMatrix#getMatrixHeight()} if after
-	 */
-	public long getTileRow(TileMatrix tileMatrix, double latitude) {
-
-		double minY = toWgs84.transformLatitude(tileMatrixSet.getMinY());
-		double maxY = toWgs84.transformLatitude(tileMatrixSet.getMaxY());
-
-		long tileId;
-		if (latitude <= minY) {
-			tileId = tileMatrix.getMatrixHeight();
-		} else if (latitude > maxY) {
-			tileId = -1;
-		} else {
-			double tileHeight = getTileHeight(tileMatrix);
-			tileId = (long) ((maxY - latitude) / tileHeight);
-		}
-
-		return tileId;
-	}
-
-	/**
-	 * Get the tile height in meters
-	 * 
-	 * @param tileMatrix
-	 * @return
-	 */
-	public double getTileHeight(TileMatrix tileMatrix) {
-		return matrixHeight / tileMatrix.getMatrixHeight();
-	}
-
-	/**
-	 * Get the bounding box of the tile row
-	 * 
-	 * @param tileRow
-	 * @return
-	 */
-	public BoundingBox getBoundingBox(TileRow tileRow) {
-
-		// Get the tile matrix at the zoom level
-		TileMatrix tileMatrix = getTileMatrix(tileRow.getZoomLevel());
-
-		return getBoundingBox(tileMatrix, tileRow);
-	}
-
-	/**
-	 * Get the bounding box of the tile row at the known zoom level
-	 * 
-	 * @param zoomLevel
-	 * @param tileRow
-	 * @return
-	 */
-	public BoundingBox getBoundingBox(long zoomLevel, TileRow tileRow) {
-
-		// Get the tile matrix at the zoom level
-		TileMatrix tileMatrix = getTileMatrix(zoomLevel);
-
-		return getBoundingBox(tileMatrix, tileRow);
-	}
-
-	/**
-	 * Get the bounding box of the Tile Row from the Tile Matrix zoom level
-	 * 
-	 * @param tileMatrix
-	 * @param tileRow
-	 * @return
-	 */
-	public BoundingBox getBoundingBox(TileMatrix tileMatrix, TileRow tileRow) {
-
-		long column = tileRow.getTileColumn();
-		long row = tileRow.getTileRow();
-
-		// Get the tile width in degrees
-		double matrixMinX = toWgs84.transformLongitude(tileMatrixSet.getMinX());
-		double matrixMaxX = toWgs84.transformLongitude(tileMatrixSet.getMaxX());
-		double matrixWidth = matrixMaxX - matrixMinX;
-		double tileWidth = matrixWidth / tileMatrix.getMatrixWidth();
-
-		// Find the longitude range
-		double minLon = matrixMinX + (tileWidth * column);
-		double maxLon = minLon + tileWidth;
-
-		// Get the tile height in degrees
-		double matrixMinY = toWgs84.transformLatitude(tileMatrixSet.getMinY());
-		double matrixMaxY = toWgs84.transformLatitude(tileMatrixSet.getMaxY());
-		double matrixHeight = matrixMaxY - matrixMinY;
-		double tileHeight = matrixHeight / tileMatrix.getMatrixHeight();
-
-		// Find the latitude range
-		double maxLat = matrixMaxY - (tileHeight * row);
-		double minLat = maxLat - tileHeight;
-
-		BoundingBox boundingBox = new BoundingBox(minLon, maxLon, minLat,
-				maxLat);
-
-		return boundingBox;
-	}
-
-	/**
 	 * Delete a Tile
 	 * 
 	 * @param column
@@ -618,6 +415,18 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		int deleted = delete(where.toString(), whereArgs);
 
 		return deleted;
+	}
+
+	/**
+	 * Count of Tiles at a zoom level
+	 * 
+	 * @param zoomLevel
+	 * @return count
+	 */
+	public int count(long zoomLevel) {
+		String where = buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+		String[] whereArgs = buildWhereArgs(zoomLevel);
+		return count(where, whereArgs);
 	}
 
 }

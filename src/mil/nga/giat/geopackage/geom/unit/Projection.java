@@ -77,6 +77,26 @@ public class Projection {
 	}
 
 	/**
+	 * Get the transformation from this Projection to the provided projection
+	 * 
+	 * @param projection
+	 * @return
+	 */
+	public ProjectionTransform getTransformation(Projection projection) {
+
+		long epsg = projection.getEpsg();
+
+		ProjectionTransform transform = new ProjectionTransform(this,
+				projection);
+
+		if (!transforms.containsKey(epsg)) {
+			transforms.put(epsg, transform);
+		}
+
+		return transform;
+	}
+
+	/**
 	 * Convert the value to meters
 	 * 
 	 * @param value

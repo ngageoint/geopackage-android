@@ -51,8 +51,8 @@ public class FeatureDao extends
 					+ SpatialReferenceSystem.class.getSimpleName());
 		}
 
-		projection = ProjectionFactory
-				.getProjection(geometryColumns.getSrsId());
+		projection = ProjectionFactory.getProjection(geometryColumns.getSrs()
+				.getOrganizationCoordsysId());
 	}
 
 	/**
