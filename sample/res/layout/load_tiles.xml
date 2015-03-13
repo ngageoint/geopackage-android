@@ -108,6 +108,12 @@
                 android:inputType="number" />
         </LinearLayout>
 
+        <CheckBox
+            android:id="@+id/load_tiles_google_tiles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/load_tiles_google_tiles_label" />
+        
         <include
             android:id="@+id/load_tiles_bounding_box"
             layout="@layout/bounding_box" />

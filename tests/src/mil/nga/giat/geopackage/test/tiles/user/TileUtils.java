@@ -12,10 +12,14 @@ import junit.framework.TestCase;
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
+import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.test.TestConstants;
 import mil.nga.giat.geopackage.test.TestUtils;
 import mil.nga.giat.geopackage.test.geom.GeoPackageGeometryDataUtils;
+import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.giat.geopackage.tiles.TileGrid;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
@@ -24,7 +28,6 @@ import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.giat.geopackage.tiles.user.TileColumn;
 import mil.nga.giat.geopackage.tiles.user.TileCursor;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
-import mil.nga.giat.geopackage.tiles.user.TileMatrixRange;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
 import mil.nga.giat.geopackage.user.ColumnValue;
@@ -794,42 +797,28 @@ public class TileUtils {
 					double height = tileMatrix.getPixelYSize()
 							* tileMatrix.getTileHeight();
 
-					long zoomLevel = dao.getZoomLevel(width, height);
+					long zoomLevel = dao.getZoomLevel(width);
 					TestCase.assertEquals(tileMatrix.getZoomLevel(), zoomLevel);
 
-					zoomLevel = dao.getZoomLevel(width + 1, height);
+					zoomLevel = dao.getZoomLevel(height);
 					TestCase.assertEquals(tileMatrix.getZoomLevel(), zoomLevel);
 
-					zoomLevel = dao.getZoomLevel(width, height + 1);
+					zoomLevel = dao.getZoomLevel(width + 1);
 					TestCase.assertEquals(tileMatrix.getZoomLevel(), zoomLevel);
 
-					zoomLevel = dao.getZoomLevel(width + 1, height + 1);
+					zoomLevel = dao.getZoomLevel(height + 1);
 					TestCase.assertEquals(tileMatrix.getZoomLevel(), zoomLevel);
 
-					zoomLevel = dao.getZoomLevel(width - 1, height - 1);
+					zoomLevel = dao.getZoomLevel(width - 1);
 					TestCase.assertEquals(
 							Math.min(tileMatrix.getZoomLevel() + 1,
 									dao.getMaxZoom()), zoomLevel);
 
-					zoomLevel = dao.getZoomLevel(width - 1, height);
+					zoomLevel = dao.getZoomLevel(height - 1);
 					TestCase.assertEquals(
 							Math.min(tileMatrix.getZoomLevel() + 1,
 									dao.getMaxZoom()), zoomLevel);
 
-					zoomLevel = dao.getZoomLevel(width, height - 1);
-					TestCase.assertEquals(
-							Math.min(tileMatrix.getZoomLevel() + 1,
-									dao.getMaxZoom()), zoomLevel);
-
-					zoomLevel = dao.getZoomLevel(width - 1, height + 1);
-					TestCase.assertEquals(
-							Math.min(tileMatrix.getZoomLevel() + 1,
-									dao.getMaxZoom()), zoomLevel);
-
-					zoomLevel = dao.getZoomLevel(width + 1, height - 1);
-					TestCase.assertEquals(
-							Math.min(tileMatrix.getZoomLevel() + 1,
-									dao.getMaxZoom()), zoomLevel);
 				}
 
 			}
@@ -839,12 +828,12 @@ public class TileUtils {
 	}
 
 	/**
-	 * Test queryByBoundingBox
+	 * Test queryByRange
 	 * 
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
-	public static void testQueryByBoundingBox(GeoPackage geoPackage)
+	public static void testQueryByRange(GeoPackage geoPackage)
 			throws SQLException {
 
 		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
@@ -865,12 +854,35 @@ public class TileUtils {
 					double height = tileMatrix.getPixelYSize()
 							* tileMatrix.getTileHeight();
 
-					long zoomLevel = dao.getZoomLevel(width, height);
+					long zoomLevel = dao.getZoomLevel(width);
 
-					BoundingBox boundingBox = new BoundingBox(-180.0,
-							180.0, -90.0, 90.0);
-					TileCursor cursor = dao.queryByBoundingBox(boundingBox,
-							zoomLevel);
+					BoundingBox setProjectionBoundingBox = new BoundingBox(
+							tileMatrixSet.getMinX(), tileMatrixSet.getMaxX(),
+							tileMatrixSet.getMinY(), tileMatrixSet.getMaxY());
+					BoundingBox setWebMercatorBoundingBox = ProjectionFactory
+							.getProjection(
+									tileMatrixSet.getSrs()
+											.getOrganizationCoordsysId())
+							.getTransformation(
+									ProjectionConstants.EPSG_WEB_MERCATOR)
+							.transform(setProjectionBoundingBox);
+					BoundingBox boundingBox = new BoundingBox(-180.0, 180.0,
+							-90.0, 90.0);
+					BoundingBox webMercatorBoundingBox = ProjectionFactory
+							.getProjection(
+									ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+							.getTransformation(
+									ProjectionConstants.EPSG_WEB_MERCATOR)
+							.transform(boundingBox);
+
+					TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
+							setWebMercatorBoundingBox,
+							tileMatrix.getMatrixWidth(),
+							tileMatrix.getMatrixHeight(),
+							webMercatorBoundingBox);
+
+					TileCursor cursor = dao
+							.queryByTileGrid(tileGrid, zoomLevel);
 					int cursorCount = cursor != null ? cursor.getCount() : 0;
 					TileCursor expectedCursor = dao.queryForTile(zoomLevel);
 
@@ -887,20 +899,26 @@ public class TileUtils {
 					double minLat = ((maxLon + 90.0) * Math.random()) - 90.0;
 					boundingBox = new BoundingBox(minLon, maxLon, minLat,
 							maxLat);
-					cursor = dao.queryByBoundingBox(boundingBox, zoomLevel);
+					webMercatorBoundingBox = ProjectionFactory
+							.getProjection(
+									ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+							.getTransformation(
+									ProjectionConstants.EPSG_WEB_MERCATOR)
+							.transform(boundingBox);
+					tileGrid = TileBoundingBoxUtils.getTileGrid(
+							setWebMercatorBoundingBox,
+							tileMatrix.getMatrixWidth(),
+							tileMatrix.getMatrixHeight(),
+							webMercatorBoundingBox);
+					cursor = dao.queryByTileGrid(tileGrid, zoomLevel);
 					cursorCount = cursor != null ? cursor.getCount() : 0;
 
-					TileMatrixRange rowRange = dao.getTileRowRange(tileMatrix,
-							boundingBox);
-					TileMatrixRange columnRange = dao.getTileColumnRange(
-							tileMatrix, boundingBox);
-
-					if (rowRange != null && columnRange != null) {
+					if (tileGrid != null) {
 						int count = 0;
-						for (long column = columnRange.getMin(); column <= columnRange
-								.getMax(); column++) {
-							for (long row = rowRange.getMin(); row <= rowRange
-									.getMax(); row++) {
+						for (long column = tileGrid.getMinX(); column <= tileGrid
+								.getMaxX(); column++) {
+							for (long row = tileGrid.getMinY(); row <= tileGrid
+									.getMaxY(); row++) {
 								TileRow tileRow = dao.queryForTile(column, row,
 										zoomLevel);
 								if (tileRow != null) {

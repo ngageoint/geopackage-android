@@ -668,6 +668,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 				.findViewById(R.id.load_tiles_compress_format);
 		final EditText compressQualityInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_compress_quality);
+		final CheckBox googleTilesCheckbox = (CheckBox) createTilesView
+				.findViewById(R.id.load_tiles_google_tiles);
 		final EditText minLatInput = (EditText) createTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
 		final EditText maxLatInput = (EditText) createTilesView
@@ -742,6 +744,9 @@ public class GeoPackageManagerFragment extends Fragment implements
 												.toString());
 							}
 
+							boolean googleTiles = googleTilesCheckbox
+									.isChecked();
+
 							BoundingBox boundingBox = new BoundingBox(minLon,
 									maxLon, minLat, maxLat);
 
@@ -761,7 +766,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 										GeoPackageManagerFragment.this, active,
 										database, tableName, tileUrl, minZoom,
 										maxZoom, compressFormat,
-										compressQuality, boundingBox);
+										compressQuality, googleTiles,
+										boundingBox);
 							}
 						} catch (Exception e) {
 							GeoPackageUtils
@@ -1269,6 +1275,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 				.findViewById(R.id.load_tiles_compress_format);
 		final EditText compressQualityInput = (EditText) loadTilesView
 				.findViewById(R.id.load_tiles_compress_quality);
+		final CheckBox googleTilesCheckbox = (CheckBox) loadTilesView
+				.findViewById(R.id.load_tiles_google_tiles);
 		final EditText minLatInput = (EditText) loadTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
 		final EditText maxLatInput = (EditText) loadTilesView
@@ -1337,6 +1345,9 @@ public class GeoPackageManagerFragment extends Fragment implements
 												.toString());
 							}
 
+							boolean googleTiles = googleTilesCheckbox
+									.isChecked();
+
 							BoundingBox boundingBox = new BoundingBox(minLon,
 									maxLon, minLat, maxLat);
 
@@ -1345,7 +1356,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 									GeoPackageManagerFragment.this, active,
 									table.getDatabase(), table.getName(),
 									tileUrl, minZoom, maxZoom, compressFormat,
-									compressQuality, boundingBox);
+									compressQuality, googleTiles, boundingBox);
 						} catch (Exception e) {
 							GeoPackageUtils
 									.showMessage(

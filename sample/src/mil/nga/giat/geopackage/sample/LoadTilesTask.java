@@ -33,13 +33,14 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 	 * @param maxZoom
 	 * @param compressFormat
 	 * @param compressQuality
+	 * @param googleTiles
 	 * @param boundingBox
 	 */
 	public static void loadTiles(Activity activity, ILoadTilesTask callback,
 			GeoPackageDatabases active, String database, String tableName,
 			String tileUrl, int minZoom, int maxZoom,
 			CompressFormat compressFormat, Integer compressQuality,
-			BoundingBox boundingBox) {
+			boolean googleTiles, BoundingBox boundingBox) {
 
 		if (minZoom > maxZoom) {
 			throw new GeoPackageException(
@@ -61,6 +62,7 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 		tileGenerator.setCompressQuality(compressQuality);
 		tileGenerator.setTileBoundingBox(boundingBox);
 		tileGenerator.setProgress(loadTilesTask);
+		tileGenerator.setGoogleTiles(googleTiles);
 
 		loadTilesTask.setTileGenerator(tileGenerator);
 

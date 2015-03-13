@@ -10,11 +10,11 @@ import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxAndroidUtils;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.giat.geopackage.tiles.TileGrid;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.user.TileCursor;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
-import mil.nga.giat.geopackage.tiles.user.TileMatrixRange;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -128,17 +128,14 @@ public class GeoPackageOverlay implements TileProvider {
 
 				TileMatrix tileMatrix = tileDao.getTileMatrix(zoomLevel);
 
-				// Get the column and row range
-				TileMatrixRange columnRange = TileBoundingBoxUtils
-						.getTileColumnRange(setWebMercatorBoundingBox,
-								tileMatrix, webMercatorBoundingBox);
-				TileMatrixRange rowRange = TileBoundingBoxUtils
-						.getTileRowRange(setWebMercatorBoundingBox, tileMatrix,
-								webMercatorBoundingBox);
+				// Get the tile grid
+				TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
+						setWebMercatorBoundingBox, tileMatrix.getMatrixWidth(),
+						tileMatrix.getMatrixHeight(), webMercatorBoundingBox);
 
-				// Query for matching tiles in the range
-				TileCursor tileCursor = tileDao.queryByRange(columnRange,
-						rowRange, zoomLevel);
+				// Query for matching tiles in the tile grid
+				TileCursor tileCursor = tileDao.queryByTileGrid(tileGrid,
+						zoomLevel);
 				if (tileCursor != null) {
 
 					// Get the requested tile dimensions

@@ -76,13 +76,13 @@ public class TileCreateTest extends CreateGeoPackageTestCase {
 	}
 
 	/**
-	 * Test queryByBoundingBox
+	 * Test queryByRange
 	 * 
 	 * @throws SQLException
 	 */
-	public void testQueryByBoundingBox() throws SQLException {
+	public void testQueryByRange() throws SQLException {
 
-		TileUtils.testQueryByBoundingBox(geoPackage);
+		TileUtils.testQueryByRange(geoPackage);
 
 	}
 

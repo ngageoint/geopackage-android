@@ -1,7 +1,7 @@
 package mil.nga.giat.geopackage.tiles;
 
 /**
- * Tile gride with x and y ranges
+ * Tile grid with x and y ranges
  * 
  * @author osbornb
  */
@@ -10,22 +10,22 @@ public class TileGrid {
 	/**
 	 * Min x
 	 */
-	private int minX;
+	private long minX;
 
 	/**
 	 * Max x
 	 */
-	private int maxX;
+	private long maxX;
 
 	/**
 	 * Min y
 	 */
-	private int minY;
+	private long minY;
 
 	/**
 	 * Max y
 	 */
-	private int maxY;
+	private long maxY;
 
 	/**
 	 * Constructor
@@ -34,43 +34,45 @@ public class TileGrid {
 	 * @param maxX
 	 * @param minY
 	 * @param maxY
+	 * @param width
+	 * @param height
 	 */
-	public TileGrid(int minX, int maxX, int minY, int maxY) {
+	public TileGrid(long minX, long maxX, long minY, long maxY) {
 		this.minX = minX;
 		this.maxX = maxX;
 		this.minY = minY;
 		this.maxY = maxY;
 	}
 
-	public int getMinX() {
+	public long getMinX() {
 		return minX;
 	}
 
-	public void setMinX(int minX) {
+	public void setMinX(long minX) {
 		this.minX = minX;
 	}
 
-	public int getMaxX() {
+	public long getMaxX() {
 		return maxX;
 	}
 
-	public void setMaxX(int maxX) {
+	public void setMaxX(long maxX) {
 		this.maxX = maxX;
 	}
 
-	public int getMinY() {
+	public long getMinY() {
 		return minY;
 	}
 
-	public void setMinY(int minY) {
+	public void setMinY(long minY) {
 		this.minY = minY;
 	}
 
-	public int getMaxY() {
+	public long getMaxY() {
 		return maxY;
 	}
 
-	public void setMaxY(int maxY) {
+	public void setMaxY(long maxY) {
 		this.maxY = maxY;
 	}
 
@@ -79,7 +81,7 @@ public class TileGrid {
 	 * 
 	 * @return
 	 */
-	public int count() {
+	public long count() {
 		return ((maxX + 1) - minX) * ((maxY + 1) - minY);
 	}
 

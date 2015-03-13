@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.geom.unit.Projection;
+import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
 import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
+import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.giat.geopackage.tiles.TileGrid;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.user.UserDao;
@@ -304,7 +308,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		} else if (widthIndex == widths.length) {
 			if (length >= widths[widthIndex - 1] / .51) {
 				widthIndex = -1;
-			}else{
+			} else {
 				widthIndex = widthIndex - 1;
 			}
 		} else if (length - widths[widthIndex - 1] < widths[widthIndex]
@@ -320,7 +324,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		} else if (heightIndex == heights.length) {
 			if (length >= heights[heightIndex - 1] / .51) {
 				heightIndex = -1;
-			}else{
+			} else {
 				heightIndex = heightIndex - 1;
 			}
 		} else if (length - heights[heightIndex - 1] < heights[heightIndex]
@@ -344,20 +348,19 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	}
 
 	/**
-	 * Query by range and zoom level
+	 * Query by tile grid and zoom level
 	 * 
-	 * @param columnRange
+	 * @param tileGrid
 	 * @param rowRange
 	 * @param zoomLevel
 	 * @return cursor from query or null if the zoom level tile ranges do not
 	 *         overlap the bounding box
 	 */
-	public TileCursor queryByRange(TileMatrixRange columnRange,
-			TileMatrixRange rowRange, long zoomLevel) {
+	public TileCursor queryByTileGrid(TileGrid tileGrid, long zoomLevel) {
 
 		TileCursor tileCursor = null;
 
-		if (columnRange != null && rowRange != null) {
+		if (tileGrid != null) {
 
 			StringBuilder where = new StringBuilder();
 
@@ -365,23 +368,23 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 
 			where.append(" AND ");
 			where.append(buildWhere(TileTable.COLUMN_TILE_COLUMN,
-					columnRange.getMin(), ">="));
+					tileGrid.getMinX(), ">="));
 
 			where.append(" AND ");
 			where.append(buildWhere(TileTable.COLUMN_TILE_COLUMN,
-					columnRange.getMax(), "<="));
+					tileGrid.getMaxX(), "<="));
 
 			where.append(" AND ");
 			where.append(buildWhere(TileTable.COLUMN_TILE_ROW,
-					rowRange.getMin(), ">="));
+					tileGrid.getMinY(), ">="));
 
 			where.append(" AND ");
 			where.append(buildWhere(TileTable.COLUMN_TILE_ROW,
-					rowRange.getMax(), "<="));
+					tileGrid.getMaxY(), "<="));
 
 			String[] whereArgs = buildWhereArgs(new Object[] { zoomLevel,
-					columnRange.getMin(), columnRange.getMax(),
-					rowRange.getMin(), rowRange.getMax() });
+					tileGrid.getMinX(), tileGrid.getMaxX(), tileGrid.getMinY(),
+					tileGrid.getMaxY() });
 
 			tileCursor = query(where.toString(), whereArgs);
 		}
@@ -427,6 +430,47 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 		String where = buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
 		String[] whereArgs = buildWhereArgs(zoomLevel);
 		return count(where, whereArgs);
+	}
+
+	/**
+	 * Determine if the tiles are in the Google tile coordinate format
+	 * 
+	 * @return
+	 */
+	public boolean isGoogleTiles() {
+
+		// Convert the bounding box to wgs84
+		BoundingBox boundingBox = new BoundingBox(tileMatrixSet.getMinX(),
+				tileMatrixSet.getMaxX(), tileMatrixSet.getMinY(),
+				tileMatrixSet.getMaxY());
+		BoundingBox wgs84BoundingBox = projection.getTransformation(
+				ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM).transform(
+				boundingBox);
+
+		boolean googleTiles = false;
+
+		// Verify the bounds are the entire world
+		if (wgs84BoundingBox.getMinLatitude() <= ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE
+				&& wgs84BoundingBox.getMaxLatitude() >= ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE
+				&& wgs84BoundingBox.getMinLongitude() <= -180.0
+				&& wgs84BoundingBox.getMaxLongitude() >= 180.0) {
+
+			googleTiles = true;
+
+			// Verify each tile matrix is the correct width and height
+			for (TileMatrix tileMatrix : tileMatrices) {
+				long zoomLevel = tileMatrix.getZoomLevel();
+				long tilesPerSide = TileBoundingBoxUtils
+						.tilesPerSide((int) zoomLevel);
+				if (tileMatrix.getMatrixWidth() != tilesPerSide
+						|| tileMatrix.getMatrixHeight() != tilesPerSide) {
+					googleTiles = false;
+					break;
+				}
+			}
+		}
+
+		return googleTiles;
 	}
 
 }

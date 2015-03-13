@@ -32,8 +32,12 @@ import mil.nga.giat.geopackage.geom.conversion.PolygonHoleMarkers;
 import mil.nga.giat.geopackage.geom.conversion.ShapeMarkers;
 import mil.nga.giat.geopackage.geom.conversion.ShapeWithChildrenMarkers;
 import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
+import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
+import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
 import mil.nga.giat.geopackage.geom.util.GeometryPrinter;
-import mil.nga.giat.geopackage.tiles.overlay.GoogleAPIGeoPackageOverlay;
+import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
+import mil.nga.giat.geopackage.tiles.overlay.GeoPackageOverlayFactory;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -50,6 +54,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.text.InputType;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -61,6 +66,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -85,6 +91,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.android.gms.maps.model.TileProvider;
 
 /**
  * Map Fragment for showing GeoPackage features and tiles
@@ -343,6 +350,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Bounding box around the features on the map
 	 */
 	private BoundingBox featuresBoundingBox;
+
+	/**
+	 * Bounding box around the tiles on the map
+	 */
+	private BoundingBox tilesBoundingBox;
 
 	/**
 	 * Constructor
@@ -962,7 +974,7 @@ public class GeoPackageMapFragment extends Fragment implements
 
 		switch (item.getItemId()) {
 		case R.id.map_zoom:
-			zoomToFeatures();
+			zoomToActive();
 			break;
 		case R.id.map_features:
 			editFeaturesMenuItem = item;
@@ -1311,6 +1323,7 @@ public class GeoPackageMapFragment extends Fragment implements
 		}
 		geoPackages.clear();
 		featuresBoundingBox = null;
+		tilesBoundingBox = null;
 		updateTask = new MapUpdateTask();
 		updateTask.zoom = zoom;
 		updateTask.execute();
@@ -1363,7 +1376,12 @@ public class GeoPackageMapFragment extends Fragment implements
 
 				// Display the tiles
 				for (GeoPackageTable tiles : database.getTiles()) {
-					displayTiles(task, tiles);
+					try {
+						displayTiles(task, tiles);
+					} catch (Exception e) {
+						Log.e(GeoPackageMapFragment.class.getSimpleName(),
+								e.getMessage());
+					}
 					if (task.isCancelled()) {
 						break;
 					}
@@ -1398,7 +1416,7 @@ public class GeoPackageMapFragment extends Fragment implements
 					}
 				}
 			}
-			boolean featuresAdded = false;
+
 			for (Map.Entry<String, List<String>> databaseFeatures : featureTables
 					.entrySet()) {
 
@@ -1410,9 +1428,6 @@ public class GeoPackageMapFragment extends Fragment implements
 					int count = displayFeatures(task,
 							databaseFeatures.getKey(), features, featuresLeft,
 							editFeaturesMode);
-					if (count > 0) {
-						featuresAdded = true;
-					}
 					featuresLeft -= count;
 					if (task.isCancelled() || featuresLeft <= 0) {
 						break;
@@ -1424,8 +1439,8 @@ public class GeoPackageMapFragment extends Fragment implements
 				}
 			}
 
-			if (featuresAdded && zoom) {
-				zoomToFeatures();
+			if (zoom) {
+				zoomToActive();
 			}
 
 			if (featuresLeft <= 0) {
@@ -1444,11 +1459,15 @@ public class GeoPackageMapFragment extends Fragment implements
 	}
 
 	/**
-	 * Zoom to features on the map
+	 * Zoom to features on the map, or tiles if no features
 	 */
-	private void zoomToFeatures() {
+	private void zoomToActive() {
 
 		BoundingBox bbox = featuresBoundingBox;
+
+		if (bbox == null) {
+			bbox = tilesBoundingBox;
+		}
 
 		if (bbox != null) {
 
@@ -1798,11 +1817,36 @@ public class GeoPackageMapFragment extends Fragment implements
 
 		TileDao tileDao = geoPackage.getTileDao(tiles.getName());
 
-		GoogleAPIGeoPackageOverlay overlay = new GoogleAPIGeoPackageOverlay(
-				tileDao);
+		TileProvider overlay = GeoPackageOverlayFactory
+				.getTileProvider(tileDao);
 		final TileOverlayOptions overlayOptions = new TileOverlayOptions();
 		overlayOptions.tileProvider(overlay);
 		overlayOptions.zIndex(-1);
+
+		TileMatrixSet tileMatrixSet = tileDao.getTileMatrixSet();
+		ProjectionTransform transform = ProjectionFactory.getProjection(
+				tileMatrixSet.getSrs().getOrganizationCoordsysId())
+				.getTransformation(
+						ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+		BoundingBox boundingBox = transform.transform(new BoundingBox(
+				tileMatrixSet.getMinX(), tileMatrixSet.getMaxX(), tileMatrixSet
+						.getMinY(), tileMatrixSet.getMaxY()));
+		if (tilesBoundingBox == null) {
+			tilesBoundingBox = boundingBox;
+		} else {
+			tilesBoundingBox.setMinLongitude(Math.max(
+					tilesBoundingBox.getMinLongitude(),
+					boundingBox.getMinLongitude()));
+			tilesBoundingBox.setMaxLongitude(Math.min(
+					tilesBoundingBox.getMaxLongitude(),
+					boundingBox.getMaxLongitude()));
+			tilesBoundingBox.setMinLatitude(Math.max(
+					tilesBoundingBox.getMinLatitude(),
+					boundingBox.getMinLatitude()));
+			tilesBoundingBox.setMaxLatitude(Math.min(
+					tilesBoundingBox.getMaxLatitude(),
+					boundingBox.getMaxLatitude()));
+		}
 
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
@@ -2625,6 +2669,8 @@ public class GeoPackageMapFragment extends Fragment implements
 				.findViewById(R.id.load_tiles_compress_format);
 		final EditText compressQualityInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_compress_quality);
+		final CheckBox googleTilesCheckbox = (CheckBox) createTilesView
+				.findViewById(R.id.load_tiles_google_tiles);
 		final EditText minLatInput = (EditText) createTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
 		final EditText maxLatInput = (EditText) createTilesView
@@ -2751,6 +2797,9 @@ public class GeoPackageMapFragment extends Fragment implements
 												.toString());
 							}
 
+							boolean googleTiles = googleTilesCheckbox
+									.isChecked();
+
 							BoundingBox boundingBox = new BoundingBox(minLon,
 									maxLon, minLat, maxLat);
 
@@ -2768,7 +2817,7 @@ public class GeoPackageMapFragment extends Fragment implements
 									GeoPackageMapFragment.this, active,
 									database, tableName, tileUrl, minZoom,
 									maxZoom, compressFormat, compressQuality,
-									boundingBox);
+									googleTiles, boundingBox);
 						} catch (Exception e) {
 							GeoPackageUtils
 									.showMessage(

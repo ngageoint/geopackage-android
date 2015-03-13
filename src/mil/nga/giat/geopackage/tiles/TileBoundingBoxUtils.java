@@ -7,7 +7,6 @@ import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
 import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
 import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
-import mil.nga.giat.geopackage.tiles.user.TileMatrixRange;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 
 /**
@@ -137,7 +136,7 @@ public class TileBoundingBoxUtils {
 	 * @param zoom
 	 * @return
 	 */
-	public static BoundingBox getWebMercatorBoundingBox(int x, int y, int zoom) {
+	public static BoundingBox getWebMercatorBoundingBox(long x, long y, int zoom) {
 
 		int tilesPerSide = tilesPerSide(zoom);
 		double tileSize = tileSize(tilesPerSide);
@@ -150,6 +149,35 @@ public class TileBoundingBoxUtils {
 				- ((y + 1) * tileSize);
 		double maxLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
 				- (y * tileSize);
+
+		BoundingBox box = new BoundingBox(minLon, maxLon, minLat, maxLat);
+
+		return box;
+	}
+
+	/**
+	 * Get the Web Mercator tile bounding box from the Google Maps API tile grid
+	 * and zoom level
+	 * 
+	 * @param x
+	 * @param y
+	 * @param zoom
+	 * @return
+	 */
+	public static BoundingBox getWebMercatorBoundingBox(TileGrid tileGrid,
+			int zoom) {
+
+		int tilesPerSide = tilesPerSide(zoom);
+		double tileSize = tileSize(tilesPerSide);
+
+		double minLon = (-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH)
+				+ (tileGrid.getMinX() * tileSize);
+		double maxLon = (-1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH)
+				+ ((tileGrid.getMaxX() + 1) * tileSize);
+		double minLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
+				- ((tileGrid.getMaxY() + 1) * tileSize);
+		double maxLat = ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH
+				- (tileGrid.getMinY() * tileSize);
 
 		BoundingBox box = new BoundingBox(minLon, maxLon, minLat, maxLat);
 
@@ -191,9 +219,55 @@ public class TileBoundingBoxUtils {
 	 * @return
 	 */
 	public static BoundingBox getProjectedBoundingBox(Projection projection,
-			int x, int y, int zoom) {
+			long x, long y, int zoom) {
 
 		BoundingBox boundingBox = getWebMercatorBoundingBox(x, y, zoom);
+
+		if (projection != null) {
+			ProjectionTransform transform = webMercator
+					.getTransformation(projection);
+			boundingBox = transform.transform(boundingBox);
+		}
+
+		return boundingBox;
+	}
+
+	/**
+	 * Get the Projected tile bounding box from the Google Maps API tile
+	 * tileGrid and zoom level
+	 * 
+	 * @param projectionEpsg
+	 * @param tileGrid
+	 * @param zoom
+	 * @return
+	 */
+	public static BoundingBox getProjectedBoundingBox(Long projectionEpsg,
+			TileGrid tileGrid, int zoom) {
+
+		BoundingBox boundingBox = getWebMercatorBoundingBox(tileGrid, zoom);
+
+		if (projectionEpsg != null) {
+			ProjectionTransform transform = webMercator
+					.getTransformation(projectionEpsg);
+			boundingBox = transform.transform(boundingBox);
+		}
+
+		return boundingBox;
+	}
+
+	/**
+	 * Get the Projected tile bounding box from the Google Maps API tile grid
+	 * and zoom level
+	 * 
+	 * @param projection
+	 * @param tileGrid
+	 * @param zoom
+	 * @return
+	 */
+	public static BoundingBox getProjectedBoundingBox(Projection projection,
+			TileGrid tileGrid, int zoom) {
+
+		BoundingBox boundingBox = getWebMercatorBoundingBox(tileGrid, zoom);
 
 		if (projection != null) {
 			ProjectionTransform transform = webMercator
@@ -309,70 +383,63 @@ public class TileBoundingBoxUtils {
 	}
 
 	/**
-	 * Get the tile column range
+	 * Get the tile grid
 	 * 
 	 * @param webMercatorTotalBox
-	 * @param tileMatrix
+	 * @param matrixWidth
+	 * @param matrixHeight
 	 * @param webMercatorBoundingBox
 	 * @return
 	 */
-	public static TileMatrixRange getTileColumnRange(
-			BoundingBox webMercatorTotalBox, TileMatrix tileMatrix,
+	public static TileGrid getTileGrid(BoundingBox webMercatorTotalBox,
+			long matrixWidth, long matrixHeight,
 			BoundingBox webMercatorBoundingBox) {
-		return getTileColumnRange(webMercatorTotalBox, tileMatrix,
-				webMercatorBoundingBox.getMinLongitude(),
+
+		long minColumn = getTileColumn(webMercatorTotalBox, matrixWidth,
+				webMercatorBoundingBox.getMinLongitude());
+		long maxColumn = getTileColumn(webMercatorTotalBox, matrixWidth,
 				webMercatorBoundingBox.getMaxLongitude());
-	}
 
-	/**
-	 * Get the tile getTileColumnRange range
-	 * 
-	 * @param webMercatorTotalBox
-	 * @param tileMatrix
-	 * @param minLongitude
-	 *            in meters
-	 * @param maxLongitude
-	 *            in meters
-	 * @return
-	 */
-	private static TileMatrixRange getTileColumnRange(
-			BoundingBox webMercatorTotalBox, TileMatrix tileMatrix,
-			double minLongitude, double maxLongitude) {
-
-		TileMatrixRange range = null;
-
-		long minColumn = getTileColumn(webMercatorTotalBox, tileMatrix,
-				minLongitude);
-		long maxColumn = getTileColumn(webMercatorTotalBox, tileMatrix,
-				maxLongitude);
-
-		if (minColumn < tileMatrix.getMatrixWidth() && maxColumn >= 0) {
-
+		if (minColumn < matrixWidth && maxColumn >= 0) {
 			if (minColumn < 0) {
 				minColumn = 0;
 			}
-			if (maxColumn >= tileMatrix.getMatrixWidth()) {
-				maxColumn = tileMatrix.getMatrixWidth() - 1;
+			if (maxColumn >= matrixWidth) {
+				maxColumn = matrixWidth - 1;
 			}
-
-			range = new TileMatrixRange(minColumn, maxColumn);
 		}
 
-		return range;
+		long maxRow = getTileRow(webMercatorTotalBox, matrixHeight,
+				webMercatorBoundingBox.getMinLatitude());
+		long minRow = getTileRow(webMercatorTotalBox, matrixHeight,
+				webMercatorBoundingBox.getMaxLatitude());
+
+		if (minRow < matrixHeight && maxRow >= 0) {
+			if (minRow < 0) {
+				minRow = 0;
+			}
+			if (maxRow >= matrixHeight) {
+				maxRow = matrixHeight - 1;
+			}
+		}
+
+		TileGrid tileGrid = new TileGrid(minColumn, maxColumn, minRow, maxRow);
+
+		return tileGrid;
 	}
 
 	/**
 	 * Get the tile column of the longitude in degrees
 	 * 
 	 * @param webMercatorTotalBox
-	 * @param tileMatrix
+	 * @param matrixWidth
 	 * @param longitude
 	 *            in meters
 	 * @return tile column if in the range, -1 if before,
 	 *         {@link TileMatrix#getMatrixWidth()} if after
 	 */
 	private static long getTileColumn(BoundingBox webMercatorTotalBox,
-			TileMatrix tileMatrix, double longitude) {
+			long matrixWidth, double longitude) {
 
 		double minX = webMercatorTotalBox.getMinLongitude();
 		double maxX = webMercatorTotalBox.getMaxLongitude();
@@ -381,11 +448,11 @@ public class TileBoundingBoxUtils {
 		if (longitude < minX) {
 			tileId = -1;
 		} else if (longitude >= maxX) {
-			tileId = tileMatrix.getMatrixWidth();
+			tileId = matrixWidth;
 		} else {
-			double matrixWidth = webMercatorTotalBox.getMaxLongitude()
+			double matrixWidthMeters = webMercatorTotalBox.getMaxLongitude()
 					- webMercatorTotalBox.getMinLongitude();
-			double tileWidth = matrixWidth / tileMatrix.getMatrixWidth();
+			double tileWidth = matrixWidthMeters / matrixWidth;
 			tileId = (long) ((longitude - minX) / tileWidth);
 		}
 
@@ -393,80 +460,30 @@ public class TileBoundingBoxUtils {
 	}
 
 	/**
-	 * Get the tile row range
-	 * 
-	 * @param webMercatorTotalBox
-	 * @param tileMatrix
-	 * @param boundingBox
-	 * @return
-	 */
-	public static TileMatrixRange getTileRowRange(
-			BoundingBox webMercatorTotalBox, TileMatrix tileMatrix,
-			BoundingBox boundingBox) {
-		return getTileRowRange(webMercatorTotalBox, tileMatrix,
-				boundingBox.getMinLatitude(), boundingBox.getMaxLatitude());
-	}
-
-	/**
-	 * Get the tile row range
-	 * 
-	 * @param webMercatorTotalBox
-	 * @param tileMatrix
-	 * @param minLatitude
-	 *            in meters
-	 * @param maxLatitude
-	 *            in meters
-	 * @return
-	 */
-	private static TileMatrixRange getTileRowRange(
-			BoundingBox webMercatorTotalBox, TileMatrix tileMatrix,
-			double minLatitude, double maxLatitude) {
-
-		TileMatrixRange range = null;
-
-		long maxRow = getTileRow(webMercatorTotalBox, tileMatrix, minLatitude);
-		long minRow = getTileRow(webMercatorTotalBox, tileMatrix, maxLatitude);
-
-		if (minRow < tileMatrix.getMatrixHeight() && maxRow >= 0) {
-
-			if (minRow < 0) {
-				minRow = 0;
-			}
-			if (maxRow >= tileMatrix.getMatrixHeight()) {
-				maxRow = tileMatrix.getMatrixHeight() - 1;
-			}
-
-			range = new TileMatrixRange(minRow, maxRow);
-		}
-
-		return range;
-	}
-
-	/**
 	 * Get the tile row of the latitude in degrees
 	 * 
 	 * @param webMercatorTotalBox
-	 * @param tileMatrix
+	 * @param matrixHeight
 	 * @param latitude
 	 *            in meters
 	 * @return tile row if in the range, -1 if before,
 	 *         {@link TileMatrix#getMatrixHeight()} if after
 	 */
 	private static long getTileRow(BoundingBox webMercatorTotalBox,
-			TileMatrix tileMatrix, double latitude) {
+			long matrixHeight, double latitude) {
 
 		double minY = webMercatorTotalBox.getMinLatitude();
 		double maxY = webMercatorTotalBox.getMaxLatitude();
 
 		long tileId;
 		if (latitude <= minY) {
-			tileId = tileMatrix.getMatrixHeight();
+			tileId = matrixHeight;
 		} else if (latitude > maxY) {
 			tileId = -1;
 		} else {
-			double matrixHeight = webMercatorTotalBox.getMaxLatitude()
+			double matrixHeightMeters = webMercatorTotalBox.getMaxLatitude()
 					- webMercatorTotalBox.getMinLatitude();
-			double tileHeight = matrixHeight / tileMatrix.getMatrixHeight();
+			double tileHeight = matrixHeightMeters / matrixHeight;
 			tileId = (long) ((maxY - latitude) / tileHeight);
 		}
 

@@ -9,7 +9,7 @@
     <string name="import_geopackage_file">Import File</string>
     <string name="create_geopackage">Create</string>
     <string name="clear_selected_tables">Deselect All</string>
-    <string name="map_zoom">Zoom to Features</string>
+    <string name="map_zoom">Zoom to Active</string>
     <string name="map_features">Features</string>
     <string name="map_bounding_box">Bounding Box</string>
     <string name="map_download_tiles">Download Tiles</string>
@@ -46,6 +46,7 @@
     </array>
     <string name="load_tiles_compress_format_prompt">Compress Format</string>
     <string name="load_tiles_compress_quality_label">Compress Quality: </string>
+    <string name="load_tiles_google_tiles_label">Google Tile Format</string>
     <string name="map_create_tiles_geopackage_label">GeoPackage: </string>
     <string name="map_create_tiles_existing_geopackage_label">Existing</string>
     <string name="map_create_tiles_existing_geopackage_dialog_label">GeoPackages</string>
