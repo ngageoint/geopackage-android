@@ -108,12 +108,34 @@
                 android:inputType="number" />
         </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/load_tiles_google_tiles"
+        <TextView
+            android:id="@+id/load_tiles_type_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/load_tiles_google_tiles_label" />
-        
+            android:text="@string/load_tiles_type_label" />
+
+        <RadioGroup
+            android:id="@+id/load_tiles_type_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+
+            <RadioButton
+                android:id="@+id/load_tiles_type_geopackage_radio_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="@string/load_tiles_type_geopackage_label" />
+
+            <RadioButton
+                android:id="@+id/load_tiles_type_google_radio_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/load_tiles_type_google_label" />
+        </RadioGroup>
+
         <include
             android:id="@+id/load_tiles_bounding_box"
             layout="@layout/bounding_box" />

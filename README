@@ -17,6 +17,12 @@ http://trac.osgeo.org/proj4j/
 Apache License, Version 2.0
 src/org/osgeo/proj4j/
 
+aFileChooser:
+https://github.com/iPaulPro/aFileChooser
+Apache License, Version 2.0
+sample/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+Used by Sample Application
+
 
 --- Assets ---
 

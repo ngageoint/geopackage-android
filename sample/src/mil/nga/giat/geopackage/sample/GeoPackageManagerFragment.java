@@ -30,19 +30,24 @@ import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.user.UserColumn;
 import mil.nga.giat.geopackage.user.UserTable;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
+import android.provider.DocumentsContract.Document;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -57,8 +62,11 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.ipaulpro.afilechooser.utils.FileUtils;
 
 /**
  * Manager Fragment, import, view, select, edit GeoPackages
@@ -294,6 +302,9 @@ public class GeoPackageManagerFragment extends Fragment implements
 			List<SpatialReferenceSystem> srsList = srsDao.queryForAll();
 			databaseInfo.append("Size: ")
 					.append(manager.readableSize(database));
+			databaseInfo.append("\n\nLocation: ").append(
+					manager.isExternal(database) ? "External" : "Local");
+			databaseInfo.append("\nPath: ").append(manager.getPath(database));
 			databaseInfo.append("\n\nFeature Tables: ").append(
 					geoPackage.getFeatureTables().size());
 			databaseInfo.append("\nTile Tables: ").append(
@@ -668,8 +679,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 				.findViewById(R.id.load_tiles_compress_format);
 		final EditText compressQualityInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_compress_quality);
-		final CheckBox googleTilesCheckbox = (CheckBox) createTilesView
-				.findViewById(R.id.load_tiles_google_tiles);
+		final RadioButton googleTilesRadioButton = (RadioButton) createTilesView
+				.findViewById(R.id.load_tiles_type_google_radio_button);
 		final EditText minLatInput = (EditText) createTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
 		final EditText maxLatInput = (EditText) createTilesView
@@ -744,7 +755,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 												.toString());
 							}
 
-							boolean googleTiles = googleTilesCheckbox
+							boolean googleTiles = googleTilesRadioButton
 									.isChecked();
 
 							BoundingBox boundingBox = new BoundingBox(minLon,
@@ -1275,8 +1286,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 				.findViewById(R.id.load_tiles_compress_format);
 		final EditText compressQualityInput = (EditText) loadTilesView
 				.findViewById(R.id.load_tiles_compress_quality);
-		final CheckBox googleTilesCheckbox = (CheckBox) loadTilesView
-				.findViewById(R.id.load_tiles_google_tiles);
+		final RadioButton googleTilesRadioButton = (RadioButton) loadTilesView
+				.findViewById(R.id.load_tiles_type_google_radio_button);
 		final EditText minLatInput = (EditText) loadTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
 		final EditText maxLatInput = (EditText) loadTilesView
@@ -1345,7 +1356,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 												.toString());
 							}
 
-							boolean googleTiles = googleTilesCheckbox
+							boolean googleTiles = googleTilesRadioButton
 									.isChecked();
 
 							BoundingBox boundingBox = new BoundingBox(minLon,
@@ -1701,35 +1712,81 @@ public class GeoPackageManagerFragment extends Fragment implements
 	 */
 	private void importFile(Intent data) {
 
+		// Get the Uri
 		final Uri uri = data.getData();
 
-		String[] parts = uri.getLastPathSegment().split(":|/");
-		String name = parts[parts.length - 1];
-		int extensionIndex = name.lastIndexOf(".");
-		if (extensionIndex > -1) {
-			name = name.substring(0, extensionIndex);
+		final ContentResolver resolver = getActivity().getContentResolver();
+
+		// Try to get the file path
+		final String path = FileUtils.getPath(getActivity(), uri);
+
+		// Try to get the GeoPackage name
+		String name = null;
+		if (path != null) {
+			name = new File(path).getName();
+		} else {
+			name = getDisplayName(resolver, uri);
 		}
 
-		final EditText input = new EditText(getActivity());
-		input.setText(name);
+		// Remove the extension
+		if (name != null) {
+			int extensionIndex = name.lastIndexOf(".");
+			if (extensionIndex > -1) {
+				name = name.substring(0, extensionIndex);
+			}
+		}
 
-		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity())
-				.setTitle(getString(R.string.geopackage_import_label))
-				.setMessage(getString(R.string.geopackage_import_name_label))
-				.setView(input)
+		LayoutInflater inflater = LayoutInflater.from(getActivity());
+		View importFileView = inflater.inflate(R.layout.import_file, null);
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+		dialog.setView(importFileView);
+
+		final EditText nameInput = (EditText) importFileView
+				.findViewById(R.id.import_file_name_input);
+		final RadioButton copyRadioButton = (RadioButton) importFileView
+				.findViewById(R.id.import_file_copy_radio_button);
+		final RadioButton externalRadioButton = (RadioButton) importFileView
+				.findViewById(R.id.import_file_external_radio_button);
+
+		// Set the default name
+		if (name != null) {
+			nameInput.setText(name);
+		}
+
+		// If no file path could be found, disable the external link option
+		if (path == null) {
+			externalRadioButton.setEnabled(false);
+		}
+
+		dialog.setTitle(getString(R.string.geopackage_import_label))
 				.setPositiveButton(getString(R.string.button_ok_label),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 
-								String value = input.getText().toString();
+								String value = nameInput.getText().toString();
 								if (value != null && !value.isEmpty()) {
+
+									boolean copy = copyRadioButton.isChecked();
+
 									try {
-										InputStream stream = getActivity()
-												.getContentResolver()
+										InputStream stream = resolver
 												.openInputStream(uri);
-										boolean imported = manager
-												.importGeoPackage(value, stream);
+										boolean imported = false;
+
+										// Import the GeoPackage by copying the
+										// file
+										if (copy) {
+											imported = manager
+													.importGeoPackage(value,
+															stream);
+										} else {
+											// Import the GeoPackage by linking
+											// to the file
+											imported = manager
+													.importGeoPackageAsExternalLink(
+															path, value);
+										}
 										if (imported) {
 											update();
 										} else {
@@ -1782,6 +1839,36 @@ public class GeoPackageManagerFragment extends Fragment implements
 						});
 
 		dialog.show();
+	}
+
+	/**
+	 * Get display name from the uri
+	 * 
+	 * @param resolver
+	 * @param uri
+	 * @return
+	 */
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	private String getDisplayName(ContentResolver resolver, Uri uri) {
+
+		String name = null;
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			Cursor nameCursor = resolver.query(uri, null, null, null, null);
+			try {
+				if (nameCursor.getCount() > 0) {
+					int displayNameIndex = nameCursor
+							.getColumnIndex(Document.COLUMN_DISPLAY_NAME);
+					if (displayNameIndex >= 0 && nameCursor.moveToFirst()) {
+						name = nameCursor.getString(displayNameIndex);
+					}
+				}
+			} finally {
+				nameCursor.close();
+			}
+		}
+
+		return name;
 	}
 
 	/**

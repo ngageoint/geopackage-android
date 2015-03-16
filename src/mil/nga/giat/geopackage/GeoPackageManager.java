@@ -16,7 +16,7 @@ import mil.nga.giat.geopackage.io.GeoPackageProgress;
 public interface GeoPackageManager {
 
 	/**
-	 * List all GeoPackage databases
+	 * List all GeoPackage databases sorted alphabetically
 	 * 
 	 * @return database list
 	 */
@@ -51,6 +51,30 @@ public interface GeoPackageManager {
 	 * @return
 	 */
 	public long size(String database);
+
+	/**
+	 * Determine if the database is a linked external file
+	 * 
+	 * @param database
+	 * @return
+	 */
+	public boolean isExternal(String database);
+
+	/**
+	 * Get the path of the database
+	 * 
+	 * @param database
+	 * @return
+	 */
+	public String getPath(String database);
+
+	/**
+	 * Get the file of the database
+	 * 
+	 * @param database
+	 * @return
+	 */
+	public File getFile(String database);
 
 	/**
 	 * Get a readable version of the database size
@@ -229,5 +253,27 @@ public interface GeoPackageManager {
 	 * @return
 	 */
 	public boolean rename(String database, String newDatabase);
+
+	/**
+	 * Import an GeoPackage as an external file link without copying locally
+	 * 
+	 * @param path
+	 *            full file path
+	 * @param database
+	 *            name to reference the database
+	 * @return true if imported successfully
+	 */
+	public boolean importGeoPackageAsExternalLink(File path, String database);
+
+	/**
+	 * Import an GeoPackage as an external file link without copying locally
+	 * 
+	 * @param path
+	 *            full file path
+	 * @param database
+	 *            name to reference the database
+	 * @return true if imported successfully
+	 */
+	public boolean importGeoPackageAsExternalLink(String path, String database);
 
 }

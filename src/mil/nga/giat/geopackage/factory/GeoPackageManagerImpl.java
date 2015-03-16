@@ -9,9 +9,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
@@ -20,12 +22,16 @@ import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.db.ExternalGeoPackage;
+import mil.nga.giat.geopackage.db.ExternalGeoPackageDataSource;
+import mil.nga.giat.geopackage.db.GeoPackageMetadataOpenHelper;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 
 import com.j256.ormlite.android.AndroidConnectionSource;
 import com.j256.ormlite.dao.DaoManager;
@@ -57,16 +63,10 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 */
 	@Override
 	public List<String> databases() {
-
+		Set<String> sortedDatabases = new TreeSet<String>();
+		addDatabases(sortedDatabases);
 		List<String> databases = new ArrayList<String>();
-
-		String[] databaseArray = context.databaseList();
-		for (String database : databaseArray) {
-			if (!isTemporary(database)) {
-				databases.add(database);
-			}
-		}
-
+		databases.addAll(sortedDatabases);
 		return databases;
 	}
 
@@ -82,16 +82,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 */
 	@Override
 	public Set<String> databaseSet() {
-
 		Set<String> databases = new HashSet<String>();
-
-		String[] databaseArray = context.databaseList();
-		for (String database : databaseArray) {
-			if (!isTemporary(database)) {
-				databases.add(database);
-			}
-		}
-
+		addDatabases(databases);
 		return databases;
 	}
 
@@ -108,13 +100,57 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 */
 	@Override
 	public long size(String database) {
-		File dbFile = context.getDatabasePath(database);
-		if (!dbFile.exists()) {
+		File dbFile = getFile(database);
+		long size = dbFile.length();
+		return size;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isExternal(String database) {
+		boolean external = false;
+		ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+				context);
+		externalDataSource.open();
+		try {
+			external = externalDataSource.exists(database);
+		} finally {
+			externalDataSource.close();
+		}
+		return external;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getPath(String database) {
+		File dbFile = getFile(database);
+		String path = dbFile.getAbsolutePath();
+		return path;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public File getFile(String database) {
+		File dbFile = null;
+		ExternalGeoPackage external = getExternalGeoPackage(database);
+		if (external != null) {
+			dbFile = new File(external.getPath());
+		} else {
+			dbFile = context.getDatabasePath(database);
+		}
+
+		if (dbFile == null || !dbFile.exists()) {
 			throw new GeoPackageException("GeoPackage does not exist: "
 					+ database);
 		}
-		long size = dbFile.length();
-		return size;
+
+		return dbFile;
 	}
 
 	/**
@@ -131,7 +167,20 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 */
 	@Override
 	public boolean delete(String database) {
-		return context.deleteDatabase(database);
+		boolean deleted = false;
+		if (isExternal(database)) {
+			ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+					context);
+			externalDataSource.open();
+			try {
+				deleted = externalDataSource.delete(database);
+			} finally {
+				externalDataSource.close();
+			}
+		} else {
+			deleted = context.deleteDatabase(database);
+		}
+		return deleted;
 	}
 
 	/**
@@ -345,6 +394,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	@Override
 	public void exportGeoPackage(String database, String name, File directory) {
 
+		// TODO handle external
+
 		File file = new File(directory, name);
 
 		// Add the extension if not on the name
@@ -374,8 +425,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
 		if (exists(database)) {
 			GeoPackageCursorFactory cursorFactory = new GeoPackageCursorFactory();
-			SQLiteDatabase sqlite = context.openOrCreateDatabase(database,
-					Context.MODE_PRIVATE, cursorFactory);
+			SQLiteDatabase sqlite;
+			ExternalGeoPackage external = getExternalGeoPackage(database);
+			if (external != null) {
+				sqlite = SQLiteDatabase.openDatabase(external.getPath(),
+						cursorFactory, SQLiteDatabase.OPEN_READWRITE
+								| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+			} else {
+				sqlite = context.openOrCreateDatabase(database,
+						Context.MODE_PRIVATE, cursorFactory);
+			}
 			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(
 					context, sqlite);
 			db = new GeoPackageImpl(sqlite, cursorFactory, tableCreator);
@@ -390,6 +449,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	@Override
 	public boolean copy(String database, String databaseCopy) {
 		// Copy the database as a new file
+		// TODO handle external
 		File dbFile = context.getDatabasePath(database);
 		File dbCopyFile = context.getDatabasePath(databaseCopy);
 		try {
@@ -411,6 +471,106 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			delete(database);
 		}
 		return exists(newDatabase);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean importGeoPackageAsExternalLink(File path, String database) {
+		return importGeoPackageAsExternalLink(path.getAbsolutePath(), database);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean importGeoPackageAsExternalLink(String path, String database) {
+
+		if (exists(database)) {
+			throw new GeoPackageException(
+					"GeoPackage database already exists: " + database);
+		}
+
+		// Verify the file is a database and can be opened
+		try {
+			SQLiteDatabase sqlite = SQLiteDatabase.openDatabase(path, null,
+					SQLiteDatabase.OPEN_READWRITE
+							| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+			sqlite.close();
+		} catch (SQLiteException e) {
+			throw new GeoPackageException(
+					"Failed to import GeoPackage database as external link: "
+							+ database + ", Path: " + path, e);
+		}
+
+		ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+				context);
+		externalDataSource.open();
+		try {
+
+			// Save the external link
+			ExternalGeoPackage external = new ExternalGeoPackage();
+			external.setName(database);
+			external.setPath(path);
+			externalDataSource.create(external);
+
+			GeoPackage geoPackage = open(database);
+			if (geoPackage != null) {
+				try {
+					if (!geoPackage.getSpatialReferenceSystemDao()
+							.isTableExists()
+							|| !geoPackage.getContentsDao().isTableExists()) {
+						externalDataSource.delete(database);
+						throw new GeoPackageException(
+								"Invalid GeoPackage database file. Does not contain required tables: "
+										+ SpatialReferenceSystem.TABLE_NAME
+										+ " & " + Contents.TABLE_NAME
+										+ ", Database: " + database
+										+ ", Path: " + path);
+					}
+				} catch (SQLException e) {
+					externalDataSource.delete(database);
+					throw new GeoPackageException(
+							"Invalid GeoPackage database file. Could not verify existence of required tables: "
+									+ SpatialReferenceSystem.TABLE_NAME
+									+ " & "
+									+ Contents.TABLE_NAME
+									+ ", Database: "
+									+ database + ", Path: " + path);
+				} finally {
+					geoPackage.close();
+				}
+			} else {
+				externalDataSource.delete(database);
+				throw new GeoPackageException(
+						"Unable to open GeoPackage database. Database: "
+								+ database);
+			}
+		} finally {
+			externalDataSource.close();
+		}
+
+		return exists(database);
+	}
+
+	/**
+	 * Add all databases to the collection
+	 * 
+	 * @param databases
+	 */
+	private void addDatabases(Collection<String> databases) {
+		String[] databaseArray = context.databaseList();
+		for (String database : databaseArray) {
+			if (!isTemporary(database)
+					&& !database
+							.equalsIgnoreCase(GeoPackageMetadataOpenHelper.DATABASE_NAME)) {
+				databases.add(database);
+			}
+		}
+
+		List<String> externalGeoPackages = getExternalGeoPackageNames();
+		databases.addAll(externalGeoPackages);
 	}
 
 	/**
@@ -460,28 +620,76 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			}
 
 			GeoPackage geoPackage = open(database);
-			try {
-				if (!geoPackage.getSpatialReferenceSystemDao().isTableExists()
-						|| !geoPackage.getContentsDao().isTableExists()) {
+			if (geoPackage != null) {
+				try {
+					if (!geoPackage.getSpatialReferenceSystemDao()
+							.isTableExists()
+							|| !geoPackage.getContentsDao().isTableExists()) {
+						delete(database);
+						throw new GeoPackageException(
+								"Invalid GeoPackage database file. Does not contain required tables: "
+										+ SpatialReferenceSystem.TABLE_NAME
+										+ " & " + Contents.TABLE_NAME
+										+ ", Database: " + database);
+					}
+				} catch (SQLException e) {
 					delete(database);
 					throw new GeoPackageException(
-							"Invalid GeoPackage database file. Does not contain required tables: "
-									+ SpatialReferenceSystem.TABLE_NAME + " & "
-									+ Contents.TABLE_NAME);
+							"Invalid GeoPackage database file. Could not verify existence of required tables: "
+									+ SpatialReferenceSystem.TABLE_NAME
+									+ " & "
+									+ Contents.TABLE_NAME
+									+ ", Database: "
+									+ database);
+				} finally {
+					geoPackage.close();
 				}
-			} catch (SQLException e) {
+			} else {
 				delete(database);
 				throw new GeoPackageException(
-						"Invalid GeoPackage database file. Could not verify existence of required tables: "
-								+ SpatialReferenceSystem.TABLE_NAME
-								+ " & "
-								+ Contents.TABLE_NAME);
-			} finally {
-				geoPackage.close();
+						"Unable to open GeoPackage database. Database: "
+								+ database);
 			}
 		}
 
 		return exists(database);
+	}
+
+	/**
+	 * Get the external GeoPackage names
+	 * 
+	 * @return
+	 */
+	private List<String> getExternalGeoPackageNames() {
+		List<String> externalNames = null;
+		ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+				context);
+		externalDataSource.open();
+		try {
+			externalNames = externalDataSource.getAllNames();
+		} finally {
+			externalDataSource.close();
+		}
+		return externalNames;
+	}
+
+	/**
+	 * Get the external GeoPackage
+	 * 
+	 * @param database
+	 * @return
+	 */
+	private ExternalGeoPackage getExternalGeoPackage(String database) {
+		ExternalGeoPackage external = null;
+		ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+				context);
+		externalDataSource.open();
+		try {
+			external = externalDataSource.get(database);
+		} finally {
+			externalDataSource.close();
+		}
+		return external;
 	}
 
 	/**

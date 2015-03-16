@@ -66,10 +66,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -2669,8 +2669,8 @@ public class GeoPackageMapFragment extends Fragment implements
 				.findViewById(R.id.load_tiles_compress_format);
 		final EditText compressQualityInput = (EditText) createTilesView
 				.findViewById(R.id.load_tiles_compress_quality);
-		final CheckBox googleTilesCheckbox = (CheckBox) createTilesView
-				.findViewById(R.id.load_tiles_google_tiles);
+		final RadioButton googleTilesRadioButton = (RadioButton) createTilesView
+				.findViewById(R.id.load_tiles_type_google_radio_button);
 		final EditText minLatInput = (EditText) createTilesView
 				.findViewById(R.id.bounding_box_min_latitude_input);
 		final EditText maxLatInput = (EditText) createTilesView
@@ -2797,7 +2797,7 @@ public class GeoPackageMapFragment extends Fragment implements
 												.toString());
 							}
 
-							boolean googleTiles = googleTilesCheckbox
+							boolean googleTiles = googleTilesRadioButton
 									.isChecked();
 
 							BoundingBox boundingBox = new BoundingBox(minLon,

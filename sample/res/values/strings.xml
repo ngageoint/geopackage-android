@@ -8,7 +8,7 @@
     <string name="import_geopackage_url">Import URL</string>
     <string name="import_geopackage_file">Import File</string>
     <string name="create_geopackage">Create</string>
-    <string name="clear_selected_tables">Deselect All</string>
+    <string name="clear_selected_tables">Clear Selections</string>
     <string name="map_zoom">Zoom to Active</string>
     <string name="map_features">Features</string>
     <string name="map_bounding_box">Bounding Box</string>
@@ -31,6 +31,9 @@
     <string name="import_url_name_label">Name: </string>
     <string name="import_url_label">URL: </string>
     <string name="import_url_preloaded_label">Preloaded</string>
+    <string name="import_file_name_label">Name: </string>
+    <string name="import_file_copy_label">Copy</string>
+    <string name="import_file_external_label">External Link</string>
     <string name="create_tiles_name_label">Name: </string>
     <string name="load_tiles_url_label">URL: </string>
     <string name="load_tiles_zoom_label">Zoom - </string>
@@ -46,7 +49,9 @@
     </array>
     <string name="load_tiles_compress_format_prompt">Compress Format</string>
     <string name="load_tiles_compress_quality_label">Compress Quality: </string>
-    <string name="load_tiles_google_tiles_label">Google Tile Format</string>
+    <string name="load_tiles_type_label">Tile Format:</string>
+    <string name="load_tiles_type_geopackage_label">GeoPackage</string>
+    <string name="load_tiles_type_google_label">Google</string>
     <string name="map_create_tiles_geopackage_label">GeoPackage: </string>
     <string name="map_create_tiles_existing_geopackage_label">Existing</string>
     <string name="map_create_tiles_existing_geopackage_dialog_label">GeoPackages</string>
@@ -70,7 +75,6 @@
     <string name="geopackage_create_label">Create</string>
     <string name="geopackage_create_features_label">Create Features</string>
     <string name="geopackage_create_tiles_label">Create Tiles</string>
-    <string name="geopackage_import_name_label">Name:</string>
     <string name="table_image_description">Table Type</string>
     <string name="geopackage_table_view_label">View</string>
     <string name="geopackage_table_edit_label">Edit</string>
