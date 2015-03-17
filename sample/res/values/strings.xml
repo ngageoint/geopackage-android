@@ -71,6 +71,7 @@
     <string name="geopackage_copy_label">Copy</string>
     <string name="geopackage_copy_suffix">_copy</string>
     <string name="geopackage_export_label">Export</string>
+    <string name="geopackage_share_label">Share</string>
     <string name="geopackage_import_label">Import</string>
     <string name="geopackage_create_label">Create</string>
     <string name="geopackage_create_features_label">Create Features</string>

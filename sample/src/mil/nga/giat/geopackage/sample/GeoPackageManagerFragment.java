@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.sample;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.SQLException;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageConstants;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.core.contents.Contents;
@@ -48,6 +50,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.provider.DocumentsContract.Document;
+import android.support.v4.content.FileProvider;
 import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -246,6 +249,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 		adapter.add(getString(R.string.geopackage_rename_label));
 		adapter.add(getString(R.string.geopackage_copy_label));
 		adapter.add(getString(R.string.geopackage_export_label));
+		adapter.add(getString(R.string.geopackage_share_label));
 		adapter.add(getString(R.string.geopackage_create_features_label));
 		adapter.add(getString(R.string.geopackage_create_tiles_label));
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -272,9 +276,12 @@ public class GeoPackageManagerFragment extends Fragment implements
 						exportDatabaseOption(database);
 						break;
 					case 5:
-						createFeaturesOption(database);
+						shareDatabaseOption(database);
 						break;
 					case 6:
+						createFeaturesOption(database);
+						break;
+					case 7:
 						createTilesOption(database);
 						break;
 					default:
@@ -538,6 +545,74 @@ public class GeoPackageManagerFragment extends Fragment implements
 						});
 
 		dialog.show();
+	}
+
+	/**
+	 * Share database option
+	 * 
+	 * @param database
+	 */
+	private void shareDatabaseOption(final String database) {
+
+		try {
+			// Get the database file
+			File databaseFile = manager.getFile(database);
+
+			// Create the share intent
+			Intent shareIntent = new Intent();
+			shareIntent.setAction(Intent.ACTION_SEND);
+			shareIntent.setType("*/*");
+
+			Uri databaseUri;
+			// If external database, no permission is needed and Uri is created
+			if (manager.isExternal(database)) {
+				databaseUri = Uri.fromFile(databaseFile);
+			}
+			// If internal database, file much be copied to cache and permission
+			// granted
+			else {
+				// Copy the database to cache
+				File cacheDirectory = getDatabaseCacheDirectory();
+				cacheDirectory.mkdir();
+				File cacheFile = new File(cacheDirectory, database + "."
+						+ GeoPackageConstants.GEOPACKAGE_EXTENSION);
+				try {
+					GeoPackageIOUtils.copyFile(databaseFile, cacheFile);
+				} catch (IOException e) {
+					throw new GeoPackageException(
+							"Failed to copy database file to cache for sharing",
+							e);
+				}
+				// Create the content Uri and add intent permissions
+				databaseUri = FileProvider.getUriForFile(getActivity(),
+						"mil.nga.giat.geopackage.sample.MainActivity",
+						cacheFile);
+				shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+			}
+
+			// Add the Uri
+			shareIntent.putExtra(Intent.EXTRA_STREAM, databaseUri);
+
+			// Start the share activity for result to delete the cache when done
+			startActivityForResult(
+					Intent.createChooser(
+							shareIntent,
+							getResources().getText(
+									R.string.geopackage_share_label)),
+					MainActivity.ACTIVITY_SHARE_FILE);
+		} catch (Exception e) {
+			GeoPackageUtils.showMessage(getActivity(),
+					getString(R.string.geopackage_share_label), e.getMessage());
+		}
+	}
+
+	/**
+	 * Get the database cache directory
+	 * 
+	 * @return
+	 */
+	private File getDatabaseCacheDirectory() {
+		return new File(getActivity().getCacheDir(), "databases");
 	}
 
 	/**
@@ -1693,6 +1768,20 @@ public class GeoPackageManagerFragment extends Fragment implements
 		case MainActivity.ACTIVITY_CHOOSE_FILE:
 			if (resultCode == Activity.RESULT_OK) {
 				importFile(data);
+			}
+			break;
+
+		case MainActivity.ACTIVITY_SHARE_FILE:
+			// Delete any cached database files
+			File databaseCache = getDatabaseCacheDirectory();
+			if (databaseCache.exists()) {
+				File[] cacheFiles = databaseCache.listFiles();
+				if (cacheFiles != null) {
+					for (File cacheFile : cacheFiles) {
+						cacheFile.delete();
+					}
+				}
+				databaseCache.delete();
 			}
 			break;
 

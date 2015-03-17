@@ -22,6 +22,8 @@ public class MainActivity extends Activity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	public static final int ACTIVITY_CHOOSE_FILE = 3342;
+	
+	public static final int ACTIVITY_SHARE_FILE = 3343;
 
 	/**
 	 * Manager drawer position
