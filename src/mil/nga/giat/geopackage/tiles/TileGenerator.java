@@ -92,7 +92,7 @@ public class TileGenerator {
 	/**
 	 * Tile grids by zoom level
 	 */
-	private final SparseArray<TileGridInfo> tileGrids = new SparseArray<TileGridInfo>();
+	private final SparseArray<TileGrid> tileGrids = new SparseArray<TileGrid>();
 
 	/**
 	 * Tile bounding box
@@ -154,18 +154,14 @@ public class TileGenerator {
 	private BoundingBox webMercatorBoundingBox;
 
 	/**
-	 * Tile Grid information wrapper
+	 * Matrix height when GeoPackage tile format
 	 */
-	private class TileGridInfo {
+	private long matrixHeight = 0;
 
-		TileGrid tileGrid;
-
-		long matrixWidth;
-
-		long matrixHeight;
-
-		TileGrid localTileGrid;
-	}
+	/**
+	 * Matrix width when GeoPackage tile format
+	 */
+	private long matrixWidth = 0;
 
 	/**
 	 * Constructor
@@ -294,85 +290,15 @@ public class TileGenerator {
 	 */
 	public int getTileCount() {
 		if (tileCount == null) {
-			// Get the tile grids and total tile count
 			int count = 0;
-			tileMatrixSetBoundingBox = boundingBox;
 			BoundingBox requestWebMercatorBoundingBox = TileBoundingBoxUtils
 					.toWebMercator(boundingBox);
-			webMercatorBoundingBox = requestWebMercatorBoundingBox;
-
-			// If Google Tile generation, the bounding box has to be the full
-			// world in the metadata
-			if (googleTiles) {
-				tileMatrixSetBoundingBox = new BoundingBox(-180.0, 180.0,
-						ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE,
-						ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
-				ProjectionTransform transform = ProjectionFactory
-						.getProjection(
-								ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
-						.getTransformation(
-								ProjectionConstants.EPSG_WEB_MERCATOR);
-				webMercatorBoundingBox = transform
-						.transform(tileMatrixSetBoundingBox);
-			}
-
-			long matrixHeight = 0;
-			long matrixWidth = 0;
 			for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
-				// Get the tile grid the includes the entire bounding box
+				// Get the tile grid that includes the entire bounding box
 				TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
 						requestWebMercatorBoundingBox, zoom);
 				count += tileGrid.count();
-				TileGridInfo gridInfo = new TileGridInfo();
-				gridInfo.tileGrid = tileGrid;
-
-				// If generating Google Tiles, determine the matrix width and
-				// height
-				if (googleTiles) {
-					gridInfo.matrixWidth = TileBoundingBoxUtils
-							.tilesPerSide(zoom);
-					gridInfo.matrixHeight = gridInfo.matrixWidth;
-				}
-				// Else, GeoPackage tile format
-				else {
-
-					// For the top zoom level, update the bounding box to be the
-					// bounds of the fitting tiles. Required for the tile
-					// dimensions to be correct
-					if (zoom == minZoom) {
-						webMercatorBoundingBox = TileBoundingBoxUtils
-								.getWebMercatorBoundingBox(tileGrid, zoom);
-						ProjectionTransform transform = ProjectionFactory
-								.getProjection(
-										ProjectionConstants.EPSG_WEB_MERCATOR)
-								.getTransformation(
-										ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-						tileMatrixSetBoundingBox = transform
-								.transform(webMercatorBoundingBox);
-
-						// Starting width and height of this tile set
-						matrixWidth = tileGrid.getMaxX() + 1
-								- tileGrid.getMinX();
-						matrixHeight = tileGrid.getMaxY() + 1
-								- tileGrid.getMinY();
-					}
-
-					// Get the local tile grid where these tiles fall into the
-					// top level zoom level of tiles
-					TileGrid localTileGrid = TileBoundingBoxUtils.getTileGrid(
-							webMercatorBoundingBox, matrixWidth, matrixHeight,
-							requestWebMercatorBoundingBox);
-
-					gridInfo.localTileGrid = localTileGrid;
-					gridInfo.matrixWidth = matrixWidth;
-					gridInfo.matrixHeight = matrixHeight;
-
-					// Double the matrix width and height for the next level
-					matrixWidth *= 2;
-					matrixHeight *= 2;
-				}
-
-				tileGrids.put(zoom, gridInfo);
+				tileGrids.put(zoom, tileGrid);
 			}
 
 			tileCount = count;
@@ -397,11 +323,17 @@ public class TileGenerator {
 		}
 
 		int count = 0;
-
 		boolean update = false;
 
-		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+		// Get the web mercator projection of the requested bounding box
+		BoundingBox requestWebMercatorBoundingBox = TileBoundingBoxUtils
+				.toWebMercator(boundingBox);
 
+		// Adjust the tile matrix set and web mercator bounds
+		adjustBounds(requestWebMercatorBoundingBox, minZoom);
+
+		// Create a new tile matrix or update an existing
+		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
 		TileMatrixSet tileMatrixSet = null;
 		if (!tileMatrixSetDao.isTableExists()
 				|| !tileMatrixSetDao.idExists(tableName)) {
@@ -416,7 +348,10 @@ public class TileGenerator {
 			update = true;
 			// Query to get the Tile Matrix Set
 			tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
-			updateTileBounds(tileMatrixSet);
+
+			// Update the tile bounds between the existing and this request
+			TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
+			updateTileBounds(tileDao, tileMatrixSet);
 		}
 
 		// Download and create the tiles
@@ -428,9 +363,33 @@ public class TileGenerator {
 			// Create the new matrix tiles
 			for (int zoom = minZoom; zoom <= maxZoom
 					&& (progress == null || progress.isActive()); zoom++) {
-				TileGridInfo tileGridInfo = tileGrids.get(zoom);
+
+				TileGrid localTileGrid = null;
+
+				// Determine the matrix width and height for Google format
+				if (googleTiles) {
+					matrixWidth = TileBoundingBoxUtils.tilesPerSide(zoom);
+					matrixHeight = matrixWidth;
+				}
+				// Get the local tile grid for GeoPackage format of where the
+				// tiles belong
+				else {
+					localTileGrid = TileBoundingBoxUtils.getTileGrid(
+							webMercatorBoundingBox, matrixWidth, matrixHeight,
+							requestWebMercatorBoundingBox);
+				}
+
+				// Generate the tiles for the zoom level
+				TileGrid tileGrid = tileGrids.get(zoom);
 				count += generateTiles(tileMatrixDao, tileDao, contents, zoom,
-						tileGridInfo, update);
+						tileGrid, localTileGrid, matrixWidth, matrixHeight,
+						update);
+
+				if (!googleTiles) {
+					// Double the matrix width and height for the next level
+					matrixWidth *= 2;
+					matrixHeight *= 2;
+				}
 			}
 
 			// Delete the table if cancelled
@@ -459,15 +418,70 @@ public class TileGenerator {
 	}
 
 	/**
+	 * Adjust the tile matrix set and web mercator bounds
+	 * 
+	 * @param requestWebMercatorBoundingBox
+	 * @param zoom
+	 */
+	private void adjustBounds(BoundingBox requestWebMercatorBoundingBox,
+			int zoom) {
+		// Google Tile Format
+		if (googleTiles) {
+			adjustGoogleBounds();
+		}
+		// GeoPackage Tile Format
+		else {
+			adjustGeoPackageBounds(requestWebMercatorBoundingBox, zoom);
+		}
+	}
+
+	/**
+	 * Adjust the tile matrix set and web mercator bounds for Google tile format
+	 */
+	private void adjustGoogleBounds() {
+		// Set the tile matrix set bounding box to be the world
+		tileMatrixSetBoundingBox = new BoundingBox(-180.0, 180.0,
+				ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE,
+				ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
+		ProjectionTransform transform = ProjectionFactory.getProjection(
+				ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+				.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+		webMercatorBoundingBox = transform.transform(tileMatrixSetBoundingBox);
+	}
+
+	/**
+	 * Adjust the tile matrix set and web mercator bounds for GeoPackage format.
+	 * Determine the tile grid width and height
+	 * 
+	 * @param requestWebMercatorBoundingBox
+	 * @param zoom
+	 */
+	private void adjustGeoPackageBounds(
+			BoundingBox requestWebMercatorBoundingBox, int zoom) {
+		// Get the fitting tile grid and determine the bounding box that
+		// fits it
+		TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
+				requestWebMercatorBoundingBox, zoom);
+		webMercatorBoundingBox = TileBoundingBoxUtils
+				.getWebMercatorBoundingBox(tileGrid, zoom);
+		ProjectionTransform transform = ProjectionFactory.getProjection(
+				ProjectionConstants.EPSG_WEB_MERCATOR).getTransformation(
+				ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+		tileMatrixSetBoundingBox = transform.transform(webMercatorBoundingBox);
+		matrixWidth = tileGrid.getMaxX() + 1 - tileGrid.getMinX();
+		matrixHeight = tileGrid.getMaxY() + 1 - tileGrid.getMinY();
+	}
+
+	/**
 	 * Update the Content and Tile Matrix Set bounds
 	 * 
+	 * @param tileDao
 	 * @param tileMatrixSet
 	 * @throws SQLException
 	 */
-	private void updateTileBounds(TileMatrixSet tileMatrixSet)
+	private void updateTileBounds(TileDao tileDao, TileMatrixSet tileMatrixSet)
 			throws SQLException {
 
-		TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
 		if (!tileDao.isGoogleTiles() && googleTiles) {
 			throw new GeoPackageException(
 					"Can not add Google formatted tiles to "
@@ -501,32 +515,70 @@ public class TileGenerator {
 			contentsDao.update(contents);
 		}
 
-		boolean expandTileMatrixSet = false;
-		if (tileMatrixSetBoundingBox.getMinLongitude() < tileMatrixSet
-				.getMinX()) {
-			tileMatrixSet.setMinX(tileMatrixSetBoundingBox.getMinLongitude());
-			expandTileMatrixSet = true;
-		}
-		if (tileMatrixSetBoundingBox.getMaxLongitude() > tileMatrixSet
-				.getMaxX()) {
-			tileMatrixSet.setMaxX(tileMatrixSetBoundingBox.getMaxLongitude());
-			expandTileMatrixSet = true;
-		}
-		if (tileMatrixSetBoundingBox.getMinLatitude() < tileMatrixSet.getMinY()) {
-			tileMatrixSet.setMinY(tileMatrixSetBoundingBox.getMinLatitude());
-			expandTileMatrixSet = true;
-		}
-		if (tileMatrixSetBoundingBox.getMaxLatitude() > tileMatrixSet.getMaxY()) {
-			tileMatrixSet.setMaxY(tileMatrixSetBoundingBox.getMaxLatitude());
-			expandTileMatrixSet = true;
+		boundingBox = contents.getBoundingBox();
+
+		if (!googleTiles) {
+
+			boolean expandTileMatrixSet = false;
+			if (tileMatrixSetBoundingBox.getMinLongitude() < tileMatrixSet
+					.getMinX()) {
+				tileMatrixSet.setMinX(tileMatrixSetBoundingBox
+						.getMinLongitude());
+				expandTileMatrixSet = true;
+			}
+			if (tileMatrixSetBoundingBox.getMaxLongitude() > tileMatrixSet
+					.getMaxX()) {
+				tileMatrixSet.setMaxX(tileMatrixSetBoundingBox
+						.getMaxLongitude());
+				expandTileMatrixSet = true;
+			}
+			if (tileMatrixSetBoundingBox.getMinLatitude() < tileMatrixSet
+					.getMinY()) {
+				tileMatrixSet
+						.setMinY(tileMatrixSetBoundingBox.getMinLatitude());
+				expandTileMatrixSet = true;
+			}
+			if (tileMatrixSetBoundingBox.getMaxLatitude() > tileMatrixSet
+					.getMaxY()) {
+				tileMatrixSet
+						.setMaxY(tileMatrixSetBoundingBox.getMaxLatitude());
+				expandTileMatrixSet = true;
+			}
+
+			// Update the tile matrix set
+			if (expandTileMatrixSet) {
+
+				// Adjust the bounds to include the request and existing bounds
+				BoundingBox totalBoundingBox = TileBoundingBoxUtils
+						.toWebMercator(boundingBox);
+				int minNewOrUpdateZoom = Math.min(minZoom,
+						(int) tileDao.getMinZoom());
+				adjustGeoPackageBounds(totalBoundingBox, minNewOrUpdateZoom);
+
+				for (long zoom = tileDao.getMinZoom(); zoom <= tileDao
+						.getMaxZoom(); zoom++) {
+					TileMatrix tileMatrix = tileDao.getTileMatrix(zoom);
+					if (tileMatrix != null) {
+						// TODO update the tile matrix and tile rows & columns
+					}
+				}
+
+				// Adjust the width and height to the min zoom level of the
+				// request
+				if (minNewOrUpdateZoom < minZoom) {
+					long adjustment = (long) Math.pow(2, minZoom
+							- minNewOrUpdateZoom);
+					matrixWidth *= adjustment;
+					matrixHeight *= adjustment;
+				}
+
+				TileMatrixSetDao tileMatrixSetDao = geoPackage
+						.getTileMatrixSetDao();
+				tileMatrixSetDao.update(tileMatrixSet);
+			}
 		}
 
-		// Update the tile matrix set
-		if (expandTileMatrixSet) {
-			TileMatrixSetDao tileMatrixSetDao = geoPackage
-					.getTileMatrixSetDao();
-			tileMatrixSetDao.update(tileMatrixSet);
-		}
+		tileMatrixSetBoundingBox = tileMatrixSet.getBoundingBox();
 	}
 
 	/**
@@ -546,21 +598,23 @@ public class TileGenerator {
 	 * @param contents
 	 * @param zoomLevel
 	 * @param tileGrid
+	 * @param localTileGrid
+	 * @param matrixWidth
+	 * @param matrixHeight
 	 * @param update
 	 * @return tile count
 	 * @throws SQLException
 	 * @throws IOException
 	 */
 	private int generateTiles(TileMatrixDao tileMatrixDao, TileDao tileDao,
-			Contents contents, int zoomLevel, TileGridInfo tileGridInfo,
+			Contents contents, int zoomLevel, TileGrid tileGrid,
+			TileGrid localTileGrid, long matrixWidth, long matrixHeight,
 			boolean update) throws SQLException, IOException {
 
 		int count = 0;
 
 		Integer tileWidth = null;
 		Integer tileHeight = null;
-
-		TileGrid tileGrid = tileGridInfo.tileGrid;
 
 		// Download and create the tile and each coordinate
 		for (long x = tileGrid.getMinX(); x <= tileGrid.getMaxX(); x++) {
@@ -605,11 +659,11 @@ public class TileGenerator {
 					long tileRow = y;
 
 					// Update the column and row to the local tile grid location
-					if (tileGridInfo.localTileGrid != null) {
+					if (localTileGrid != null) {
 						tileColumn = (x - tileGrid.getMinX())
-								+ tileGridInfo.localTileGrid.getMinX();
+								+ localTileGrid.getMinX();
 						tileRow = (y - tileGrid.getMinY())
-								+ tileGridInfo.localTileGrid.getMinY();
+								+ localTileGrid.getMinY();
 					}
 
 					newRow.setTileColumn(tileColumn);
@@ -686,9 +740,6 @@ public class TileGenerator {
 
 			// Create the tile matrix
 			if (create) {
-
-				long matrixWidth = tileGridInfo.matrixWidth;
-				long matrixHeight = tileGridInfo.matrixHeight;
 
 				// Calculate meters per pixel
 				double pixelXSize = (webMercatorBoundingBox.getMaxLongitude() - webMercatorBoundingBox
