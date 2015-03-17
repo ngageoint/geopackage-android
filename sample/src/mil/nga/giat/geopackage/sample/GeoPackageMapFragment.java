@@ -1368,23 +1368,31 @@ public class GeoPackageMapFragment extends Fragment implements
 		if (active != null) {
 
 			// Add tile overlays first
-			for (GeoPackageDatabase database : active.getDatabases()) {
+			List<GeoPackageDatabase> activeDatabases = new ArrayList<GeoPackageDatabase>();
+			activeDatabases.addAll(active.getDatabases());
+			for (GeoPackageDatabase database : activeDatabases) {
 
 				// Open each GeoPackage
 				GeoPackage geoPackage = manager.open(database.getDatabase());
-				geoPackages.put(database.getDatabase(), geoPackage);
 
-				// Display the tiles
-				for (GeoPackageTable tiles : database.getTiles()) {
-					try {
-						displayTiles(task, tiles);
-					} catch (Exception e) {
-						Log.e(GeoPackageMapFragment.class.getSimpleName(),
-								e.getMessage());
+				if (geoPackage != null) {
+
+					geoPackages.put(database.getDatabase(), geoPackage);
+
+					// Display the tiles
+					for (GeoPackageTable tiles : database.getTiles()) {
+						try {
+							displayTiles(task, tiles);
+						} catch (Exception e) {
+							Log.e(GeoPackageMapFragment.class.getSimpleName(),
+									e.getMessage());
+						}
+						if (task.isCancelled()) {
+							break;
+						}
 					}
-					if (task.isCancelled()) {
-						break;
-					}
+				} else {
+					active.removeDatabase(database.getDatabase());
 				}
 
 				if (task.isCancelled()) {

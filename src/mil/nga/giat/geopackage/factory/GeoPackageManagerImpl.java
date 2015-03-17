@@ -567,8 +567,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			}
 		}
 
-		List<String> externalGeoPackages = getExternalGeoPackageNames();
-		databases.addAll(externalGeoPackages);
+		// Get the external GeoPackages, adding those where the file exists and
+		// deleting those with missing files
+		List<ExternalGeoPackage> externalGeoPackages = getExternalGeoPackages();
+		for (ExternalGeoPackage external : externalGeoPackages) {
+			if (new File(external.getPath()).exists()) {
+				databases.add(external.getName());
+			} else {
+				delete(external.getName());
+			}
+		}
 	}
 
 	/**
@@ -654,21 +662,21 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	}
 
 	/**
-	 * Get the external GeoPackage names
+	 * Get the external GeoPackages
 	 * 
 	 * @return
 	 */
-	private List<String> getExternalGeoPackageNames() {
-		List<String> externalNames = null;
+	private List<ExternalGeoPackage> getExternalGeoPackages() {
+		List<ExternalGeoPackage> externals = null;
 		ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
 				context);
 		externalDataSource.open();
 		try {
-			externalNames = externalDataSource.getAllNames();
+			externals = externalDataSource.getAll();
 		} finally {
 			externalDataSource.close();
 		}
-		return externalNames;
+		return externals;
 	}
 
 	/**
