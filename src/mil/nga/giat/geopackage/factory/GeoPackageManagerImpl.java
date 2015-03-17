@@ -394,8 +394,6 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	@Override
 	public void exportGeoPackage(String database, String name, File directory) {
 
-		// TODO handle external
-
 		File file = new File(directory, name);
 
 		// Add the extension if not on the name
@@ -405,7 +403,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		}
 
 		// Copy the geopackage database to the new file location
-		File dbFile = context.getDatabasePath(database);
+		File dbFile = getFile(database);
 		try {
 			GeoPackageIOUtils.copyFile(dbFile, file);
 		} catch (IOException e) {
@@ -449,14 +447,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	@Override
 	public boolean copy(String database, String databaseCopy) {
 		// Copy the database as a new file
-		// TODO handle external
-		File dbFile = context.getDatabasePath(database);
+		File dbFile = getFile(database);
 		File dbCopyFile = context.getDatabasePath(databaseCopy);
 		try {
 			GeoPackageIOUtils.copyFile(dbFile, dbCopyFile);
 		} catch (IOException e) {
 			throw new GeoPackageException(
-					"Failed to import GeoPackage database: " + database, e);
+					"Failed to copy GeoPackage database '" + database
+							+ "' to '" + databaseCopy + "'", e);
 		}
 
 		return exists(databaseCopy);
