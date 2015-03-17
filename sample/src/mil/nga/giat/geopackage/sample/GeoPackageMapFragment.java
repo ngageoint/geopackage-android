@@ -1465,8 +1465,14 @@ public class GeoPackageMapFragment extends Fragment implements
 
 		BoundingBox bbox = featuresBoundingBox;
 
+		float paddingPercentage;
 		if (bbox == null) {
 			bbox = tilesBoundingBox;
+			paddingPercentage = getActivity().getResources().getInteger(
+					R.integer.map_tiles_zoom_padding_percentage) * .01f;
+		} else {
+			paddingPercentage = getActivity().getResources().getInteger(
+					R.integer.map_features_zoom_padding_percentage) * .01f;
 		}
 
 		if (bbox != null) {
@@ -1483,8 +1489,6 @@ public class GeoPackageMapFragment extends Fragment implements
 
 			View view = getView();
 			int minViewLength = Math.min(view.getWidth(), view.getHeight());
-			float paddingPercentage = getActivity().getResources().getInteger(
-					R.integer.map_features_zoom_padding_percentage) * .01f;
 			final int padding = (int) Math.floor(minViewLength
 					* paddingPercentage);
 
@@ -1834,16 +1838,16 @@ public class GeoPackageMapFragment extends Fragment implements
 		if (tilesBoundingBox == null) {
 			tilesBoundingBox = boundingBox;
 		} else {
-			tilesBoundingBox.setMinLongitude(Math.max(
+			tilesBoundingBox.setMinLongitude(Math.min(
 					tilesBoundingBox.getMinLongitude(),
 					boundingBox.getMinLongitude()));
-			tilesBoundingBox.setMaxLongitude(Math.min(
+			tilesBoundingBox.setMaxLongitude(Math.max(
 					tilesBoundingBox.getMaxLongitude(),
 					boundingBox.getMaxLongitude()));
-			tilesBoundingBox.setMinLatitude(Math.max(
+			tilesBoundingBox.setMinLatitude(Math.min(
 					tilesBoundingBox.getMinLatitude(),
 					boundingBox.getMinLatitude()));
-			tilesBoundingBox.setMaxLatitude(Math.min(
+			tilesBoundingBox.setMaxLatitude(Math.max(
 					tilesBoundingBox.getMaxLatitude(),
 					boundingBox.getMaxLatitude()));
 		}
