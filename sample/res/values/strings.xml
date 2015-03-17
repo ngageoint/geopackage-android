@@ -87,6 +87,11 @@
     <string name="edit_contents_max_y_label">Max Y: </string>
     <string name="edit_contents_min_x_label">Min X: </string>
     <string name="edit_contents_max_x_label">Max X: </string>
+    <string name="edit_tiles_label">Tile Matrix Set:</string>
+    <string name="edit_tiles_min_y_label">Min Y: </string>
+    <string name="edit_tiles_max_y_label">Max Y: </string>
+    <string name="edit_tiles_min_x_label">Min X: </string>
+    <string name="edit_tiles_max_x_label">Max X: </string>
     <string name="edit_features_z_label">Z: </string>
     <string name="edit_features_m_label">M: </string>
     <string name="edit_features_geometry_type_label">Geometry Type: </string>

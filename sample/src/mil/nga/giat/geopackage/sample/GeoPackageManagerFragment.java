@@ -841,7 +841,8 @@ public class GeoPackageManagerFragment extends Fragment implements
 								GeoPackage geoPackage = manager.open(database);
 								try {
 									geoPackage.createTileTableWithMetadata(
-											tableName, boundingBox, 4326);
+											tableName, boundingBox,
+											boundingBox, 4326);
 								} finally {
 									geoPackage.close();
 								}
@@ -890,7 +891,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 	public void onLoadTilesPostExecute(String result) {
 		if (result != null) {
 			GeoPackageUtils.showMessage(getActivity(),
-					getString(R.string.geopackage_import_label), result);
+					getString(R.string.geopackage_create_tiles_label), result);
 		}
 		update();
 	}
@@ -1104,6 +1105,11 @@ public class GeoPackageManagerFragment extends Fragment implements
 		final EditText maxXInput = (EditText) editTableView
 				.findViewById(R.id.edit_contents_max_x_input);
 
+		EditText tempMinYMatrixSetInput = null;
+		EditText tempMaxYMatrixSetInput = null;
+		EditText tempMinXMatrixSetInput = null;
+		EditText tempMaxXMatrixSetInput = null;
+
 		Spinner tempGeometryTypeSpinner = null;
 		EditText tempZInput = null;
 		EditText tempMInput = null;
@@ -1119,6 +1125,24 @@ public class GeoPackageManagerFragment extends Fragment implements
 				tempTileMatrixSet = tileMatrixSetDao
 						.queryForId(table.getName());
 				tempContents = tempTileMatrixSet.getContents();
+
+				tempMinYMatrixSetInput = (EditText) editTableView
+						.findViewById(R.id.edit_tiles_min_y_input);
+				tempMaxYMatrixSetInput = (EditText) editTableView
+						.findViewById(R.id.edit_tiles_max_y_input);
+				tempMinXMatrixSetInput = (EditText) editTableView
+						.findViewById(R.id.edit_tiles_min_x_input);
+				tempMaxXMatrixSetInput = (EditText) editTableView
+						.findViewById(R.id.edit_tiles_max_x_input);
+
+				tempMinYMatrixSetInput.setText(String.valueOf(tempTileMatrixSet
+						.getMinY()));
+				tempMaxYMatrixSetInput.setText(String.valueOf(tempTileMatrixSet
+						.getMaxY()));
+				tempMinXMatrixSetInput.setText(String.valueOf(tempTileMatrixSet
+						.getMinX()));
+				tempMaxXMatrixSetInput.setText(String.valueOf(tempTileMatrixSet
+						.getMaxX()));
 			} else {
 
 				tempGeometryTypeSpinner = (Spinner) editTableView
@@ -1176,6 +1200,10 @@ public class GeoPackageManagerFragment extends Fragment implements
 		final EditText mInput = tempMInput;
 		final TileMatrixSet tileMatrixSet = tempTileMatrixSet;
 		final GeometryColumns geometryColumns = tempGeometryColumns;
+		final EditText minYMatrixSetInput = tempMinYMatrixSetInput;
+		final EditText maxYMatrixSetInput = tempMaxYMatrixSetInput;
+		final EditText minXMatrixSetInput = tempMinXMatrixSetInput;
+		final EditText maxXMatrixSetInput = tempMaxXMatrixSetInput;
 
 		dialog.setPositiveButton(getString(R.string.button_ok_label),
 				new DialogInterface.OnClickListener() {
@@ -1228,15 +1256,41 @@ public class GeoPackageManagerFragment extends Fragment implements
 								TileMatrixSetDao tileMatrixSetDao = geoPackage
 										.getTileMatrixSetDao();
 
-								if (minY == null || maxY == null
-										|| minX == null || maxX == null) {
+								String minYMatrixSetString = minYMatrixSetInput
+										.getText().toString();
+								Double minMatrixSetY = minYMatrixSetString != null
+										&& !minYMatrixSetString.isEmpty() ? Double
+										.valueOf(minYMatrixSetString) : null;
+
+								String maxYMatrixSetString = maxYMatrixSetInput
+										.getText().toString();
+								Double maxMatrixSetY = maxYMatrixSetString != null
+										&& !maxYMatrixSetString.isEmpty() ? Double
+										.valueOf(maxYMatrixSetString) : null;
+
+								String minXMatrixSetString = minXMatrixSetInput
+										.getText().toString();
+								Double minMatrixSetX = minXMatrixSetString != null
+										&& !minXMatrixSetString.isEmpty() ? Double
+										.valueOf(minXMatrixSetString) : null;
+
+								String maxXMatrixSetString = maxXMatrixSetInput
+										.getText().toString();
+								Double maxMatrixSetX = maxXMatrixSetString != null
+										&& !maxXMatrixSetString.isEmpty() ? Double
+										.valueOf(maxXMatrixSetString) : null;
+
+								if (minMatrixSetY == null
+										|| maxMatrixSetY == null
+										|| minMatrixSetX == null
+										|| maxMatrixSetX == null) {
 									throw new GeoPackageException(
 											"Min and max bounds are required for Tiles");
 								}
-								tileMatrixSet.setMinY(minY);
-								tileMatrixSet.setMaxY(maxY);
-								tileMatrixSet.setMinX(minX);
-								tileMatrixSet.setMaxX(maxX);
+								tileMatrixSet.setMinY(minMatrixSetY);
+								tileMatrixSet.setMaxY(maxMatrixSetY);
+								tileMatrixSet.setMinX(minMatrixSetX);
+								tileMatrixSet.setMaxX(maxMatrixSetX);
 
 								tileMatrixSetDao.update(tileMatrixSet);
 							} else {

@@ -80,9 +80,7 @@ public class GeoPackageOverlay implements TileProvider {
 				.getTransformation(webMercator);
 
 		TileMatrixSet tileMatrixSet = tileDao.getTileMatrixSet();
-		BoundingBox setProjectionBoundingBox = new BoundingBox(
-				tileMatrixSet.getMinX(), tileMatrixSet.getMaxX(),
-				tileMatrixSet.getMinY(), tileMatrixSet.getMaxY());
+		BoundingBox setProjectionBoundingBox = tileMatrixSet.getBoundingBox();
 		setWebMercatorBoundingBox = projectionToWebMercator
 				.transform(setProjectionBoundingBox);
 	}

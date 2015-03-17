@@ -440,9 +440,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	public boolean isGoogleTiles() {
 
 		// Convert the bounding box to wgs84
-		BoundingBox boundingBox = new BoundingBox(tileMatrixSet.getMinX(),
-				tileMatrixSet.getMaxX(), tileMatrixSet.getMinY(),
-				tileMatrixSet.getMaxY());
+		BoundingBox boundingBox = tileMatrixSet.getBoundingBox();
 		BoundingBox wgs84BoundingBox = projection.getTransformation(
 				ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM).transform(
 				boundingBox);

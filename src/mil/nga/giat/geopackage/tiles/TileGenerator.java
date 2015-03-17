@@ -102,6 +102,11 @@ public class TileGenerator {
 			ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
 
 	/**
+	 * Tile matrix set bounding box
+	 */
+	private BoundingBox tileMatrixSetBoundingBox;
+
+	/**
 	 * Compress format
 	 */
 	private CompressFormat compressFormat = null;
@@ -204,6 +209,20 @@ public class TileGenerator {
 	}
 
 	/**
+	 * Determine if the url has bounding box variables
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private boolean hasBoundingBox(String url) {
+
+		String replacedUrl = replaceBoundingBox(url, boundingBox);
+		boolean hasBoundingBox = !replacedUrl.equals(url);
+
+		return hasBoundingBox;
+	}
+
+	/**
 	 * Set the tile bounding box
 	 * 
 	 * @param boundingBox
@@ -277,6 +296,7 @@ public class TileGenerator {
 		if (tileCount == null) {
 			// Get the tile grids and total tile count
 			int count = 0;
+			tileMatrixSetBoundingBox = boundingBox;
 			BoundingBox requestWebMercatorBoundingBox = TileBoundingBoxUtils
 					.toWebMercator(boundingBox);
 			webMercatorBoundingBox = requestWebMercatorBoundingBox;
@@ -284,7 +304,7 @@ public class TileGenerator {
 			// If Google Tile generation, the bounding box has to be the full
 			// world in the metadata
 			if (googleTiles) {
-				boundingBox = new BoundingBox(-180.0, 180.0,
+				tileMatrixSetBoundingBox = new BoundingBox(-180.0, 180.0,
 						ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE,
 						ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
 				ProjectionTransform transform = ProjectionFactory
@@ -292,7 +312,8 @@ public class TileGenerator {
 								ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
 						.getTransformation(
 								ProjectionConstants.EPSG_WEB_MERCATOR);
-				webMercatorBoundingBox = transform.transform(boundingBox);
+				webMercatorBoundingBox = transform
+						.transform(tileMatrixSetBoundingBox);
 			}
 
 			long matrixHeight = 0;
@@ -326,7 +347,7 @@ public class TileGenerator {
 										ProjectionConstants.EPSG_WEB_MERCATOR)
 								.getTransformation(
 										ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-						boundingBox = transform
+						tileMatrixSetBoundingBox = transform
 								.transform(webMercatorBoundingBox);
 
 						// Starting width and height of this tile set
@@ -380,7 +401,6 @@ public class TileGenerator {
 		boolean update = false;
 
 		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
-		ContentsDao contentsDao = geoPackage.getContentsDao();
 
 		TileMatrixSet tileMatrixSet = null;
 		if (!tileMatrixSetDao.isTableExists()
@@ -389,42 +409,14 @@ public class TileGenerator {
 			tileMatrixSet = geoPackage.createTileTableWithMetadata(
 					tableName,
 					boundingBox,
+					tileMatrixSetBoundingBox,
 					(long) context.getResources().getInteger(
 							R.integer.geopackage_srs_epsg_srs_id));
 		} else {
 			update = true;
-			// Retrieve the tile matrix set
+			// Query to get the Tile Matrix Set
 			tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
-			Contents contents = tileMatrixSet.getContents();
-
-			boolean expandBoundingBox = false;
-			if (boundingBox.getMinLongitude() < tileMatrixSet.getMinX()) {
-				tileMatrixSet.setMinX(boundingBox.getMinLongitude());
-				contents.setMinX(tileMatrixSet.getMinX());
-				expandBoundingBox = true;
-			}
-			if (boundingBox.getMaxLongitude() > tileMatrixSet.getMaxX()) {
-				tileMatrixSet.setMaxX(boundingBox.getMaxLongitude());
-				contents.setMaxX(tileMatrixSet.getMaxX());
-				expandBoundingBox = true;
-			}
-			if (boundingBox.getMinLatitude() < tileMatrixSet.getMinY()) {
-				tileMatrixSet.setMinY(boundingBox.getMinLatitude());
-				contents.setMinY(tileMatrixSet.getMinY());
-				expandBoundingBox = true;
-			}
-			if (boundingBox.getMaxLatitude() > tileMatrixSet.getMaxY()) {
-				tileMatrixSet.setMaxY(boundingBox.getMaxLatitude());
-				contents.setMaxY(tileMatrixSet.getMaxY());
-				expandBoundingBox = true;
-			}
-
-			// Update the tile matrix set
-			if (expandBoundingBox) {
-				tileMatrixSetDao.update(tileMatrixSet);
-				contentsDao.update(contents);
-			}
-
+			updateTileBounds(tileMatrixSet);
 		}
 
 		// Download and create the tiles
@@ -449,6 +441,7 @@ public class TileGenerator {
 			} else {
 				// Update the contents last modified date
 				contents.setLastChange(new Date());
+				ContentsDao contentsDao = geoPackage.getContentsDao();
 				contentsDao.update(contents);
 			}
 		} catch (RuntimeException e) {
@@ -463,6 +456,77 @@ public class TileGenerator {
 		}
 
 		return count;
+	}
+
+	/**
+	 * Update the Content and Tile Matrix Set bounds
+	 * 
+	 * @param tileMatrixSet
+	 * @throws SQLException
+	 */
+	private void updateTileBounds(TileMatrixSet tileMatrixSet)
+			throws SQLException {
+
+		TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
+		if (!tileDao.isGoogleTiles() && googleTiles) {
+			throw new GeoPackageException(
+					"Can not add Google formatted tiles to "
+							+ tableName
+							+ " which already contains GeoPackage formatted tiles");
+		}
+
+		Contents contents = tileMatrixSet.getContents();
+
+		boolean expandContents = false;
+		if (boundingBox.getMinLongitude() < contents.getMinX()) {
+			contents.setMinX(boundingBox.getMinLongitude());
+			expandContents = true;
+		}
+		if (boundingBox.getMaxLongitude() > contents.getMaxX()) {
+			contents.setMaxX(boundingBox.getMaxLongitude());
+			expandContents = true;
+		}
+		if (boundingBox.getMinLatitude() < contents.getMinY()) {
+			contents.setMinY(boundingBox.getMinLatitude());
+			expandContents = true;
+		}
+		if (boundingBox.getMaxLatitude() > contents.getMaxY()) {
+			contents.setMaxY(boundingBox.getMaxLatitude());
+			expandContents = true;
+		}
+
+		// Update the contents
+		if (expandContents) {
+			ContentsDao contentsDao = geoPackage.getContentsDao();
+			contentsDao.update(contents);
+		}
+
+		boolean expandTileMatrixSet = false;
+		if (tileMatrixSetBoundingBox.getMinLongitude() < tileMatrixSet
+				.getMinX()) {
+			tileMatrixSet.setMinX(tileMatrixSetBoundingBox.getMinLongitude());
+			expandTileMatrixSet = true;
+		}
+		if (tileMatrixSetBoundingBox.getMaxLongitude() > tileMatrixSet
+				.getMaxX()) {
+			tileMatrixSet.setMaxX(tileMatrixSetBoundingBox.getMaxLongitude());
+			expandTileMatrixSet = true;
+		}
+		if (tileMatrixSetBoundingBox.getMinLatitude() < tileMatrixSet.getMinY()) {
+			tileMatrixSet.setMinY(tileMatrixSetBoundingBox.getMinLatitude());
+			expandTileMatrixSet = true;
+		}
+		if (tileMatrixSetBoundingBox.getMaxLatitude() > tileMatrixSet.getMaxY()) {
+			tileMatrixSet.setMaxY(tileMatrixSetBoundingBox.getMaxLatitude());
+			expandTileMatrixSet = true;
+		}
+
+		// Update the tile matrix set
+		if (expandTileMatrixSet) {
+			TileMatrixSetDao tileMatrixSetDao = geoPackage
+					.getTileMatrixSetDao();
+			tileMatrixSetDao.update(tileMatrixSet);
+		}
 	}
 
 	/**
@@ -728,20 +792,6 @@ public class TileGenerator {
 				String.valueOf(boundingBox.getMaxLongitude()));
 
 		return url;
-	}
-
-	/**
-	 * Determine if the url has bounding box variables
-	 * 
-	 * @param url
-	 * @return
-	 */
-	private boolean hasBoundingBox(String url) {
-
-		String replacedUrl = replaceBoundingBox(url, boundingBox);
-		boolean hasBoundingBox = !replacedUrl.equals(url);
-
-		return hasBoundingBox;
 	}
 
 	/**

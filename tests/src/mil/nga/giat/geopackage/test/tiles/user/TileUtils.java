@@ -856,9 +856,8 @@ public class TileUtils {
 
 					long zoomLevel = dao.getZoomLevel(width);
 
-					BoundingBox setProjectionBoundingBox = new BoundingBox(
-							tileMatrixSet.getMinX(), tileMatrixSet.getMaxX(),
-							tileMatrixSet.getMinY(), tileMatrixSet.getMaxY());
+					BoundingBox setProjectionBoundingBox = tileMatrixSet
+							.getBoundingBox();
 					BoundingBox setWebMercatorBoundingBox = ProjectionFactory
 							.getProjection(
 									tileMatrixSet.getSrs()

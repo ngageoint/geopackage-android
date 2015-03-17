@@ -228,12 +228,14 @@ public interface GeoPackage {
 	 * Create a new tile table and the GeoPackage metadata
 	 * 
 	 * @param tableName
-	 * @param boundingBox
+	 * @param contentsBoundingBox
+	 * @param tileMatrixSetBoundingBox
 	 * @param srsId
 	 * @return tile matrix set
 	 */
 	public TileMatrixSet createTileTableWithMetadata(String tableName,
-			BoundingBox boundingBox, long srsId);
+			BoundingBox contentsBoundingBox,
+			BoundingBox tileMatrixSetBoundingBox, long srsId);
 
 	/**
 	 * Get a Data Columns DAO

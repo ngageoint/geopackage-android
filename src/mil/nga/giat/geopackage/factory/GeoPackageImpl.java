@@ -606,7 +606,8 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public TileMatrixSet createTileTableWithMetadata(String tableName,
-			BoundingBox boundingBox, long srsId) {
+			BoundingBox contentsBoundingBox,
+			BoundingBox tileMatrixSetBoundingBox, long srsId) {
 
 		TileMatrixSet tileMatrixSet = null;
 
@@ -629,10 +630,10 @@ class GeoPackageImpl implements GeoPackage {
 			contents.setDataType(ContentsDataType.TILES);
 			contents.setIdentifier(tableName);
 			contents.setLastChange(new Date());
-			contents.setMinX(boundingBox.getMinLongitude());
-			contents.setMinY(boundingBox.getMinLatitude());
-			contents.setMaxX(boundingBox.getMaxLongitude());
-			contents.setMaxY(boundingBox.getMaxLatitude());
+			contents.setMinX(contentsBoundingBox.getMinLongitude());
+			contents.setMinY(contentsBoundingBox.getMinLatitude());
+			contents.setMaxX(contentsBoundingBox.getMaxLongitude());
+			contents.setMaxY(contentsBoundingBox.getMaxLatitude());
 			contents.setSrs(srs);
 			getContentsDao().create(contents);
 
@@ -640,10 +641,10 @@ class GeoPackageImpl implements GeoPackage {
 			tileMatrixSet = new TileMatrixSet();
 			tileMatrixSet.setContents(contents);
 			tileMatrixSet.setSrs(contents.getSrs());
-			tileMatrixSet.setMinX(contents.getMinX());
-			tileMatrixSet.setMinY(contents.getMinY());
-			tileMatrixSet.setMaxX(contents.getMaxX());
-			tileMatrixSet.setMaxY(contents.getMaxY());
+			tileMatrixSet.setMinX(tileMatrixSetBoundingBox.getMinLongitude());
+			tileMatrixSet.setMinY(tileMatrixSetBoundingBox.getMinLatitude());
+			tileMatrixSet.setMaxX(tileMatrixSetBoundingBox.getMaxLongitude());
+			tileMatrixSet.setMaxY(tileMatrixSetBoundingBox.getMaxLatitude());
 			getTileMatrixSetDao().create(tileMatrixSet);
 
 		} catch (RuntimeException e) {

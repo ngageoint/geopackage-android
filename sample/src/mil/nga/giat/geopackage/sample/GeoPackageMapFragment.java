@@ -11,6 +11,7 @@ import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
+import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
@@ -1836,13 +1837,13 @@ public class GeoPackageMapFragment extends Fragment implements
 		overlayOptions.zIndex(-1);
 
 		TileMatrixSet tileMatrixSet = tileDao.getTileMatrixSet();
+		Contents contents = tileMatrixSet.getContents();
 		ProjectionTransform transform = ProjectionFactory.getProjection(
 				tileMatrixSet.getSrs().getOrganizationCoordsysId())
 				.getTransformation(
 						ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-		BoundingBox boundingBox = transform.transform(new BoundingBox(
-				tileMatrixSet.getMinX(), tileMatrixSet.getMaxX(), tileMatrixSet
-						.getMinY(), tileMatrixSet.getMaxY()));
+		BoundingBox boundingBox = transform
+				.transform(contents.getBoundingBox());
 		if (tilesBoundingBox == null) {
 			tilesBoundingBox = boundingBox;
 		} else {
@@ -2863,6 +2864,10 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	@Override
 	public void onLoadTilesPostExecute(String result) {
+		if (result != null) {
+			GeoPackageUtils.showMessage(getActivity(),
+					getString(R.string.geopackage_create_tiles_label), result);
+		}
 		loadTilesFinished();
 	}
 

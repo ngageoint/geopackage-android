@@ -2,6 +2,7 @@ package mil.nga.giat.geopackage.core.contents;
 
 import java.util.Date;
 
+import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
@@ -316,6 +317,17 @@ public class Contents {
 	 */
 	public ForeignCollection<TileMatrix> getTileMatrix() {
 		return tileMatrix;
+	}
+
+	/**
+	 * Get a bounding box
+	 * 
+	 * @return
+	 */
+	public BoundingBox getBoundingBox() {
+		BoundingBox boundingBox = new BoundingBox(getMinX(), getMaxX(),
+				getMinY(), getMaxY());
+		return boundingBox;
 	}
 
 }
