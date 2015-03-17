@@ -350,8 +350,7 @@ public class TileGenerator {
 			tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
 
 			// Update the tile bounds between the existing and this request
-			TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
-			updateTileBounds(tileDao, tileMatrixSet);
+			updateTileBounds(tileMatrixSet);
 		}
 
 		// Download and create the tiles
@@ -475,14 +474,23 @@ public class TileGenerator {
 	/**
 	 * Update the Content and Tile Matrix Set bounds
 	 * 
-	 * @param tileDao
 	 * @param tileMatrixSet
 	 * @throws SQLException
 	 */
-	private void updateTileBounds(TileDao tileDao, TileMatrixSet tileMatrixSet)
+	private void updateTileBounds(TileMatrixSet tileMatrixSet)
 			throws SQLException {
 
-		if (!tileDao.isGoogleTiles() && googleTiles) {
+		TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
+
+		if (tileDao.isGoogleTiles()) {
+			if (!googleTiles) {
+				// If adding GeoPackage tiles to a Google Tile format, do them
+				// as Google tiles
+				googleTiles = true;
+				adjustGoogleBounds();
+			}
+		} else if (googleTiles) {
+			// Can't add Google formatted tiles to GeoPackage tiles
 			throw new GeoPackageException(
 					"Can not add Google formatted tiles to "
 							+ tableName
