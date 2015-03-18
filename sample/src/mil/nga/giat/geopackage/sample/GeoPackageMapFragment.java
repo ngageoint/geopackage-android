@@ -146,7 +146,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * True when the map is visible
 	 */
 	private static boolean visible = false;
-	
+
 	/**
 	 * GeoPackage manager
 	 */
@@ -379,18 +379,7 @@ public class GeoPackageMapFragment extends Fragment implements
 		vibrator = (Vibrator) getActivity().getSystemService(
 				Context.VIBRATOR_SERVICE);
 
-//		if (view != null) {
-//			ViewGroup parent = (ViewGroup) view.getParent();
-//			if (parent != null) {
-//				parent.removeView(view);
-//			}
-//		}
-//
-//		try {
-			view = inflater.inflate(R.layout.fragment_map, container, false);
-//		} catch (InflateException e) {
-//
-//		}
+		view = inflater.inflate(R.layout.fragment_map, container, false);
 		map = getMapFragment().getMap();
 
 		setLoadTilesView();
@@ -413,8 +402,8 @@ public class GeoPackageMapFragment extends Fragment implements
 
 		GeoPackageFactory.initialize(getActivity());
 		manager = GeoPackageFactory.getManager(getActivity());
-		
-		if(visible){
+
+		if (visible) {
 			updateInBackground(active.isModified());
 		}
 
@@ -426,7 +415,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	private MapFragment getMapFragment() {
 		FragmentManager fm = null;
-		if (Build.VERSION.SDK_INT < 21/* TODO Build.VERSION_CODES.LOLLIPOP */) {
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT_WATCH) {
 			fm = getFragmentManager();
 		} else {
 			fm = getChildFragmentManager();

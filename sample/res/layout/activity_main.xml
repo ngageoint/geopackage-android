@@ -20,8 +20,7 @@
         android:id="@+id/fragment_manager"
         android:name="mil.nga.giat.geopackage.sample.GeoPackageManagerFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout="@layout/fragment_manager" />
+        android:layout_height="match_parent" />
 
     <fragment
         android:id="@+id/fragment_map"
