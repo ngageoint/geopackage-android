@@ -139,7 +139,6 @@ public class GeoPackageManagerFragment extends Fragment implements
 			Bundle savedInstanceState) {
 		active = GeoPackageDatabases.getInstance();
 		this.inflater = inflater;
-		GeoPackageFactory.initialize(getActivity());
 		manager = GeoPackageFactory.getManager(getActivity());
 		View v = inflater.inflate(R.layout.fragment_manager, null);
 		ExpandableListView elv = (ExpandableListView) v

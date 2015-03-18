@@ -400,7 +400,6 @@ public class GeoPackageMapFragment extends Fragment implements
 		map.setOnMarkerClickListener(this);
 		map.setOnMarkerDragListener(this);
 
-		GeoPackageFactory.initialize(getActivity());
 		manager = GeoPackageFactory.getManager(getActivity());
 
 		if (visible) {
