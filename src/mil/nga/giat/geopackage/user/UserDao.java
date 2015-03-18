@@ -102,12 +102,27 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	 * @param value
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public TCursor queryForEq(String fieldName, Object value) {
+		return queryForEq(fieldName, value, null, null, null);
+	}
+
+	/**
+	 * Query for the row where the field equals the value
+	 * 
+	 * @param fieldName
+	 * @param value
+	 * @param groupBy
+	 * @param having
+	 * @param orderBy
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public TCursor queryForEq(String fieldName, Object value, String groupBy,
+			String having, String orderBy) {
 		String where = buildWhere(fieldName, value);
 		String[] whereArgs = buildWhereArgs(value);
 		return (TCursor) db.query(getTableName(), table.getColumnNames(),
-				where, whereArgs, null, null, null);
+				where, whereArgs, groupBy, having, orderBy);
 	}
 
 	/**

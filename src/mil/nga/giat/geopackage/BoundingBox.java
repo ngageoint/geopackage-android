@@ -82,4 +82,50 @@ public class BoundingBox {
 		this.maxLatitude = maxLatitude;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(maxLatitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(maxLongitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(minLatitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(minLongitude);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BoundingBox other = (BoundingBox) obj;
+		if (Double.doubleToLongBits(maxLatitude) != Double
+				.doubleToLongBits(other.maxLatitude))
+			return false;
+		if (Double.doubleToLongBits(maxLongitude) != Double
+				.doubleToLongBits(other.maxLongitude))
+			return false;
+		if (Double.doubleToLongBits(minLatitude) != Double
+				.doubleToLongBits(other.minLatitude))
+			return false;
+		if (Double.doubleToLongBits(minLongitude) != Double
+				.doubleToLongBits(other.minLongitude))
+			return false;
+		return true;
+	}
+
 }

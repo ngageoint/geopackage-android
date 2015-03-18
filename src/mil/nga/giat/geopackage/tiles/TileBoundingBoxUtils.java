@@ -59,6 +59,35 @@ public class TileBoundingBoxUtils {
 	}
 
 	/**
+	 * Get the union bounding box combining the two bounding boxes
+	 * 
+	 * @param boundingBox
+	 * @param boundingBox2
+	 * @return
+	 */
+	public static BoundingBox union(BoundingBox boundingBox,
+			BoundingBox boundingBox2) {
+
+		double minLongitude = Math.min(boundingBox.getMinLongitude(),
+				boundingBox2.getMinLongitude());
+		double maxLongitude = Math.max(boundingBox.getMaxLongitude(),
+				boundingBox2.getMaxLongitude());
+		double minLatitude = Math.min(boundingBox.getMinLatitude(),
+				boundingBox2.getMinLatitude());
+		double maxLatitude = Math.max(boundingBox.getMaxLatitude(),
+				boundingBox2.getMaxLatitude());
+
+		BoundingBox union = null;
+
+		if (minLongitude < maxLongitude && minLatitude < maxLatitude) {
+			union = new BoundingBox(minLongitude, maxLongitude, minLatitude,
+					maxLatitude);
+		}
+
+		return union;
+	}
+
+	/**
 	 * Get the X pixel for where the longitude fits into the bounding box
 	 * 
 	 * @param width
@@ -438,7 +467,7 @@ public class TileBoundingBoxUtils {
 	 * @return tile column if in the range, -1 if before,
 	 *         {@link TileMatrix#getMatrixWidth()} if after
 	 */
-	private static long getTileColumn(BoundingBox webMercatorTotalBox,
+	public static long getTileColumn(BoundingBox webMercatorTotalBox,
 			long matrixWidth, double longitude) {
 
 		double minX = webMercatorTotalBox.getMinLongitude();
@@ -469,7 +498,7 @@ public class TileBoundingBoxUtils {
 	 * @return tile row if in the range, -1 if before,
 	 *         {@link TileMatrix#getMatrixHeight()} if after
 	 */
-	private static long getTileRow(BoundingBox webMercatorTotalBox,
+	public static long getTileRow(BoundingBox webMercatorTotalBox,
 			long matrixHeight, double latitude) {
 
 		double minY = webMercatorTotalBox.getMinLatitude();

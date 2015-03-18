@@ -204,4 +204,16 @@ public class TileMatrixSet {
 		return boundingBox;
 	}
 
+	/**
+	 * Set a bounding box
+	 * 
+	 * @param boundingBox
+	 */
+	public void setBoundingBox(BoundingBox boundingBox) {
+		setMinX(boundingBox.getMinLongitude());
+		setMaxX(boundingBox.getMaxLongitude());
+		setMinY(boundingBox.getMinLatitude());
+		setMaxY(boundingBox.getMaxLatitude());
+	}
+
 }

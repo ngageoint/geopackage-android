@@ -248,6 +248,18 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	}
 
 	/**
+	 * Query for Tiles at a zoom level in descending row and column order
+	 * 
+	 * @param zoomLevel
+	 * @return tile cursor, should be closed
+	 */
+	public TileCursor queryForTileDescending(long zoomLevel) {
+		return queryForEq(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel, null, null,
+				TileTable.COLUMN_TILE_ROW + " DESC, "
+						+ TileTable.COLUMN_TILE_COLUMN + " DESC");
+	}
+
+	/**
 	 * Query for Tiles at a zoom level and column
 	 * 
 	 * @param column
