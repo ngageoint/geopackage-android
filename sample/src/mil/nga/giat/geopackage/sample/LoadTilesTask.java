@@ -54,6 +54,7 @@ public class LoadTilesTask extends AsyncTask<String, Integer, String> implements
 		final LoadTilesTask loadTilesTask = new LoadTilesTask(activity,
 				callback, progressDialog, active);
 
+		GeoPackageFactory.initialize(activity);
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 		GeoPackage geoPackage = manager.open(database);
 		TileGenerator tileGenerator = new TileGenerator(activity, geoPackage,

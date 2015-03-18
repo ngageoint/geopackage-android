@@ -1,7 +1,6 @@
 package mil.nga.giat.geopackage.sample;
 
-import mil.nga.giat.geopackage.geom.unit.AndroidProjectionParameterRetriever;
-import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
+import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -20,10 +19,6 @@ import android.view.MenuItem;
  */
 public class MainActivity extends Activity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
-
-	public static final int ACTIVITY_CHOOSE_FILE = 3342;
-	
-	public static final int ACTIVITY_SHARE_FILE = 3343;
 
 	/**
 	 * Manager drawer position
@@ -53,78 +48,58 @@ public class MainActivity extends Activity implements
 	private int navigationPosition = MANAGER_POSITION;
 
 	/**
-	 * Active or checked databases
-	 */
-	private GeoPackageDatabases active;
-
-	/**
 	 * Map fragment
 	 */
-	private GeoPackageMapFragment mapFragment = GeoPackageMapFragment
-			.newInstance();
+	private GeoPackageMapFragment mapFragment;
 
 	/**
 	 * Manager fragment
 	 */
-	private GeoPackageManagerFragment managerFragment = GeoPackageManagerFragment
-			.newInstance();
+	private GeoPackageManagerFragment managerFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// Initialize the active GeoPackages
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		GeoPackageDatabases.initialize(settings);
+
+		// Set the content view
 		setContentView(R.layout.activity_main);
 
-		// Initialize the projection factory
-		AndroidProjectionParameterRetriever projectionRetriever = new AndroidProjectionParameterRetriever(this);
-		ProjectionFactory.initialize(projectionRetriever);
-		
-		// if (savedInstanceState != null) {
-		// mapFragment = (GeoPackageMapFragment) getFragmentManager()
-		// .getFragment(savedInstanceState, "mapFragment");
-		// managerFragment = (GeoPackageManagerFragment) getFragmentManager()
-		// .getFragment(savedInstanceState, "managerFragment");
-		// }
-		// if (mapFragment == null) {
-		// mapFragment = GeoPackageMapFragment.newInstance();
-		// }
-		// if (managerFragment == null) {
-		// managerFragment = GeoPackageManagerFragment.newInstance();
-		// }
-
+		// Retrieve the fragments
+		managerFragment = (GeoPackageManagerFragment) getFragmentManager()
+				.findFragmentById(R.id.fragment_manager);
+		mapFragment = (GeoPackageMapFragment) getFragmentManager()
+				.findFragmentById(R.id.fragment_map);
 		navigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
+
 		title = getString(R.string.title_manager);
 
 		// Set up the drawer.
 		navigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+
+		// Set the first position
+		onNavigationDrawerItemSelected(navigationPosition);
 	}
 
-	@Override
-	public void onResume() {
-		active = new GeoPackageDatabases();
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		active.setPreferences(settings);
-		active.loadFromPreferences();
-		mapFragment.setActive(active);
-		managerFragment.setActive(active);
-		super.onResume();
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		// if (mapFragment.isAdded()) {
-		// getFragmentManager().putFragment(outState, "mapFragment",
-		// mapFragment);
-		// }
-		// if (managerFragment.isAdded()) {
-		// getFragmentManager().putFragment(outState, "managerFragment",
-		// managerFragment);
-		// }
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Set the selected position
+	 */
 	@Override
 	public void onNavigationDrawerItemSelected(int position) {
 		// update the main content by replacing fragments
@@ -135,32 +110,28 @@ public class MainActivity extends Activity implements
 		switch (position) {
 
 		case MANAGER_POSITION:
-			if (managerFragment.isAdded()) {
+			if (managerFragment != null) {
 				transaction.show(managerFragment);
-			} else {
-				transaction.add(R.id.container, managerFragment);
+				title = getString(R.string.title_manager);
 			}
-			title = getString(R.string.title_manager);
 			break;
 		case MAP_POSITION:
-			if (mapFragment.isAdded()) {
+			if (mapFragment != null) {
 				transaction.show(mapFragment);
-			} else {
-				transaction.add(R.id.container, mapFragment);
+				title = getString(R.string.title_map);
 			}
-			title = getString(R.string.title_map);
 			break;
 		default:
 
 		}
 
 		if (position != MANAGER_POSITION) {
-			if (managerFragment.isAdded()) {
+			if (managerFragment != null && managerFragment.isAdded()) {
 				transaction.hide(managerFragment);
 			}
 		}
 		if (position != MAP_POSITION) {
-			if (mapFragment.isAdded()) {
+			if (mapFragment != null && mapFragment.isAdded()) {
 				transaction.hide(mapFragment);
 			}
 		}
@@ -170,13 +141,9 @@ public class MainActivity extends Activity implements
 		transaction.commit();
 	}
 
-	public void restoreActionBar() {
-		ActionBar actionBar = getActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-		actionBar.setDisplayShowTitleEnabled(true);
-		actionBar.setTitle(title);
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		if (!navigationDrawerFragment.isDrawerOpen()) {
@@ -200,6 +167,19 @@ public class MainActivity extends Activity implements
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	/**
+	 * Restore the action bar
+	 */
+	public void restoreActionBar() {
+		ActionBar actionBar = getActionBar();
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		actionBar.setDisplayShowTitleEnabled(true);
+		actionBar.setTitle(title);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 

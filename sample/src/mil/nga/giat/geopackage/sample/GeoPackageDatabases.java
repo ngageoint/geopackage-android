@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import mil.nga.giat.geopackage.GeoPackageException;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
@@ -19,6 +20,36 @@ public class GeoPackageDatabases {
 	private static final String DATABASES_PREFERENCE = "databases";
 	private static final String TILE_TABLES_PREFERENCE_SUFFIX = "_tile_tables";
 	private static final String FEATURE_TABLES_PREFERENCE_SUFFIX = "_feature_tables";
+
+	/**
+	 * Singleton instance
+	 */
+	private static GeoPackageDatabases instance;
+
+	/**
+	 * Initialize the singleton instance and load from preferences
+	 * 
+	 * @param preferences
+	 */
+	public static void initialize(SharedPreferences preferences) {
+		if (instance == null) {
+			instance = new GeoPackageDatabases();
+			instance.setPreferences(preferences);
+			instance.loadFromPreferences();
+		}
+	}
+
+	/**
+	 * Get the singleton instance
+	 * 
+	 * @return
+	 */
+	public static GeoPackageDatabases getInstance() {
+		if (instance == null) {
+			throw new GeoPackageException("Not initialized");
+		}
+		return instance;
+	}
 
 	/**
 	 * Map of databases
@@ -38,7 +69,7 @@ public class GeoPackageDatabases {
 	/**
 	 * Constructor
 	 */
-	public GeoPackageDatabases() {
+	private GeoPackageDatabases() {
 
 	}
 
@@ -180,6 +211,7 @@ public class GeoPackageDatabases {
 	 * Load the GeoPackage databases from the saved preferences
 	 */
 	public void loadFromPreferences() {
+		databases.clear();
 		Set<String> databases = settings.getStringSet(DATABASES_PREFERENCE,
 				new HashSet<String>());
 		for (String database : databases) {

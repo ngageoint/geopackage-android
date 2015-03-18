@@ -57,7 +57,6 @@ import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -95,7 +94,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
 
 /**
- * Map Fragment for showing GeoPackage features and tiles
+ * GeoPackage Map Fragment
  * 
  * @author osbornb
  */
@@ -112,16 +111,6 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Map type key for saving to preferences
 	 */
 	private static final String MAP_TYPE_KEY = "map_type_key";
-
-	/**
-	 * Get a new instance of the fragment
-	 * 
-	 * @return
-	 */
-	public static GeoPackageMapFragment newInstance() {
-		GeoPackageMapFragment mapFragment = new GeoPackageMapFragment();
-		return mapFragment;
-	}
 
 	/**
 	 * Active GeoPackages
@@ -153,6 +142,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	 */
 	private static View editFeaturesPolygonHoleView;
 
+	/**
+	 * True when the map is visible
+	 */
+	private static boolean visible = false;
+	
 	/**
 	 * GeoPackage manager
 	 */
@@ -365,39 +359,38 @@ public class GeoPackageMapFragment extends Fragment implements
 	}
 
 	/**
-	 * Set the active databases
-	 * 
-	 * @param active
+	 * {@inheritDoc}
 	 */
-	public void setActive(GeoPackageDatabases active) {
-		this.active = active;
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
+		active = GeoPackageDatabases.getInstance();
+
 		vibrator = (Vibrator) getActivity().getSystemService(
 				Context.VIBRATOR_SERVICE);
 
-		if (view != null) {
-			ViewGroup parent = (ViewGroup) view.getParent();
-			if (parent != null) {
-				parent.removeView(view);
-			}
-		}
-
-		try {
+//		if (view != null) {
+//			ViewGroup parent = (ViewGroup) view.getParent();
+//			if (parent != null) {
+//				parent.removeView(view);
+//			}
+//		}
+//
+//		try {
 			view = inflater.inflate(R.layout.fragment_map, container, false);
-		} catch (InflateException e) {
-
-		}
+//		} catch (InflateException e) {
+//
+//		}
 		map = getMapFragment().getMap();
 
 		setLoadTilesView();
@@ -418,12 +411,19 @@ public class GeoPackageMapFragment extends Fragment implements
 		map.setOnMarkerClickListener(this);
 		map.setOnMarkerDragListener(this);
 
+		GeoPackageFactory.initialize(getActivity());
 		manager = GeoPackageFactory.getManager(getActivity());
-		updateInBackground(true);
+		
+		if(visible){
+			updateInBackground(active.isModified());
+		}
 
 		return touch;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	private MapFragment getMapFragment() {
 		FragmentManager fm = null;
 		if (Build.VERSION.SDK_INT < 21/* TODO Build.VERSION_CODES.LOLLIPOP */) {
@@ -920,20 +920,30 @@ public class GeoPackageMapFragment extends Fragment implements
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onResume() {
 		super.onResume();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public View getView() {
 		return view;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
 		map.setMyLocationEnabled(!hidden);
+		visible = !hidden;
 
 		if (!hidden && active.isModified()) {
 			active.setModified(false);
@@ -1504,8 +1514,13 @@ public class GeoPackageMapFragment extends Fragment implements
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					map.animateCamera(CameraUpdateFactory.newLatLngBounds(
-							boundsBuilder.build(), padding));
+					try {
+						map.animateCamera(CameraUpdateFactory.newLatLngBounds(
+								boundsBuilder.build(), padding));
+					} catch (Exception e) {
+						Log.w(GeoPackageMapFragment.class.getSimpleName(),
+								"Unable to move camera", e);
+					}
 				}
 			});
 		}

@@ -16,6 +16,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <fragment
+        android:id="@+id/fragment_manager"
+        android:name="mil.nga.giat.geopackage.sample.GeoPackageManagerFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_manager" />
+
+    <fragment
+        android:id="@+id/fragment_map"
+        android:name="mil.nga.giat.geopackage.sample.GeoPackageMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    
     <!--
          android:layout_gravity="start" tells DrawerLayout to treat
          this as a sliding drawer on the left side for left-to-right

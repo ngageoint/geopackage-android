@@ -72,23 +72,22 @@ import android.widget.TextView;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
 /**
- * Manager Fragment, import, view, select, edit GeoPackages
+ * GeoPackage Manager Fragment
  * 
  * @author osbornb
- * 
  */
 public class GeoPackageManagerFragment extends Fragment implements
 		ILoadTilesTask {
 
 	/**
-	 * Get a new fragment instance
-	 * 
-	 * @return
+	 * Intent activity request code when choosing a file
 	 */
-	public static GeoPackageManagerFragment newInstance() {
-		GeoPackageManagerFragment listFragment = new GeoPackageManagerFragment();
-		return listFragment;
-	}
+	public static final int ACTIVITY_CHOOSE_FILE = 3342;
+
+	/**
+	 * Intent activity request code when sharing a file
+	 */
+	public static final int ACTIVITY_SHARE_FILE = 3343;
 
 	/**
 	 * Active GeoPackages
@@ -133,18 +132,14 @@ public class GeoPackageManagerFragment extends Fragment implements
 	}
 
 	/**
-	 * Constructor
-	 * 
-	 * @param active
+	 * {@inheritDoc}
 	 */
-	public void setActive(GeoPackageDatabases active) {
-		this.active = active;
-	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		active = GeoPackageDatabases.getInstance();
 		this.inflater = inflater;
+		GeoPackageFactory.initialize(getActivity());
 		manager = GeoPackageFactory.getManager(getActivity());
 		View v = inflater.inflate(R.layout.fragment_manager, null);
 		ExpandableListView elv = (ExpandableListView) v
@@ -176,12 +171,18 @@ public class GeoPackageManagerFragment extends Fragment implements
 		return v;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onResume() {
 		super.onResume();
 		update();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
@@ -599,7 +600,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 							shareIntent,
 							getResources().getText(
 									R.string.geopackage_share_label)),
-					MainActivity.ACTIVITY_SHARE_FILE);
+					ACTIVITY_SHARE_FILE);
 		} catch (Exception e) {
 			GeoPackageUtils.showMessage(getActivity(),
 					getString(R.string.geopackage_share_label), e.getMessage());
@@ -1807,7 +1808,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 			chooseFile.setType("*/*");
 			Intent intent = Intent.createChooser(chooseFile,
 					"Choose a GeoPackage file");
-			startActivityForResult(intent, MainActivity.ACTIVITY_CHOOSE_FILE);
+			startActivityForResult(intent, ACTIVITY_CHOOSE_FILE);
 		} catch (Exception e) {
 			// eat
 		}
@@ -1819,13 +1820,13 @@ public class GeoPackageManagerFragment extends Fragment implements
 		boolean handled = true;
 
 		switch (requestCode) {
-		case MainActivity.ACTIVITY_CHOOSE_FILE:
+		case ACTIVITY_CHOOSE_FILE:
 			if (resultCode == Activity.RESULT_OK) {
 				importFile(data);
 			}
 			break;
 
-		case MainActivity.ACTIVITY_SHARE_FILE:
+		case ACTIVITY_SHARE_FILE:
 			// Delete any cached database files
 			File databaseCache = getDatabaseCacheDirectory();
 			if (databaseCache.exists()) {

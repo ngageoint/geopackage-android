@@ -1,6 +1,6 @@
 package mil.nga.giat.geopackage.geom.unit;
 
-import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 
 /**
@@ -17,17 +17,17 @@ public class AndroidProjectionParameterRetriever implements
 	private static final String RESOURCE_PREFIX = "projection_epsg_";
 
 	/**
-	 * Activity
+	 * Context
 	 */
-	private final Activity activity;
+	private final Context context;
 
 	/**
 	 * Constructor
 	 * 
-	 * @param activity
+	 * @param context
 	 */
-	public AndroidProjectionParameterRetriever(Activity activity) {
-		this.activity = activity;
+	public AndroidProjectionParameterRetriever(Context context) {
+		this.context = context;
 	}
 
 	/**
@@ -38,22 +38,22 @@ public class AndroidProjectionParameterRetriever implements
 		String projectionString = null;
 		if (epsg > 0) {
 			try {
-				projectionString = activity.getString(activity.getResources()
+				projectionString = context.getString(context.getResources()
 						.getIdentifier(RESOURCE_PREFIX + epsg, "string",
-								activity.getPackageName()));
+								context.getPackageName()));
 			} catch (Exception e) {
 				Log.w(AndroidProjectionParameterRetriever.class.getSimpleName(),
 						"No Projection Found for EPSG Code: " + epsg);
 			}
 		}
 		if (projectionString == null) {
-			projectionString = activity
-					.getString(activity
+			projectionString = context
+					.getString(context
 							.getResources()
 							.getIdentifier(
 									RESOURCE_PREFIX
 											+ ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM,
-									"string", activity.getPackageName()));
+									"string", context.getPackageName()));
 		}
 		return projectionString;
 	}

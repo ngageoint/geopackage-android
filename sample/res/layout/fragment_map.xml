@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        class="com.google.android.gms.maps.MapFragment" />
+        android:name="com.google.android.gms.maps.MapFragment" />
 
     <LinearLayout
         android:id="@+id/mapLoadTilesButtons"
