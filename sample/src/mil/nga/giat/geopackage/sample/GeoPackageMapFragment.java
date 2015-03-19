@@ -374,7 +374,7 @@ public class GeoPackageMapFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		active = GeoPackageDatabases.getInstance();
+		active = GeoPackageDatabases.getInstance(getActivity());
 
 		vibrator = (Vibrator) getActivity().getSystemService(
 				Context.VIBRATOR_SERVICE);

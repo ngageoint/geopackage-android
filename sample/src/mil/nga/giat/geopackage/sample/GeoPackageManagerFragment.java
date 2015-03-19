@@ -137,7 +137,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		active = GeoPackageDatabases.getInstance();
+		active = GeoPackageDatabases.getInstance(getActivity());
 		this.inflater = inflater;
 		manager = GeoPackageFactory.getManager(getActivity());
 		View v = inflater.inflate(R.layout.fragment_manager, null);

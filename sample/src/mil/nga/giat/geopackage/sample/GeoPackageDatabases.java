@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-import mil.nga.giat.geopackage.GeoPackageException;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 
 /**
  * Collection of active GeoPackage database tables
@@ -17,8 +20,19 @@ import android.content.SharedPreferences.Editor;
  */
 public class GeoPackageDatabases {
 
+	/**
+	 * Database preferences value
+	 */
 	private static final String DATABASES_PREFERENCE = "databases";
+	
+	/**
+	 * Tile Tables Preference suffix
+	 */
 	private static final String TILE_TABLES_PREFERENCE_SUFFIX = "_tile_tables";
+	
+	/**
+	 * Feature Tables Preference suffix
+	 */
 	private static final String FEATURE_TABLES_PREFERENCE_SUFFIX = "_feature_tables";
 
 	/**
@@ -27,26 +41,31 @@ public class GeoPackageDatabases {
 	private static GeoPackageDatabases instance;
 
 	/**
-	 * Initialize the singleton instance and load from preferences
-	 * 
-	 * @param preferences
+	 * Initialization lock
 	 */
-	public static void initialize(SharedPreferences preferences) {
-		if (instance == null) {
-			instance = new GeoPackageDatabases();
-			instance.setPreferences(preferences);
-			instance.loadFromPreferences();
-		}
-	}
+	private static final Lock initializeLock = new ReentrantLock();
 
 	/**
 	 * Get the singleton instance
 	 * 
+	 * @param context
 	 * @return
 	 */
-	public static GeoPackageDatabases getInstance() {
+	public static GeoPackageDatabases getInstance(Context context) {
 		if (instance == null) {
-			throw new GeoPackageException("Not initialized");
+			try {
+				initializeLock.lock();
+				if (instance == null) {
+					SharedPreferences preferences = PreferenceManager
+							.getDefaultSharedPreferences(context);
+					GeoPackageDatabases active = new GeoPackageDatabases();
+					active.setPreferences(preferences);
+					active.loadFromPreferences();
+					instance = active;
+				}
+			} finally {
+				initializeLock.unlock();
+			}
 		}
 		return instance;
 	}

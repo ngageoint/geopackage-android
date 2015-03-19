@@ -1,13 +1,10 @@
 package mil.nga.giat.geopackage.sample;
 
-import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -60,11 +57,6 @@ public class MainActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		// Initialize the active GeoPackages
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		GeoPackageDatabases.initialize(settings);
 
 		// Set the content view
 		setContentView(R.layout.activity_main);
