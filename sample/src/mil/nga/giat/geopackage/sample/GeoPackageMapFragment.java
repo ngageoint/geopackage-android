@@ -2,10 +2,17 @@ package mil.nga.giat.geopackage.sample;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
@@ -345,6 +352,11 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Bounding box around the features on the map
 	 */
 	private BoundingBox featuresBoundingBox;
+
+	/**
+	 * Lock for concurrently updating the features bounding box
+	 */
+	private Lock featuresBoundingBoxLock = new ReentrantLock();
 
 	/**
 	 * Bounding box around the tiles on the map
@@ -733,8 +745,8 @@ public class GeoPackageMapFragment extends Fragment implements
 							featureDao.getProjection());
 					GoogleMapShape shape = converter.toShape(geometry);
 					prepareShapeOptions(shape, true, true);
-					GoogleMapShape mapShape = converter.addShapeToMap(map,
-							shape);
+					GoogleMapShape mapShape = GoogleMapShapeConverter
+							.addShapeToMap(map, shape);
 					addEditableShape(featureId, mapShape);
 				}
 			}
@@ -1348,12 +1360,6 @@ public class GeoPackageMapFragment extends Fragment implements
 	private class MapUpdateTask extends AsyncTask<Object, Object, Integer> {
 
 		/**
-		 * Shape converter
-		 */
-		private final GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
-				null);
-
-		/**
 		 * Updating tiles and features toast
 		 */
 		private Toast updateToast;
@@ -1369,6 +1375,11 @@ public class GeoPackageMapFragment extends Fragment implements
 		private int maxFeatures;
 
 		/**
+		 * Update start time
+		 */
+		private Date startTime;
+
+		/**
 		 * {@inheritDoc}
 		 */
 		@Override
@@ -1376,6 +1387,7 @@ public class GeoPackageMapFragment extends Fragment implements
 			updateToast = Toast.makeText(getActivity(),
 					"Updating Tiles and Features", Toast.LENGTH_LONG);
 			updateToast.show();
+			startTime = new Date();
 		}
 
 		/**
@@ -1394,12 +1406,16 @@ public class GeoPackageMapFragment extends Fragment implements
 		 */
 		@Override
 		protected void onProgressUpdate(Object... shapeUpdate) {
-			GoogleMapShape mapShape = converter.addShapeToMap(map,
-					(GoogleMapShape) shapeUpdate[1]);
+			GoogleMapShape shape = (GoogleMapShape) shapeUpdate[1];
+
+			GoogleMapShape mapShape = GoogleMapShapeConverter.addShapeToMap(
+					map, shape);
 
 			if (editFeaturesMode) {
-				addEditableShape((Long) shapeUpdate[0], mapShape);
+				long featureId = (Long) shapeUpdate[0];
+				addEditableShape(featureId, mapShape);
 			}
+
 		}
 
 		/**
@@ -1407,14 +1423,20 @@ public class GeoPackageMapFragment extends Fragment implements
 		 */
 		@Override
 		protected void onPostExecute(Integer count) {
+			Date stopTime = new Date();
+			DecimalFormat format = new DecimalFormat("0.##");
+			String time = format.format((stopTime.getTime() - startTime
+					.getTime()) / 1000.0);
 			updateToast.cancel();
 			if (count > 0) {
 				if (count >= maxFeatures) {
-					Toast.makeText(getActivity(),
-							"Max Features Drawn: " + count, Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(
+							getActivity(),
+							"Max Features Drawn: " + count + " (" + time
+									+ " sec)", Toast.LENGTH_SHORT).show();
 				} else {
-					Toast.makeText(getActivity(), "Features Drawn: " + count,
+					Toast.makeText(getActivity(),
+							"Features Drawn: " + count + " (" + time + " sec)",
 							Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -1425,6 +1447,9 @@ public class GeoPackageMapFragment extends Fragment implements
 
 		/**
 		 * Add a shape to the map
+		 * 
+		 * @param featureId
+		 * @param shape
 		 */
 		public void addToMap(long featureId, GoogleMapShape shape) {
 			publishProgress(new Object[] { featureId, shape });
@@ -1439,9 +1464,9 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * @param maxFeatures
 	 * @return feature count
 	 */
-	private int update(MapUpdateTask task, int maxFeatures) {
+	private int update(MapUpdateTask task, final int maxFeatures) {
 
-		int count = 0;
+		AtomicInteger count = new AtomicInteger();
 
 		if (active != null) {
 
@@ -1502,17 +1527,28 @@ public class GeoPackageMapFragment extends Fragment implements
 				}
 			}
 
+			// Get the thread pool size, or 0 if single threaded
+			int threadPoolSize = getActivity().getResources().getInteger(
+					R.integer.map_update_thread_pool_size);
+
+			// Create a thread pool for processing features
+			ExecutorService threadPool = null;
+			if (threadPoolSize > 0) {
+				threadPool = Executors.newFixedThreadPool(threadPoolSize);
+			}
+
 			for (Map.Entry<String, List<String>> databaseFeatures : featureTables
 					.entrySet()) {
 
-				if (count >= maxFeatures) {
+				if (count.get() >= maxFeatures) {
 					break;
 				}
 
 				for (String features : databaseFeatures.getValue()) {
-					count += displayFeatures(task, databaseFeatures.getKey(),
-							features, maxFeatures - count, editFeaturesMode);
-					if (task.isCancelled() || count >= maxFeatures) {
+					displayFeatures(task, threadPool,
+							databaseFeatures.getKey(), features, count,
+							maxFeatures, editFeaturesMode);
+					if (task.isCancelled() || count.get() >= maxFeatures) {
 						break;
 					}
 				}
@@ -1522,9 +1558,21 @@ public class GeoPackageMapFragment extends Fragment implements
 				}
 			}
 
+			if (threadPool != null) {
+				threadPool.shutdown();
+				if (!task.isCancelled() && count.get() < maxFeatures) {
+					try {
+						threadPool.awaitTermination(10000 /* TODO */,
+								TimeUnit.MILLISECONDS);
+					} catch (InterruptedException e) {
+						Log.w(GeoPackageMapFragment.class.getSimpleName(), e);
+					}
+				}
+			}
+
 		}
 
-		return count;
+		return Math.min(count.get(), maxFeatures);
 	}
 
 	/**
@@ -1575,56 +1623,164 @@ public class GeoPackageMapFragment extends Fragment implements
 	 * Display features
 	 * 
 	 * @param task
+	 * @param threadPool
 	 * @param database
 	 * @param features
+	 * @param count
 	 * @param maxFeatures
 	 * @param editable
-	 * @return count of features added
 	 */
-	private int displayFeatures(MapUpdateTask task, String database,
-			String features, int maxFeatures, final boolean editable) {
+	private void displayFeatures(MapUpdateTask task,
+			ExecutorService threadPool, String database, String features,
+			AtomicInteger count, final int maxFeatures, final boolean editable) {
 
-		int count = 0;
-
+		// Get the GeoPackage and feature DAO
 		GeoPackage geoPackage = geoPackages.get(database);
-
 		FeatureDao featureDao = geoPackage.getFeatureDao(features);
 
+		// Query for all rows
 		FeatureCursor cursor = featureDao.queryForAll();
 		try {
-
-			final GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
-					featureDao.getProjection());
-
-			while (!task.isCancelled() && count < maxFeatures
+			while (!task.isCancelled() && count.get() < maxFeatures
 					&& cursor.moveToNext()) {
 				FeatureRow row = cursor.getRow();
-				final long featureId = row.getId();
-				GeoPackageGeometryData geometryData = row.getGeometry();
-				if (geometryData != null && !geometryData.isEmpty()) {
 
-					final Geometry geometry = geometryData.getGeometry();
-
-					if (geometry != null) {
-						count++;
-						final GoogleMapShape shape = converter
-								.toShape(geometry);
-						if (featuresBoundingBox != null) {
-							shape.boundingBox(featuresBoundingBox);
-						} else {
-							featuresBoundingBox = shape.boundingBox();
-						}
-						prepareShapeOptions(shape, editable, true);
-						task.addToMap(featureId, shape);
-					}
+				if (threadPool != null) {
+					// Process the feature row in the thread pool
+					FeatureRowProcessor processor = new FeatureRowProcessor(
+							task, featureDao, row, count, maxFeatures, editable);
+					threadPool.execute(processor);
+				} else {
+					processFeatureRow(task, featureDao, row, count,
+							maxFeatures, editable);
 				}
 			}
 
 		} finally {
 			cursor.close();
 		}
+	}
 
-		return count;
+	/**
+	 * Single feature row processor
+	 * 
+	 * @author osbornb
+	 */
+	private class FeatureRowProcessor implements Runnable {
+
+		/**
+		 * Map update task
+		 */
+		private final MapUpdateTask task;
+
+		/**
+		 * Feature DAO
+		 */
+		private final FeatureDao featureDao;
+
+		/**
+		 * Feature row
+		 */
+		private final FeatureRow row;
+
+		/**
+		 * Total feature count
+		 */
+		private final AtomicInteger count;
+
+		/**
+		 * Total max features
+		 */
+		private final int maxFeatures;
+
+		/**
+		 * Editable shape flag
+		 */
+		private final boolean editable;
+
+		/**
+		 * Constructor
+		 * 
+		 * @param task
+		 * @param featureDao
+		 * @param row
+		 * @param count
+		 * @param maxFeatures
+		 * @param editable
+		 */
+		public FeatureRowProcessor(MapUpdateTask task, FeatureDao featureDao,
+				FeatureRow row, AtomicInteger count, int maxFeatures,
+				boolean editable) {
+			this.task = task;
+			this.featureDao = featureDao;
+			this.row = row;
+			this.count = count;
+			this.maxFeatures = maxFeatures;
+			this.editable = editable;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void run() {
+			processFeatureRow(task, featureDao, row, count, maxFeatures,
+					editable);
+		}
+
+	}
+
+	/**
+	 * Process the feature row
+	 * 
+	 * @param task
+	 * @param featureDao
+	 * @param row
+	 * @param count
+	 * @param maxFeatures
+	 * @param editable
+	 */
+	private void processFeatureRow(MapUpdateTask task, FeatureDao featureDao,
+			FeatureRow row, AtomicInteger count, int maxFeatures,
+			boolean editable) {
+		mil.nga.giat.geopackage.geom.unit.Projection projection = featureDao
+				.getProjection();
+		final GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+				projection);
+
+		final long featureId = row.getId();
+		GeoPackageGeometryData geometryData = row.getGeometry();
+		if (geometryData != null && !geometryData.isEmpty()) {
+
+			final Geometry geometry = geometryData.getGeometry();
+
+			if (geometry != null) {
+				if (count.getAndIncrement() < maxFeatures) {
+					final GoogleMapShape shape = converter.toShape(geometry);
+					updateFeaturesBoundingBox(shape);
+					prepareShapeOptions(shape, editable, true);
+					task.addToMap(featureId, shape);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update the features bounding box with the shape
+	 * 
+	 * @param shape
+	 */
+	private void updateFeaturesBoundingBox(GoogleMapShape shape) {
+		try {
+			featuresBoundingBoxLock.lock();
+			if (featuresBoundingBox != null) {
+				shape.expandBoundingBox(featuresBoundingBox);
+			} else {
+				featuresBoundingBox = shape.boundingBox();
+			}
+		} finally {
+			featuresBoundingBoxLock.unlock();
+		}
 	}
 
 	/**

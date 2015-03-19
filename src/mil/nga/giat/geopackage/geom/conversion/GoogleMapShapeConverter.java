@@ -1137,7 +1137,8 @@ public class GoogleMapShapeConverter {
 	 * @param shape
 	 * @return
 	 */
-	public GoogleMapShape addShapeToMap(GoogleMap map, GoogleMapShape shape) {
+	public static GoogleMapShape addShapeToMap(GoogleMap map,
+			GoogleMapShape shape) {
 
 		GoogleMapShape addedShape = null;
 
@@ -1205,7 +1206,7 @@ public class GoogleMapShapeConverter {
 	 * @param latLng
 	 * @return
 	 */
-	public Marker addLatLngToMap(GoogleMap map, LatLng latLng) {
+	public static Marker addLatLngToMap(GoogleMap map, LatLng latLng) {
 		return addLatLngToMap(map, latLng, new MarkerOptions());
 	}
 
@@ -1216,7 +1217,8 @@ public class GoogleMapShapeConverter {
 	 * @param options
 	 * @return
 	 */
-	public Marker addMarkerOptionsToMap(GoogleMap map, MarkerOptions options) {
+	public static Marker addMarkerOptionsToMap(GoogleMap map,
+			MarkerOptions options) {
 		return map.addMarker(options);
 	}
 
@@ -1228,7 +1230,7 @@ public class GoogleMapShapeConverter {
 	 * @param options
 	 * @return
 	 */
-	public Marker addLatLngToMap(GoogleMap map, LatLng latLng,
+	public static Marker addLatLngToMap(GoogleMap map, LatLng latLng,
 			MarkerOptions options) {
 		return map.addMarker(options.position(latLng));
 	}
@@ -1240,7 +1242,8 @@ public class GoogleMapShapeConverter {
 	 * @param polyline
 	 * @return
 	 */
-	public Polyline addPolylineToMap(GoogleMap map, PolylineOptions polyline) {
+	public static Polyline addPolylineToMap(GoogleMap map,
+			PolylineOptions polyline) {
 		return map.addPolyline(polyline);
 	}
 
@@ -1251,7 +1254,7 @@ public class GoogleMapShapeConverter {
 	 * @param polygon
 	 * @return
 	 */
-	public com.google.android.gms.maps.model.Polygon addPolygonToMap(
+	public static com.google.android.gms.maps.model.Polygon addPolygonToMap(
 			GoogleMap map, PolygonOptions polygon) {
 		return map.addPolygon(polygon);
 	}
@@ -1263,7 +1266,7 @@ public class GoogleMapShapeConverter {
 	 * @param latLngs
 	 * @return
 	 */
-	public MultiMarker addLatLngsToMap(GoogleMap map, MultiLatLng latLngs) {
+	public static MultiMarker addLatLngsToMap(GoogleMap map, MultiLatLng latLngs) {
 		MultiMarker multiMarker = new MultiMarker();
 		for (LatLng latLng : latLngs.getLatLngs()) {
 			MarkerOptions markerOptions = new MarkerOptions();
@@ -1287,7 +1290,7 @@ public class GoogleMapShapeConverter {
 	 * @param polylines
 	 * @return
 	 */
-	public MultiPolyline addPolylinesToMap(GoogleMap map,
+	public static MultiPolyline addPolylinesToMap(GoogleMap map,
 			MultiPolylineOptions polylines) {
 		MultiPolyline multiPolyline = new MultiPolyline();
 		for (PolylineOptions polylineOption : polylines.getPolylineOptions()) {
@@ -1307,7 +1310,7 @@ public class GoogleMapShapeConverter {
 	 * @param polygons
 	 * @return
 	 */
-	public mil.nga.giat.geopackage.geom.conversion.MultiPolygon addPolygonsToMap(
+	public static mil.nga.giat.geopackage.geom.conversion.MultiPolygon addPolygonsToMap(
 			GoogleMap map, MultiPolygonOptions polygons) {
 		mil.nga.giat.geopackage.geom.conversion.MultiPolygon multiPolygon = new mil.nga.giat.geopackage.geom.conversion.MultiPolygon();
 		for (PolygonOptions polygonOption : polygons.getPolygonOptions()) {

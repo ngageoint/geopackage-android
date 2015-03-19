@@ -1,8 +1,5 @@
 package mil.nga.giat.geopackage.geom.unit;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.osgeo.proj4j.CoordinateReferenceSystem;
 
 /**
@@ -21,11 +18,6 @@ public class Projection {
 	 * Coordinate Reference System
 	 */
 	private final CoordinateReferenceSystem crs;
-
-	/**
-	 * Mapping of transformations to other EPSG codes
-	 */
-	private final Map<Long, ProjectionTransform> transforms = new HashMap<Long, ProjectionTransform>();
 
 	/**
 	 * Constructor
@@ -57,43 +49,26 @@ public class Projection {
 	}
 
 	/**
-	 * Get the transformation from this Projection to the EPSG code
+	 * Get the transformation from this Projection to the EPSG code. Each thread
+	 * of execution should have it's own transformation.
 	 * 
 	 * @param epsg
 	 * @return
 	 */
 	public ProjectionTransform getTransformation(long epsg) {
-
-		ProjectionTransform transform = transforms.get(epsg);
-
-		if (transform == null) {
-			Projection projectionTo = ProjectionFactory.getProjection(epsg);
-			transform = new ProjectionTransform(this, projectionTo);
-
-			transforms.put(epsg, transform);
-		}
-
-		return transform;
+		Projection projectionTo = ProjectionFactory.getProjection(epsg);
+		return getTransformation(projectionTo);
 	}
 
 	/**
-	 * Get the transformation from this Projection to the provided projection
+	 * Get the transformation from this Projection to the provided projection.
+	 * Each thread of execution should have it's own transformation.
 	 * 
 	 * @param projection
 	 * @return
 	 */
 	public ProjectionTransform getTransformation(Projection projection) {
-
-		long epsg = projection.getEpsg();
-
-		ProjectionTransform transform = new ProjectionTransform(this,
-				projection);
-
-		if (!transforms.containsKey(epsg)) {
-			transforms.put(epsg, transform);
-		}
-
-		return transform;
+		return new ProjectionTransform(this, projection);
 	}
 
 	/**

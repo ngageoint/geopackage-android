@@ -197,7 +197,7 @@ public class GoogleMapShape {
 	 */
 	public BoundingBox boundingBox() {
 		BoundingBox boundingBox = new BoundingBox(180, -180, 90, -90);
-		boundingBox(boundingBox);
+		expandBoundingBox(boundingBox);
 		return boundingBox;
 	}
 
@@ -206,7 +206,7 @@ public class GoogleMapShape {
 	 * 
 	 * @param boundingBox
 	 */
-	public void boundingBox(BoundingBox boundingBox) {
+	public void expandBoundingBox(BoundingBox boundingBox) {
 
 		switch (shapeType) {
 
@@ -294,7 +294,7 @@ public class GoogleMapShape {
 			@SuppressWarnings("unchecked")
 			List<GoogleMapShape> shapeList = (List<GoogleMapShape>) shape;
 			for (GoogleMapShape shapeListItem : shapeList) {
-				shapeListItem.boundingBox(boundingBox);
+				shapeListItem.expandBoundingBox(boundingBox);
 			}
 			break;
 		}

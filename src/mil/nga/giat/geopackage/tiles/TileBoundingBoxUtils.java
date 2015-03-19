@@ -17,13 +17,6 @@ import mil.nga.giat.geopackage.tiles.user.TileRow;
 public class TileBoundingBoxUtils {
 
 	/**
-	 * Transformation from WGS 84 to Web Mercator
-	 */
-	private static ProjectionTransform toWebMercator = ProjectionFactory
-			.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
-			.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
-
-	/**
 	 * Web mercator projection
 	 */
 	private static Projection webMercator = ProjectionFactory
@@ -360,6 +353,9 @@ public class TileBoundingBoxUtils {
 		Point upperRightPoint = new Point(false, false,
 				boundingBox.getMaxLongitude(), maxLatitude);
 
+		ProjectionTransform toWebMercator = ProjectionFactory.getProjection(
+				ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+				.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
 		lowerLeftPoint = toWebMercator.transform(lowerLeftPoint);
 		upperRightPoint = toWebMercator.transform(upperRightPoint);
 
