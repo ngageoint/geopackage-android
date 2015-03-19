@@ -1374,7 +1374,7 @@ public class GeoPackageMapFragment extends Fragment implements
 		@Override
 		protected void onPreExecute() {
 			updateToast = Toast.makeText(getActivity(),
-					"Updating Tiles and Features", Toast.LENGTH_SHORT);
+					"Updating Tiles and Features", Toast.LENGTH_LONG);
 			updateToast.show();
 		}
 
@@ -1411,8 +1411,8 @@ public class GeoPackageMapFragment extends Fragment implements
 			if (count > 0) {
 				if (count >= maxFeatures) {
 					Toast.makeText(getActivity(),
-							"Max Features Drawn: " + getMaxFeatures(),
-							Toast.LENGTH_SHORT).show();
+							"Max Features Drawn: " + count, Toast.LENGTH_SHORT)
+							.show();
 				} else {
 					Toast.makeText(getActivity(), "Features Drawn: " + count,
 							Toast.LENGTH_SHORT).show();
