@@ -1287,6 +1287,19 @@ public class GeoPackageMapFragment extends Fragment implements
 	}
 
 	/**
+	 * Get the max features
+	 * 
+	 * @return
+	 */
+	private int getMaxFeatures() {
+		SharedPreferences settings = PreferenceManager
+				.getDefaultSharedPreferences(getActivity());
+		int maxFeatures = settings.getInt(MAX_FEATURES_KEY, getResources()
+				.getInteger(R.integer.map_max_features_default));
+		return maxFeatures;
+	}
+
+	/**
 	 * Set the map type
 	 * 
 	 * @param mapType
@@ -1324,45 +1337,111 @@ public class GeoPackageMapFragment extends Fragment implements
 		featuresBoundingBox = null;
 		tilesBoundingBox = null;
 		updateTask = new MapUpdateTask();
-		updateTask.zoom = zoom;
-		updateTask.execute();
+		int maxFeatures = getMaxFeatures();
+		updateTask.execute(zoom, maxFeatures);
 
 	}
 
 	/**
 	 * Update the map in the background
 	 */
-	private class MapUpdateTask extends AsyncTask<Void, Void, Void> {
+	private class MapUpdateTask extends AsyncTask<Object, Object, Integer> {
 
-		boolean zoom = false;
+		/**
+		 * Shape converter
+		 */
+		private final GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+				null);
 
+		/**
+		 * Updating tiles and features toast
+		 */
+		private Toast updateToast;
+
+		/**
+		 * Zoom after update flag
+		 */
+		private boolean zoom;
+
+		/**
+		 * Max features to draw
+		 */
+		private int maxFeatures;
+
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
-		protected Void doInBackground(Void... params) {
-			update(this, zoom);
-			return null;
+		protected void onPreExecute() {
+			updateToast = Toast.makeText(getActivity(),
+					"Updating Tiles and Features", Toast.LENGTH_SHORT);
+			updateToast.show();
 		}
-	}
 
-	/**
-	 * Get the max features
-	 * 
-	 * @return
-	 */
-	private int getMaxFeatures() {
-		SharedPreferences settings = PreferenceManager
-				.getDefaultSharedPreferences(getActivity());
-		int maxFeatures = settings.getInt(MAX_FEATURES_KEY, getResources()
-				.getInteger(R.integer.map_max_features_default));
-		return maxFeatures;
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected Integer doInBackground(Object... params) {
+			zoom = (Boolean) params[0];
+			maxFeatures = (Integer) params[1];
+			int count = update(this, maxFeatures);
+			return count;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onProgressUpdate(Object... shapeUpdate) {
+			GoogleMapShape mapShape = converter.addShapeToMap(map,
+					(GoogleMapShape) shapeUpdate[1]);
+
+			if (editFeaturesMode) {
+				addEditableShape((Long) shapeUpdate[0], mapShape);
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPostExecute(Integer count) {
+			updateToast.cancel();
+			if (count > 0) {
+				if (count >= maxFeatures) {
+					Toast.makeText(getActivity(),
+							"Max Features Drawn: " + getMaxFeatures(),
+							Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getActivity(), "Features Drawn: " + count,
+							Toast.LENGTH_SHORT).show();
+				}
+			}
+			if (zoom) {
+				zoomToActive();
+			}
+		}
+
+		/**
+		 * Add a shape to the map
+		 */
+		public void addToMap(long featureId, GoogleMapShape shape) {
+			publishProgress(new Object[] { featureId, shape });
+		}
+
 	}
 
 	/**
 	 * Update the map
 	 * 
 	 * @param task
-	 * @param
+	 * @param maxFeatures
+	 * @return feature count
 	 */
-	private void update(MapUpdateTask task, boolean zoom) {
+	private int update(MapUpdateTask task, int maxFeatures) {
+
+		int count = 0;
 
 		if (active != null) {
 
@@ -1400,7 +1479,6 @@ public class GeoPackageMapFragment extends Fragment implements
 			}
 
 			// Add features
-			int featuresLeft = getMaxFeatures();
 			Map<String, List<String>> featureTables = new HashMap<String, List<String>>();
 			if (editFeaturesMode) {
 				List<String> databaseFeatures = new ArrayList<String>();
@@ -1427,16 +1505,14 @@ public class GeoPackageMapFragment extends Fragment implements
 			for (Map.Entry<String, List<String>> databaseFeatures : featureTables
 					.entrySet()) {
 
-				if (featuresLeft <= 0) {
+				if (count >= maxFeatures) {
 					break;
 				}
 
 				for (String features : databaseFeatures.getValue()) {
-					int count = displayFeatures(task,
-							databaseFeatures.getKey(), features, featuresLeft,
-							editFeaturesMode);
-					featuresLeft -= count;
-					if (task.isCancelled() || featuresLeft <= 0) {
+					count += displayFeatures(task, databaseFeatures.getKey(),
+							features, maxFeatures - count, editFeaturesMode);
+					if (task.isCancelled() || count >= maxFeatures) {
 						break;
 					}
 				}
@@ -1446,23 +1522,9 @@ public class GeoPackageMapFragment extends Fragment implements
 				}
 			}
 
-			if (zoom) {
-				zoomToActive();
-			}
-
-			if (featuresLeft <= 0) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						Toast.makeText(getActivity(),
-								"Max Features Drawn: " + getMaxFeatures(),
-								Toast.LENGTH_SHORT).show();
-					}
-				});
-			}
-
 		}
 
+		return count;
 	}
 
 	/**
@@ -1499,18 +1561,13 @@ public class GeoPackageMapFragment extends Fragment implements
 			final int padding = (int) Math.floor(minViewLength
 					* paddingPercentage);
 
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						map.animateCamera(CameraUpdateFactory.newLatLngBounds(
-								boundsBuilder.build(), padding));
-					} catch (Exception e) {
-						Log.w(GeoPackageMapFragment.class.getSimpleName(),
-								"Unable to move camera", e);
-					}
-				}
-			});
+			try {
+				map.animateCamera(CameraUpdateFactory.newLatLngBounds(
+						boundsBuilder.build(), padding));
+			} catch (Exception e) {
+				Log.w(GeoPackageMapFragment.class.getSimpleName(),
+						"Unable to move camera", e);
+			}
 		}
 	}
 
@@ -1558,17 +1615,7 @@ public class GeoPackageMapFragment extends Fragment implements
 							featuresBoundingBox = shape.boundingBox();
 						}
 						prepareShapeOptions(shape, editable, true);
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								GoogleMapShape mapShape = converter
-										.addShapeToMap(map, shape);
-
-								if (editable) {
-									addEditableShape(featureId, mapShape);
-								}
-							}
-						});
+						task.addToMap(featureId, shape);
 					}
 				}
 			}
