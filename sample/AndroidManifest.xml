@@ -39,7 +39,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="mil.nga.giat.geopackage.sample.MainActivity"
+            android:authorities="mil.nga.giat.geopackage.sample.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true" >
             <meta-data

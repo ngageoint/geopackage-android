@@ -563,47 +563,142 @@ public class GeoPackageManagerFragment extends Fragment implements
 			shareIntent.setAction(Intent.ACTION_SEND);
 			shareIntent.setType("*/*");
 
-			Uri databaseUri;
-			// If external database, no permission is needed and Uri is created
+			// If external database, no permission is needed
 			if (manager.isExternal(database)) {
-				databaseUri = Uri.fromFile(databaseFile);
+				// Create the Uri and share
+				Uri databaseUri = Uri.fromFile(databaseFile);
+				launchShareIntent(shareIntent, databaseUri);
 			}
-			// If internal database, file much be copied to cache and permission
-			// granted
+			// If internal database, file must be copied to cache for permission
 			else {
-				// Copy the database to cache
-				File cacheDirectory = getDatabaseCacheDirectory();
-				cacheDirectory.mkdir();
-				File cacheFile = new File(cacheDirectory, database + "."
-						+ GeoPackageConstants.GEOPACKAGE_EXTENSION);
-				try {
-					GeoPackageIOUtils.copyFile(databaseFile, cacheFile);
-				} catch (IOException e) {
-					throw new GeoPackageException(
-							"Failed to copy database file to cache for sharing",
-							e);
-				}
-				// Create the content Uri and add intent permissions
-				databaseUri = FileProvider.getUriForFile(getActivity(),
-						"mil.nga.giat.geopackage.sample.MainActivity",
-						cacheFile);
-				shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				// Launch the share copy task
+				ShareCopyTask shareCopyTask = new ShareCopyTask(shareIntent);
+				shareCopyTask.execute(databaseFile, database);
 			}
 
-			// Add the Uri
-			shareIntent.putExtra(Intent.EXTRA_STREAM, databaseUri);
-
-			// Start the share activity for result to delete the cache when done
-			startActivityForResult(
-					Intent.createChooser(
-							shareIntent,
-							getResources().getText(
-									R.string.geopackage_share_label)),
-					ACTIVITY_SHARE_FILE);
 		} catch (Exception e) {
 			GeoPackageUtils.showMessage(getActivity(),
 					getString(R.string.geopackage_share_label), e.getMessage());
 		}
+	}
+
+	/**
+	 * Launch the provided share intent with the database Uri
+	 * 
+	 * @param shareIntent
+	 * @param databaseUri
+	 */
+	private void launchShareIntent(Intent shareIntent, Uri databaseUri) {
+
+		// Add the Uri
+		shareIntent.putExtra(Intent.EXTRA_STREAM, databaseUri);
+
+		// Start the share activity for result to delete the cache when done
+		startActivityForResult(Intent.createChooser(shareIntent, getResources()
+				.getText(R.string.geopackage_share_label)), ACTIVITY_SHARE_FILE);
+	}
+
+	/**
+	 * Copy an internal database to a shareable location and share
+	 */
+	private class ShareCopyTask extends AsyncTask<Object, Void, String> {
+
+		/**
+		 * Share intent
+		 */
+		private Intent shareIntent;
+
+		/**
+		 * Share copy dialog
+		 */
+		private ProgressDialog shareCopyDialog = null;
+
+		/**
+		 * Cache file created
+		 */
+		private File cacheFile = null;
+
+		/**
+		 * Constructor
+		 * 
+		 * @param shareIntent
+		 */
+		ShareCopyTask(Intent shareIntent) {
+			this.shareIntent = shareIntent;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPreExecute() {
+			shareCopyDialog = new ProgressDialog(getActivity());
+			shareCopyDialog
+					.setMessage(getString(R.string.geopackage_share_copy_message));
+			shareCopyDialog.setCancelable(false);
+			shareCopyDialog.setIndeterminate(true);
+			shareCopyDialog.setButton(ProgressDialog.BUTTON_NEGATIVE,
+					getString(R.string.button_cancel_label),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							cancel(true);
+						}
+					});
+			shareCopyDialog.show();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected String doInBackground(Object... params) {
+
+			File databaseFile = (File) params[0];
+			String database = (String) params[1];
+
+			// Copy the database to cache
+			File cacheDirectory = getDatabaseCacheDirectory();
+			cacheDirectory.mkdir();
+			cacheFile = new File(cacheDirectory, database + "."
+					+ GeoPackageConstants.GEOPACKAGE_EXTENSION);
+			try {
+				GeoPackageIOUtils.copyFile(databaseFile, cacheFile);
+			} catch (IOException e) {
+				return e.getMessage();
+			}
+
+			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onCancelled(String result) {
+			shareCopyDialog.dismiss();
+			deleteCachedDatabaseFiles();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		protected void onPostExecute(String result) {
+			shareCopyDialog.dismiss();
+			if (result != null) {
+				GeoPackageUtils.showMessage(getActivity(),
+						getString(R.string.geopackage_share_label), result);
+			} else {
+				// Create the content Uri and add intent permissions
+				Uri databaseUri = FileProvider.getUriForFile(getActivity(),
+						"mil.nga.giat.geopackage.sample.fileprovider",
+						cacheFile);
+				shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				launchShareIntent(shareIntent, databaseUri);
+			}
+		}
+
 	}
 
 	/**
@@ -1826,17 +1921,7 @@ public class GeoPackageManagerFragment extends Fragment implements
 			break;
 
 		case ACTIVITY_SHARE_FILE:
-			// Delete any cached database files
-			File databaseCache = getDatabaseCacheDirectory();
-			if (databaseCache.exists()) {
-				File[] cacheFiles = databaseCache.listFiles();
-				if (cacheFiles != null) {
-					for (File cacheFile : cacheFiles) {
-						cacheFile.delete();
-					}
-				}
-				databaseCache.delete();
-			}
+			deleteCachedDatabaseFiles();
 			break;
 
 		default:
@@ -1845,6 +1930,22 @@ public class GeoPackageManagerFragment extends Fragment implements
 
 		if (!handled) {
 			super.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+
+	/**
+	 * Delete any cached database files
+	 */
+	private void deleteCachedDatabaseFiles() {
+		File databaseCache = getDatabaseCacheDirectory();
+		if (databaseCache.exists()) {
+			File[] cacheFiles = databaseCache.listFiles();
+			if (cacheFiles != null) {
+				for (File cacheFile : cacheFiles) {
+					cacheFile.delete();
+				}
+			}
+			databaseCache.delete();
 		}
 	}
 
