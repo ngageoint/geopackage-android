@@ -101,6 +101,39 @@ public class ExternalGeoPackageDataSource {
 	}
 
 	/**
+	 * Rename the external GeoPackage to the new name
+	 * 
+	 * @param external
+	 * @param newName
+	 * @return
+	 */
+	public boolean rename(ExternalGeoPackage external, String newName) {
+		boolean renamed = rename(external.getName(), newName);
+		if (renamed) {
+			external.setName(newName);
+		}
+		return renamed;
+	}
+
+	/**
+	 * Rename the external GeoPackage name to the new name
+	 * 
+	 * @param name
+	 * @param newName
+	 * @return
+	 */
+	public boolean rename(String name, String newName) {
+		String whereClause = GeoPackageMetadataOpenHelper.COLUMN_NAME + " = ?";
+		String[] whereArgs = new String[] { name };
+		ContentValues values = new ContentValues();
+		values.put(GeoPackageMetadataOpenHelper.COLUMN_NAME, newName);
+		int updateCount = db.update(
+				GeoPackageMetadataOpenHelper.TABLE_EXTERNAL_GEOPACKAGE, values,
+				whereClause, whereArgs);
+		return updateCount > 0;
+	}
+
+	/**
 	 * Get all External GeoPackages
 	 * 
 	 * @return

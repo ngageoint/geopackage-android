@@ -465,7 +465,17 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	 */
 	@Override
 	public boolean rename(String database, String newDatabase) {
-		if (copy(database, newDatabase)) {
+		ExternalGeoPackage external = getExternalGeoPackage(database);
+		if (external != null) {
+			ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+					context);
+			externalDataSource.open();
+			try {
+				externalDataSource.rename(external, newDatabase);
+			} finally {
+				externalDataSource.close();
+			}
+		} else if (copy(database, newDatabase)) {
 			delete(database);
 		}
 		return exists(newDatabase);
