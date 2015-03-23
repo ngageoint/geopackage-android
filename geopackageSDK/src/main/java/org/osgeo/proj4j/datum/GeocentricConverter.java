@@ -175,7 +175,7 @@ public class GeocentricConverter
 
   	/* --------------------------------------------------------------
   	 * Following iterative algorithm was developped by
-  	 * "Institut für Erdmessung", University of Hannover, July 1988.
+  	 * "Institut fr Erdmessung", University of Hannover, July 1988.
   	 * Internet: www.ife.uni-hannover.de
   	 * Iterative computation of CPHI,SPHI and Height.
   	 * Iteration of CPHI and SPHI to 10**-12 radian resp.

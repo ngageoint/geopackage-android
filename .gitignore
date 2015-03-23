@@ -1,2 +1,25 @@
-/bin
-/gen
+#java specific
+*.class
+*.settings
+
+# Built application files
+*.apk
+*.ap_
+
+# Generated files
+.gradle/
+build/
+bin/
+gen/
+local.properties
+
+## generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+# IDE files
+.idea/
+*.iml
