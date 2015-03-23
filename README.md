@@ -15,7 +15,7 @@ Software source code previously released under an open source license and then m
 
 #### GeoPackage SDK Sample ####
 
-The GeoPackage SDK Sample app provides an extensive standalone example on how to use the SDK.
+The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sample-android) app provides an extensive standalone example on how to use the SDK.
 
 #### Example ####
 
