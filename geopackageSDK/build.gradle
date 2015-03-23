@@ -1,0 +1,43 @@
+apply plugin: 'com.android.library'
+apply plugin: 'maven'
+
+group 'mil.nga.giat.geopackage'
+version '1.0.0'
+
+android {
+    compileSdkVersion 14
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 21
+
+        testApplicationId "mil.nga.giat.geopackage.test"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+
+
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository')
+            }
+        }
+
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.google.android.gms:play-services:+'
+    compile 'com.google.maps.android:android-maps-utils:0.3.3'
+    compile 'com.j256.ormlite:ormlite-android:4.48'
+}
