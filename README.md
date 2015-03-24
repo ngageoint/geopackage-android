@@ -19,7 +19,58 @@ The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sam
 
 #### Example ####
 
-TODO
+Small subset of functionality example:
+
+    // Context context = ...;
+    // File geoPackageFile = ...;
+    // GoogleMap map = ...;
+    
+    // Get a manager
+    GeoPackageManager manager = GeoPackageFactory.getManager(context);
+    
+    // Available databases
+    List<String> databases = manager.databases();
+    
+    // Import database
+    boolean imported = manager.importGeoPackage(geoPackageFile);
+    
+    // Open database
+    GeoPackage geoPackage = manager.open(databases.get(0));
+    
+    // Feature and tile tables
+    List<String> features = geoPackage.getFeatureTables();
+    List<String> tiles = geoPackage.getTileTables();
+    
+    // Query Features
+    FeatureDao featureDao = geoPackage.getFeatureDao(features.get(0));
+    GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+            featureDao.getProjection());
+    FeatureCursor featureCursor = featureDao.queryForAll();
+    try{
+        while(featureCursor.moveToNext()){
+            FeatureRow featureRow = featureCursor.getRow();
+            GeoPackageGeometryData geometryData = featureRow.getGeometry();
+            Geometry geometry = geometryData.getGeometry();
+            GoogleMapShape shape = converter.toShape(geometry);
+            GoogleMapShape mapShape = GoogleMapShapeConverter
+                    .addShapeToMap(map, shape);
+            // ...
+        }
+    }finally{
+        featureCursor.close();
+    }
+    
+    // Tile Provider
+    TileDao tileDao = geoPackage.getTileDao(tiles.get(0));
+    TileProvider overlay = GeoPackageOverlayFactory
+            .getTileProvider(tileDao);
+    TileOverlayOptions overlayOptions = new TileOverlayOptions();
+    overlayOptions.tileProvider(overlay);
+    overlayOptions.zIndex(-1);
+    map.addTileOverlay(overlayOptions);
+    
+    // Close database
+    geoPackage.close();
 
 ### License ###
 
