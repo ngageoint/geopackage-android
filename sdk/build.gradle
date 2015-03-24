@@ -23,7 +23,22 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            manifest.srcFile 'src/main/AndroidManifest.xml'
+            java.srcDirs = ['src/main/java']
+            res.srcDirs = ['src/main/res']
+        }
 
+        lintOptions {
+            abortOnError false
+        }
+    }
+
+    task sourceJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.java.srcDirs
+    }
 
     uploadArchives {
         repositories {
@@ -31,7 +46,9 @@ android {
                 repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository')
             }
         }
-
+        artifacts {
+            archives sourceJar
+        }
     }
 }
 
