@@ -4,7 +4,7 @@ import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDataType;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.schema.TableColumnKey;
 
 import com.j256.ormlite.field.DatabaseField;

@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.unit;
+package mil.nga.giat.geopackage.projection;
 
 import java.util.HashMap;
 import java.util.Map;

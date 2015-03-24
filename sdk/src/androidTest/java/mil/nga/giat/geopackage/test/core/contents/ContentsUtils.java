@@ -16,9 +16,9 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
-import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.test.TestUtils;
+import mil.nga.giat.wkb.geom.GeometryType;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;

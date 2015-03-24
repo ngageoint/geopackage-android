@@ -2,7 +2,7 @@ package mil.nga.giat.geopackage.test.extension;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.extension.GeometryExtensions;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.test.BaseTestCase;
 
 /**

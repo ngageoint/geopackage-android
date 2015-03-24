@@ -1,11 +1,11 @@
 package mil.nga.giat.geopackage.tiles;
 
 import mil.nga.giat.geopackage.BoundingBox;
-import mil.nga.giat.geopackage.geom.Point;
-import mil.nga.giat.geopackage.geom.unit.Projection;
-import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
-import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
-import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
+import mil.nga.giat.wkb.geom.Point;
+import mil.nga.giat.geopackage.projection.Projection;
+import mil.nga.giat.geopackage.projection.ProjectionConstants;
+import mil.nga.giat.geopackage.projection.ProjectionFactory;
+import mil.nga.giat.geopackage.projection.ProjectionTransform;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 

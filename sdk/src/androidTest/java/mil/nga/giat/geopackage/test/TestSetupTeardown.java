@@ -21,7 +21,6 @@ import mil.nga.giat.geopackage.factory.GeoPackageFactory;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
-import mil.nga.giat.geopackage.geom.GeometryType;
 import mil.nga.giat.geopackage.io.BitmapConverter;
 import mil.nga.giat.geopackage.metadata.Metadata;
 import mil.nga.giat.geopackage.metadata.MetadataDao;
@@ -34,6 +33,8 @@ import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
+import mil.nga.giat.wkb.geom.GeometryType;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;

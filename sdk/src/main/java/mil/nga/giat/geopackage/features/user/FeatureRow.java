@@ -3,7 +3,7 @@ package mil.nga.giat.geopackage.features.user;
 import java.io.IOException;
 
 import mil.nga.giat.geopackage.GeoPackageException;
-import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.user.UserRow;
 import android.content.ContentValues;
 

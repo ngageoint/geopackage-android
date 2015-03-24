@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.data;
+package mil.nga.giat.geopackage.geom;
 
 /**
  * GeoPackage Geometry Envelope

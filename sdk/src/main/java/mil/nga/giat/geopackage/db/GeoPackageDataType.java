@@ -2,7 +2,7 @@ package mil.nga.giat.geopackage.db;
 
 import java.util.Locale;
 
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 
 /**
  * GeoPackage Data Types (non Geometry) for database columns as defined in

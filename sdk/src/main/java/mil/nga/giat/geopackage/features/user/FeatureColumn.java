@@ -2,7 +2,7 @@ package mil.nga.giat.geopackage.features.user;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.user.UserColumn;
 
 /**

@@ -13,7 +13,7 @@ import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.contents.ContentsDataType;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.schema.columns.DataColumns;
 import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;

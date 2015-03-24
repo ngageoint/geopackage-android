@@ -5,23 +5,23 @@ import java.util.List;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
-import mil.nga.giat.geopackage.geom.CircularString;
-import mil.nga.giat.geopackage.geom.CompoundCurve;
-import mil.nga.giat.geopackage.geom.Geometry;
-import mil.nga.giat.geopackage.geom.GeometryCollection;
-import mil.nga.giat.geopackage.geom.GeometryType;
-import mil.nga.giat.geopackage.geom.LineString;
-import mil.nga.giat.geopackage.geom.MultiLineString;
-import mil.nga.giat.geopackage.geom.MultiPoint;
-import mil.nga.giat.geopackage.geom.MultiPolygon;
-import mil.nga.giat.geopackage.geom.Point;
-import mil.nga.giat.geopackage.geom.Polygon;
-import mil.nga.giat.geopackage.geom.PolyhedralSurface;
-import mil.nga.giat.geopackage.geom.TIN;
-import mil.nga.giat.geopackage.geom.Triangle;
-import mil.nga.giat.geopackage.geom.unit.Projection;
-import mil.nga.giat.geopackage.geom.unit.ProjectionConstants;
-import mil.nga.giat.geopackage.geom.unit.ProjectionTransform;
+import mil.nga.giat.wkb.geom.CircularString;
+import mil.nga.giat.wkb.geom.CompoundCurve;
+import mil.nga.giat.wkb.geom.Geometry;
+import mil.nga.giat.wkb.geom.GeometryCollection;
+import mil.nga.giat.wkb.geom.GeometryType;
+import mil.nga.giat.wkb.geom.LineString;
+import mil.nga.giat.wkb.geom.MultiLineString;
+import mil.nga.giat.wkb.geom.MultiPoint;
+import mil.nga.giat.wkb.geom.MultiPolygon;
+import mil.nga.giat.wkb.geom.Point;
+import mil.nga.giat.wkb.geom.Polygon;
+import mil.nga.giat.wkb.geom.PolyhedralSurface;
+import mil.nga.giat.wkb.geom.TIN;
+import mil.nga.giat.wkb.geom.Triangle;
+import mil.nga.giat.geopackage.projection.Projection;
+import mil.nga.giat.geopackage.projection.ProjectionConstants;
+import mil.nga.giat.geopackage.projection.ProjectionTransform;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -57,7 +57,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Constructor with specified projection, see
 	 * {@link FeatureDao#getProjection}
-	 * 
+	 *
 	 * @param projection
 	 */
 	public GoogleMapShapeConverter(Projection projection) {
@@ -75,7 +75,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Get the projection
-	 * 
+	 *
 	 * @return
 	 */
 	public Projection getProjection() {
@@ -84,7 +84,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link Point} to a {@link LatLng}
-	 * 
+	 *
 	 * @param point
 	 * @return
 	 */
@@ -98,7 +98,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link LatLng} to a {@link Point}
-	 * 
+	 *
 	 * @param latLng
 	 * @return
 	 */
@@ -108,7 +108,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link LatLng} to a {@link Point}
-	 * 
+	 *
 	 * @param latLng
 	 * @param hasZ
 	 * @param hasM
@@ -126,7 +126,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link LineString} to a {@link PolylineOptions}
-	 * 
+	 *
 	 * @param lineString
 	 * @return
 	 */
@@ -152,7 +152,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link Polyline} to a {@link LineString}
-	 * 
+	 *
 	 * @param polyline
 	 * @return
 	 */
@@ -162,7 +162,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link Polyline} to a {@link LineString}
-	 * 
+	 *
 	 * @param polyline
 	 * @param hasZ
 	 * @param hasM
@@ -174,7 +174,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link PolylineOptions} to a {@link LineString}
-	 * 
+	 *
 	 * @param polyline
 	 * @return
 	 */
@@ -184,7 +184,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link PolylineOptions} to a {@link LineString}
-	 * 
+	 *
 	 * @param polyline
 	 * @param hasZ
 	 * @param hasM
@@ -197,7 +197,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link LatLng} to a {@link LineString}
-	 * 
+	 *
 	 * @param latLngs
 	 * @return
 	 */
@@ -207,7 +207,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link LatLng} to a {@link LineString}
-	 * 
+	 *
 	 * @param latLngs
 	 * @param hasZ
 	 * @param hasM
@@ -225,7 +225,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link LatLng} to a {@link CircularString}
-	 * 
+	 *
 	 * @param latLngs
 	 * @return
 	 */
@@ -235,7 +235,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link LatLng} to a {@link CircularString}
-	 * 
+	 *
 	 * @param latLngs
 	 * @param hasZ
 	 * @param hasM
@@ -253,7 +253,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link LatLng} to a {@link LineString}
-	 * 
+	 *
 	 * @param lineString
 	 * @param latLngs
 	 */
@@ -267,7 +267,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link Polygon} to a {@link PolygonOptions}
-	 * 
+	 *
 	 * @param lineString
 	 * @return
 	 */
@@ -317,7 +317,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a {@link com.google.android.gms.maps.model.Polygon} to a
 	 * {@link Polygon}
-	 * 
+	 *
 	 * @param mapPolygon
 	 * @return
 	 */
@@ -328,7 +328,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a {@link com.google.android.gms.maps.model.Polygon} to a
 	 * {@link Polygon}
-	 * 
+	 *
 	 * @param polygon
 	 * @param hasZ
 	 * @param hasM
@@ -342,7 +342,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a {@link com.google.android.gms.maps.model.Polygon} to a
 	 * {@link Polygon}
-	 * 
+	 *
 	 * @param polygon
 	 * @return
 	 */
@@ -353,7 +353,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a {@link com.google.android.gms.maps.model.Polygon} to a
 	 * {@link Polygon}
-	 * 
+	 *
 	 * @param polygon
 	 * @param hasZ
 	 * @param hasM
@@ -366,7 +366,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a list of {@link LatLng} and list of hole list {@link LatLng} to
 	 * a {@link Polygon}
-	 * 
+	 *
 	 * @param latLngs
 	 * @param holes
 	 * @return
@@ -378,7 +378,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a list of {@link LatLng} and list of hole list {@link LatLng} to
 	 * a {@link Polygon}
-	 * 
+	 *
 	 * @param latLngs
 	 * @param holes
 	 * @param hasZ
@@ -416,7 +416,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPoint} to a {@link MultiLatLng}
-	 * 
+	 *
 	 * @param multiPoint
 	 * @return
 	 */
@@ -434,7 +434,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
-	 * 
+	 *
 	 * @param latLngs
 	 * @return
 	 */
@@ -444,7 +444,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
-	 * 
+	 *
 	 * @param latLngs
 	 * @param hasZ
 	 * @param hasM
@@ -457,7 +457,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
-	 * 
+	 *
 	 * @param latLngs
 	 * @return
 	 */
@@ -467,7 +467,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiLatLng} to a {@link MultiPoint}
-	 * 
+	 *
 	 * @param latLngs
 	 * @param hasZ
 	 * @param hasM
@@ -488,7 +488,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiLineString} to a {@link MultiPolylineOptions}
-	 * 
+	 *
 	 * @param multiLineString
 	 * @return
 	 */
@@ -506,7 +506,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polyline} to a {@link MultiLineString}
-	 * 
+	 *
 	 * @param polylineList
 	 * @return
 	 */
@@ -516,7 +516,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polyline} to a {@link MultiLineString}
-	 * 
+	 *
 	 * @param polylineList
 	 * @param hasZ
 	 * @param hasM
@@ -537,7 +537,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of List<LatLng> to a {@link MultiLineString}
-	 * 
+	 *
 	 * @param polylineList
 	 * @return
 	 */
@@ -548,7 +548,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of List<LatLng> to a {@link MultiLineString}
-	 * 
+	 *
 	 * @param polylineList
 	 * @param hasZ
 	 * @param hasM
@@ -569,7 +569,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of List<LatLng> to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param polylineList
 	 * @return
 	 */
@@ -579,7 +579,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of List<LatLng> to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param polylineList
 	 * @param hasZ
 	 * @param hasM
@@ -600,7 +600,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolylineOptions} to a {@link MultiLineString}
-	 * 
+	 *
 	 * @param multiPolylineOptions
 	 * @return
 	 */
@@ -611,7 +611,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolylineOptions} to a {@link MultiLineString}
-	 * 
+	 *
 	 * @param multiPolylineOptions
 	 * @param hasZ
 	 * @param hasM
@@ -634,7 +634,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param multiPolylineOptions
 	 * @return
 	 */
@@ -645,7 +645,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param multiPolylineOptions
 	 * @param hasZ
 	 * @param hasM
@@ -668,7 +668,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolygon} to a {@link MultiPolygonOptions}
-	 * 
+	 *
 	 * @param multiPolygon
 	 * @return
 	 */
@@ -687,7 +687,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a list of {@link com.google.android.gms.maps.model.Polygon} to a
 	 * {@link MultiPolygon}
-	 * 
+	 *
 	 * @param polygonList
 	 * @return
 	 */
@@ -699,7 +699,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a list of {@link com.google.android.gms.maps.model.Polygon} to a
 	 * {@link MultiPolygon}
-	 * 
+	 *
 	 * @param polygonList
 	 * @param hasZ
 	 * @param hasM
@@ -721,7 +721,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polygon} to a {@link MultiPolygon}
-	 * 
+	 *
 	 * @param polygonList
 	 * @return
 	 */
@@ -731,7 +731,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polygon} to a {@link MultiPolygon}
-	 * 
+	 *
 	 * @param polygonList
 	 * @param hasZ
 	 * @param hasM
@@ -751,7 +751,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolygonOptions} to a {@link MultiPolygon}
-	 * 
+	 *
 	 * @param multiPolygonOptions
 	 * @return
 	 */
@@ -762,7 +762,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link PolygonOptions} to a {@link MultiPolygon}
-	 * 
+	 *
 	 * @param multiPolygonOptions
 	 * @param hasZ
 	 * @param hasM
@@ -784,7 +784,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link CompoundCurve} to a {@link MultiPolylineOptions}
-	 * 
+	 *
 	 * @param compoundCurve
 	 * @return
 	 */
@@ -802,7 +802,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polyline} to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param polylineList
 	 * @return
 	 */
@@ -812,7 +812,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polyline} to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param polylineList
 	 * @param hasZ
 	 * @param hasM
@@ -833,7 +833,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param multiPolylineOptions
 	 * @return
 	 */
@@ -844,7 +844,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolylineOptions} to a {@link CompoundCurve}
-	 * 
+	 *
 	 * @param multiPolylineOptions
 	 * @param hasZ
 	 * @param hasM
@@ -867,7 +867,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link PolyhedralSurface} to a {@link MultiPolygonOptions}
-	 * 
+	 *
 	 * @param polyhedralSurface
 	 * @return
 	 */
@@ -885,7 +885,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polygon} to a {@link PolyhedralSurface}
-	 * 
+	 *
 	 * @param polygonList
 	 * @return
 	 */
@@ -896,7 +896,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a list of {@link Polygon} to a {@link PolyhedralSurface}
-	 * 
+	 *
 	 * @param polygonList
 	 * @param hasZ
 	 * @param hasM
@@ -918,7 +918,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolygonOptions} to a {@link PolyhedralSurface}
-	 * 
+	 *
 	 * @param multiPolygonOptions
 	 * @return
 	 */
@@ -929,7 +929,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link MultiPolygonOptions} to a {@link PolyhedralSurface}
-	 * 
+	 *
 	 * @param multiPolygonOptions
 	 * @param hasZ
 	 * @param hasM
@@ -951,7 +951,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link Geometry} to a Map shape
-	 * 
+	 *
 	 * @param geometry
 	 * @return
 	 */
@@ -1032,7 +1032,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link GeometryCollection} to a list of Map shapes
-	 * 
+	 *
 	 * @param geometryCollection
 	 * @return
 	 */
@@ -1051,7 +1051,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a {@link Geometry} to a Map shape and add it
-	 * 
+	 *
 	 * @param map
 	 * @param geometry
 	 * @return
@@ -1132,7 +1132,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a shape to the map
-	 * 
+	 *
 	 * @param map
 	 * @param shape
 	 * @return
@@ -1201,7 +1201,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a LatLng to the map
-	 * 
+	 *
 	 * @param map
 	 * @param latLng
 	 * @return
@@ -1212,7 +1212,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add MarkerOptions to the map
-	 * 
+	 *
 	 * @param map
 	 * @param options
 	 * @return
@@ -1224,7 +1224,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a LatLng to the map
-	 * 
+	 *
 	 * @param map
 	 * @param latLng
 	 * @param options
@@ -1237,7 +1237,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a Polyline to the map
-	 * 
+	 *
 	 * @param map
 	 * @param polyline
 	 * @return
@@ -1249,7 +1249,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a Polygon to the map
-	 * 
+	 *
 	 * @param map
 	 * @param polygon
 	 * @return
@@ -1261,7 +1261,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a list of LatLngs to the map
-	 * 
+	 *
 	 * @param map
 	 * @param latLngs
 	 * @return
@@ -1285,7 +1285,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a list of Polylines to the map
-	 * 
+	 *
 	 * @param map
 	 * @param polylines
 	 * @return
@@ -1305,7 +1305,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a list of Polygons to the map
-	 * 
+	 *
 	 * @param map
 	 * @param polygons
 	 * @return
@@ -1329,7 +1329,7 @@ public class GoogleMapShapeConverter {
 	/**
 	 * Convert a {@link GeometryCollection} to a list of Map shapes and add to
 	 * the map
-	 * 
+	 *
 	 * @param map
 	 * @param geometryCollection
 	 * @return
@@ -1349,7 +1349,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a shape to the map as markers
-	 * 
+	 *
 	 * @param map
 	 * @param shape
 	 * @param markerOptions
@@ -1471,7 +1471,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add the list of points as markers
-	 * 
+	 *
 	 * @param map
 	 * @param points
 	 * @param customMarkerOptions
@@ -1509,7 +1509,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a Polyline to the map as markers
-	 * 
+	 *
 	 * @param map
 	 * @param polylineOptions
 	 * @param polylineMarkerOptions
@@ -1539,7 +1539,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a Polygon to the map as markers
-	 * 
+	 *
 	 * @param shapeMarkers
 	 * @param map
 	 * @param polygonOptions
@@ -1584,7 +1584,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a MultiPolylineOptions to the map as markers
-	 * 
+	 *
 	 * @param shapeMarkers
 	 * @param map
 	 * @param multiPolyline
@@ -1611,7 +1611,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Add a MultiPolygonOptions to the map as markers
-	 * 
+	 *
 	 * @param shapeMarkers
 	 * @param map
 	 * @param multiPolygon
@@ -1639,7 +1639,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Get a list of points as LatLng from a list of Markers
-	 * 
+	 *
 	 * @param markers
 	 * @return
 	 */
@@ -1653,7 +1653,7 @@ public class GoogleMapShapeConverter {
 
 	/**
 	 * Convert a GoogleMapShape to a Geometry
-	 * 
+	 *
 	 * @param shape
 	 * @return
 	 */

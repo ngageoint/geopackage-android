@@ -3,7 +3,7 @@ package mil.nga.giat.geopackage.geom.conversion;
 import java.util.List;
 
 import mil.nga.giat.geopackage.BoundingBox;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;

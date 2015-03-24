@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.unit;
+package mil.nga.giat.geopackage.projection;
 
 import android.content.Context;
 import android.util.Log;

@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.unit;
+package mil.nga.giat.geopackage.projection;
 
 /**
  * Interface for retrieving the proj4 projection parameter string for an EPSG

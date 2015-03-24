@@ -1,6 +1,6 @@
 package mil.nga.giat.geopackage.features.user;
 
-import mil.nga.giat.geopackage.geom.data.GeoPackageGeometryData;
+import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.user.UserCursor;
 import android.database.Cursor;
 

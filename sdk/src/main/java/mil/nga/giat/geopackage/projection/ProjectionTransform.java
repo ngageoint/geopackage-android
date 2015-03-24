@@ -1,7 +1,7 @@
-package mil.nga.giat.geopackage.geom.unit;
+package mil.nga.giat.geopackage.projection;
 
 import mil.nga.giat.geopackage.BoundingBox;
-import mil.nga.giat.geopackage.geom.Point;
+import mil.nga.giat.wkb.geom.Point;
 
 import org.osgeo.proj4j.CoordinateTransform;
 import org.osgeo.proj4j.CoordinateTransformFactory;

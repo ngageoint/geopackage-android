@@ -5,7 +5,7 @@ import java.util.List;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.user.UserTableReader;
 import android.database.Cursor;
 

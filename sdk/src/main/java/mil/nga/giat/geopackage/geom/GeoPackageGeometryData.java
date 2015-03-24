@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.data;
+package mil.nga.giat.geopackage.geom;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -7,11 +7,11 @@ import java.nio.ByteOrder;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.extension.GeometryExtensions;
-import mil.nga.giat.geopackage.geom.Geometry;
-import mil.nga.giat.geopackage.geom.wkb.WkbGeometryReader;
-import mil.nga.giat.geopackage.geom.wkb.WkbGeometryWriter;
-import mil.nga.giat.geopackage.io.ByteReader;
-import mil.nga.giat.geopackage.io.ByteWriter;
+import mil.nga.giat.wkb.geom.Geometry;
+import mil.nga.giat.wkb.io.WkbGeometryReader;
+import mil.nga.giat.wkb.io.WkbGeometryWriter;
+import mil.nga.giat.wkb.io.ByteReader;
+import mil.nga.giat.wkb.io.ByteWriter;
 
 /**
  * GeoPackage Geometry Data

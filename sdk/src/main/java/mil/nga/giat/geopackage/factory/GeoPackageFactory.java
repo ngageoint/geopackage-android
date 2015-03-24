@@ -1,8 +1,8 @@
 package mil.nga.giat.geopackage.factory;
 
 import mil.nga.giat.geopackage.GeoPackageManager;
-import mil.nga.giat.geopackage.geom.unit.AndroidProjectionParameterRetriever;
-import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
+import mil.nga.giat.geopackage.projection.AndroidProjectionParameterRetriever;
+import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import android.content.Context;
 
 /**

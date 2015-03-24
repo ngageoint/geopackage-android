@@ -4,7 +4,7 @@ GeoPackage Android is a SDK implementation of the Open Geospatial Consortium [Ge
 
 The GeoPackage SDK provides the ability to manage GeoPackage files providing read, write, import, export, share, and open support. Open GeoPackage files provide read and write access to features and tiles. Feature support includes Well-Known Binary and Google Map shape translations. Tile support includes URL tile generation and Google Map Tile Providers.
 
-The GeoPackage SDK Sample App was developed at the National Geospatial-Intelligence Agency (NGA) in collaboration with [BIT Systems](https://www.bit-sys.com/index.jsp). The government has "unlimited rights" and is releasing this software to increase the impact of government investments by providing developers with the opportunity to take things in new directions. The software use, modification, and distribution rights are stipulated within the [MIT license](http://choosealicense.com/licenses/mit/).
+The GeoPackage SDK was developed at the National Geospatial-Intelligence Agency (NGA) in collaboration with [BIT Systems](https://www.bit-sys.com/index.jsp). The government has "unlimited rights" and is releasing this software to increase the impact of government investments by providing developers with the opportunity to take things in new directions. The software use, modification, and distribution rights are stipulated within the [MIT license](http://choosealicense.com/licenses/mit/).
 
 ### Pull Requests ###
 If you'd like to contribute to this project, please make a pull request. We'll review the pull request and discuss the changes. All pull request contributions to this project will be released under the MIT license.
@@ -97,6 +97,9 @@ Small subset of functionality example:
     SOFTWARE.
 
 ### Dependencies ###
+
+#### [WKB](https://git.geointapps.org/geopackage/wkb) ####
+The MIT License (MIT)
 
 #### [OrmLite](http://ormlite.com/) ####
 Open Source License

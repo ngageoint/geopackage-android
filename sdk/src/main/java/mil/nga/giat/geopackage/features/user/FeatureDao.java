@@ -4,9 +4,9 @@ import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
-import mil.nga.giat.geopackage.geom.GeometryType;
-import mil.nga.giat.geopackage.geom.unit.Projection;
-import mil.nga.giat.geopackage.geom.unit.ProjectionFactory;
+import mil.nga.giat.wkb.geom.GeometryType;
+import mil.nga.giat.geopackage.projection.Projection;
+import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import mil.nga.giat.geopackage.user.UserDao;
 import android.database.sqlite.SQLiteDatabase;
 

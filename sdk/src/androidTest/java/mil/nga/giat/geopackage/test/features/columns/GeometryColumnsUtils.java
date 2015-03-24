@@ -19,7 +19,7 @@ import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSql;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMm;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsSqlMmDao;
-import mil.nga.giat.geopackage.geom.GeometryType;
+import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.test.TestUtils;
 
