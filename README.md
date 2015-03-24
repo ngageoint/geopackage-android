@@ -69,7 +69,7 @@ Small subset of functionality example:
     overlayOptions.zIndex(-1);
     map.addTileOverlay(overlayOptions);
     
-    // Close database
+    // Close database when done
     geoPackage.close();
 
 ### License ###
