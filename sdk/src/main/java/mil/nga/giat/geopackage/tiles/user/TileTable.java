@@ -17,7 +17,7 @@ public class TileTable extends UserTable<TileColumn> {
 	/**
 	 * Id column name, Requirement 52
 	 */
-	public static final String COLUMN_ID = "ID";
+	public static final String COLUMN_ID = "id";
 
 	/**
 	 * Zoom level column name, Requirement 53

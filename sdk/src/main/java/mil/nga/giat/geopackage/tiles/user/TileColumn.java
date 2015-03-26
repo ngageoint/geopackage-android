@@ -19,7 +19,7 @@ public class TileColumn extends UserColumn {
 	 */
 	public static TileColumn createIdColumn(int index) {
 		return new TileColumn(index, TileTable.COLUMN_ID,
-				GeoPackageDataType.INTEGER, null, true, null, true);
+				GeoPackageDataType.INTEGER, null, false, null, true);
 	}
 
 	/**
