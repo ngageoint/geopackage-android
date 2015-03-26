@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +44,11 @@ import com.j256.ormlite.support.ConnectionSource;
  * @author osbornb
  */
 class GeoPackageManagerImpl implements GeoPackageManager {
+
+    /**
+     * GeoPackage application id
+     */
+    private static final String APPLICATION_ID = "GP10";
 
 	/**
 	 * Context
@@ -197,6 +203,11 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		} else {
 			SQLiteDatabase db = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
+
+            // Set the application id as a GeoPackage
+            int applicationId = ByteBuffer.wrap(APPLICATION_ID.getBytes()).asIntBuffer().get();
+            db.execSQL(String.format("PRAGMA application_id = %d;",
+                    applicationId));
 
 			// Create the minimum required tables
 			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(
