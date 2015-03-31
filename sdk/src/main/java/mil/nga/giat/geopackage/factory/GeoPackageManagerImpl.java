@@ -225,7 +225,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			try {
 				SpatialReferenceSystemDao dao = DaoManager.createDao(
 						connectionSource, SpatialReferenceSystem.class);
-				dao.createEpsg(context);
+				dao.createWgs84(context);
 				dao.createUndefinedCartesian(context);
 				dao.createUndefinedGeographic(context);
 			} catch (SQLException e) {

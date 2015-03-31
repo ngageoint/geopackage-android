@@ -18,6 +18,7 @@ import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
+import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.projection.Projection;
 import mil.nga.giat.geopackage.projection.ProjectionConstants;
 import mil.nga.giat.geopackage.projection.ProjectionFactory;
@@ -352,13 +353,16 @@ public class TileGenerator {
 		TileMatrixSet tileMatrixSet = null;
 		if (!tileMatrixSetDao.isTableExists()
 				|| !tileMatrixSetDao.idExists(tableName)) {
-			// Create the tile table
+            // Create the web mercator srs if needed
+            SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
+            srsDao.getOrCreate(context, ProjectionConstants.EPSG_WEB_MERCATOR);
+            // Create the tile table
 			tileMatrixSet = geoPackage.createTileTableWithMetadata(
 					tableName,
 					boundingBox,
-					tileMatrixSetBoundingBox,
-					(long) context.getResources().getInteger(
-							R.integer.geopackage_srs_epsg_srs_id));
+                    ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM,
+                    webMercatorBoundingBox,
+                    ProjectionConstants.EPSG_WEB_MERCATOR);
 		} else {
 			update = true;
 			// Query to get the Tile Matrix Set
@@ -510,24 +514,24 @@ public class TileGenerator {
 
 		Contents contents = tileMatrixSet.getContents();
 
-		ProjectionTransform transformToWgs84 = ProjectionFactory.getProjection(
+		ProjectionTransform transformContentsToWgs84 = ProjectionFactory.getProjection(
 				contents.getSrs().getOrganizationCoordsysId())
 				.getTransformation(
 						ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-		ProjectionTransform transformToProjection = ProjectionFactory
-				.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
-				.getTransformation(
-						contents.getSrs().getOrganizationCoordsysId());
 
 		// Combine the existing content and request bounding boxes
-		BoundingBox contentsBoundingBox = transformToWgs84.transform(contents
+		BoundingBox contentsBoundingBox = transformContentsToWgs84.transform(contents
 				.getBoundingBox());
 		boundingBox = TileBoundingBoxUtils.union(contentsBoundingBox,
 				boundingBox);
 
 		// Update the contents if modified
 		if (!contentsBoundingBox.equals(boundingBox)) {
-			contents.setBoundingBox(transformToProjection
+            ProjectionTransform transformContentsToProjection = ProjectionFactory
+                    .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+                    .getTransformation(
+                            contents.getSrs().getOrganizationCoordsysId());
+			contents.setBoundingBox(transformContentsToProjection
 					.transform(boundingBox));
 			ContentsDao contentsDao = geoPackage.getContentsDao();
 			contentsDao.update(contents);
@@ -537,7 +541,11 @@ public class TileGenerator {
 		// rows needs to be adjusted
 		if (!googleTiles) {
 
-			BoundingBox previousTileMatrixSetBoundingBox = transformToWgs84
+            ProjectionTransform transformTileMatrixSetToWgs84 = ProjectionFactory.getProjection(
+                    tileMatrixSet.getSrs().getOrganizationCoordsysId())
+                    .getTransformation(
+                            ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+			BoundingBox previousTileMatrixSetBoundingBox = transformTileMatrixSetToWgs84
 					.transform(tileMatrixSet.getBoundingBox());
 
 			// Adjust the bounds to include the request and existing bounds
@@ -550,7 +558,11 @@ public class TileGenerator {
 			// Update the tile matrix set if modified
 			if (!previousTileMatrixSetBoundingBox
 					.equals(tileMatrixSetBoundingBox)) {
-				tileMatrixSet.setBoundingBox(transformToProjection
+                ProjectionTransform transformTileMatrixSetToProjection = ProjectionFactory
+                        .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+                        .getTransformation(
+                                tileMatrixSet.getSrs().getOrganizationCoordsysId());
+				tileMatrixSet.setBoundingBox(transformTileMatrixSetToProjection
 						.transform(tileMatrixSetBoundingBox));
 				TileMatrixSetDao tileMatrixSetDao = geoPackage
 						.getTileMatrixSetDao();
@@ -561,7 +573,7 @@ public class TileGenerator {
 			// mercator
 			ProjectionTransform transformToWebMercator = ProjectionFactory
 					.getProjection(
-							contents.getSrs().getOrganizationCoordsysId())
+                            tileMatrixSet.getSrs().getOrganizationCoordsysId())
 					.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
 			BoundingBox previousTileMatrixSetWebMercatorBoundingBox = transformToWebMercator
 					.transform(previousTileMatrixSetBoundingBox);
@@ -576,7 +588,7 @@ public class TileGenerator {
 				TileMatrix tileMatrix = tileDao.getTileMatrix(zoom);
 				if (tileMatrix != null) {
 
-					// Determine the new width and height at his level
+					// Determine the new width and height at this level
 					long adjustment = (long) Math.pow(2, zoom
 							- minNewOrUpdateZoom);
 					long zoomMatrixWidth = matrixWidth * adjustment;

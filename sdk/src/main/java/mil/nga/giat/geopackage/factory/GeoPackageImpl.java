@@ -61,7 +61,7 @@ import com.j256.ormlite.support.ConnectionSource;
 
 /**
  * A single GeoPackage database connection implementation
- * 
+ *
  * @author osbornb
  */
 class GeoPackageImpl implements GeoPackage {
@@ -88,7 +88,7 @@ class GeoPackageImpl implements GeoPackage {
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param database
 	 * @param cursorFactory
 	 * @param tableCreator
@@ -606,13 +606,14 @@ class GeoPackageImpl implements GeoPackage {
 	 */
 	@Override
 	public TileMatrixSet createTileTableWithMetadata(String tableName,
-			BoundingBox contentsBoundingBox,
-			BoundingBox tileMatrixSetBoundingBox, long srsId) {
+			BoundingBox contentsBoundingBox, long contentsSrsId,
+			BoundingBox tileMatrixSetBoundingBox, long tileMatrixSetSrsId) {
 
 		TileMatrixSet tileMatrixSet = null;
 
 		// Get the SRS
-		SpatialReferenceSystem srs = getSrs(srsId);
+		SpatialReferenceSystem contentsSrs = getSrs(contentsSrsId);
+        SpatialReferenceSystem tileMatrixSetSrs = getSrs(tileMatrixSetSrsId);
 
 		// Create the Tile Matrix Set and Tile Matrix tables
 		createTileMatrixSetTable();
@@ -634,13 +635,13 @@ class GeoPackageImpl implements GeoPackage {
 			contents.setMinY(contentsBoundingBox.getMinLatitude());
 			contents.setMaxX(contentsBoundingBox.getMaxLongitude());
 			contents.setMaxY(contentsBoundingBox.getMaxLatitude());
-			contents.setSrs(srs);
+			contents.setSrs(contentsSrs);
 			getContentsDao().create(contents);
 
 			// Create new matrix tile set
 			tileMatrixSet = new TileMatrixSet();
 			tileMatrixSet.setContents(contents);
-			tileMatrixSet.setSrs(contents.getSrs());
+			tileMatrixSet.setSrs(tileMatrixSetSrs);
 			tileMatrixSet.setMinX(tileMatrixSetBoundingBox.getMinLongitude());
 			tileMatrixSet.setMinY(tileMatrixSetBoundingBox.getMinLatitude());
 			tileMatrixSet.setMaxX(tileMatrixSetBoundingBox.getMaxLongitude());
@@ -661,7 +662,7 @@ class GeoPackageImpl implements GeoPackage {
 
 	/**
 	 * Get the Spatial Reference System by id
-	 * 
+	 *
 	 * @param srsId
 	 * @return
 	 */
@@ -840,7 +841,7 @@ class GeoPackageImpl implements GeoPackage {
 
 	/**
 	 * Create a dao
-	 * 
+	 *
 	 * @param type
 	 * @return
 	 */
@@ -857,7 +858,7 @@ class GeoPackageImpl implements GeoPackage {
 
 	/**
 	 * Verify table or view exists
-	 * 
+	 *
 	 * @param dao
 	 */
 	private void verifyTableExists(BaseDaoImpl<?, ?> dao) {

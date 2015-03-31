@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
+import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
@@ -56,35 +57,39 @@ public class SpatialReferenceSystemDao extends
 	}
 
 	/**
-	 * Creates the required EPSG Spatial Reference System (spec Requirement 11)
-	 * 
+	 * Creates the required EPSG WGS84 Spatial Reference System (spec Requirement 11)
+	 *
+     * @return
 	 * @throws SQLException
 	 */
-	public void createEpsg(Context context) throws SQLException {
+	public SpatialReferenceSystem createWgs84(Context context) throws SQLException {
 
 		Resources resources = context.getResources();
 		SpatialReferenceSystem srs = new SpatialReferenceSystem();
 		srs.setSrsName(resources
-				.getString(R.string.geopackage_srs_epsg_srs_name));
-		srs.setSrsId(resources.getInteger(R.integer.geopackage_srs_epsg_srs_id));
+				.getString(R.string.geopackage_srs_wgs84_srs_name));
+		srs.setSrsId(resources.getInteger(R.integer.geopackage_srs_wgs84_srs_id));
 		srs.setOrganization(resources
-				.getString(R.string.geopackage_srs_epsg_organization));
+				.getString(R.string.geopackage_srs_wgs84_organization));
 		srs.setOrganizationCoordsysId(resources
-				.getInteger(R.integer.geopackage_srs_epsg_organization_coordsys_id));
+				.getInteger(R.integer.geopackage_srs_wgs84_organization_coordsys_id));
 		srs.setDefinition(resources
-				.getString(R.string.geopackage_srs_epsg_definition));
+				.getString(R.string.geopackage_srs_wgs84_definition));
 		srs.setDescription(resources
-				.getString(R.string.geopackage_srs_epsg_description));
+				.getString(R.string.geopackage_srs_wgs84_description));
 		create(srs);
+
+        return srs;
 	}
 
 	/**
 	 * Creates the required Undefined Cartesian Spatial Reference System (spec
 	 * Requirement 11)
-	 * 
+	 *
+     * @return
 	 * @throws SQLException
 	 */
-	public void createUndefinedCartesian(Context context) throws SQLException {
+	public SpatialReferenceSystem createUndefinedCartesian(Context context) throws SQLException {
 
 		Resources resources = context.getResources();
 		SpatialReferenceSystem srs = new SpatialReferenceSystem();
@@ -101,15 +106,18 @@ public class SpatialReferenceSystemDao extends
 		srs.setDescription(resources
 				.getString(R.string.geopackage_srs_undefined_cartesian_description));
 		create(srs);
+
+        return srs;
 	}
 
 	/**
 	 * Creates the required Undefined Geographic Spatial Reference System (spec
 	 * Requirement 11)
-	 * 
+	 *
+     * @return
 	 * @throws SQLException
 	 */
-	public void createUndefinedGeographic(Context context) throws SQLException {
+	public SpatialReferenceSystem createUndefinedGeographic(Context context) throws SQLException {
 
 		Resources resources = context.getResources();
 		SpatialReferenceSystem srs = new SpatialReferenceSystem();
@@ -126,7 +134,67 @@ public class SpatialReferenceSystemDao extends
 		srs.setDescription(resources
 				.getString(R.string.geopackage_srs_undefined_geographic_description));
 		create(srs);
+
+        return srs;
 	}
+
+    /**
+     * Creates the Web Mercator Spatial Reference System if it does not already exist
+     *
+     * @return
+     * @throws SQLException
+     */
+    public SpatialReferenceSystem createWebMercator(Context context) throws SQLException {
+
+        Resources resources = context.getResources();
+        SpatialReferenceSystem srs = new SpatialReferenceSystem();
+        srs.setSrsName(resources
+                .getString(R.string.geopackage_srs_web_mercator_srs_name));
+        srs.setSrsId(resources.getInteger(R.integer.geopackage_srs_web_mercator_srs_id));
+        srs.setOrganization(resources
+                .getString(R.string.geopackage_srs_web_mercator_organization));
+        srs.setOrganizationCoordsysId(resources
+                .getInteger(R.integer.geopackage_srs_web_mercator_organization_coordsys_id));
+        srs.setDefinition(resources
+                .getString(R.string.geopackage_srs_web_mercator_definition));
+        srs.setDescription(resources
+                .getString(R.string.geopackage_srs_web_mercator_description));
+        create(srs);
+
+        return srs;
+    }
+
+    /**
+     * Get or Create the Spatial Reference System for the provided id
+     * @param context
+     * @param srsId
+     * @return
+     */
+    public SpatialReferenceSystem getOrCreate(Context context, long srsId) throws SQLException{
+
+        SpatialReferenceSystem srs = queryForId(srsId);
+
+        if(srs == null) {
+            switch ((int) srsId) {
+                case 4326:
+                    srs = createWgs84(context);
+                    break;
+                case -1:
+                    srs = createUndefinedCartesian(context);
+                    break;
+                case 0:
+                    srs = createUndefinedGeographic(context);
+                    break;
+                case 3857:
+                    srs = createWebMercator(context);
+                    break;
+                default:
+                    throw new GeoPackageException("Spatial Reference System not supported for metadata creation: " + srsId);
+            }
+        }
+
+        return srs;
+    }
 
 	/**
 	 * Delete the Spatial Reference System, cascading
