@@ -1,5 +1,6 @@
 package mil.nga.giat.geopackage;
 
+import java.io.Closeable;
 import java.util.List;
 
 import mil.nga.giat.geopackage.core.contents.Contents;
@@ -32,7 +33,7 @@ import com.j256.ormlite.support.ConnectionSource;
  * 
  * @author osbornb
  */
-public interface GeoPackage {
+public interface GeoPackage extends Closeable {
 
 	/**
 	 * Close the GeoPackage connection
