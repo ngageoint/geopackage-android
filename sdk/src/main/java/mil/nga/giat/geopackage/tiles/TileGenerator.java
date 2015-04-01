@@ -571,13 +571,12 @@ public class TileGenerator {
 
 			// Get the previous bounding box and new bounding box in web
 			// mercator
-			ProjectionTransform transformToWebMercator = ProjectionFactory
-					.getProjection(
-                            tileMatrixSet.getSrs().getOrganizationCoordsysId())
+			ProjectionTransform transformWgs84ToWebMercator = ProjectionFactory
+					.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
 					.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
-			BoundingBox previousTileMatrixSetWebMercatorBoundingBox = transformToWebMercator
+			BoundingBox previousTileMatrixSetWebMercatorBoundingBox = transformWgs84ToWebMercator
 					.transform(previousTileMatrixSetBoundingBox);
-			BoundingBox tileMatrixSetWebMercatorBoundingBox = transformToWebMercator
+			BoundingBox tileMatrixSetWebMercatorBoundingBox = transformWgs84ToWebMercator
 					.transform(tileMatrixSetBoundingBox);
 
 			TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
