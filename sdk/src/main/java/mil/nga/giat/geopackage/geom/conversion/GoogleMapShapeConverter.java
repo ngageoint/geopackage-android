@@ -82,6 +82,22 @@ public class GoogleMapShapeConverter {
 		return projection;
 	}
 
+    /**
+     * Get the transformation from the projection to WGS 84
+     * @return
+     */
+    public ProjectionTransform getToWgs84Transform() {
+        return toWgs84;
+    }
+
+    /**
+     * Get the transformation to the projection from WGS 84
+     * @return
+     */
+    public ProjectionTransform getFromWgs84Transform() {
+        return fromWgs84;
+    }
+
 	/**
 	 * Convert a {@link Point} to a {@link LatLng}
 	 *

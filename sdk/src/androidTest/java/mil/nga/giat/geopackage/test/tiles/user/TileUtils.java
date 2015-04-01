@@ -810,14 +810,10 @@ public class TileUtils {
 					TestCase.assertEquals(tileMatrix.getZoomLevel(), zoomLevel);
 
 					zoomLevel = dao.getZoomLevel(width - 1);
-					TestCase.assertEquals(
-							Math.min(tileMatrix.getZoomLevel() + 1,
-									dao.getMaxZoom()), zoomLevel);
+                    TestCase.assertEquals(tileMatrix.getZoomLevel(), zoomLevel);
 
 					zoomLevel = dao.getZoomLevel(height - 1);
-					TestCase.assertEquals(
-							Math.min(tileMatrix.getZoomLevel() + 1,
-									dao.getMaxZoom()), zoomLevel);
+                    TestCase.assertEquals(tileMatrix.getZoomLevel(), zoomLevel);
 
 				}
 

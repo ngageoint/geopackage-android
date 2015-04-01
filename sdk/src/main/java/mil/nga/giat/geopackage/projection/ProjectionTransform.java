@@ -70,7 +70,7 @@ public class ProjectionTransform {
 		ProjCoordinate fromCoord;
 		if (from.hasZ()) {
 			fromCoord = new ProjCoordinate(from.getX(), from.getY(),
-					from.getZ());
+					from.getZ() != null ? from.getZ() : Double.NaN);
 		} else {
 			fromCoord = new ProjCoordinate(from.getX(), from.getY());
 		}

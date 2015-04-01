@@ -136,7 +136,7 @@ public class GoogleMapShapeConverterUtils {
 		LatLng latLng = converter.toLatLng(point);
 		TestCase.assertNotNull(latLng);
 
-		comparePointAndLatLng(point, latLng);
+		comparePointAndLatLng(converter, point, latLng);
 
 		Point point2 = converter.toPoint(latLng, point.hasZ(), point.hasM());
 		TestCase.assertNotNull(point2);
@@ -147,13 +147,20 @@ public class GoogleMapShapeConverterUtils {
 
 	/**
 	 * Compare Point with LatLng
-	 * 
+	 *
+     * @param converter
 	 * @param point
 	 * @param latLng
 	 */
-	private static void comparePointAndLatLng(Point point, LatLng latLng) {
-		TestCase.assertEquals(point.getX(), latLng.longitude);
-		TestCase.assertEquals(point.getY(), latLng.latitude);
+	private static void comparePointAndLatLng(GoogleMapShapeConverter converter, Point point, LatLng latLng) {
+        double x = point.getX();
+        double y = point.getY();
+        if(converter != null){
+            x = converter.getToWgs84Transform().transformLongitude(x);
+            y = converter.getToWgs84Transform().transformLatitude(y);
+        }
+		TestCase.assertEquals(x, latLng.longitude, 0.001);
+		TestCase.assertEquals(y, latLng.latitude, 0.001);
 	}
 
 	/**
@@ -163,8 +170,8 @@ public class GoogleMapShapeConverterUtils {
 	 * @param point2
 	 */
 	private static void comparePoints(Point point, Point point2) {
-		TestCase.assertEquals(point.getX(), point2.getX());
-		TestCase.assertEquals(point.getY(), point2.getY());
+		TestCase.assertEquals(point.getX(), point2.getX(), 0.001);
+		TestCase.assertEquals(point.getY(), point2.getY(), 0.001);
 	}
 
 	/**
@@ -179,7 +186,7 @@ public class GoogleMapShapeConverterUtils {
 		PolylineOptions polyline = converter.toPolyline(lineString);
 		TestCase.assertNotNull(polyline);
 
-		compareLineStringAndPolyline(lineString, polyline);
+		compareLineStringAndPolyline(converter, lineString, polyline);
 
 		LineString lineString2 = converter.toLineString(polyline);
 		compareLineStrings(lineString, lineString2);
@@ -187,38 +194,41 @@ public class GoogleMapShapeConverterUtils {
 
 	/**
 	 * Compare LineString with Polyline
-	 * 
+	 *
+     * @param converter
 	 * @param lineString
 	 * @param polyline
 	 */
-	private static void compareLineStringAndPolyline(LineString lineString,
+	private static void compareLineStringAndPolyline(GoogleMapShapeConverter converter, LineString lineString,
 			PolylineOptions polyline) {
-		compareLineStringAndLatLngs(lineString, polyline.getPoints());
+		compareLineStringAndLatLngs(converter, lineString, polyline.getPoints());
 	}
 
 	/**
 	 * Compare LineString with LatLng points
-	 * 
+	 *
+     * @param converter
 	 * @param lineString
 	 * @param points
 	 */
-	private static void compareLineStringAndLatLngs(LineString lineString,
+	private static void compareLineStringAndLatLngs(GoogleMapShapeConverter converter, LineString lineString,
 			List<LatLng> points) {
-		comparePointsAndLatLngs(lineString.getPoints(), points);
+		comparePointsAndLatLngs(converter, lineString.getPoints(), points);
 	}
 
 	/**
 	 * Compare list of points and lat longs
-	 * 
+	 *
+     * @param converter
 	 * @param points
 	 * @param points2
 	 */
-	private static void comparePointsAndLatLngs(List<Point> points,
+	private static void comparePointsAndLatLngs(GoogleMapShapeConverter converter, List<Point> points,
 			List<LatLng> points2) {
 		TestCase.assertEquals(points.size(), points2.size());
 
 		for (int i = 0; i < points.size(); i++) {
-			comparePointAndLatLng(points.get(i), points2.get(i));
+			comparePointAndLatLng(converter, points.get(i), points2.get(i));
 		}
 	}
 
@@ -259,7 +269,7 @@ public class GoogleMapShapeConverterUtils {
 		PolygonOptions polygonOptions = converter.toPolygon(polygon);
 		TestCase.assertNotNull(polygonOptions);
 
-		comparePolygonAndMapPolygon(polygon, polygonOptions);
+		comparePolygonAndMapPolygon(converter, polygon, polygonOptions);
 
 		Polygon polygon2 = converter.toPolygon(polygonOptions);
 		comparePolygons(polygon, polygon2);
@@ -267,11 +277,13 @@ public class GoogleMapShapeConverterUtils {
 
 	/**
 	 * Compare Polygon with Map Polygon
-	 * 
+	 *
+     * @param converter
 	 * @param polygon
 	 * @param polygon2
 	 */
-	private static void comparePolygonAndMapPolygon(Polygon polygon,
+	private static void comparePolygonAndMapPolygon(GoogleMapShapeConverter converter,
+            Polygon polygon,
 			PolygonOptions polygon2) {
 		List<LineString> rings = polygon.getRings();
 		List<LatLng> points = polygon2.getPoints();
@@ -280,12 +292,12 @@ public class GoogleMapShapeConverterUtils {
 		TestCase.assertEquals(polygon.numRings(), 1 + holes.size());
 
 		LineString polygonRing = rings.get(0);
-		compareLineStringAndLatLngs(polygonRing, points);
+		compareLineStringAndLatLngs(converter, polygonRing, points);
 
 		for (int i = 1; i < rings.size(); i++) {
 			LineString ring = rings.get(i);
 			List<LatLng> hole = holes.get(i - 1);
-			compareLineStringAndLatLngs(ring, hole);
+			compareLineStringAndLatLngs(converter, ring, hole);
 		}
 	}
 
@@ -320,7 +332,7 @@ public class GoogleMapShapeConverterUtils {
 		TestCase.assertFalse(latLngs.getLatLngs().isEmpty());
 
 		List<Point> points = multiPoint.getPoints();
-		comparePointsAndLatLngs(points, latLngs.getLatLngs());
+		comparePointsAndLatLngs(converter, points, latLngs.getLatLngs());
 
 		MultiPoint multiPoint2 = converter.toMultiPoint(latLngs);
 		comparePoints(multiPoint.getPoints(), multiPoint2.getPoints());
@@ -340,7 +352,7 @@ public class GoogleMapShapeConverterUtils {
 		TestCase.assertFalse(polylines.getPolylineOptions().isEmpty());
 
 		List<LineString> lineStrings = multiLineString.getLineStrings();
-		compareLineStringsAndPolylines(lineStrings,
+		compareLineStringsAndPolylines(converter, lineStrings,
 				polylines.getPolylineOptions());
 
 		MultiLineString multiLineString2 = converter
@@ -350,16 +362,18 @@ public class GoogleMapShapeConverterUtils {
 
 	/**
 	 * Compare list of line strings with list of polylines
-	 * 
+	 *
+     * @param converter
 	 * @param lineStrings
 	 * @param polylines
 	 */
 	private static void compareLineStringsAndPolylines(
+            GoogleMapShapeConverter converter,
 			List<LineString> lineStrings, List<PolylineOptions> polylines) {
 
 		TestCase.assertEquals(lineStrings.size(), polylines.size());
 		for (int i = 0; i < lineStrings.size(); i++) {
-			compareLineStringAndPolyline(lineStrings.get(i), polylines.get(i));
+			compareLineStringAndPolyline(converter, lineStrings.get(i), polylines.get(i));
 		}
 
 	}
@@ -368,7 +382,7 @@ public class GoogleMapShapeConverterUtils {
 	 * Compare two lists of line strings
 	 * 
 	 * @param lineStrings
-	 * @param polylines
+	 * @param lineStrings2
 	 */
 	private static void compareLineStrings(List<LineString> lineStrings,
 			List<LineString> lineStrings2) {
@@ -394,7 +408,7 @@ public class GoogleMapShapeConverterUtils {
 		TestCase.assertFalse(mapPolygons.getPolygonOptions().isEmpty());
 
 		List<Polygon> polygons = multiPolygon.getPolygons();
-		comparePolygonsAndMapPolygons(polygons, mapPolygons.getPolygonOptions());
+		comparePolygonsAndMapPolygons(converter, polygons, mapPolygons.getPolygonOptions());
 
 		MultiPolygon multiPolygon2 = converter
 				.toMultiPolygonFromOptions(mapPolygons);
@@ -403,16 +417,17 @@ public class GoogleMapShapeConverterUtils {
 
 	/**
 	 * Compare list of polygons with list of map polygons
-	 * 
+	 *
+     * @param converter
 	 * @param polygons
 	 * @param mapPolygons
 	 */
-	private static void comparePolygonsAndMapPolygons(List<Polygon> polygons,
+	private static void comparePolygonsAndMapPolygons(GoogleMapShapeConverter converter, List<Polygon> polygons,
 			List<PolygonOptions> mapPolygons) {
 
 		TestCase.assertEquals(polygons.size(), mapPolygons.size());
 		for (int i = 0; i < polygons.size(); i++) {
-			comparePolygonAndMapPolygon(polygons.get(i), mapPolygons.get(i));
+			comparePolygonAndMapPolygon(converter, polygons.get(i), mapPolygons.get(i));
 		}
 
 	}
@@ -421,7 +436,7 @@ public class GoogleMapShapeConverterUtils {
 	 * Compare two lists of polygons
 	 * 
 	 * @param polygons
-	 * @param mapPolygons
+	 * @param polygons2
 	 */
 	private static void comparePolygons(List<Polygon> polygons,
 			List<Polygon> polygons2) {
@@ -447,7 +462,7 @@ public class GoogleMapShapeConverterUtils {
 		TestCase.assertFalse(polylines.getPolylineOptions().isEmpty());
 
 		List<LineString> lineStrings = compoundCurve.getLineStrings();
-		compareLineStringsAndPolylines(lineStrings,
+		compareLineStringsAndPolylines(converter, lineStrings,
 				polylines.getPolylineOptions());
 
 		CompoundCurve compoundCurve2 = converter
@@ -470,7 +485,7 @@ public class GoogleMapShapeConverterUtils {
 		TestCase.assertFalse(mapPolygons.getPolygonOptions().isEmpty());
 
 		List<Polygon> polygons = polyhedralSurface.getPolygons();
-		comparePolygonsAndMapPolygons(polygons, mapPolygons.getPolygonOptions());
+		comparePolygonsAndMapPolygons(converter, polygons, mapPolygons.getPolygonOptions());
 
 		PolyhedralSurface polyhedralSurface2 = converter
 				.toPolyhedralSurfaceWithOptions(mapPolygons);
