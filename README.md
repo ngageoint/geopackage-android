@@ -98,7 +98,5 @@ Small subset of functionality example:
 
 ### Dependencies ###
 
-* [WKB](https://git.geointapps.org/geopackage/wkb) (The MIT License (MIT)) - Well-Known Binary Library
+* [GeoPackage Core](https://git.geointapps.org/geopackage/geopackage-core) (The MIT License (MIT)) - GeoPackage Library
 * [OrmLite](http://ormlite.com/) (Open Source License) - Object Relational Mapping (ORM) Library
-* [Proj4J](http://trac.osgeo.org/proj4j/) (Apache License, Version 2.0) - Projection Library
-
