@@ -8,6 +8,11 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 
+/**
+ * Conversions between Bitmaps and image bytes
+ *
+ * @author osbornb
+ */
 public class BitmapConverter {
 
 	/**

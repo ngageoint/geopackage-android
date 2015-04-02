@@ -1,8 +1,8 @@
 package mil.nga.giat.geopackage.db;
 
-import mil.nga.giat.geopackage.GeoPackageException;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+
+import mil.nga.giat.geopackage.GeoPackageException;
 
 /**
  * Database utility methods
@@ -121,29 +121,6 @@ public class GeoPackageDatabaseUtils {
 		}
 
 		return value;
-	}
-
-	/**
-	 * Does the table exist?
-	 * 
-	 * @param db
-	 * @param tableName
-	 * @return
-	 */
-	public static boolean tableExists(SQLiteDatabase db, String tableName) {
-
-		boolean exists = false;
-
-		Cursor cursor = db
-				.rawQuery(
-						"select DISTINCT tbl_name from sqlite_master where tbl_name = ?",
-						new String[] { tableName });
-		if (cursor != null) {
-			exists = cursor.getCount() > 0;
-			cursor.close();
-		}
-
-		return exists;
 	}
 
 }

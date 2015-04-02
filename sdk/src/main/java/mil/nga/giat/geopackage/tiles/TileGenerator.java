@@ -1,5 +1,12 @@
 package mil.nga.giat.geopackage.tiles;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory.Options;
+import android.util.SparseArray;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -19,13 +26,13 @@ import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.giat.geopackage.io.BitmapConverter;
+import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
+import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.projection.Projection;
 import mil.nga.giat.geopackage.projection.ProjectionConstants;
 import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import mil.nga.giat.geopackage.projection.ProjectionTransform;
-import mil.nga.giat.geopackage.io.BitmapConverter;
-import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
-import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
@@ -35,12 +42,6 @@ import mil.nga.giat.geopackage.tiles.user.TileCursor;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.tiles.user.TileRow;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory.Options;
-import android.util.SparseArray;
 
 /**
  * Creates a set of tiles within a GeoPackage by downloading the tiles from a
@@ -355,7 +356,7 @@ public class TileGenerator {
 				|| !tileMatrixSetDao.idExists(tableName)) {
             // Create the web mercator srs if needed
             SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
-            srsDao.getOrCreate(context, ProjectionConstants.EPSG_WEB_MERCATOR);
+            srsDao.getOrCreate(ProjectionConstants.EPSG_WEB_MERCATOR);
             // Create the tile table
 			tileMatrixSet = geoPackage.createTileTableWithMetadata(
 					tableName,
@@ -607,7 +608,7 @@ public class TileGenerator {
 							BoundingBox tileBoundingBox = TileBoundingBoxUtils
 									.getWebMercatorBoundingBox(
 											previousTileMatrixSetWebMercatorBoundingBox,
-											tileMatrix, tileRow);
+											tileMatrix, tileRow.getTileColumn(), tileRow.getTileRow());
 
 							// Get the mid lat and lon to find the new tile row
 							// and column

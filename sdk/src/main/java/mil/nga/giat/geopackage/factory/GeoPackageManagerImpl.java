@@ -1,5 +1,12 @@
 package mil.nga.giat.geopackage.factory;
 
+import android.content.Context;
+import android.database.DatabaseErrorHandler;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+
+import com.j256.ormlite.dao.DaoManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,6 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.GeoPackageConstants;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.R;
@@ -25,18 +33,11 @@ import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.giat.geopackage.db.ExternalGeoPackage;
 import mil.nga.giat.geopackage.db.ExternalGeoPackageDataSource;
+import mil.nga.giat.geopackage.db.GeoPackageAndroidConnection;
 import mil.nga.giat.geopackage.db.GeoPackageMetadataOpenHelper;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
-import android.content.Context;
-import android.database.DatabaseErrorHandler;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-
-import com.j256.ormlite.android.AndroidConnectionSource;
-import com.j256.ormlite.dao.DaoManager;
-import com.j256.ormlite.support.ConnectionSource;
 
 /**
  * GeoPackage Database management implementation
@@ -44,11 +45,6 @@ import com.j256.ormlite.support.ConnectionSource;
  * @author osbornb
  */
 class GeoPackageManagerImpl implements GeoPackageManager {
-
-    /**
-     * GeoPackage application id
-     */
-    private static final String APPLICATION_ID = "GP10";
 
 	/**
 	 * Context
@@ -203,15 +199,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		} else {
 			SQLiteDatabase db = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
+            GeoPackageAndroidConnection connection = new GeoPackageAndroidConnection(db);
 
             // Set the application id as a GeoPackage
-            int applicationId = ByteBuffer.wrap(APPLICATION_ID.getBytes()).asIntBuffer().get();
-            db.execSQL(String.format("PRAGMA application_id = %d;",
+            int applicationId = ByteBuffer.wrap(GeoPackageConstants.APPLICATION_ID.getBytes()).asIntBuffer().get();
+            connection.execSQL(String.format("PRAGMA application_id = %d;",
                     applicationId));
 
 			// Create the minimum required tables
-			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(
-					context, db);
+			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
 
 			// Create the Spatial Reference System table (spec Requirement 10)
 			tableCreator.createSpatialReferenceSystem();
@@ -221,20 +217,19 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
 			// Create the required Spatial Reference Systems (spec Requirement
 			// 11)
-			ConnectionSource connectionSource = new AndroidConnectionSource(db);
 			try {
 				SpatialReferenceSystemDao dao = DaoManager.createDao(
-						connectionSource, SpatialReferenceSystem.class);
-				dao.createWgs84(context);
-				dao.createUndefinedCartesian(context);
-				dao.createUndefinedGeographic(context);
+						connection.getConnectionSource(), SpatialReferenceSystem.class);
+				dao.createWgs84();
+				dao.createUndefinedCartesian();
+				dao.createUndefinedGeographic();
 			} catch (SQLException e) {
 				throw new GeoPackageException(
 						"Error creating default required Spatial Reference Systems",
 						e);
 			}
 
-			db.close();
+            connection.close();
 			created = true;
 		}
 
@@ -295,11 +290,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 					"GeoPackage database file '"
 							+ file
 							+ "' does not have a valid extension of '"
-							+ context
-									.getString(R.string.geopackage_file_suffix)
+							+ GeoPackageConstants.GEOPACKAGE_EXTENSION
 							+ "' or '"
-							+ context
-									.getString(R.string.geopackage_extended_file_suffix)
+							+ GeoPackageConstants.GEOPACKAGE_EXTENDED_EXTENSION
 							+ "'");
 		}
 
@@ -409,7 +402,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
 		// Add the extension if not on the name
 		if (!hasGeoPackageExtension(file)) {
-			name += "." + context.getString(R.string.geopackage_file_suffix);
+			name += "." + GeoPackageConstants.GEOPACKAGE_EXTENSION;
 			file = new File(directory, name);
 		}
 
@@ -444,9 +437,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 				sqlite = context.openOrCreateDatabase(database,
 						Context.MODE_PRIVATE, cursorFactory);
 			}
-			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(
-					context, sqlite);
-			db = new GeoPackageImpl(sqlite, cursorFactory, tableCreator);
+            GeoPackageAndroidConnection connection = new GeoPackageAndroidConnection(sqlite);
+			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
+			db = new GeoPackageAndroidImpl(connection, cursorFactory, tableCreator);
 		}
 
 		return db;
@@ -739,10 +732,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	private boolean hasGeoPackageExtension(File file) {
 		String extension = GeoPackageIOUtils.getFileExtension(file);
 		boolean isGeoPackage = extension != null
-				&& (extension.equalsIgnoreCase(context
-						.getString(R.string.geopackage_file_suffix)) || extension
-						.equalsIgnoreCase(context
-								.getString(R.string.geopackage_extended_file_suffix)));
+				&& (extension.equalsIgnoreCase(GeoPackageConstants.GEOPACKAGE_EXTENSION) || extension
+						.equalsIgnoreCase(GeoPackageConstants.GEOPACKAGE_EXTENDED_EXTENSION));
 		return isGeoPackage;
 	}
 

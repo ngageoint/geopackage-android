@@ -23,7 +23,7 @@ import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureRow;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
+import mil.nga.giat.geopackage.io.AndroidGeoPackageIOUtils;
 import mil.nga.giat.geopackage.schema.columns.DataColumns;
 import mil.nga.giat.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.giat.geopackage.schema.constraints.DataColumnConstraintType;
@@ -114,7 +114,7 @@ public class TestUtils {
 	 */
 	public static String getAssetFileInternalStorageLocation(Context context,
 			String assetPath) {
-		return GeoPackageIOUtils.getInternalFilePath(context, assetPath);
+		return AndroidGeoPackageIOUtils.getInternalFilePath(context, assetPath);
 	}
 
 	/**

@@ -156,7 +156,7 @@ public class GeoPackageOverlay implements TileProvider {
 						BoundingBox tileWebMercatorBoundingBox = TileBoundingBoxUtils
 								.getWebMercatorBoundingBox(
 										setWebMercatorBoundingBox, tileMatrix,
-										tileRow);
+										tileRow.getTileColumn(), tileRow.getTileRow());
 
 						// Get the bounding box where the requested image and
 						// tile overlap

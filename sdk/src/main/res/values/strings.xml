@@ -1,51 +1,9 @@
 <resources>
 
     <string name="app_name">GeoPackageSDK</string>
-    
-    <string name="geopackage_file_suffix">gpkg</string>
-    <string name="geopackage_extended_file_suffix">gpkx</string>
+
     <string name="geopackage_db_rollback_suffix">-journal</string>
-    
-    <string name="sql_directory">sql</string>
-    <string name="sql_spatial_reference_system">C.1. gpkg_spatial_ref_sys</string>
-    <string name="sql_contents">C.2. gpkg_contents</string>
-    <string name="sql_geometry_columns">C.3. gpkg_geometry_columns</string>
-    <string name="sql_tile_matrix_set">C.5. gpkg_tile_matrix_set</string>
-    <string name="sql_tile_matrix">C.6. gpkg_tile_matrix</string>
-    <string name="sql_data_columns">C.8. gpkg_data_columns</string>
-    <string name="sql_data_column_constraints">C.9. gpkg_data_column_constraints</string>
-    <string name="sql_metadata">C.10. gpkg_metadata</string>
-    <string name="sql_metadata_reference">C.11. gpkg_metadata_reference</string>
-    <string name="sql_extensions">C.12. gpkg_extensions</string>
-    
-    <string name="geopackage_srs_wgs84_srs_name">WGS 84 geodetic</string>
-    <integer name="geopackage_srs_wgs84_srs_id">4326</integer>
-    <string name="geopackage_srs_wgs84_organization">EPSG</string>
-    <integer name="geopackage_srs_wgs84_organization_coordsys_id">4326</integer>
-    <string name="geopackage_srs_wgs84_definition">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326”]]</string>
-    <string name="geopackage_srs_wgs84_description">longitude/latitude coordinates in decimal degrees on the WGS 84 spheroid</string>
-  
-    <string name="geopackage_srs_undefined_cartesian_srs_name">Undefined cartesian SRS</string>
-    <integer name="geopackage_srs_undefined_cartesian_srs_id">-1</integer>
-    <string name="geopackage_srs_undefined_cartesian_organization">NONE</string>
-    <integer name="geopackage_srs_undefined_cartesian_organization_coordsys_id">-1</integer>
-    <string name="geopackage_srs_undefined_cartesian_definition">undefined</string>
-    <string name="geopackage_srs_undefined_cartesian_description">undefined cartesian coordinate reference system</string>
 
-    <string name="geopackage_srs_undefined_geographic_srs_name">Undefined geographic SRS</string>
-    <integer name="geopackage_srs_undefined_geographic_srs_id">0</integer>
-    <string name="geopackage_srs_undefined_geographic_organization">NONE</string>
-    <integer name="geopackage_srs_undefined_geographic_organization_coordsys_id">0</integer>
-    <string name="geopackage_srs_undefined_geographic_definition">undefined</string>
-    <string name="geopackage_srs_undefined_geographic_description">undefined geographic coordinate reference system</string>
-
-    <string name="geopackage_srs_web_mercator_srs_name">WGS 84 / Pseudo-Mercator</string>
-    <integer name="geopackage_srs_web_mercator_srs_id">3857</integer>
-    <string name="geopackage_srs_web_mercator_organization">EPSG</string>
-    <integer name="geopackage_srs_web_mercator_organization_coordsys_id">3857</integer>
-    <string name="geopackage_srs_web_mercator_definition">PROJCS["WGS 84 / Pseudo-Mercator",GEOGCS["Popular Visualisation CRS",DATUM["Popular_Visualisation_Datum",SPHEROID["Popular Visualisation Sphere",6378137,0,AUTHORITY["EPSG","7059"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6055"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4055"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],PROJECTION["Mercator_1SP"],PARAMETER["central_meridian",0],PARAMETER["scale_factor",1],PARAMETER["false_easting",0],PARAMETER["false_northing",0],AUTHORITY["EPSG","3785"],AXIS["X",EAST],AXIS["Y",NORTH]]</string>
-    <string name="geopackage_srs_web_mercator_description">Spherical Mercator projection coordinate system</string>
-    
     <string name="tile_generator_variable_z">\\{z\\}</string>
     <string name="tile_generator_variable_x">\\{x\\}</string>
     <string name="tile_generator_variable_y">\\{y\\}</string>
