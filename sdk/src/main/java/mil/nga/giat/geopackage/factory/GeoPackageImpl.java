@@ -3,7 +3,6 @@ package mil.nga.giat.geopackage.factory;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.j256.ormlite.android.AndroidConnectionSource;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 
@@ -51,14 +50,15 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
     /**
      * Constructor
      *
+     * @param name
      * @param database
      * @param cursorFactory
      * @param tableCreator
      */
-    GeoPackageImpl(GeoPackageConnection database,
+    GeoPackageImpl(String name, GeoPackageConnection database,
                    GeoPackageCursorFactory cursorFactory,
                    GeoPackageTableCreator tableCreator) {
-        super(database, new AndroidConnectionSource(database.getDb()), tableCreator);
+        super(name, database, tableCreator);
         this.database = database.getDb();
         this.cursorFactory = cursorFactory;
     }

@@ -38,6 +38,7 @@ import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadataOpenHelper;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
+import mil.nga.giat.geopackage.validate.GeoPackageValidate;
 
 /**
  * GeoPackage Database management implementation
@@ -202,32 +203,11 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             GeoPackageConnection connection = new GeoPackageConnection(db);
 
             // Set the application id as a GeoPackage
-            int applicationId = ByteBuffer.wrap(GeoPackageConstants.APPLICATION_ID.getBytes()).asIntBuffer().get();
-            connection.execSQL(String.format("PRAGMA application_id = %d;",
-                    applicationId));
+            connection.setApplicationId();
 
 			// Create the minimum required tables
 			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
-
-			// Create the Spatial Reference System table (spec Requirement 10)
-			tableCreator.createSpatialReferenceSystem();
-
-			// Create the Contents table (spec Requirement 13)
-			tableCreator.createContents();
-
-			// Create the required Spatial Reference Systems (spec Requirement
-			// 11)
-			try {
-				SpatialReferenceSystemDao dao = DaoManager.createDao(
-						connection.getConnectionSource(), SpatialReferenceSystem.class);
-				dao.createWgs84();
-				dao.createUndefinedCartesian();
-				dao.createUndefinedGeographic();
-			} catch (SQLException e) {
-				throw new GeoPackageException(
-						"Error creating default required Spatial Reference Systems",
-						e);
-			}
+            tableCreator.createRequired();
 
             connection.close();
 			created = true;
@@ -285,16 +265,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	public boolean importGeoPackage(String name, File file, boolean override) {
 
 		// Verify the file has the right extension
-		if (!hasGeoPackageExtension(file)) {
-			throw new GeoPackageException(
-					"GeoPackage database file '"
-							+ file
-							+ "' does not have a valid extension of '"
-							+ GeoPackageConstants.GEOPACKAGE_EXTENSION
-							+ "' or '"
-							+ GeoPackageConstants.GEOPACKAGE_EXTENDED_EXTENSION
-							+ "'");
-		}
+        GeoPackageValidate.validateGeoPackageExtension(file);
 
 		// Use the provided name or the base file name as the database name
 		String database;
@@ -401,7 +372,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		File file = new File(directory, name);
 
 		// Add the extension if not on the name
-		if (!hasGeoPackageExtension(file)) {
+		if (!GeoPackageValidate.hasGeoPackageExtension(file)) {
 			name += "." + GeoPackageConstants.GEOPACKAGE_EXTENSION;
 			file = new File(directory, name);
 		}
@@ -439,7 +410,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			}
             GeoPackageConnection connection = new GeoPackageConnection(sqlite);
 			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
-			db = new GeoPackageImpl(connection, cursorFactory, tableCreator);
+			db = new GeoPackageImpl(database, connection, cursorFactory, tableCreator);
 		}
 
 		return db;
@@ -530,26 +501,10 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 			GeoPackage geoPackage = open(database);
 			if (geoPackage != null) {
 				try {
-					if (!geoPackage.getSpatialReferenceSystemDao()
-							.isTableExists()
-							|| !geoPackage.getContentsDao().isTableExists()) {
-						externalDataSource.delete(database);
-						throw new GeoPackageException(
-								"Invalid GeoPackage database file. Does not contain required tables: "
-										+ SpatialReferenceSystem.TABLE_NAME
-										+ " & " + Contents.TABLE_NAME
-										+ ", Database: " + database
-										+ ", Path: " + path);
-					}
-				} catch (SQLException e) {
+                    GeoPackageValidate.validateMinimumTables(geoPackage);
+				} catch (RuntimeException e) {
 					externalDataSource.delete(database);
-					throw new GeoPackageException(
-							"Invalid GeoPackage database file. Could not verify existence of required tables: "
-									+ SpatialReferenceSystem.TABLE_NAME
-									+ " & "
-									+ Contents.TABLE_NAME
-									+ ", Database: "
-									+ database + ", Path: " + path);
+					throw e;
 				} finally {
 					geoPackage.close();
 				}
@@ -721,20 +676,6 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 	private boolean isTemporary(String database) {
 		return database.endsWith(context
 				.getString(R.string.geopackage_db_rollback_suffix));
-	}
-
-	/**
-	 * Check the file extension to see if it is a GeoPackage
-	 * 
-	 * @param file
-	 * @return true if GeoPackage extension
-	 */
-	private boolean hasGeoPackageExtension(File file) {
-		String extension = GeoPackageIOUtils.getFileExtension(file);
-		boolean isGeoPackage = extension != null
-				&& (extension.equalsIgnoreCase(GeoPackageConstants.GEOPACKAGE_EXTENSION) || extension
-						.equalsIgnoreCase(GeoPackageConstants.GEOPACKAGE_EXTENDED_EXTENSION));
-		return isGeoPackage;
 	}
 
 }

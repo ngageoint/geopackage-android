@@ -11,12 +11,17 @@ import com.j256.ormlite.support.ConnectionSource;
  *
  * @author osbornb
  */
-public class GeoPackageConnection implements GeoPackageCoreConnection {
+public class GeoPackageConnection extends GeoPackageCoreConnection {
 
     /**
      * Database connection
      */
     private final SQLiteDatabase db;
+
+    /**
+     * Connection source
+     */
+    private final ConnectionSource connectionSource;
 
     /**
      * Constructor
@@ -25,6 +30,7 @@ public class GeoPackageConnection implements GeoPackageCoreConnection {
      */
     public GeoPackageConnection(SQLiteDatabase db) {
         this.db = db;
+        this.connectionSource = new AndroidConnectionSource(db);
     }
 
     /**
@@ -41,7 +47,7 @@ public class GeoPackageConnection implements GeoPackageCoreConnection {
      */
     @Override
     public ConnectionSource getConnectionSource() {
-        return new AndroidConnectionSource(db);
+        return connectionSource;
     }
 
     /**
@@ -76,6 +82,7 @@ public class GeoPackageConnection implements GeoPackageCoreConnection {
      */
     @Override
     public void close() {
+        connectionSource.closeQuietly();
         db.close();
     }
 
