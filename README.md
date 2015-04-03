@@ -37,6 +37,18 @@ Small subset of functionality example:
     // Open database
     GeoPackage geoPackage = manager.open(databases.get(0));
     
+    // GeoPackage Table DAOs
+    SpatialReferenceSystemDao srsDao = getSpatialReferenceSystemDao();
+    ContentsDao contentsDao = geoPackage.getContentsDao();
+    GeometryColumnsDao geomColumnsDao = geoPackage.getGeometryColumnsDao();
+    TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+    TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
+    DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
+    DataColumnConstraintsDao dataColumnConstraintsDao = geoPackage.getDataColumnConstraintsDao();
+    MetadataDao metadataDao = geoPackage.getMetadataDao();
+    MetadataReferenceDao metadataReferenceDao = geoPackage.getMetadataReferenceDao();
+    ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
+    
     // Feature and tile tables
     List<String> features = geoPackage.getFeatureTables();
     List<String> tiles = geoPackage.getTileTables();
