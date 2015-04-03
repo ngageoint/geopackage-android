@@ -19,8 +19,6 @@ The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sam
 
 #### Example ####
 
-Small subset of functionality example:
-
     // Context context = ...;
     // File geoPackageFile = ...;
     // GoogleMap map = ...;
