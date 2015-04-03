@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import mil.nga.giat.geopackage.GeoPackageException;
+import mil.nga.giat.geopackage.projection.Projection;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,6 +33,11 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	 * User table
 	 */
 	private final TTable table;
+
+    /**
+     * Projection
+     */
+    protected Projection projection;
 
 	/**
 	 * Constructor
@@ -76,6 +83,15 @@ public abstract class UserDao<TTable extends UserTable<?>, TRow extends UserRow<
 	public TTable getTable() {
 		return table;
 	}
+
+    /**
+     * Get the projection
+     *
+     * @return
+     */
+    public Projection getProjection() {
+        return projection;
+    }
 
 	/**
 	 * Drop the user table

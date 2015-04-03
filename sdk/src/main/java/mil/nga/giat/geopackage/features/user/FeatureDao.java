@@ -1,14 +1,14 @@
 package mil.nga.giat.geopackage.features.user;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
-import mil.nga.giat.wkb.geom.GeometryType;
-import mil.nga.giat.geopackage.projection.Projection;
 import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import mil.nga.giat.geopackage.user.UserDao;
-import android.database.sqlite.SQLiteDatabase;
+import mil.nga.giat.wkb.geom.GeometryType;
 
 /**
  * Feature DAO for reading feature user data tables
@@ -22,11 +22,6 @@ public class FeatureDao extends
 	 * Geometry Columns
 	 */
 	private final GeometryColumns geometryColumns;
-
-	/**
-	 * Projection
-	 */
-	private Projection projection;
 
 	/**
 	 * Constructor
@@ -53,15 +48,6 @@ public class FeatureDao extends
 
 		projection = ProjectionFactory.getProjection(geometryColumns.getSrs()
 				.getOrganizationCoordsysId());
-	}
-
-	/**
-	 * Get the projection
-	 * 
-	 * @return
-	 */
-	public Projection getProjection() {
-		return projection;
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package mil.nga.giat.geopackage.tiles.user;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.util.LongSparseArray;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +12,6 @@ import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
-import mil.nga.giat.geopackage.projection.Projection;
 import mil.nga.giat.geopackage.projection.ProjectionConstants;
 import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
@@ -17,8 +19,6 @@ import mil.nga.giat.geopackage.tiles.TileGrid;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.user.UserDao;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.v4.util.LongSparseArray;
 
 /**
  * Tile DAO for reading tile user tables
@@ -61,11 +61,6 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * Array of heights of the tiles at each zoom level in meters
 	 */
 	private final double[] heights;
-
-	/**
-	 * Projection
-	 */
-	private Projection projection;
 
 	/**
 	 * Constructor
@@ -198,15 +193,6 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 */
 	public long getMaxZoom() {
 		return maxZoom;
-	}
-
-	/**
-	 * Get the projection
-	 * 
-	 * @return
-	 */
-	public Projection getProjection() {
-		return projection;
 	}
 
 	/**
@@ -363,7 +349,6 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * Query by tile grid and zoom level
 	 * 
 	 * @param tileGrid
-	 * @param rowRange
 	 * @param zoomLevel
 	 * @return cursor from query or null if the zoom level tile ranges do not
 	 *         overlap the bounding box
