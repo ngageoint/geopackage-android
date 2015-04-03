@@ -9,7 +9,7 @@ import java.io.File;
  *
  * @author osbornb
  */
-public class AndroidGeoPackageIOUtils {
+public class ContextIOUtils {
 
     /**
      * Get the internal storage file for the file path

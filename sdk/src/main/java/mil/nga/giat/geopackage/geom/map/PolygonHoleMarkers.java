@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.conversion;
+package mil.nga.giat.geopackage.geom.map;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,13 +6,24 @@ import java.util.List;
 import com.google.android.gms.maps.model.Marker;
 
 /**
- * Multiple Marker object
+ * Polygon Hole with Markers object
  * 
  * @author osbornb
  */
-public class MultiMarker implements ShapeMarkers {
+public class PolygonHoleMarkers implements ShapeMarkers {
+
+	final private PolygonMarkers parentPolygon;
 
 	private List<Marker> markers = new ArrayList<Marker>();
+
+	/**
+	 * Constructor
+	 * 
+	 * @param polygonMarkers
+	 */
+	public PolygonHoleMarkers(PolygonMarkers polygonMarkers) {
+		parentPolygon = polygonMarkers;
+	}
 
 	public void add(Marker marker) {
 		markers.add(marker);
@@ -40,12 +51,31 @@ public class MultiMarker implements ShapeMarkers {
 	}
 
 	/**
+	 * Is it valid
+	 * 
+	 * @return
+	 */
+	public boolean isValid() {
+		return markers.isEmpty() || markers.size() >= 3;
+	}
+
+	/**
+	 * Is it deleted
+	 * 
+	 * @return
+	 */
+	public boolean isDeleted() {
+		return markers.isEmpty();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void delete(Marker marker) {
 		if (markers.remove(marker)) {
 			marker.remove();
+			parentPolygon.update();
 		}
 	}
 
@@ -54,7 +84,7 @@ public class MultiMarker implements ShapeMarkers {
 	 */
 	@Override
 	public void addNew(Marker marker) {
-		add(marker);
+		GoogleMapShapeMarkers.addMarkerAsPolygon(marker, markers);
 	}
 
 }

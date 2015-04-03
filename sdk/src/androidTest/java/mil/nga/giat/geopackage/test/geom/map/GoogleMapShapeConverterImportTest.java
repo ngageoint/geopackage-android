@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.test.geom.conversion;
+package mil.nga.giat.geopackage.test.geom.map;
 
 import java.sql.SQLException;
 

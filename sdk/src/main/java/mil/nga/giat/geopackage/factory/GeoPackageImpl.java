@@ -13,7 +13,7 @@ import java.util.List;
 import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
-import mil.nga.giat.geopackage.db.GeoPackageAndroidConnection;
+import mil.nga.giat.geopackage.db.GeoPackageConnection;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
@@ -36,7 +36,7 @@ import mil.nga.giat.geopackage.tiles.user.TileTableReader;
  *
  * @author osbornb
  */
-class GeoPackageAndroidImpl extends GeoPackageImpl implements GeoPackage {
+class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
     /**
      * Database connection
@@ -55,9 +55,9 @@ class GeoPackageAndroidImpl extends GeoPackageImpl implements GeoPackage {
      * @param cursorFactory
      * @param tableCreator
      */
-    GeoPackageAndroidImpl(GeoPackageAndroidConnection database,
-                          GeoPackageCursorFactory cursorFactory,
-                          GeoPackageTableCreator tableCreator) {
+    GeoPackageImpl(GeoPackageConnection database,
+                   GeoPackageCursorFactory cursorFactory,
+                   GeoPackageTableCreator tableCreator) {
         super(database, new AndroidConnectionSource(database.getDb()), tableCreator);
         this.database = database.getDb();
         this.cursorFactory = cursorFactory;

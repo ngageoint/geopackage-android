@@ -2,8 +2,8 @@ package mil.nga.giat.geopackage.tiles.user;
 
 import java.util.List;
 
+import mil.nga.giat.geopackage.db.CursorDatabaseUtils;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
-import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
 import mil.nga.giat.geopackage.user.UserTableReader;
 import android.database.Cursor;
 
@@ -42,8 +42,8 @@ public class TileTableReader extends UserTableReader<TileColumn, TileTable> {
 
 		GeoPackageDataType dataType = GeoPackageDataType.fromName(type);
 
-		Object defaultValue = GeoPackageDatabaseUtils.getValue(cursor,
-				defaultValueIndex, dataType);
+		Object defaultValue = CursorDatabaseUtils.getValue(cursor,
+                defaultValueIndex, dataType);
 
 		TileColumn column = new TileColumn(index, name, dataType, max, notNull,
 				defaultValue, primaryKey);

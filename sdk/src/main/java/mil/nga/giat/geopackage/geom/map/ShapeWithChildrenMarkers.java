@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.conversion;
+package mil.nga.giat.geopackage.geom.map;
 
 /**
  * Shape markers interface for handling marker changes on shapes that have

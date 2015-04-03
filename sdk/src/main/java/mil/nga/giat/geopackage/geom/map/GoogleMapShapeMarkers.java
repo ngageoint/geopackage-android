@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.conversion;
+package mil.nga.giat.geopackage.geom.map;
 
 import java.util.HashMap;
 import java.util.List;

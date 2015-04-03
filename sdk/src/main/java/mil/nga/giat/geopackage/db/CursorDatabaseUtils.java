@@ -9,7 +9,7 @@ import mil.nga.giat.geopackage.GeoPackageException;
  * 
  * @author osbornb
  */
-public class GeoPackageDatabaseUtils {
+public class CursorDatabaseUtils {
 
 	/**
 	 * Get the value from the cursor from the provided column

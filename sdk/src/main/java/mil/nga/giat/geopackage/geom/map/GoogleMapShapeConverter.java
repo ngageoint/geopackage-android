@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.conversion;
+package mil.nga.giat.geopackage.geom.map;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1326,9 +1326,9 @@ public class GoogleMapShapeConverter {
 	 * @param polygons
 	 * @return
 	 */
-	public static mil.nga.giat.geopackage.geom.conversion.MultiPolygon addPolygonsToMap(
+	public static mil.nga.giat.geopackage.geom.map.MultiPolygon addPolygonsToMap(
 			GoogleMap map, MultiPolygonOptions polygons) {
-		mil.nga.giat.geopackage.geom.conversion.MultiPolygon multiPolygon = new mil.nga.giat.geopackage.geom.conversion.MultiPolygon();
+		mil.nga.giat.geopackage.geom.map.MultiPolygon multiPolygon = new mil.nga.giat.geopackage.geom.map.MultiPolygon();
 		for (PolygonOptions polygonOption : polygons.getPolygonOptions()) {
 			com.google.android.gms.maps.model.Polygon polygon = addPolygonToMap(
 					map, polygonOption);
@@ -1891,7 +1891,7 @@ public class GoogleMapShapeConverter {
 				geometry = toMultiPolygonFromOptions(multiPolygonOptions);
 				break;
 			case MULTI_POLYGON:
-				mil.nga.giat.geopackage.geom.conversion.MultiPolygon multiPolygon = (mil.nga.giat.geopackage.geom.conversion.MultiPolygon) shapeObject;
+				mil.nga.giat.geopackage.geom.map.MultiPolygon multiPolygon = (mil.nga.giat.geopackage.geom.map.MultiPolygon) shapeObject;
 				geometry = toMultiPolygon(multiPolygon.getPolygons());
 				break;
 			case MULTI_POLYGON_MARKERS:

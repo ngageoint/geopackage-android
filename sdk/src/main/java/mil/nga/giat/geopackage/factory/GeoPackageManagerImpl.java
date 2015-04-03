@@ -31,10 +31,10 @@ import mil.nga.giat.geopackage.R;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystemDao;
-import mil.nga.giat.geopackage.db.ExternalGeoPackage;
-import mil.nga.giat.geopackage.db.ExternalGeoPackageDataSource;
-import mil.nga.giat.geopackage.db.GeoPackageAndroidConnection;
-import mil.nga.giat.geopackage.db.GeoPackageMetadataOpenHelper;
+import mil.nga.giat.geopackage.db.GeoPackageConnection;
+import mil.nga.giat.geopackage.db.metadata.ExternalGeoPackage;
+import mil.nga.giat.geopackage.db.metadata.ExternalGeoPackageDataSource;
+import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadataOpenHelper;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
@@ -199,7 +199,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 		} else {
 			SQLiteDatabase db = context.openOrCreateDatabase(database,
 					Context.MODE_PRIVATE, null);
-            GeoPackageAndroidConnection connection = new GeoPackageAndroidConnection(db);
+            GeoPackageConnection connection = new GeoPackageConnection(db);
 
             // Set the application id as a GeoPackage
             int applicationId = ByteBuffer.wrap(GeoPackageConstants.APPLICATION_ID.getBytes()).asIntBuffer().get();
@@ -437,9 +437,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 				sqlite = context.openOrCreateDatabase(database,
 						Context.MODE_PRIVATE, cursorFactory);
 			}
-            GeoPackageAndroidConnection connection = new GeoPackageAndroidConnection(sqlite);
+            GeoPackageConnection connection = new GeoPackageConnection(sqlite);
 			GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
-			db = new GeoPackageAndroidImpl(connection, cursorFactory, tableCreator);
+			db = new GeoPackageImpl(connection, cursorFactory, tableCreator);
 		}
 
 		return db;

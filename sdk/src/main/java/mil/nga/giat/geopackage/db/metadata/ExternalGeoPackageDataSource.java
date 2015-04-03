@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.db;
+package mil.nga.giat.geopackage.db.metadata;
 
 import java.util.ArrayList;
 import java.util.List;

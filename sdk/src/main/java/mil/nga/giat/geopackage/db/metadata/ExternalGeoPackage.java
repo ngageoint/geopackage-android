@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.db;
+package mil.nga.giat.geopackage.db.metadata;
 
 /**
  * External GeoPackage

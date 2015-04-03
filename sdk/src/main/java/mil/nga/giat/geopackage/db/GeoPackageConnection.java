@@ -11,7 +11,7 @@ import com.j256.ormlite.support.ConnectionSource;
  *
  * @author osbornb
  */
-public class GeoPackageAndroidConnection implements GeoPackageConnection {
+public class GeoPackageConnection implements GeoPackageCoreConnection {
 
     /**
      * Database connection
@@ -19,11 +19,11 @@ public class GeoPackageAndroidConnection implements GeoPackageConnection {
     private final SQLiteDatabase db;
 
     /**
-     * Consructor
+     * Constructor
      *
      * @param db
      */
-    public GeoPackageAndroidConnection(SQLiteDatabase db) {
+    public GeoPackageConnection(SQLiteDatabase db) {
         this.db = db;
     }
 

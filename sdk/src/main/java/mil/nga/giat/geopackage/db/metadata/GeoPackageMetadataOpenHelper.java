@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.db;
+package mil.nga.giat.geopackage.db.metadata;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

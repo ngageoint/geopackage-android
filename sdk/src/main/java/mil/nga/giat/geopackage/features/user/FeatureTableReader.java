@@ -2,8 +2,8 @@ package mil.nga.giat.geopackage.features.user;
 
 import java.util.List;
 
+import mil.nga.giat.geopackage.db.CursorDatabaseUtils;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
-import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.user.UserTableReader;
@@ -58,8 +58,8 @@ public class FeatureTableReader extends
 		} else {
 			dataType = GeoPackageDataType.fromName(type);
 		}
-		Object defaultValue = GeoPackageDatabaseUtils.getValue(cursor,
-				defaultValueIndex, dataType);
+		Object defaultValue = CursorDatabaseUtils.getValue(cursor,
+                defaultValueIndex, dataType);
 
 		FeatureColumn column = new FeatureColumn(index, name, dataType, max,
 				notNull, defaultValue, primaryKey, geometryType);

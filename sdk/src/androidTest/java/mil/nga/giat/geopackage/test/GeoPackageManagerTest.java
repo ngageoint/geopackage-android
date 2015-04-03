@@ -9,7 +9,7 @@ import mil.nga.giat.geopackage.GeoPackage;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.GeoPackageManager;
 import mil.nga.giat.geopackage.factory.GeoPackageFactory;
-import mil.nga.giat.geopackage.io.AndroidGeoPackageIOUtils;
+import mil.nga.giat.geopackage.io.ContextIOUtils;
 
 /**
  * Test GeoPackage Manager methods
@@ -255,7 +255,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
 		assertTrue("Database not returned in the set", manager.databaseSet()
 				.contains(TestConstants.TEST_DB_NAME));
 
-		File exportDirectory = AndroidGeoPackageIOUtils.getInternalFile(activity,
+		File exportDirectory = ContextIOUtils.getInternalFile(activity,
                 null);
 
 		// Delete previous exported file

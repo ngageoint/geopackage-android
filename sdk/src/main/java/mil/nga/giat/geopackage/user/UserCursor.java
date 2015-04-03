@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.user;
 
-import mil.nga.giat.geopackage.db.GeoPackageDatabaseUtils;
+import mil.nga.giat.geopackage.db.CursorDatabaseUtils;
+
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
@@ -48,8 +49,8 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
 	 * @return
 	 */
 	protected Object getValue(TColumn column) {
-		Object value = GeoPackageDatabaseUtils.getValue(this,
-				column.getIndex(), column.getDataType());
+		Object value = CursorDatabaseUtils.getValue(this,
+                column.getIndex(), column.getDataType());
 		return value;
 	}
 

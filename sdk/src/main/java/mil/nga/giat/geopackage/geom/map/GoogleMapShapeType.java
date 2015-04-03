@@ -1,4 +1,4 @@
-package mil.nga.giat.geopackage.geom.conversion;
+package mil.nga.giat.geopackage.geom.map;
 
 /**
  * Enumeration of Map shape types for handling geometry hierarchies
