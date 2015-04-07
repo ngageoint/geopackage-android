@@ -1,11 +1,12 @@
 package mil.nga.giat.geopackage.features.user;
 
+import android.content.ContentValues;
+
 import java.io.IOException;
 
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.user.UserRow;
-import android.content.ContentValues;
 
 /**
  * Feature Row containing the values from a single cursor row
@@ -28,7 +29,7 @@ public class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
 	/**
 	 * Constructor to create an empty row
 	 * 
-	 * @param columns
+	 * @param table
 	 */
 	FeatureRow(FeatureTable table) {
 		super(table);

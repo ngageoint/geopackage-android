@@ -24,7 +24,7 @@ public class TileCursor extends UserCursor<TileColumn, TileTable, TileRow> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected TileRow getRow(int[] columnTypes, Object[] values) {
+    public TileRow getRow(int[] columnTypes, Object[] values) {
 		TileRow row = new TileRow(getTable(), columnTypes, values);
 		return row;
 	}

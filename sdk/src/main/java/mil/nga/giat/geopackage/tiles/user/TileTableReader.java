@@ -2,17 +2,16 @@ package mil.nga.giat.geopackage.tiles.user;
 
 import java.util.List;
 
-import mil.nga.giat.geopackage.db.CursorDatabaseUtils;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.user.UserTableReader;
-import android.database.Cursor;
 
 /**
  * Reads the metadata from an existing tile table
  * 
  * @author osbornb
  */
-public class TileTableReader extends UserTableReader<TileColumn, TileTable> {
+public class TileTableReader extends
+        UserTableReader<TileColumn, TileTable, TileRow, TileCursor> {
 
 	/**
 	 * Constructor
@@ -36,13 +35,13 @@ public class TileTableReader extends UserTableReader<TileColumn, TileTable> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected TileColumn createColumn(Cursor cursor, int index, String name,
+	protected TileColumn createColumn(TileCursor cursor, int index, String name,
 			String type, Long max, boolean notNull, int defaultValueIndex,
 			boolean primaryKey) {
 
 		GeoPackageDataType dataType = GeoPackageDataType.fromName(type);
 
-		Object defaultValue = CursorDatabaseUtils.getValue(cursor,
+		Object defaultValue = cursor.getValue(
                 defaultValueIndex, dataType);
 
 		TileColumn column = new TileColumn(index, name, dataType, max, notNull,

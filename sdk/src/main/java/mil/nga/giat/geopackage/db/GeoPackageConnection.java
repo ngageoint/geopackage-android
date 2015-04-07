@@ -81,6 +81,14 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * {@inheritDoc}
      */
     @Override
+    public int delete(String table, String whereClause, String[] whereArgs) {
+        return db.delete(table, whereClause, whereArgs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void close() {
         connectionSource.closeQuietly();
         db.close();

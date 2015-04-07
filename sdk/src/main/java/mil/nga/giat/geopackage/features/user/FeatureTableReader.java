@@ -2,12 +2,10 @@ package mil.nga.giat.geopackage.features.user;
 
 import java.util.List;
 
-import mil.nga.giat.geopackage.db.CursorDatabaseUtils;
 import mil.nga.giat.geopackage.db.GeoPackageDataType;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
-import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.geopackage.user.UserTableReader;
-import android.database.Cursor;
+import mil.nga.giat.wkb.geom.GeometryType;
 
 /**
  * Reads the metadata from an existing feature table
@@ -15,7 +13,7 @@ import android.database.Cursor;
  * @author osbornb
  */
 public class FeatureTableReader extends
-		UserTableReader<FeatureColumn, FeatureTable> {
+        UserTableReader<FeatureColumn, FeatureTable, FeatureRow, FeatureCursor> {
 
 	/**
 	 * Geometry columns
@@ -45,7 +43,7 @@ public class FeatureTableReader extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected FeatureColumn createColumn(Cursor cursor, int index, String name,
+	protected FeatureColumn createColumn(FeatureCursor cursor, int index, String name,
 			String type, Long max, boolean notNull, int defaultValueIndex,
 			boolean primaryKey) {
 
@@ -58,7 +56,7 @@ public class FeatureTableReader extends
 		} else {
 			dataType = GeoPackageDataType.fromName(type);
 		}
-		Object defaultValue = CursorDatabaseUtils.getValue(cursor,
+		Object defaultValue = cursor.getValue(
                 defaultValueIndex, dataType);
 
 		FeatureColumn column = new FeatureColumn(index, name, dataType, max,

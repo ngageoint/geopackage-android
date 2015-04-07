@@ -1,7 +1,6 @@
 package mil.nga.giat.geopackage.factory;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -16,19 +15,23 @@ import mil.nga.giat.geopackage.db.GeoPackageConnection;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.giat.geopackage.features.user.FeatureConnection;
 import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureTable;
 import mil.nga.giat.geopackage.features.user.FeatureTableReader;
+import mil.nga.giat.geopackage.features.user.FeatureWrapperConnection;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.giat.geopackage.tiles.matrix.TileMatrixKey;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.giat.geopackage.tiles.matrixset.TileMatrixSetDao;
+import mil.nga.giat.geopackage.tiles.user.TileConnection;
 import mil.nga.giat.geopackage.tiles.user.TileCursor;
 import mil.nga.giat.geopackage.tiles.user.TileDao;
 import mil.nga.giat.geopackage.tiles.user.TileTable;
 import mil.nga.giat.geopackage.tiles.user.TileTableReader;
+import mil.nga.giat.geopackage.tiles.user.TileWrapperConnection;
 
 /**
  * A single GeoPackage database connection implementation
@@ -40,7 +43,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
     /**
      * Database connection
      */
-    private final SQLiteDatabase database;
+    private final GeoPackageConnection database;
 
     /**
      * Cursor factory
@@ -59,7 +62,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                    GeoPackageCursorFactory cursorFactory,
                    GeoPackageTableCreator tableCreator) {
         super(name, database, tableCreator);
-        this.database = database.getDb();
+        this.database = database;
         this.cursorFactory = cursorFactory;
     }
 
@@ -78,8 +81,9 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
         // Read the existing table and create the dao
         FeatureTableReader tableReader = new FeatureTableReader(geometryColumns);
-        final FeatureTable featureTable = tableReader.readTable(database);
-        FeatureDao dao = new FeatureDao(database, geometryColumns, featureTable);
+        final FeatureTable featureTable = tableReader.readTable(new FeatureWrapperConnection(database));
+        FeatureConnection userDb = new FeatureConnection(database);
+        FeatureDao dao = new FeatureDao(database, userDb, geometryColumns, featureTable);
 
         // Register the table to wrap cursors with the feature cursor
         cursorFactory.registerTable(geometryColumns.getTableName(),
@@ -208,8 +212,9 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         // Read the existing table and create the dao
         TileTableReader tableReader = new TileTableReader(
                 tileMatrixSet.getTableName());
-        final TileTable tileTable = tableReader.readTable(database);
-        TileDao dao = new TileDao(database, tileMatrixSet, tileMatrices,
+        final TileTable tileTable = tableReader.readTable(new TileWrapperConnection(database));
+        TileConnection userDb = new TileConnection(database);
+        TileDao dao = new TileDao(database, userDb, tileMatrixSet, tileMatrices,
                 tileTable);
 
         // Register the table to wrap cursors with the tile cursor

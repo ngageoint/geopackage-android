@@ -26,7 +26,7 @@ public class FeatureCursor extends
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected FeatureRow getRow(int[] columnTypes, Object[] values) {
+    public FeatureRow getRow(int[] columnTypes, Object[] values) {
 		FeatureRow row = new FeatureRow(getTable(), columnTypes, values);
 		return row;
 	}
@@ -37,7 +37,7 @@ public class FeatureCursor extends
 	 * Handles geometries
 	 */
 	@Override
-	protected Object getValue(FeatureColumn column) {
+    public Object getValue(FeatureColumn column) {
 		Object value;
 		if (column.isGeometry()) {
 			value = getGeometry();

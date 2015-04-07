@@ -1,9 +1,7 @@
 package mil.nga.giat.geopackage.tiles.user;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.util.LongSparseArray;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +10,7 @@ import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.db.GeoPackageConnection;
 import mil.nga.giat.geopackage.projection.ProjectionConstants;
 import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
@@ -25,7 +24,12 @@ import mil.nga.giat.geopackage.user.UserDao;
  * 
  * @author osbornb
  */
-public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
+public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor> {
+
+    /**
+     * Tile connection
+     */
+    private final TileConnection tileDb;
 
 	/**
 	 * Tile Matrix Set
@@ -66,14 +70,16 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * Constructor
 	 * 
 	 * @param db
+     * @param tileDb
 	 * @param tileMatrixSet
 	 * @param tileMatrices
 	 * @param table
 	 */
-	public TileDao(SQLiteDatabase db, TileMatrixSet tileMatrixSet,
+	public TileDao(GeoPackageConnection db, TileConnection tileDb,TileMatrixSet tileMatrixSet,
 			List<TileMatrix> tileMatrices, TileTable table) {
-		super(db, table);
+		super(db, tileDb, table);
 
+        this.tileDb = tileDb;
 		this.tileMatrixSet = tileMatrixSet;
 		this.tileMatrices = tileMatrices;
 		this.widths = new double[tileMatrices.size()];
@@ -123,22 +129,7 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 * into the tile matrix lengths
 	 */
 	public void adjustTileMatrixLengths() {
-		double tileMatrixWidth = tileMatrixSet.getMaxX()
-				- tileMatrixSet.getMinX();
-		double tileMatrixHeight = tileMatrixSet.getMaxY()
-				- tileMatrixSet.getMinY();
-		for (TileMatrix tileMatrix : tileMatrices) {
-			int tempMatrixWidth = (int) (tileMatrixWidth / (tileMatrix
-					.getPixelXSize() * tileMatrix.getTileWidth()));
-			int tempMatrixHeight = (int) (tileMatrixHeight / (tileMatrix
-					.getPixelYSize() * tileMatrix.getTileHeight()));
-			if (tempMatrixWidth > tileMatrix.getMatrixWidth()) {
-				tileMatrix.setMatrixWidth(tempMatrixWidth);
-			}
-			if (tempMatrixHeight > tileMatrix.getMatrixHeight()) {
-				tileMatrix.setMatrixHeight(tempMatrixHeight);
-			}
-		}
+        TileDaoUtils.adjustTileMatrixLengths(tileMatrixSet, tileMatrices);
 	}
 
 	/**
@@ -148,6 +139,15 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	public TileRow newRow() {
 		return new TileRow(getTable());
 	}
+
+    /**
+     * Get the Tile connection
+     *
+     * @return
+     */
+    public TileConnection getTileDb() {
+        return tileDb;
+    }
 
 	/**
 	 * Get the tile matrix set
@@ -286,63 +286,8 @@ public class TileDao extends UserDao<TileTable, TileRow, TileCursor> {
 	 */
 	public Long getZoomLevel(double length) {
 
-		Long zoomLevel = null;
-
-		// Find where the width and height fit in
-		int widthIndex = Arrays.binarySearch(widths, length);
-		if (widthIndex < 0) {
-			widthIndex = (widthIndex + 1) * -1;
-		}
-		int heightIndex = Arrays.binarySearch(heights, length);
-		if (heightIndex < 0) {
-			heightIndex = (heightIndex + 1) * -1;
-		}
-
-		// Find the closest width or verify it isn't too small or large
-		if (widthIndex == 0) {
-			if (length < widths[widthIndex] * .51) {
-				widthIndex = -1;
-			}
-		} else if (widthIndex == widths.length) {
-			if (length >= widths[widthIndex - 1] / .51) {
-				widthIndex = -1;
-			} else {
-				widthIndex = widthIndex - 1;
-			}
-		} else if (length - widths[widthIndex - 1] < widths[widthIndex]
-				- length) {
-			widthIndex--;
-		}
-
-		// Find the closest height or verify it isn't too small or large
-		if (heightIndex == 0) {
-			if (length < heights[heightIndex] * .51) {
-				heightIndex = -1;
-			}
-		} else if (heightIndex == heights.length) {
-			if (length >= heights[heightIndex - 1] / .51) {
-				heightIndex = -1;
-			} else {
-				heightIndex = heightIndex - 1;
-			}
-		} else if (length - heights[heightIndex - 1] < heights[heightIndex]
-				- length) {
-			heightIndex--;
-		}
-
-		if (widthIndex >= 0 && heightIndex >= 0) {
-
-			// Use one zoom size smaller if possible
-			int index = Math.min(widthIndex, heightIndex);
-			if (index >= 0) {
-
-				TileMatrix tileMatrix = tileMatrices.get(tileMatrices.size()
-						- index - 1);
-				zoomLevel = tileMatrix.getZoomLevel();
-			}
-		}
-
-		return zoomLevel;
+		Long zoomLevel = TileDaoUtils.getZoomLevel(widths, heights, tileMatrices, length);
+        return zoomLevel;
 	}
 
 	/**

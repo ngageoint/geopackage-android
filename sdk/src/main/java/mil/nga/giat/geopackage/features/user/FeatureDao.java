@@ -1,10 +1,9 @@
 package mil.nga.giat.geopackage.features.user;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import mil.nga.giat.geopackage.GeoPackageException;
 import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.giat.geopackage.db.GeoPackageConnection;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import mil.nga.giat.geopackage.user.UserDao;
@@ -16,7 +15,12 @@ import mil.nga.giat.wkb.geom.GeometryType;
  * @author osbornb
  */
 public class FeatureDao extends
-		UserDao<FeatureTable, FeatureRow, FeatureCursor> {
+		UserDao<FeatureColumn, FeatureTable, FeatureRow, FeatureCursor> {
+
+    /**
+     * Feature connection
+     */
+    private final FeatureConnection featureDb;
 
 	/**
 	 * Geometry Columns
@@ -27,13 +31,15 @@ public class FeatureDao extends
 	 * Constructor
 	 * 
 	 * @param db
+     * @param featureDb
 	 * @param geometryColumns
 	 * @param table
 	 */
-	public FeatureDao(SQLiteDatabase db, GeometryColumns geometryColumns,
+	public FeatureDao(GeoPackageConnection db, FeatureConnection featureDb, GeometryColumns geometryColumns,
 			FeatureTable table) {
-		super(db, table);
+		super(db, featureDb, table);
 
+        this.featureDb = featureDb;
 		this.geometryColumns = geometryColumns;
 		if (geometryColumns.getContents() == null) {
 			throw new GeoPackageException(GeometryColumns.class.getSimpleName()
@@ -57,6 +63,15 @@ public class FeatureDao extends
 	public FeatureRow newRow() {
 		return new FeatureRow(getTable());
 	}
+
+    /**
+     * Get the Feature connection
+     *
+     * @return
+     */
+    public FeatureConnection getFeatureDb() {
+        return featureDb;
+    }
 
 	/**
 	 * Get the Geometry Columns

@@ -29,7 +29,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
 	/**
 	 * Constructor to create an empty row
 	 * 
-	 * @param columns
+	 * @param table
 	 */
 	TileRow(TileTable table) {
 		super(table);
