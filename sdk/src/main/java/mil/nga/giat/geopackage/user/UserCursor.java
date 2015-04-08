@@ -88,4 +88,12 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
         return value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean wasNull() {
+        return false;
+    }
+
 }

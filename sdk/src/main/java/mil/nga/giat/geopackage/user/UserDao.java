@@ -1,7 +1,6 @@
 package mil.nga.giat.geopackage.user;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import mil.nga.giat.geopackage.db.GeoPackageConnection;
@@ -83,25 +82,6 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
 		row.setId(id);
 		return id;
 	}
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int count(String where, String[] args) {
-
-        StringBuilder countQuery = new StringBuilder();
-        countQuery.append("select count(*) from " + getTableName());
-        if (where != null) {
-            countQuery.append(" where ").append(where);
-        }
-
-        Cursor countCursor = db.rawQuery(countQuery.toString(), args);
-        countCursor.moveToFirst();
-        int count = countCursor.getInt(0);
-        countCursor.close();
-        return count;
-    }
 
 	/**
 	 * Inserts a new row

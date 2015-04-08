@@ -62,27 +62,27 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * {@inheritDoc}
      */
     @Override
-    public boolean tableExists(String tableName) {
-        boolean exists = false;
-
-        Cursor cursor = db
-                .rawQuery(
-                        "select DISTINCT tbl_name from sqlite_master where tbl_name = ?",
-                        new String[]{tableName});
-        if (cursor != null) {
-            exists = cursor.getCount() > 0;
-            cursor.close();
-        }
-
-        return exists;
+    public int delete(String table, String whereClause, String[] whereArgs) {
+        return db.delete(table, whereClause, whereArgs);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int delete(String table, String whereClause, String[] whereArgs) {
-        return db.delete(table, whereClause, whereArgs);
+    public int count(String table, String where, String[] args) {
+
+        StringBuilder countQuery = new StringBuilder();
+        countQuery.append("select count(*) from " + table);
+        if (where != null) {
+            countQuery.append(" where ").append(where);
+        }
+
+        Cursor countCursor = db.rawQuery(countQuery.toString(), args);
+        countCursor.moveToFirst();
+        int count = countCursor.getInt(0);
+        countCursor.close();
+        return count;
     }
 
     /**
