@@ -69,7 +69,7 @@ public class GoogleMapShapeMarkers {
 	/**
 	 * Add a list of markers with no shape
 	 * 
-	 * @param marker
+	 * @param markers
 	 */
 	public void add(List<Marker> markers) {
 		for (Marker marker : markers) {

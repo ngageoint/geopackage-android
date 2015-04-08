@@ -44,7 +44,6 @@ public class BitmapConverter {
 	 * 
 	 * @param bitmap
 	 * @param format
-	 * @param quality
 	 * @return
 	 * @throws IOException
 	 */
