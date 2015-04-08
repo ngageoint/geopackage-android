@@ -70,8 +70,21 @@ The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sam
         featureCursor.close();
     }
     
-    // Tile Provider
+    // Query Tiles
     TileDao tileDao = geoPackage.getTileDao(tiles.get(0));
+    TileCursor tileCursor = tileDao.queryForAll();
+    try{
+        while(tileCursor.moveToNext()){
+            TileRow tileRow = tileCursor.getRow();
+            byte[] tileBytes = tileRow.getTileData();
+            Bitmap tileBitmap = tileRow.getTileDataBitmap();
+            // ...
+        }
+    }finally{
+        tileCursor.close();
+    }
+    
+    // Tile Provider
     TileProvider overlay = GeoPackageOverlayFactory
             .getTileProvider(tileDao);
     TileOverlayOptions overlayOptions = new TileOverlayOptions();
@@ -106,7 +119,7 @@ The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sam
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-### Dependencies ###
+### Remote Dependencies ###
 
 * [GeoPackage Core](https://git.geointapps.org/geopackage/geopackage-core) (The MIT License (MIT)) - GeoPackage Library
 * [OrmLite](http://ormlite.com/) (Open Source License) - Object Relational Mapping (ORM) Library
