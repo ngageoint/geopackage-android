@@ -193,6 +193,7 @@ public class TileGenerator {
 	public TileGenerator(Context context, GeoPackage geoPackage,
 			String tableName, String tileUrl, int minZoom, int maxZoom) {
 		this.context = context;
+        geoPackage.verifyWritable();
 		this.geoPackage = geoPackage;
 		this.tableName = tableName;
 		try {

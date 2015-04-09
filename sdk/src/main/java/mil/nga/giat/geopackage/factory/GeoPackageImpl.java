@@ -57,11 +57,12 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * @param database
      * @param cursorFactory
      * @param tableCreator
+     * @param writable
      */
-    GeoPackageImpl(String name, GeoPackageConnection database,
+    GeoPackageImpl(String name, String path, GeoPackageConnection database,
                    GeoPackageCursorFactory cursorFactory,
-                   GeoPackageTableCreator tableCreator) {
-        super(name, database, tableCreator);
+                   GeoPackageTableCreator tableCreator, boolean writable) {
+        super(name, path, database, tableCreator, writable);
         this.database = database;
         this.cursorFactory = cursorFactory;
     }
