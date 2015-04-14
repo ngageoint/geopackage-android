@@ -11,5 +11,13 @@
     <string name="tile_generator_variable_max_lat">\\{maxLat\\}</string>
     <string name="tile_generator_variable_min_lon">\\{minLon\\}</string>
     <string name="tile_generator_variable_max_lon">\\{maxLon\\}</string>
-    
+
+    <integer name="feature_tiles_width">256</integer>
+    <integer name="feature_tiles_height">256</integer>
+    <string name="feature_tiles_compress_format">PNG</string>
+    <string name="feature_tiles_point_radius">2.0</string>
+    <string name="feature_tiles_line_stroke_width">2.0</string>
+    <string name="feature_tiles_polygon_stroke_width">2.0</string>
+    <bool name="feature_tiles_polygon_fill">false</bool>
+
 </resources>

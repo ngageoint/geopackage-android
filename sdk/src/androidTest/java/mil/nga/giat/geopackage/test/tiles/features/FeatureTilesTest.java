@@ -1,9 +1,8 @@
-package mil.nga.giat.geopackage.test.tiles.overlay;
+package mil.nga.giat.geopackage.test.tiles.features;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
-
-import com.google.android.gms.maps.model.Tile;
 
 import java.sql.SQLException;
 
@@ -15,38 +14,38 @@ import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.projection.ProjectionConstants;
 import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.test.CreateGeoPackageTestCase;
+import mil.nga.giat.geopackage.tiles.features.FeatureTiles;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
-import mil.nga.giat.geopackage.tiles.overlay.FeatureOverlay;
 import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.wkb.geom.LineString;
 import mil.nga.giat.wkb.geom.Point;
 import mil.nga.giat.wkb.geom.Polygon;
 
 /**
- * Test GeoPackage Feature Overlay, tiles created from features
+ * Test GeoPackage Feature Tiles, tiles created from features
  *
  * @author osbornb
  */
-public class FeatureOverlayTest extends CreateGeoPackageTestCase {
+public class FeatureTilesTest extends CreateGeoPackageTestCase {
 
     /**
      * Constructor
      */
-    public FeatureOverlayTest() {
+    public FeatureTilesTest() {
 
     }
 
     /**
-     * Test overlay
+     * Test feature tiles
      *
      * @throws java.sql.SQLException
      */
-    public void testOverlay() throws SQLException {
+    public void testFeatureTiles() throws SQLException {
 
         BoundingBox boundingBox = new BoundingBox();
 
         GeometryColumns geometryColumns = new GeometryColumns();
-        geometryColumns.setId(new TableColumnKey("featureoverlay",
+        geometryColumns.setId(new TableColumnKey("feature_tiles",
                 "geom"));
         geometryColumns.setGeometryType(GeometryType.GEOMETRY);
         geometryColumns.setZ((byte) 0);
@@ -70,38 +69,40 @@ public class FeatureOverlayTest extends CreateGeoPackageTestCase {
 
         insertFourPolygons(featureDao, new double[][]{{60.0, 35.0}, {65.0, 15.0}, {15.0, 20.0}, {20.0, 40.0}}, new double[][]{{50.0, 30.0}, {48.0, 22.0}, {30.0, 23.0}, {25.0, 34.0}});
 
-        FeatureOverlay overlay = new FeatureOverlay(featureDao);
+        FeatureTiles featureTiles = new FeatureTiles(activity, featureDao);
 
-        Paint pointPaint = overlay.getPointPaint();
+        Paint pointPaint = featureTiles.getPointPaint();
         pointPaint.setColor(Color.BLUE);
 
-        Paint linePaint = overlay.getLinePaint();
+        Paint linePaint = featureTiles.getLinePaint();
         linePaint.setColor(Color.GREEN);
 
-        Paint polygonPaint = overlay.getPolygonPaint();
+        Paint polygonPaint = featureTiles.getPolygonPaint();
         polygonPaint.setColor(Color.RED);
 
-        overlay.setFillPolygon(true);
-        Paint polygonFillPaint = overlay.getPolygonFillPaint();
+        featureTiles.setFillPolygon(true);
+        Paint polygonFillPaint = featureTiles.getPolygonFillPaint();
         polygonFillPaint.setColor(Color.RED);
         polygonFillPaint.setAlpha(50);
 
-        createTiles(overlay, 0, 1);
+        createTiles(featureTiles, 0, 1);
 
     }
 
-    private void createTiles(FeatureOverlay overlay, int minZoom, int maxZoom) {
+    private void createTiles(FeatureTiles featureTiles, int minZoom, int maxZoom) {
         for (int i = minZoom; i <= maxZoom; i++) {
-            createTiles(overlay, i);
+            createTiles(featureTiles, i);
         }
     }
 
-    private void createTiles(FeatureOverlay overlay, int zoom) {
+    private void createTiles(FeatureTiles featureTiles, int zoom) {
         int tilesPerSide = TileBoundingBoxUtils.tilesPerSide(zoom);
         for (int i = 0; i < tilesPerSide; i++) {
             for (int j = 0; j < tilesPerSide; j++) {
-                Tile tile = overlay.getTile(i, j, zoom);
-                byte[] data = tile.data;
+                Bitmap bitmap = featureTiles.drawTile(i, j, zoom);
+                assertTrue(bitmap.getByteCount() > 0);
+                assertEquals(featureTiles.getTileWidth(), bitmap.getWidth());
+                assertEquals(featureTiles.getTileHeight(), bitmap.getHeight());
             }
         }
     }
