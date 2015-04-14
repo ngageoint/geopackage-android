@@ -1,6 +1,7 @@
 package mil.nga.giat.geopackage.test.tiles.features;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 
@@ -14,8 +15,9 @@ import mil.nga.giat.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.giat.geopackage.projection.ProjectionConstants;
 import mil.nga.giat.geopackage.schema.TableColumnKey;
 import mil.nga.giat.geopackage.test.CreateGeoPackageTestCase;
-import mil.nga.giat.geopackage.tiles.features.FeatureTiles;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.giat.geopackage.tiles.features.FeatureTilePointIcon;
+import mil.nga.giat.geopackage.tiles.features.FeatureTiles;
 import mil.nga.giat.wkb.geom.GeometryType;
 import mil.nga.giat.wkb.geom.LineString;
 import mil.nga.giat.wkb.geom.Point;
@@ -57,12 +59,12 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
         FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);
 
         insertPoint(featureDao, 0, 0);
-        insertPoint(featureDao, 0, 89);
-        insertPoint(featureDao, 0, -89);
+        insertPoint(featureDao, 0, ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE - 1);
+        insertPoint(featureDao, 0, ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE + 1);
         insertPoint(featureDao, -179, 0);
         insertPoint(featureDao, 179, 0);
 
-        insertFourPoints(featureDao, 179, 89);
+        insertFourPoints(featureDao, 179, ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE - 1);
         insertFourPoints(featureDao, 90, 45);
 
         insertFourLines(featureDao, new double[][]{{135.0, 67.5}, {90.0, 45.0}, {135.0, 45.0}});
@@ -72,7 +74,11 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
         FeatureTiles featureTiles = new FeatureTiles(activity, featureDao);
 
         Paint pointPaint = featureTiles.getPointPaint();
-        pointPaint.setColor(Color.BLUE);
+        //pointPaint.setColor(Color.BLUE);
+        Bitmap bitmap = BitmapFactory.decodeResource(activity.getResources(), mil.nga.giat.geopackage.test.R.drawable.ic_launcher);
+        bitmap = Bitmap.createScaledBitmap(bitmap, 25, 25, false);
+        FeatureTilePointIcon icon = new FeatureTilePointIcon(bitmap);
+        featureTiles.setPointIcon(icon);
 
         Paint linePaint = featureTiles.getLinePaint();
         linePaint.setColor(Color.GREEN);

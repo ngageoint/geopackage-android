@@ -79,6 +79,11 @@ public class FeatureTiles {
     private Paint pointPaint = new Paint();
 
     /**
+     * Optional point icon in place of a drawn circle
+     */
+    private FeatureTilePointIcon pointIcon;
+
+    /**
      * Line paint
      */
     private Paint linePaint = new Paint();
@@ -218,6 +223,24 @@ public class FeatureTiles {
      */
     public void setPointPaint(Paint pointPaint) {
         this.pointPaint = pointPaint;
+    }
+
+    /**
+     * Get the point icon
+     *
+     * @return
+     */
+    public FeatureTilePointIcon getPointIcon() {
+        return pointIcon;
+    }
+
+    /**
+     * Set the point icon
+     *
+     * @param pointIcon
+     */
+    public void setPointIcon(FeatureTilePointIcon pointIcon) {
+        this.pointIcon = pointIcon;
     }
 
     /**
@@ -580,13 +603,22 @@ public class FeatureTiles {
      * @param latLng
      */
     private void drawLatLng(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Paint paint, LatLng latLng) {
+
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
                 getLongitude(transform, latLng));
         float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
                 getLatitude(transform, latLng));
-        if (x >= 0 && x <= tileWidth && y >= 0 && y <= tileHeight) {
-            canvas.drawCircle(x, y, pointRadius, paint);
+
+        if (pointIcon != null) {
+            if (x >= 0 - pointIcon.getWidth() && x <= tileWidth + pointIcon.getWidth() && y >= 0 - pointIcon.getHeight() && y <= tileHeight + pointIcon.getHeight()) {
+                canvas.drawBitmap(pointIcon.getIcon(), x - pointIcon.getXOffset(), y - pointIcon.getYOffset(), paint);
+            }
+        } else {
+            if (x >= 0 - pointRadius && x <= tileWidth + pointRadius && y >= 0 - pointRadius && y <= tileHeight + pointRadius) {
+                canvas.drawCircle(x, y, pointRadius, paint);
+            }
         }
+
     }
 
     /**
