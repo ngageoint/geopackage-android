@@ -28,6 +28,10 @@ import mil.nga.giat.geopackage.geom.map.MultiLatLng;
 import mil.nga.giat.geopackage.geom.map.MultiPolygonOptions;
 import mil.nga.giat.geopackage.geom.map.MultiPolylineOptions;
 import mil.nga.giat.geopackage.io.BitmapConverter;
+import mil.nga.giat.geopackage.projection.Projection;
+import mil.nga.giat.geopackage.projection.ProjectionConstants;
+import mil.nga.giat.geopackage.projection.ProjectionFactory;
+import mil.nga.giat.geopackage.projection.ProjectionTransform;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.giat.wkb.geom.Geometry;
 
@@ -37,6 +41,12 @@ import mil.nga.giat.wkb.geom.Geometry;
  * @author osbornb
  */
 public class FeatureTiles {
+
+    /**
+     * WGS84 Projection
+     */
+    private static final Projection wgs84Projection = ProjectionFactory
+            .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
     /**
      * Tile data access object
@@ -74,19 +84,9 @@ public class FeatureTiles {
     private Paint linePaint = new Paint();
 
     /**
-     * Line path
-     */
-    private Path linePath = new Path();
-
-    /**
      * Polygon paint
      */
     private Paint polygonPaint = new Paint();
-
-    /**
-     * Polygon path
-     */
-    private Path polygonPath = new Path();
 
     /**
      * Fill polygon flag
@@ -130,90 +130,164 @@ public class FeatureTiles {
 
     }
 
+    /**
+     * Get the tile width
+     *
+     * @return
+     */
     public int getTileWidth() {
         return tileWidth;
     }
 
+    /**
+     * Set the tile width
+     *
+     * @param tileWidth
+     */
     public void setTileWidth(int tileWidth) {
         this.tileWidth = tileWidth;
     }
 
+    /**
+     * Get the tile height
+     *
+     * @return
+     */
     public int getTileHeight() {
         return tileHeight;
     }
 
+    /**
+     * Set the tile height
+     *
+     * @param tileHeight
+     */
     public void setTileHeight(int tileHeight) {
         this.tileHeight = tileHeight;
     }
 
+    /**
+     * Get the compress format
+     *
+     * @return
+     */
     public CompressFormat getCompressFormat() {
         return compressFormat;
     }
 
+    /**
+     * Set the compress format
+     *
+     * @param compressFormat
+     */
     public void setCompressFormat(CompressFormat compressFormat) {
         this.compressFormat = compressFormat;
     }
 
+    /**
+     * Get the point radius
+     *
+     * @return
+     */
     public float getPointRadius() {
         return pointRadius;
     }
 
+    /**
+     * Set the point radius
+     *
+     * @param pointRadius
+     */
     public void setPointRadius(float pointRadius) {
         this.pointRadius = pointRadius;
     }
 
+    /**
+     * Get point paint
+     *
+     * @return
+     */
     public Paint getPointPaint() {
         return pointPaint;
     }
 
+    /**
+     * Set the point paint
+     *
+     * @param pointPaint
+     */
     public void setPointPaint(Paint pointPaint) {
         this.pointPaint = pointPaint;
     }
 
+    /**
+     * Get the line paint
+     *
+     * @return
+     */
     public Paint getLinePaint() {
         return linePaint;
     }
 
+    /**
+     * Set the line paint
+     *
+     * @param linePaint
+     */
     public void setLinePaint(Paint linePaint) {
         this.linePaint = linePaint;
     }
 
+    /**
+     * Get the polygon paint
+     *
+     * @return
+     */
     public Paint getPolygonPaint() {
         return polygonPaint;
     }
 
+    /**
+     * Set the polygon paint
+     *
+     * @param polygonPaint
+     */
     public void setPolygonPaint(Paint polygonPaint) {
         this.polygonPaint = polygonPaint;
     }
 
-    public Path getLinePath() {
-        return linePath;
-    }
-
-    public void setLinePath(Path linePath) {
-        this.linePath = linePath;
-    }
-
-    public Path getPolygonPath() {
-        return polygonPath;
-    }
-
-    public void setPolygonPath(Path polygonPath) {
-        this.polygonPath = polygonPath;
-    }
-
+    /**
+     * Is fill polygon
+     *
+     * @return
+     */
     public boolean isFillPolygon() {
         return fillPolygon;
     }
 
+    /**
+     * Set the fill polygon
+     *
+     * @param fillPolygon
+     */
     public void setFillPolygon(boolean fillPolygon) {
         this.fillPolygon = fillPolygon;
     }
 
+    /**
+     * Get the polygon fill paint
+     *
+     * @return
+     */
     public Paint getPolygonFillPaint() {
         return polygonFillPaint;
     }
 
+    /**
+     * Set the polygon fill paint
+     *
+     * @param polygonFillPaint
+     */
     public void setPolygonFillPaint(Paint polygonFillPaint) {
         this.polygonFillPaint = polygonFillPaint;
     }
@@ -256,7 +330,7 @@ public class FeatureTiles {
     public Bitmap drawTile(int x, int y, int zoom) {
 
         BoundingBox boundingBox = TileBoundingBoxUtils
-                .getBoundingBox(x, y, zoom);
+                .getWebMercatorBoundingBox(x, y, zoom);
 
         // TODO query by bounding box
         FeatureCursor cursor = featureDao.queryForAll();
@@ -280,12 +354,13 @@ public class FeatureTiles {
                 tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
+        ProjectionTransform wgs84ToWebMercatorTransform = wgs84Projection.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
         GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
                 featureDao.getProjection());
 
         while (cursor.moveToNext()) {
             FeatureRow row = cursor.getRow();
-            drawFeature(boundingBox, bitmap, canvas, row, converter);
+            drawFeature(boundingBox, wgs84ToWebMercatorTransform, bitmap, canvas, row, converter);
         }
 
         cursor.close();
@@ -306,11 +381,12 @@ public class FeatureTiles {
                 tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
+        ProjectionTransform wgs84ToWebMercatorTransform = wgs84Projection.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
         GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
                 featureDao.getProjection());
 
         for (FeatureRow row : featureRow) {
-            drawFeature(boundingBox, bitmap, canvas, row, converter);
+            drawFeature(boundingBox, wgs84ToWebMercatorTransform, bitmap, canvas, row, converter);
         }
 
         return bitmap;
@@ -320,17 +396,18 @@ public class FeatureTiles {
      * Draw the feature on the canvas
      *
      * @param boundingBox
+     * @param transform
      * @param bitmap
      * @param canvas
      * @param row
      * @param converter
      */
-    private void drawFeature(BoundingBox boundingBox, Bitmap bitmap, Canvas canvas, FeatureRow row, GoogleMapShapeConverter converter) {
+    private void drawFeature(BoundingBox boundingBox, ProjectionTransform transform, Bitmap bitmap, Canvas canvas, FeatureRow row, GoogleMapShapeConverter converter) {
         GeoPackageGeometryData geomData = row.getGeometry();
         if (geomData != null) {
             Geometry geometry = geomData.getGeometry();
             GoogleMapShape shape = converter.toShape(geometry);
-            drawShape(boundingBox, canvas, shape);
+            drawShape(boundingBox, transform, canvas, shape);
         }
     }
 
@@ -338,10 +415,11 @@ public class FeatureTiles {
      * Draw the shape on the canvas
      *
      * @param boundingBox
+     * @param transform
      * @param canvas
      * @param shape
      */
-    private void drawShape(BoundingBox boundingBox, Canvas canvas, GoogleMapShape shape) {
+    private void drawShape(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, GoogleMapShape shape) {
 
         Object shapeObject = shape.getShape();
 
@@ -349,46 +427,46 @@ public class FeatureTiles {
 
             case LAT_LNG:
                 LatLng latLng = (LatLng) shapeObject;
-                drawLatLng(boundingBox, canvas, pointPaint, latLng);
+                drawLatLng(boundingBox, transform, canvas, pointPaint, latLng);
                 break;
             case POLYLINE_OPTIONS:
                 PolylineOptions polylineOptions = (PolylineOptions) shapeObject;
-                linePath.reset();
-                addPolyline(boundingBox, polylineOptions);
-                drawLinePath(canvas);
+                Path linePath = new Path();
+                addPolyline(boundingBox, transform, linePath, polylineOptions);
+                drawLinePath(canvas, linePath);
                 break;
             case POLYGON_OPTIONS:
                 PolygonOptions polygonOptions = (PolygonOptions) shapeObject;
-                polygonPath.reset();
-                addPolygon(boundingBox, polygonOptions);
-                drawPolygonPath(canvas);
+                Path polygonPath = new Path();
+                addPolygon(boundingBox, transform, polygonPath, polygonOptions);
+                drawPolygonPath(canvas, polygonPath);
                 break;
             case MULTI_LAT_LNG:
                 MultiLatLng multiLatLng = (MultiLatLng) shapeObject;
                 for (LatLng latLngFromMulti : multiLatLng.getLatLngs()) {
-                    drawLatLng(boundingBox, canvas, pointPaint, latLngFromMulti);
+                    drawLatLng(boundingBox, transform, canvas, pointPaint, latLngFromMulti);
                 }
                 break;
             case MULTI_POLYLINE_OPTIONS:
                 MultiPolylineOptions multiPolylineOptions = (MultiPolylineOptions) shapeObject;
-                linePath.reset();
+                Path multiLinePath = new Path();
                 for (PolylineOptions polyline : multiPolylineOptions.getPolylineOptions()) {
-                    addPolyline(boundingBox, polyline);
+                    addPolyline(boundingBox, transform, multiLinePath, polyline);
                 }
-                drawLinePath(canvas);
+                drawLinePath(canvas, multiLinePath);
                 break;
             case MULTI_POLYGON_OPTIONS:
                 MultiPolygonOptions multiPolygonOptions = (MultiPolygonOptions) shapeObject;
-                polygonPath.reset();
+                Path multiPolygonPath = new Path();
                 for (PolygonOptions polygon : multiPolygonOptions.getPolygonOptions()) {
-                    addPolygon(boundingBox, polygon);
+                    addPolygon(boundingBox, transform, multiPolygonPath, polygon);
                 }
-                drawPolygonPath(canvas);
+                drawPolygonPath(canvas, multiPolygonPath);
                 break;
             case COLLECTION:
                 List<GoogleMapShape> shapes = (List<GoogleMapShape>) shapeObject;
                 for (GoogleMapShape listShape : shapes) {
-                    drawShape(boundingBox, canvas, listShape);
+                    drawShape(boundingBox, transform, canvas, listShape);
                 }
                 break;
         }
@@ -399,21 +477,23 @@ public class FeatureTiles {
      * Draw the line path on the canvas
      *
      * @param canvas
+     * @param path
      */
-    private void drawLinePath(Canvas canvas) {
-        canvas.drawPath(linePath, linePaint);
+    private void drawLinePath(Canvas canvas, Path path) {
+        canvas.drawPath(path, linePaint);
     }
 
     /**
      * Draw the path on the canvas
      *
      * @param canvas
+     * @param path
      */
-    private void drawPolygonPath(Canvas canvas) {
-        canvas.drawPath(polygonPath, polygonPaint);
+    private void drawPolygonPath(Canvas canvas, Path path) {
+        canvas.drawPath(path, polygonPaint);
         if (fillPolygon) {
-            polygonPath.setFillType(Path.FillType.EVEN_ODD);
-            canvas.drawPath(polygonPath, polygonFillPaint);
+            path.setFillType(Path.FillType.EVEN_ODD);
+            canvas.drawPath(path, polygonFillPaint);
         }
     }
 
@@ -421,22 +501,23 @@ public class FeatureTiles {
      * Add the polyline to the path
      *
      * @param boundingBox
+     * @param path
      * @param polyline
      */
-    private void addPolyline(BoundingBox boundingBox, PolylineOptions polyline) {
+    private void addPolyline(BoundingBox boundingBox, ProjectionTransform transform, Path path, PolylineOptions polyline) {
         List<LatLng> points = polyline.getPoints();
         if (points.size() >= 2) {
 
             for (int i = 0; i < points.size(); i++) {
                 LatLng point = points.get(i);
                 float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
-                        point.longitude);
+                        getLongitude(transform, point));
                 float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
-                        point.latitude);
+                        getLatitude(transform, point));
                 if (i == 0) {
-                    linePath.moveTo(x, y);
+                    path.moveTo(x, y);
                 } else {
-                    linePath.lineTo(x, y);
+                    path.lineTo(x, y);
                 }
             }
         }
@@ -446,17 +527,19 @@ public class FeatureTiles {
      * Add the polygon on the canvas
      *
      * @param boundingBox
+     * @param transform
+     * @param path
      * @param polygon
      */
-    private void addPolygon(BoundingBox boundingBox, PolygonOptions polygon) {
+    private void addPolygon(BoundingBox boundingBox, ProjectionTransform transform, Path path, PolygonOptions polygon) {
         List<LatLng> points = polygon.getPoints();
         if (points.size() >= 2) {
-            addRing(boundingBox, points);
+            addRing(boundingBox, transform, path, points);
 
             // Add the holes
             for (List<LatLng> hole : polygon.getHoles()) {
                 if (hole.size() >= 2) {
-                    addRing(boundingBox, hole);
+                    addRing(boundingBox, transform, path, hole);
                 }
             }
         }
@@ -466,41 +549,66 @@ public class FeatureTiles {
      * Add a ring
      *
      * @param boundingBox
+     * @param transform
+     * @param path
      * @param points
      */
-    private void addRing(BoundingBox boundingBox, List<LatLng> points) {
+    private void addRing(BoundingBox boundingBox, ProjectionTransform transform, Path path, List<LatLng> points) {
 
         for (int i = 0; i < points.size(); i++) {
             LatLng point = point = points.get(i);
             float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
-                    point.longitude);
+                    getLongitude(transform, point));
             float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
-                    point.latitude);
+                    getLatitude(transform, point));
             if (i == 0) {
-                polygonPath.moveTo(x, y);
+                path.moveTo(x, y);
             } else {
-                polygonPath.lineTo(x, y);
+                path.lineTo(x, y);
             }
         }
-        polygonPath.close();
+        path.close();
     }
 
     /**
      * Draw the lat lng on the canvas
      *
      * @param boundingBox
+     * @param transform
      * @param canvas
      * @param paint
      * @param latLng
      */
-    private void drawLatLng(BoundingBox boundingBox, Canvas canvas, Paint paint, LatLng latLng) {
+    private void drawLatLng(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Paint paint, LatLng latLng) {
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
-                latLng.longitude);
+                getLongitude(transform, latLng));
         float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
-                latLng.latitude);
+                getLatitude(transform, latLng));
         if (x >= 0 && x <= tileWidth && y >= 0 && y <= tileHeight) {
             canvas.drawCircle(x, y, pointRadius, paint);
         }
+    }
+
+    /**
+     * Get the web mercator longitude
+     *
+     * @param transform
+     * @param point
+     * @return
+     */
+    private double getLongitude(ProjectionTransform transform, LatLng point) {
+        return transform.transformLongitude(point.longitude);
+    }
+
+    /**
+     * Get the web mercator latitude
+     *
+     * @param transform
+     * @param point
+     * @return
+     */
+    private double getLatitude(ProjectionTransform transform, LatLng point) {
+        return transform.transformLatitude(point.latitude);
     }
 
 }
