@@ -153,14 +153,11 @@ public class GoogleMapShapeConverterUtils {
 	 * @param latLng
 	 */
 	private static void comparePointAndLatLng(GoogleMapShapeConverter converter, Point point, LatLng latLng) {
-        double x = point.getX();
-        double y = point.getY();
         if(converter != null){
-            x = converter.getToWgs84Transform().transformLongitude(x);
-            y = converter.getToWgs84Transform().transformLatitude(y);
+            point = converter.toWgs84(point);
         }
-		TestCase.assertEquals(x, latLng.longitude, 0.001);
-		TestCase.assertEquals(y, latLng.latitude, 0.001);
+		TestCase.assertEquals(point.getX(), latLng.longitude, 0.001);
+		TestCase.assertEquals(point.getY(), latLng.latitude, 0.001);
 	}
 
 	/**
