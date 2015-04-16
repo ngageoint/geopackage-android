@@ -11,58 +11,59 @@ import mil.nga.giat.wkb.geom.GeometryType;
 
 /**
  * Feature DAO for reading feature user data tables
- * 
+ *
  * @author osbornb
  */
 public class FeatureDao extends
-		UserDao<FeatureColumn, FeatureTable, FeatureRow, FeatureCursor> {
+        UserDao<FeatureColumn, FeatureTable, FeatureRow, FeatureCursor> {
 
     /**
      * Feature connection
      */
     private final FeatureConnection featureDb;
 
-	/**
-	 * Geometry Columns
-	 */
-	private final GeometryColumns geometryColumns;
+    /**
+     * Geometry Columns
+     */
+    private final GeometryColumns geometryColumns;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param db
+    /**
+     * Constructor
+     *
+     * @param database
+     * @param db
      * @param featureDb
-	 * @param geometryColumns
-	 * @param table
-	 */
-	public FeatureDao(GeoPackageConnection db, FeatureConnection featureDb, GeometryColumns geometryColumns,
-			FeatureTable table) {
-		super(db, featureDb, table);
+     * @param geometryColumns
+     * @param table
+     */
+    public FeatureDao(String database, GeoPackageConnection db, FeatureConnection featureDb, GeometryColumns geometryColumns,
+                      FeatureTable table) {
+        super(database, db, featureDb, table);
 
         this.featureDb = featureDb;
-		this.geometryColumns = geometryColumns;
-		if (geometryColumns.getContents() == null) {
-			throw new GeoPackageException(GeometryColumns.class.getSimpleName()
-					+ " " + geometryColumns.getId() + " has null "
-					+ Contents.class.getSimpleName());
-		}
-		if (geometryColumns.getSrs() == null) {
-			throw new GeoPackageException(GeometryColumns.class.getSimpleName()
-					+ " " + geometryColumns.getId() + " has null "
-					+ SpatialReferenceSystem.class.getSimpleName());
-		}
+        this.geometryColumns = geometryColumns;
+        if (geometryColumns.getContents() == null) {
+            throw new GeoPackageException(GeometryColumns.class.getSimpleName()
+                    + " " + geometryColumns.getId() + " has null "
+                    + Contents.class.getSimpleName());
+        }
+        if (geometryColumns.getSrs() == null) {
+            throw new GeoPackageException(GeometryColumns.class.getSimpleName()
+                    + " " + geometryColumns.getId() + " has null "
+                    + SpatialReferenceSystem.class.getSimpleName());
+        }
 
-		projection = ProjectionFactory.getProjection(geometryColumns.getSrs()
-				.getOrganizationCoordsysId());
-	}
+        projection = ProjectionFactory.getProjection(geometryColumns.getSrs()
+                .getOrganizationCoordsysId());
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public FeatureRow newRow() {
-		return new FeatureRow(getTable());
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FeatureRow newRow() {
+        return new FeatureRow(getTable());
+    }
 
     /**
      * Get the Feature connection
@@ -73,31 +74,31 @@ public class FeatureDao extends
         return featureDb;
     }
 
-	/**
-	 * Get the Geometry Columns
-	 * 
-	 * @return
-	 */
-	public GeometryColumns getGeometryColumns() {
-		return geometryColumns;
-	}
+    /**
+     * Get the Geometry Columns
+     *
+     * @return
+     */
+    public GeometryColumns getGeometryColumns() {
+        return geometryColumns;
+    }
 
-	/**
-	 * The the Geometry Column name
-	 * 
-	 * @return
-	 */
-	public String getGeometryColumnName() {
-		return geometryColumns.getColumnName();
-	}
+    /**
+     * The the Geometry Column name
+     *
+     * @return
+     */
+    public String getGeometryColumnName() {
+        return geometryColumns.getColumnName();
+    }
 
-	/**
-	 * Get the Geometry Type
-	 * 
-	 * @return
-	 */
-	public GeometryType getGeometryType() {
-		return geometryColumns.getGeometryType();
-	}
+    /**
+     * Get the Geometry Type
+     *
+     * @return
+     */
+    public GeometryType getGeometryType() {
+        return geometryColumns.getGeometryType();
+    }
 
 }

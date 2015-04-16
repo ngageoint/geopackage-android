@@ -29,9 +29,9 @@ import mil.nga.giat.geopackage.core.contents.Contents;
 import mil.nga.giat.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.giat.geopackage.db.GeoPackageConnection;
 import mil.nga.giat.geopackage.db.GeoPackageTableCreator;
-import mil.nga.giat.geopackage.db.metadata.ExternalGeoPackage;
-import mil.nga.giat.geopackage.db.metadata.ExternalGeoPackageDataSource;
-import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadataOpenHelper;
+import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadata;
+import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadataDataSource;
+import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadataDb;
 import mil.nga.giat.geopackage.io.GeoPackageIOUtils;
 import mil.nga.giat.geopackage.io.GeoPackageProgress;
 import mil.nga.giat.geopackage.validate.GeoPackageValidate;
@@ -110,13 +110,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     @Override
     public boolean isExternal(String database) {
         boolean external = false;
-        ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                 context);
-        externalDataSource.open();
+        metadataDb.open();
         try {
-            external = externalDataSource.exists(database);
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            external = dataSource.isExternal(database);
         } finally {
-            externalDataSource.close();
+            metadataDb.close();
         }
         return external;
     }
@@ -137,9 +138,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     @Override
     public File getFile(String database) {
         File dbFile = null;
-        ExternalGeoPackage external = getExternalGeoPackage(database);
-        if (external != null) {
-            dbFile = new File(external.getPath());
+        GeoPackageMetadata metadata = getGeoPackageMetadata(database);
+        if (metadata != null && metadata.isExternal()) {
+            dbFile = new File(metadata.getExternalPath());
         } else {
             dbFile = context.getDatabasePath(database);
         }
@@ -167,16 +168,19 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     @Override
     public boolean delete(String database) {
         boolean deleted = false;
-        if (isExternal(database)) {
-            ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
-                    context);
-            externalDataSource.open();
-            try {
-                deleted = externalDataSource.delete(database);
-            } finally {
-                externalDataSource.close();
-            }
-        } else {
+        boolean external = isExternal(database);
+
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            deleted = dataSource.delete(database);
+        } finally {
+            metadataDb.close();
+        }
+
+        if (!external) {
             deleted = context.deleteDatabase(database);
         }
         return deleted;
@@ -397,15 +401,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             String path = null;
             boolean writable = true;
             SQLiteDatabase sqlite;
-            ExternalGeoPackage external = getExternalGeoPackage(database);
-            if (external != null) {
-                path = external.getPath();
+            GeoPackageMetadata metadata = getGeoPackageMetadata(database);
+            if (metadata != null && metadata.isExternal()) {
+                path = metadata.getExternalPath();
                 try {
-                    sqlite = SQLiteDatabase.openDatabase(external.getPath(),
+                    sqlite = SQLiteDatabase.openDatabase(path,
                             cursorFactory, SQLiteDatabase.OPEN_READWRITE
                                     | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
                 } catch (Exception e) {
-                    sqlite = SQLiteDatabase.openDatabase(external.getPath(),
+                    sqlite = SQLiteDatabase.openDatabase(path,
                             cursorFactory, SQLiteDatabase.OPEN_READONLY
                                     | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
                     writable = false;
@@ -446,17 +450,21 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean rename(String database, String newDatabase) {
-        ExternalGeoPackage external = getExternalGeoPackage(database);
-        if (external != null) {
-            ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+        GeoPackageMetadata metadata = getGeoPackageMetadata(database);
+        if (metadata != null) {
+
+            GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                     context);
-            externalDataSource.open();
+            metadataDb.open();
             try {
-                externalDataSource.rename(external, newDatabase);
+                GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+                dataSource.rename(metadata, newDatabase);
             } finally {
-                externalDataSource.close();
+                metadataDb.close();
             }
-        } else if (copy(database, newDatabase)) {
+        }
+
+        if ((metadata == null || !metadata.isExternal()) && copy(database, newDatabase)) {
             delete(database);
         }
         return exists(newDatabase);
@@ -493,35 +501,35 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                             + database + ", Path: " + path, e);
         }
 
-        ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                 context);
-        externalDataSource.open();
+        metadataDb.open();
         try {
-
-            // Save the external link
-            ExternalGeoPackage external = new ExternalGeoPackage();
-            external.setName(database);
-            external.setPath(path);
-            externalDataSource.create(external);
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            // Save the external link in metadata
+            GeoPackageMetadata metadata = new GeoPackageMetadata();
+            metadata.setName(database);
+            metadata.setExternalPath(path);
+            dataSource.create(metadata);
 
             GeoPackage geoPackage = open(database);
             if (geoPackage != null) {
                 try {
                     GeoPackageValidate.validateMinimumTables(geoPackage);
                 } catch (RuntimeException e) {
-                    externalDataSource.delete(database);
+                    dataSource.delete(database);
                     throw e;
                 } finally {
                     geoPackage.close();
                 }
             } else {
-                externalDataSource.delete(database);
+                dataSource.delete(database);
                 throw new GeoPackageException(
                         "Unable to open GeoPackage database. Database: "
                                 + database);
             }
         } finally {
-            externalDataSource.close();
+            metadataDb.close();
         }
 
         return exists(database);
@@ -537,16 +545,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         for (String database : databaseArray) {
             if (!isTemporary(database)
                     && !database
-                    .equalsIgnoreCase(GeoPackageMetadataOpenHelper.DATABASE_NAME)) {
+                    .equalsIgnoreCase(GeoPackageMetadataDb.DATABASE_NAME)) {
                 databases.add(database);
             }
         }
 
         // Get the external GeoPackages, adding those where the file exists and
         // deleting those with missing files
-        List<ExternalGeoPackage> externalGeoPackages = getExternalGeoPackages();
-        for (ExternalGeoPackage external : externalGeoPackages) {
-            if (new File(external.getPath()).exists()) {
+        List<GeoPackageMetadata> externalGeoPackages = getExternalGeoPackages();
+        for (GeoPackageMetadata external : externalGeoPackages) {
+            if (new File(external.getExternalPath()).exists()) {
                 databases.add(external.getName());
             } else {
                 delete(external.getName());
@@ -637,40 +645,46 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     }
 
     /**
-     * Get the external GeoPackages
+     * Get all external GeoPackage metadata
      *
      * @return
      */
-    private List<ExternalGeoPackage> getExternalGeoPackages() {
-        List<ExternalGeoPackage> externals = null;
-        ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+    private List<GeoPackageMetadata> getExternalGeoPackages() {
+        List<GeoPackageMetadata> metadata = null;
+
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                 context);
-        externalDataSource.open();
+        metadataDb.open();
         try {
-            externals = externalDataSource.getAll();
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            metadata = dataSource.getAllExternal();
         } finally {
-            externalDataSource.close();
+            metadataDb.close();
         }
-        return externals;
+
+        return metadata;
     }
 
     /**
-     * Get the external GeoPackage
+     * Get the GeoPackage metadata
      *
      * @param database
      * @return
      */
-    private ExternalGeoPackage getExternalGeoPackage(String database) {
-        ExternalGeoPackage external = null;
-        ExternalGeoPackageDataSource externalDataSource = new ExternalGeoPackageDataSource(
+    private GeoPackageMetadata getGeoPackageMetadata(String database) {
+        GeoPackageMetadata metadata = null;
+
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                 context);
-        externalDataSource.open();
+        metadataDb.open();
         try {
-            external = externalDataSource.get(database);
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            metadata = dataSource.get(database);
         } finally {
-            externalDataSource.close();
+            metadataDb.close();
         }
-        return external;
+
+        return metadata;
     }
 
     /**

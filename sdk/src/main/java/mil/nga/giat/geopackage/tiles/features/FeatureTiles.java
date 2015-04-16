@@ -2,6 +2,7 @@ package mil.nga.giat.geopackage.tiles.features;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
@@ -18,6 +19,9 @@ import java.util.List;
 
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.R;
+import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadataDb;
+import mil.nga.giat.geopackage.db.metadata.GeometryMetadata;
+import mil.nga.giat.geopackage.db.metadata.GeometryMetadataDataSource;
 import mil.nga.giat.geopackage.features.user.FeatureCursor;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureRow;
@@ -45,13 +49,29 @@ public class FeatureTiles {
     /**
      * WGS84 Projection
      */
-    private static final Projection wgs84Projection = ProjectionFactory
+    private static final Projection WGS_84_PROJECTION = ProjectionFactory
             .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
+    /**
+     * Web Mercator Projection
+     */
+    private static final Projection WEB_MERCATOR_PROJECTION = ProjectionFactory
+            .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
+
+    /**
+     * Context
+     */
+    private final Context context;
 
     /**
      * Tile data access object
      */
     private final FeatureDao featureDao;
+
+    /**
+     * When true, features are retrieved from the geometry index. When false all geometries are queried
+     */
+    private boolean indexQuery = true;
 
     /**
      * Tile height
@@ -110,6 +130,7 @@ public class FeatureTiles {
      * @param featureDao
      */
     public FeatureTiles(Context context, FeatureDao featureDao) {
+        this.context = context;
         this.featureDao = featureDao;
 
         Resources resources = context.getResources();
@@ -133,6 +154,24 @@ public class FeatureTiles {
         polygonFillPaint.setAntiAlias(true);
         polygonFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
+    }
+
+    /**
+     * Is index query
+     *
+     * @return
+     */
+    public boolean isIndexQuery() {
+        return indexQuery;
+    }
+
+    /**
+     * Set the index query
+     *
+     * @param indexQuery
+     */
+    public void setIndexQuery(boolean indexQuery) {
+        this.indexQuery = indexQuery;
     }
 
     /**
@@ -351,11 +390,82 @@ public class FeatureTiles {
      * @return
      */
     public Bitmap drawTile(int x, int y, int zoom) {
+        Bitmap bitmap;
+        if (indexQuery) {
+            bitmap = drawTileQueryIndex(x, y, zoom);
+        } else {
+            bitmap = drawTileQueryAll(x, y, zoom);
+        }
+        return bitmap;
+    }
+
+    /**
+     * Draw a tile bitmap from the x, y, and zoom level by querying all features. This could
+     * be very slow if there are a lot of features
+     *
+     * @param x
+     * @param y
+     * @param zoom
+     * @return
+     */
+    public Bitmap drawTileQueryIndex(int x, int y, int zoom) {
+
+        // Get the web mercator bounding box
+        BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
+                .getWebMercatorBoundingBox(x, y, zoom);
+
+        // Convert to the projection bounding box to query the index
+        ProjectionTransform webMercatorToProjectionTransform = WEB_MERCATOR_PROJECTION.getTransformation(featureDao.getProjection());
+        BoundingBox projectionBoundingBox = webMercatorToProjectionTransform.transform(webMercatorBoundingBox);
+
+        // Create bitmap and canvas
+        Bitmap bitmap = Bitmap.createBitmap(tileWidth,
+                tileHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+
+        // WGS84 to web mercator projection and google shape converter
+        ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+        GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+                featureDao.getProjection());
+
+        GeoPackageMetadataDb db = new GeoPackageMetadataDb(context);
+        db.open();
+        try {
+            // Query for geometries matching the bounds in the index
+            GeometryMetadataDataSource ds = new GeometryMetadataDataSource(db);
+            Cursor cursor = ds.query(featureDao.getDatabase(), featureDao.getTableName(), projectionBoundingBox);
+            try {
+                while (cursor.moveToNext()) {
+                    GeometryMetadata metadata = ds.createGeometryMetadata(cursor);
+                    long id = metadata.getId();
+                    FeatureRow row = featureDao.queryForIdRow(id);
+                    drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, bitmap, canvas, row, converter);
+                }
+            } finally {
+                cursor.close();
+            }
+        } finally {
+            db.close();
+        }
+
+        return bitmap;
+    }
+
+    /**
+     * Draw a tile bitmap from the x, y, and zoom level by querying all features. This could
+     * be very slow if there are a lot of features
+     *
+     * @param x
+     * @param y
+     * @param zoom
+     * @return
+     */
+    public Bitmap drawTileQueryAll(int x, int y, int zoom) {
 
         BoundingBox boundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(x, y, zoom);
 
-        // TODO query by bounding box
+        // Query for all features
         FeatureCursor cursor = featureDao.queryForAll();
 
         // Draw the tile bitmap
@@ -377,7 +487,7 @@ public class FeatureTiles {
                 tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        ProjectionTransform wgs84ToWebMercatorTransform = wgs84Projection.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+        ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
         GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
                 featureDao.getProjection());
 
@@ -404,7 +514,7 @@ public class FeatureTiles {
                 tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
-        ProjectionTransform wgs84ToWebMercatorTransform = wgs84Projection.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+        ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
         GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
                 featureDao.getProjection());
 

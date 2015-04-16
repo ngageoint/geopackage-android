@@ -37,9 +37,9 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
 
-        FeatureTileUtils.insertFeatures(featureDao);
+        FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
-        FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, featureDao);
+        FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, geoPackage, featureDao);
 
         TileGenerator tileGenerator = new FeatureTileGenerator(activity, geoPackage,
                 "gen_feature_tiles", featureTiles, minZoom, maxZoom);

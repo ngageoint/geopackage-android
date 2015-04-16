@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import java.sql.SQLException;
 
+import mil.nga.giat.geopackage.db.FeatureIndexer;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
@@ -32,9 +33,12 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
 
-        FeatureTileUtils.insertFeatures(featureDao);
+        FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
-        FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, featureDao);
+        FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, geoPackage, featureDao);
+
+        FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
+        indexer.index();
 
         createTiles(featureTiles, 0, 1);
 

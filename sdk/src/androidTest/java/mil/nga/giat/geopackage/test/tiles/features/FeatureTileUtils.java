@@ -6,8 +6,13 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import java.sql.SQLException;
+import java.util.Date;
+
 import mil.nga.giat.geopackage.BoundingBox;
 import mil.nga.giat.geopackage.GeoPackage;
+import mil.nga.giat.geopackage.core.contents.Contents;
+import mil.nga.giat.geopackage.core.contents.ContentsDao;
 import mil.nga.giat.geopackage.features.columns.GeometryColumns;
 import mil.nga.giat.geopackage.features.user.FeatureDao;
 import mil.nga.giat.geopackage.features.user.FeatureRow;
@@ -54,22 +59,33 @@ public class FeatureTileUtils {
      * Insert features
      *
      * @param featureDao
+     * @return number of features
      */
-    public static void insertFeatures(FeatureDao featureDao) {
+    public static int insertFeatures(GeoPackage geoPackage, FeatureDao featureDao) throws SQLException {
 
+        int count = 0;
+
+        count += 5;
         insertPoint(featureDao, 0, 0);
         insertPoint(featureDao, 0, ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE - 1);
         insertPoint(featureDao, 0, ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE + 1);
         insertPoint(featureDao, -179, 0);
         insertPoint(featureDao, 179, 0);
 
+        count += 4;
         insertFourPoints(featureDao, 179, ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE - 1);
+        count += 4;
         insertFourPoints(featureDao, 90, 45);
 
+        count += 4;
         insertFourLines(featureDao, new double[][]{{135.0, 67.5}, {90.0, 45.0}, {135.0, 45.0}});
 
+        count += 4;
         insertFourPolygons(featureDao, new double[][]{{60.0, 35.0}, {65.0, 15.0}, {15.0, 20.0}, {20.0, 40.0}}, new double[][]{{50.0, 30.0}, {48.0, 22.0}, {30.0, 23.0}, {25.0, 34.0}});
 
+        updateLastChange(geoPackage, featureDao);
+
+        return count;
     }
 
     /**
@@ -77,7 +93,7 @@ public class FeatureTileUtils {
      *
      * @return
      */
-    public static FeatureTiles createFeatureTiles(Context context, FeatureDao featureDao) {
+    public static FeatureTiles createFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
 
         FeatureTiles featureTiles = new FeatureTiles(context, featureDao);
 
@@ -102,21 +118,21 @@ public class FeatureTileUtils {
         return featureTiles;
     }
 
-    private static void insertFourPoints(FeatureDao featureDao, double x, double y) {
+    public static void insertFourPoints(FeatureDao featureDao, double x, double y) {
         insertPoint(featureDao, x, y);
         insertPoint(featureDao, x, -1 * y);
         insertPoint(featureDao, -1 * x, y);
         insertPoint(featureDao, -1 * x, -1 * y);
     }
 
-    private static void insertFourLines(FeatureDao featureDao, double[][] points) {
+    public static void insertFourLines(FeatureDao featureDao, double[][] points) {
         insertLine(featureDao, convertPoints(points, false, false));
         insertLine(featureDao, convertPoints(points, true, false));
         insertLine(featureDao, convertPoints(points, false, true));
         insertLine(featureDao, convertPoints(points, true, true));
     }
 
-    private static void insertFourPolygons(FeatureDao featureDao, double[][]... points) {
+    public static void insertFourPolygons(FeatureDao featureDao, double[][]... points) {
         insertPolygon(featureDao, convertPoints(false, false, points));
         insertPolygon(featureDao, convertPoints(true, false, points));
         insertPolygon(featureDao, convertPoints(false, true, points));
@@ -144,24 +160,28 @@ public class FeatureTileUtils {
         return newPoints;
     }
 
-    private static void insertPoint(FeatureDao featureDao, double x, double y) {
+    public static long insertPoint(FeatureDao featureDao, double x, double y) {
         FeatureRow featureRow = featureDao.newRow();
-        GeoPackageGeometryData pointGeomData = new GeoPackageGeometryData(
-                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-        Point point = new Point(false, false, x, y);
-        pointGeomData.setGeometry(point);
-        featureRow.setGeometry(pointGeomData);
-        featureDao.insert(featureRow);
+        setPoint(featureRow, x, y);
+        return featureDao.insert(featureRow);
     }
 
-    private static void insertLine(FeatureDao featureDao, double[][] points) {
+    public static void setPoint(FeatureRow featureRow, double x, double y) {
+        GeoPackageGeometryData geomData = new GeoPackageGeometryData(
+                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+        Point point = new Point(false, false, x, y);
+        geomData.setGeometry(point);
+        featureRow.setGeometry(geomData);
+    }
+
+    public static long insertLine(FeatureDao featureDao, double[][] points) {
         FeatureRow featureRow = featureDao.newRow();
-        GeoPackageGeometryData pointGeomData = new GeoPackageGeometryData(
+        GeoPackageGeometryData geomData = new GeoPackageGeometryData(
                 ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
         LineString lineString = getLineString(points);
-        pointGeomData.setGeometry(lineString);
-        featureRow.setGeometry(pointGeomData);
-        featureDao.insert(featureRow);
+        geomData.setGeometry(lineString);
+        featureRow.setGeometry(geomData);
+        return featureDao.insert(featureRow);
     }
 
     private static LineString getLineString(double[][] points) {
@@ -173,18 +193,25 @@ public class FeatureTileUtils {
         return lineString;
     }
 
-    private static void insertPolygon(FeatureDao featureDao, double[][]... points) {
+    public static long insertPolygon(FeatureDao featureDao, double[][]... points) {
         FeatureRow featureRow = featureDao.newRow();
-        GeoPackageGeometryData pointGeomData = new GeoPackageGeometryData(
+        GeoPackageGeometryData geomData = new GeoPackageGeometryData(
                 ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
         Polygon polygon = new Polygon(false, false);
         for (double[][] ring : points) {
             LineString lineString = getLineString(ring);
             polygon.addRing(lineString);
         }
-        pointGeomData.setGeometry(polygon);
-        featureRow.setGeometry(pointGeomData);
-        featureDao.insert(featureRow);
+        geomData.setGeometry(polygon);
+        featureRow.setGeometry(geomData);
+        return featureDao.insert(featureRow);
+    }
+
+    public static void updateLastChange(GeoPackage geoPackage, FeatureDao featureDao) throws SQLException {
+        Contents contents = featureDao.getGeometryColumns().getContents();
+        contents.setLastChange(new Date());
+        ContentsDao contentsDao = geoPackage.getContentsDao();
+        contentsDao.update(contents);
     }
 
 }

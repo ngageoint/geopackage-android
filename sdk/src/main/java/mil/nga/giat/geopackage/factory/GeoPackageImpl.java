@@ -84,7 +84,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         FeatureTableReader tableReader = new FeatureTableReader(geometryColumns);
         final FeatureTable featureTable = tableReader.readTable(new FeatureWrapperConnection(database));
         FeatureConnection userDb = new FeatureConnection(database);
-        FeatureDao dao = new FeatureDao(database, userDb, geometryColumns, featureTable);
+        FeatureDao dao = new FeatureDao(getName(), database, userDb, geometryColumns, featureTable);
 
         // Register the table to wrap cursors with the feature cursor
         cursorFactory.registerTable(geometryColumns.getTableName(),
@@ -195,7 +195,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                 tileMatrixSet.getTableName());
         final TileTable tileTable = tableReader.readTable(new TileWrapperConnection(database));
         TileConnection userDb = new TileConnection(database);
-        TileDao dao = new TileDao(database, userDb, tileMatrixSet, tileMatrices,
+        TileDao dao = new TileDao(getName(), database, userDb, tileMatrixSet, tileMatrices,
                 tileTable);
 
         // Register the table to wrap cursors with the tile cursor

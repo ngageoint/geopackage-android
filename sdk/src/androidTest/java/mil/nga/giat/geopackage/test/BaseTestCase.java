@@ -1,6 +1,8 @@
 package mil.nga.giat.geopackage.test;
 
 import mil.nga.giat.geopackage.GeoPackageActivity;
+import mil.nga.giat.geopackage.db.metadata.GeoPackageMetadataDb;
+
 import android.app.Activity;
 import android.content.Context;
 import android.test.ActivityInstrumentationTestCase2;
@@ -40,6 +42,8 @@ public abstract class BaseTestCase extends
 		// Set the activity and test context
 		activity = getActivity();
 		testContext = TestUtils.getTestContext(activity);
+
+        activity.deleteDatabase(GeoPackageMetadataDb.DATABASE_NAME);
 	}
 
 }
