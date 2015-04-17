@@ -192,6 +192,61 @@ public class FeatureTiles {
     }
 
     /**
+     * Manually set the width and height draw overlap
+     *
+     * @param pixels
+     */
+    public void setDrawOverlap(float pixels) {
+        setWidthDrawOverlap(pixels);
+        setHeightDrawOverlap(pixels);
+    }
+
+    /**
+     * Get the width draw overlap
+     *
+     * @return
+     */
+    public float getWidthDrawOverlap() {
+        return widthOverlap;
+    }
+
+    /**
+     * Manually set the width draw overlap
+     *
+     * @param pixels
+     */
+    public void setWidthDrawOverlap(float pixels) {
+        widthOverlap = pixels;
+    }
+
+    /**
+     * Get the height draw overlap
+     *
+     * @return
+     */
+    public float getHeightDrawOverlap() {
+        return heightOverlap;
+    }
+
+    /**
+     * Manually set the height draw overlap
+     *
+     * @param pixels
+     */
+    public void setHeightDrawOverlap(float pixels) {
+        heightOverlap = pixels;
+    }
+
+    /**
+     * Get the feature DAO
+     *
+     * @return
+     */
+    public FeatureDao getFeatureDao() {
+        return featureDao;
+    }
+
+    /**
      * Is index query
      *
      * @return
