@@ -124,6 +124,16 @@ public class FeatureTiles {
     private Paint polygonFillPaint = new Paint();
 
     /**
+     * Height overlapping pixels between tile images
+     */
+    private float heightOverlap;
+
+    /**
+     * Width overlapping pixels between tile images
+     */
+    private float widthOverlap;
+
+    /**
      * Constructor
      *
      * @param context
@@ -155,6 +165,29 @@ public class FeatureTiles {
         polygonFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         polygonFillPaint.setAlpha(resources.getInteger(R.integer.feature_tiles_polygon_fill_alpha));
 
+        calculateDrawOverlap();
+    }
+
+    /**
+     * Call after making changes to the point icon, point radius, or paint stroke widths.
+     * Determines the pixel overlap between tiles
+     */
+    public void calculateDrawOverlap() {
+        if (pointIcon != null) {
+            heightOverlap = pointIcon.getHeight();
+            widthOverlap = pointIcon.getWidth();
+        } else {
+            heightOverlap = pointRadius;
+            widthOverlap = pointRadius;
+        }
+
+        float linePaintHalfStroke = linePaint.getStrokeWidth() / 2.0f;
+        heightOverlap = Math.max(heightOverlap, linePaintHalfStroke);
+        widthOverlap = Math.max(widthOverlap, linePaintHalfStroke);
+
+        float polygonPaintHalfStroke = polygonPaint.getStrokeWidth() / 2.0f;
+        heightOverlap = Math.max(heightOverlap, polygonPaintHalfStroke);
+        widthOverlap = Math.max(widthOverlap, polygonPaintHalfStroke);
     }
 
     /**
@@ -415,9 +448,20 @@ public class FeatureTiles {
         BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(x, y, zoom);
 
+        // Create an expanded bounding box to handle features outside the tile that overlap
+        double minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, 0 - widthOverlap);
+        double maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, tileWidth + widthOverlap);
+        double maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
+        double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
+        BoundingBox expandedQueryBoundingBox = new BoundingBox(
+                minLongitude,
+                maxLongitude,
+                minLatitude,
+                maxLatitude);
+
         // Convert to the projection bounding box to query the index
         ProjectionTransform webMercatorToProjectionTransform = WEB_MERCATOR_PROJECTION.getTransformation(featureDao.getProjection());
-        BoundingBox projectionBoundingBox = webMercatorToProjectionTransform.transform(webMercatorBoundingBox);
+        BoundingBox projectionBoundingBox = webMercatorToProjectionTransform.transform(expandedQueryBoundingBox);
 
         // Create bitmap and canvas
         Bitmap bitmap = Bitmap.createBitmap(tileWidth,

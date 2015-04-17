@@ -115,6 +115,8 @@ public class FeatureTileUtils {
         polygonFillPaint.setColor(Color.RED);
         polygonFillPaint.setAlpha(50);
 
+        featureTiles.calculateDrawOverlap();
+
         return featureTiles;
     }
 
