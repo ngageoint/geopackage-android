@@ -38,6 +38,7 @@ import mil.nga.giat.geopackage.projection.ProjectionFactory;
 import mil.nga.giat.geopackage.projection.ProjectionTransform;
 import mil.nga.giat.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.giat.wkb.geom.Geometry;
+import mil.nga.giat.wkb.geom.Point;
 
 /**
  * Tiles generated from features
@@ -484,7 +485,7 @@ public class FeatureTiles {
                     GeometryMetadata metadata = ds.createGeometryMetadata(cursor);
                     long id = metadata.getId();
                     FeatureRow row = featureDao.queryForIdRow(id);
-                    drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, bitmap, canvas, row, converter);
+                    drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, row, converter);
                 }
             } finally {
                 cursor.close();
@@ -538,7 +539,7 @@ public class FeatureTiles {
 
         while (cursor.moveToNext()) {
             FeatureRow row = cursor.getRow();
-            drawFeature(boundingBox, wgs84ToWebMercatorTransform, bitmap, canvas, row, converter);
+            drawFeature(boundingBox, wgs84ToWebMercatorTransform, canvas, row, converter);
         }
 
         cursor.close();
@@ -564,7 +565,7 @@ public class FeatureTiles {
                 featureDao.getProjection());
 
         for (FeatureRow row : featureRow) {
-            drawFeature(boundingBox, wgs84ToWebMercatorTransform, bitmap, canvas, row, converter);
+            drawFeature(boundingBox, wgs84ToWebMercatorTransform, canvas, row, converter);
         }
 
         return bitmap;
@@ -575,12 +576,11 @@ public class FeatureTiles {
      *
      * @param boundingBox
      * @param transform
-     * @param bitmap
      * @param canvas
      * @param row
      * @param converter
      */
-    private void drawFeature(BoundingBox boundingBox, ProjectionTransform transform, Bitmap bitmap, Canvas canvas, FeatureRow row, GoogleMapShapeConverter converter) {
+    private void drawFeature(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row, GoogleMapShapeConverter converter) {
         GeoPackageGeometryData geomData = row.getGeometry();
         if (geomData != null) {
             Geometry geometry = geomData.getGeometry();
@@ -687,11 +687,12 @@ public class FeatureTiles {
         if (points.size() >= 2) {
 
             for (int i = 0; i < points.size(); i++) {
-                LatLng point = points.get(i);
+                LatLng latLng = points.get(i);
+                Point point = getPoint(transform, latLng);
                 float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
-                        getLongitude(transform, point));
+                        point.getX());
                 float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
-                        getLatitude(transform, point));
+                        point.getY());
                 if (i == 0) {
                     path.moveTo(x, y);
                 } else {
@@ -734,11 +735,12 @@ public class FeatureTiles {
     private void addRing(BoundingBox boundingBox, ProjectionTransform transform, Path path, List<LatLng> points) {
 
         for (int i = 0; i < points.size(); i++) {
-            LatLng point = point = points.get(i);
+            LatLng latLng = points.get(i);
+            Point point = getPoint(transform, latLng);
             float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
-                    getLongitude(transform, point));
+                    point.getX());
             float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
-                    getLatitude(transform, point));
+                    point.getY());
             if (i == 0) {
                 path.moveTo(x, y);
             } else {
@@ -759,10 +761,11 @@ public class FeatureTiles {
      */
     private void drawLatLng(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Paint paint, LatLng latLng) {
 
+        Point point = getPoint(transform, latLng);
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
-                getLongitude(transform, latLng));
+                point.getX());
         float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
-                getLatitude(transform, latLng));
+                point.getY());
 
         if (pointIcon != null) {
             if (x >= 0 - pointIcon.getWidth() && x <= tileWidth + pointIcon.getWidth() && y >= 0 - pointIcon.getHeight() && y <= tileHeight + pointIcon.getHeight()) {
@@ -777,25 +780,15 @@ public class FeatureTiles {
     }
 
     /**
-     * Get the web mercator longitude
+     * Get the web mercator point
      *
      * @param transform
      * @param point
      * @return
      */
-    private double getLongitude(ProjectionTransform transform, LatLng point) {
-        return transform.transformLongitude(point.longitude);
-    }
-
-    /**
-     * Get the web mercator latitude
-     *
-     * @param transform
-     * @param point
-     * @return
-     */
-    private double getLatitude(ProjectionTransform transform, LatLng point) {
-        return transform.transformLatitude(point.latitude);
+    private Point getPoint(ProjectionTransform transform, LatLng point) {
+        double[] lonLat = transform.transform(point.longitude, point.latitude);
+        return new Point(lonLat[0], lonLat[1]);
     }
 
 }
