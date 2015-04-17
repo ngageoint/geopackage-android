@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -237,7 +238,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean importGeoPackage(String database, InputStream stream) {
-        return importGeoPackage(database, stream, false);
+        return importGeoPackage(database, stream, false, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String database, InputStream stream, GeoPackageProgress progress) {
+        return importGeoPackage(database, stream, false, progress);
     }
 
     /**
@@ -246,7 +255,28 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     @Override
     public boolean importGeoPackage(String database, InputStream stream,
                                     boolean override) {
-        boolean success = importGeoPackage(database, override, stream, null);
+        return importGeoPackage(database, stream, override, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String database, InputStream stream,
+                                    boolean override, GeoPackageProgress progress) {
+
+        if (progress != null) {
+            try {
+                int streamLength = stream.available();
+                if (streamLength > 0) {
+                    progress.setMax(streamLength);
+                }
+            } catch (IOException e) {
+                Log.w("Could not determine stream available size. Database: " + database, e);
+            }
+        }
+
+        boolean success = importGeoPackage(database, override, stream, progress);
         return success;
     }
 
