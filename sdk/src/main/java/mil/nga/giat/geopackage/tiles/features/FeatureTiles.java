@@ -153,6 +153,7 @@ public class FeatureTiles {
         fillPolygon = resources.getBoolean(R.bool.feature_tiles_polygon_fill);
         polygonFillPaint.setAntiAlias(true);
         polygonFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        polygonFillPaint.setAlpha(resources.getInteger(R.integer.feature_tiles_polygon_fill_alpha));
 
     }
 

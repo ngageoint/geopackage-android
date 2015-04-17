@@ -19,5 +19,6 @@
     <string name="feature_tiles_line_stroke_width">2.0</string>
     <string name="feature_tiles_polygon_stroke_width">2.0</string>
     <bool name="feature_tiles_polygon_fill">false</bool>
+    <integer name="feature_tiles_polygon_fill_alpha">25</integer>
 
 </resources>
