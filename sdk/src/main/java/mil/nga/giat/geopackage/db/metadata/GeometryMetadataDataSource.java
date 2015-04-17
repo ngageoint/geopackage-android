@@ -411,36 +411,36 @@ public class GeometryMetadataDataSource {
         StringBuilder selection = new StringBuilder();
         selection.append(GeometryMetadata.COLUMN_GEOPACKAGE_ID).append(" = ? AND ")
                 .append(GeometryMetadata.COLUMN_TABLE_NAME).append(" = ?");
-        selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_X).append(" >= ?");
-        selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_X).append(" <= ?");
-        selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_Y).append(" >= ?");
-        selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_Y).append(" <= ?");
+        selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_X).append(" <= ?");
+        selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_X).append(" >= ?");
+        selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_Y).append(" <= ?");
+        selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_Y).append(" >= ?");
         int args = 6;
         if (envelope.hasZ()) {
             args += 2;
-            selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_Z).append(" >= ?");
-            selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_Z).append(" <= ?");
+            selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_Z).append(" <= ?");
+            selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_Z).append(" >= ?");
         }
         if (envelope.hasM()) {
             args += 2;
-            selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_M).append(" >= ?");
-            selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_M).append(" <= ?");
+            selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_M).append(" <= ?");
+            selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_M).append(" >= ?");
         }
         String[] selectionArgs = new String[args];
         int argCount = 0;
         selectionArgs[argCount++] = String.valueOf(geoPackageId);
         selectionArgs[argCount++] = tableName;
-        selectionArgs[argCount++] = String.valueOf(envelope.getMinX());
         selectionArgs[argCount++] = String.valueOf(envelope.getMaxX());
-        selectionArgs[argCount++] = String.valueOf(envelope.getMinY());
+        selectionArgs[argCount++] = String.valueOf(envelope.getMinX());
         selectionArgs[argCount++] = String.valueOf(envelope.getMaxY());
+        selectionArgs[argCount++] = String.valueOf(envelope.getMinY());
         if (envelope.hasZ()) {
-            selectionArgs[argCount++] = String.valueOf(envelope.getMinZ());
             selectionArgs[argCount++] = String.valueOf(envelope.getMaxZ());
+            selectionArgs[argCount++] = String.valueOf(envelope.getMinZ());
         }
         if (envelope.hasM()) {
-            selectionArgs[argCount++] = String.valueOf(envelope.getMinM());
             selectionArgs[argCount++] = String.valueOf(envelope.getMaxM());
+            selectionArgs[argCount++] = String.valueOf(envelope.getMinM());
         }
         Cursor cursor = db.query(
                 GeometryMetadata.TABLE_NAME,
