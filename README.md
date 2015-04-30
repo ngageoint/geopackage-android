@@ -2,7 +2,7 @@
 
 GeoPackage Android is a SDK implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).
 
-The GeoPackage SDK provides the ability to manage GeoPackage files providing read, write, import, export, share, and open support. Open GeoPackage files provide read and write access to features and tiles. Feature support includes Well-Known Binary and Google Map shape translations. Tile support includes URL tile generation and Google Map Tile Providers.
+The GeoPackage SDK provides the ability to manage GeoPackage files providing read, write, import, export, share, and open support. Open GeoPackage files provide read and write access to features and tiles. Feature support includes Well-Known Binary and Google Map shape translations. Tile generation supports creation by URL or features. Tile providers supporting GeoPackage format, Google tile API, and feature tile generation.
 
 The GeoPackage SDK was developed at the National Geospatial-Intelligence Agency (NGA) in collaboration with [BIT Systems](https://www.bit-sys.com/index.jsp). The government has "unlimited rights" and is releasing this software to increase the impact of government investments by providing developers with the opportunity to take things in new directions. The software use, modification, and distribution rights are stipulated within the [MIT license](http://choosealicense.com/licenses/mit/).
 
@@ -52,7 +52,8 @@ The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sam
     List<String> tiles = geoPackage.getTileTables();
     
     // Query Features
-    FeatureDao featureDao = geoPackage.getFeatureDao(features.get(0));
+    String featureTable = features.get(0);
+    FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
     GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
             featureDao.getProjection());
     FeatureCursor featureCursor = featureDao.queryForAll();
@@ -71,7 +72,8 @@ The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sam
     }
     
     // Query Tiles
-    TileDao tileDao = geoPackage.getTileDao(tiles.get(0));
+    String tileTable = tiles.get(0);
+    TileDao tileDao = geoPackage.getTileDao(tileTable);
     TileCursor tileCursor = tileDao.queryForAll();
     try{
         while(tileCursor.moveToNext()){
@@ -84,13 +86,31 @@ The [GeoPackage SDK Sample](https://git.geointapps.org/geopackage/geopackage-sam
         tileCursor.close();
     }
     
-    // Tile Provider
+    // Tile Provider (GeoPackage or Google API)
     TileProvider overlay = GeoPackageOverlayFactory
             .getTileProvider(tileDao);
     TileOverlayOptions overlayOptions = new TileOverlayOptions();
     overlayOptions.tileProvider(overlay);
     overlayOptions.zIndex(-1);
     map.addTileOverlay(overlayOptions);
+    
+    // Feature Tile Provider
+    FeatureTiles featureTiles = new FeatureTiles(context, featureDao);
+    TileProvider featureOverlay = new FeatureOverlay(featureTiles);
+    TileOverlayOptions featureOverlayOptions = new TileOverlayOptions();
+    featureOverlayOptions.tileProvider(featureOverlay);
+    featureOverlayOptions.zIndex(-1);
+    map.addTileOverlay(featureOverlayOptions);
+    
+    // URL Tile Generator
+    TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,
+                    "url_tile_table", "http://url/{z}/{x}/{y}.png", 2, 7);
+    int urlTileCount = urlTileGenerator.generateTiles();
+    
+    // Feature Tile Generator
+    TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
+                    featureTable + "_tiles", featureTiles, 10, 15);
+    int featureTileCount = featureTileGenerator.generateTiles();
     
     // Close database when done
     geoPackage.close();
