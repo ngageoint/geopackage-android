@@ -20,7 +20,7 @@ public class GeometryMetadata {
     /**
      * Table name column
      */
-    public static final String COLUMN_TABLE_NAME = TableMetadata.TABLE_NAME;
+    public static final String COLUMN_TABLE_NAME = TableMetadata.COLUMN_TABLE_NAME;
 
     /**
      * Geometry Id column
