@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
-group 'mil.nga.giat.geopackage'
+group 'mil.nga.giat.geopackage.android'
 version '1.0.0'
 
 android {
