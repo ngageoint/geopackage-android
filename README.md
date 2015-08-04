@@ -21,6 +21,37 @@ The GeoPackage SDK provides the ability to manage GeoPackage files providing rea
 
 The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-android) app provides an extensive standalone example on how to use the SDK.
 
+#### Project Setup ####
+
+Include as repositories in your project build.gradle:
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+##### Normal Build #####
+
+Include the dependency in your module build.gradle with desired version number:
+
+    compile "mil.nga.giat.geopackage:sdk:1.0.0"
+    
+As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
+    
+##### Local Build #####
+
+Replace the normal build dependency in your module build.gradle with:
+
+    compile project(':sdk')
+    
+Include in your settings.gradle:
+
+    include ':sdk'
+    
+From your project directory, link the cloned SDK directory:
+
+    ln -s ../geopackage-android/sdk sdk
+
 #### Example ####
 
     // Context context = ...;
