@@ -34,7 +34,7 @@ Include as repositories in your project build.gradle:
 
 Include the dependency in your module build.gradle with desired version number:
 
-    compile "mil.nga.giat.geopackage:sdk:1.0.0"
+    compile "mil.nga.giat.geopackage.android:geopackage-sdk:1.0.0"
     
 As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
     
@@ -42,15 +42,15 @@ As part of the build process, run the "uploadArchives" task on the geopackage-an
 
 Replace the normal build dependency in your module build.gradle with:
 
-    compile project(':sdk')
+    compile project(':geopackage-sdk')
     
 Include in your settings.gradle:
 
-    include ':sdk'
+    include ':geopackage-sdk'
     
 From your project directory, link the cloned SDK directory:
 
-    ln -s ../geopackage-android/sdk sdk
+    ln -s ../geopackage-android/geopackage-sdk geopackage-sdk
 
 #### Example ####
 
