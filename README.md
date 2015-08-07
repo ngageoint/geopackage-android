@@ -125,6 +125,8 @@ The following repositories must be built first (Central Repository Artifacts Com
 * [GeoPackage WKB Java] (https://github.com/ngageoint/geopackage-wkb-java)
 * [GeoPackage Core Java] (https://github.com/ngageoint/geopackage-core-java)
 
+Build this repository using Android Studio and/or Gradle.
+
 #### Project Setup ####
 
 Include as repositories in your project build.gradle:
