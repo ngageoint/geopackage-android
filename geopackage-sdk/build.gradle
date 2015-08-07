@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
-group 'mil.nga.giat.geopackage.android'
+group 'mil.nga.geopackage.android'
 version '1.0.0'
 
 android {
@@ -12,7 +12,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 21
 
-        testApplicationId 'mil.nga.giat.geopackage.test'
+        testApplicationId 'mil.nga.geopackage.test'
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
@@ -57,5 +57,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:6.1.71'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'com.j256.ormlite:ormlite-android:4.48'
-    compile 'mil.nga.giat.geopackage:geopackage-core:1.0.0'
+    compile 'mil.nga.geopackage:geopackage-core:1.0.0'
 }
