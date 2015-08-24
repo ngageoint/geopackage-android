@@ -40,7 +40,7 @@ The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-andro
     GeoPackage geoPackage = manager.open(databases.get(0));
     
     // GeoPackage Table DAOs
-    SpatialReferenceSystemDao srsDao = getSpatialReferenceSystemDao();
+    SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
     ContentsDao contentsDao = geoPackage.getContentsDao();
     GeometryColumnsDao geomColumnsDao = geoPackage.getGeometryColumnsDao();
     TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
