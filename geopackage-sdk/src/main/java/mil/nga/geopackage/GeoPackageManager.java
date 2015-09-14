@@ -23,6 +23,13 @@ public interface GeoPackageManager {
     public List<String> databases();
 
     /**
+     * List all external GeoPackage databases sorted alphabetically
+     *
+     * @return external database list
+     */
+    public List<String> externalDatabases();
+
+    /**
      * Get the count of GeoPackage databases
      *
      * @return
@@ -35,6 +42,13 @@ public interface GeoPackageManager {
      * @return database set
      */
     public Set<String> databaseSet();
+
+    /**
+     * Set of all external GeoPackage databases
+     *
+     * @return external database set
+     */
+    public Set<String> externalDatabaseSet();
 
     /**
      * Determine if the database exists
@@ -91,6 +105,20 @@ public interface GeoPackageManager {
      * @return true if deleted
      */
     public boolean delete(String database);
+
+    /**
+     * Delete all databases
+     *
+     * @return true if deleted
+     */
+    public boolean deleteAll();
+
+    /**
+     * Delete all external GeoPackages
+     *
+     * @return true if deleted
+     */
+    public boolean deleteAllExternal();
 
     /**
      * Create a new GeoPackage database

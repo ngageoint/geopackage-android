@@ -73,6 +73,18 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public List<String> externalDatabases() {
+        Set<String> sortedDatabases = new TreeSet<String>();
+        addExternalDatabases(sortedDatabases);
+        List<String> databases = new ArrayList<String>();
+        databases.addAll(sortedDatabases);
+        return databases;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public int count() {
         return context.databaseList().length;
     }
@@ -84,6 +96,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public Set<String> databaseSet() {
         Set<String> databases = new HashSet<String>();
         addDatabases(databases);
+        return databases;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> externalDatabaseSet() {
+        Set<String> databases = new HashSet<String>();
+        addExternalDatabases(databases);
         return databases;
     }
 
@@ -184,6 +206,36 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         if (!external) {
             deleted = context.deleteDatabase(database);
         }
+        return deleted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean deleteAll(){
+
+        boolean deleted = true;
+
+        for(String database: databaseSet()){
+            deleted = delete(database) && deleted;
+        }
+
+        return deleted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean deleteAllExternal(){
+
+        boolean deleted = true;
+
+        for(String database: externalDatabaseSet()){
+            deleted = delete(database) && deleted;
+        }
+
         return deleted;
     }
 
@@ -580,6 +632,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             }
         }
 
+        // Add the external databases
+        addExternalDatabases(databases);
+    }
+
+    /**
+     * Add all external databases to the collection
+     *
+     * @param databases
+     */
+    private void addExternalDatabases(Collection<String> databases) {
         // Get the external GeoPackages, adding those where the file exists and
         // deleting those with missing files
         List<GeoPackageMetadata> externalGeoPackages = getExternalGeoPackages();
