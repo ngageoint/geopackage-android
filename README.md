@@ -21,37 +21,6 @@ The GeoPackage SDK provides the ability to manage GeoPackage files providing rea
 
 The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-android) app provides an extensive standalone example on how to use the SDK.
 
-#### Project Setup ####
-
-Include as repositories in your project build.gradle:
-
-    repositories {
-        jcenter()
-        mavenLocal()
-    }
-
-##### Normal Build #####
-
-Include the dependency in your module build.gradle with desired version number:
-
-    compile "mil.nga.geopackage.android:geopackage-sdk:1.0.0"
-    
-As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
-    
-##### Local Build #####
-
-Replace the normal build dependency in your module build.gradle with:
-
-    compile project(':geopackage-sdk')
-    
-Include in your settings.gradle:
-
-    include ':geopackage-sdk'
-    
-From your project directory, link the cloned SDK directory:
-
-    ln -s ../geopackage-android/geopackage-sdk geopackage-sdk
-
 #### Example ####
 
     // Context context = ...;
@@ -149,6 +118,45 @@ From your project directory, link the cloned SDK directory:
     
     // Close database when done
     geoPackage.close();
+
+### Build ###
+
+The following repositories must be built first (Central Repository Artifacts Coming Soon):
+* [GeoPackage WKB Java] (https://github.com/ngageoint/geopackage-wkb-java)
+* [GeoPackage Core Java] (https://github.com/ngageoint/geopackage-core-java)
+
+Build this repository using Android Studio and/or Gradle.
+
+#### Project Setup ####
+
+Include as repositories in your project build.gradle:
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+##### Normal Build #####
+
+Include the dependency in your module build.gradle with desired version number:
+
+    compile "mil.nga.geopackage.android:geopackage-sdk:1.0.0"
+    
+As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
+    
+##### Local Build #####
+
+Replace the normal build dependency in your module build.gradle with:
+
+    compile project(':geopackage-sdk')
+    
+Include in your settings.gradle:
+
+    include ':geopackage-sdk'
+    
+From your project directory, link the cloned SDK directory:
+
+    ln -s ../geopackage-android/geopackage-sdk geopackage-sdk
 
 ### Remote Dependencies ###
 
