@@ -1,8 +1,11 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
-group 'mil.nga.geopackage.android'
-version '1.0.0'
+group = "mil.nga.geopackage"
+archivesBaseName = "geopackage-android"
+version = "1.0.0"
+def remotePublish = false
 
 android {
     compileSdkVersion 21
@@ -35,21 +38,94 @@ android {
         }
     }
 
-    task sourceJar(type: Jar) {
+    task javadoc(type: Javadoc) {
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        destinationDir = file("../javadoc/")
+        failOnError false
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
         classifier = 'sources'
         from sourceSets.main.java.srcDirs
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
     }
 
     uploadArchives {
         repositories {
             mavenDeployer {
-                repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository')
+
+                if (!remotePublish) {
+
+                    repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository')
+
+                } else {
+
+                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
+                    }
+
+                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                        authentication(userName: ossrhUsername, password: ossrhPassword)
+                    }
+
+                    pom.project {
+                        name 'GeoPackage Android'
+                        packaging 'aar'
+                        description 'GeoPackage Android implementation'
+                        url 'https://github.com/ngageoint/geopackage-android'
+
+                        scm {
+                            url 'git@github.com:ngageoint/geopackage-android.git'
+                            connection 'scm:git:git@github.com:ngageoint/geopackage-android.git'
+                            developerConnection 'scm:git:git@github.com:ngageoint/geopackage-android.git'
+                        }
+
+                        licenses {
+                            license {
+                                name 'The MIT License (MIT)'
+                                url 'https://github.com/ngageoint/geopackage-android/blob/master/LICENSE.txt'
+                                distribution 'repo'
+                            }
+                        }
+
+                        organization {
+                            name 'National Geospatial-Intelligence Agency'
+                            url 'https://www.nga.mil'
+                        }
+
+                        developers {
+                            developer {
+                                id 'bosborn'
+                                name 'Brian Osborn'
+                                email 'osbornb@bit-sys.com'
+                                organizationUrl 'https://www.bit-sys.com'
+                                roles {
+                                    role 'developer'
+                                }
+                                timezone 'UTC-07'
+                            }
+                        }
+                    }
+                }
             }
         }
-        artifacts {
-            archives sourceJar
-        }
     }
+
 }
 
 dependencies {
