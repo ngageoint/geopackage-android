@@ -1,6 +1,7 @@
 #java specific
 *.class
 *.settings
+javadoc/
 
 # Built application files
 *.apk
