@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
-group 'mil.nga.geopackage.android'
+group 'mil.nga.geopackage'
 version '1.0.0'
 
 android {
@@ -44,12 +44,31 @@ android {
         repositories {
             mavenDeployer {
                 repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository')
+                pom.artifactId = 'geopackage-android'
             }
         }
         artifacts {
             archives sourceJar
         }
     }
+
+    /*
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(
+                        url: "${nexusUrl}/content/repositories/releases") {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+                snapshotRepository(
+                        url: "${nexusUrl}/content/repositories/snapshots") {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+                pom.artifactId = 'geopackage-android'
+            }
+        }
+    }
+    */
 }
 
 dependencies {
