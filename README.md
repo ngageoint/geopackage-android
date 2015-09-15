@@ -11,7 +11,7 @@ Software source code previously released under an open source license and then m
 
 ### About ###
 
-GeoPackage Android is a SDK implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).
+GeoPackage Android is a SDK implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).  It is listed as an [OGC GeoPackage Implementation](http://www.geopackage.org/#implementations) by the National Geospatial-Intelligence Agency.
 
 The GeoPackage SDK provides the ability to manage GeoPackage files providing read, write, import, export, share, and open support. Open GeoPackage files provide read and write access to features and tiles. Feature support includes Well-Known Binary and Google Map shape translations. Tile generation supports creation by URL or features. Tile providers supporting GeoPackage format, Google tile API, and feature tile generation.
 
@@ -119,6 +119,12 @@ The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-andro
     // Close database when done
     geoPackage.close();
 
+### Installation ###
+
+Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|1.0.0|aar)
+
+    compile "mil.nga.geopackage:geopackage-android:1.0.0"
+
 ### Build ###
 
 Build this repository using Android Studio and/or Gradle.
@@ -136,7 +142,7 @@ Include as repositories in your project build.gradle:
 
 Include the dependency in your module build.gradle with desired version number:
 
-    compile "mil.nga.geopackage.android:geopackage-sdk:1.0.0"
+    compile "mil.nga.geopackage:geopackage-android:1.0.0"
     
 As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
     
