@@ -60,6 +60,7 @@ android {
     }
 
     signing {
+        required {remotePublish}
         sign configurations.archives
     }
 
