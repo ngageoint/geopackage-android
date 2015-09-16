@@ -121,7 +121,7 @@ The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-andro
 
 ### Installation ###
 
-Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|1.0.0|aar)
+Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|1.0.0|aar) (AAR, POM, Source, Javadoc)
 
     compile "mil.nga.geopackage:geopackage-android:1.0.0"
 
