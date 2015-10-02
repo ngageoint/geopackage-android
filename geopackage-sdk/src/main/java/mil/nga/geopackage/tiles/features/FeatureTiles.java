@@ -2,7 +2,6 @@ package mil.nga.geopackage.tiles.features;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
@@ -19,9 +18,8 @@ import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.R;
-import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
-import mil.nga.geopackage.db.metadata.GeometryMetadata;
-import mil.nga.geopackage.db.metadata.GeometryMetadataDataSource;
+import mil.nga.geopackage.features.index.FeatureIndexManager;
+import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
@@ -70,9 +68,9 @@ public class FeatureTiles {
     private final FeatureDao featureDao;
 
     /**
-     * When true, features are retrieved from the geometry index. When false all geometries are queried
+     * When not null, features are retrieved using a feature index
      */
-    private boolean indexQuery = true;
+    private FeatureIndexManager indexManager;
 
     /**
      * Tile height
@@ -249,19 +247,30 @@ public class FeatureTiles {
     /**
      * Is index query
      *
-     * @return
+     * @return true if an index query
      */
     public boolean isIndexQuery() {
-        return indexQuery;
+        return indexManager != null && indexManager.isIndexed();
     }
 
     /**
-     * Set the index query
+     * Get the index manager
      *
-     * @param indexQuery
+     * @return index manager or null
+     * @since 1.1.0
      */
-    public void setIndexQuery(boolean indexQuery) {
-        this.indexQuery = indexQuery;
+    public FeatureIndexManager getIndexManager() {
+        return indexManager;
+    }
+
+    /**
+     * Set the index
+     *
+     * @param indexManager
+     * @since 1.1.0
+     */
+    public void setIndexManager(FeatureIndexManager indexManager) {
+        this.indexManager = indexManager;
     }
 
     /**
@@ -462,8 +471,8 @@ public class FeatureTiles {
             tileData = BitmapConverter.toBytes(
                     bitmap, compressFormat);
         } catch (IOException e) {
-            Log.e("Failed to create tile. x: " + x + ", y: "
-                    + y + ", zoom: " + zoom, e.getMessage());
+            Log.e(FeatureTiles.class.getSimpleName(), "Failed to create tile. x: " + x + ", y: "
+                    + y + ", zoom: " + zoom, e);
         } finally {
             bitmap.recycle();
         }
@@ -481,7 +490,7 @@ public class FeatureTiles {
      */
     public Bitmap drawTile(int x, int y, int zoom) {
         Bitmap bitmap;
-        if (indexQuery) {
+        if (isIndexQuery()) {
             bitmap = drawTileQueryIndex(x, y, zoom);
         } else {
             bitmap = drawTileQueryAll(x, y, zoom);
@@ -515,10 +524,6 @@ public class FeatureTiles {
                 minLatitude,
                 maxLatitude);
 
-        // Convert to the projection bounding box to query the index
-        ProjectionTransform webMercatorToProjectionTransform = WEB_MERCATOR_PROJECTION.getTransformation(featureDao.getProjection());
-        BoundingBox projectionBoundingBox = webMercatorToProjectionTransform.transform(expandedQueryBoundingBox);
-
         // Create bitmap and canvas
         Bitmap bitmap = Bitmap.createBitmap(tileWidth,
                 tileHeight, Bitmap.Config.ARGB_8888);
@@ -529,24 +534,14 @@ public class FeatureTiles {
         GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
                 featureDao.getProjection());
 
-        GeoPackageMetadataDb db = new GeoPackageMetadataDb(context);
-        db.open();
+        // Query for geometries matching the bounds in the index
+        FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
         try {
-            // Query for geometries matching the bounds in the index
-            GeometryMetadataDataSource ds = new GeometryMetadataDataSource(db);
-            Cursor cursor = ds.query(featureDao.getDatabase(), featureDao.getTableName(), projectionBoundingBox);
-            try {
-                while (cursor.moveToNext()) {
-                    GeometryMetadata metadata = ds.createGeometryMetadata(cursor);
-                    long id = metadata.getId();
-                    FeatureRow row = featureDao.queryForIdRow(id);
-                    drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, row, converter);
-                }
-            } finally {
-                cursor.close();
+            for (FeatureRow featureRow : results) {
+                drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, featureRow, converter);
             }
         } finally {
-            db.close();
+            results.close();
         }
 
         return bitmap;

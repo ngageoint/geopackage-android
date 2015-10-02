@@ -1,9 +1,11 @@
 package mil.nga.geopackage.db;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import java.util.Date;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
@@ -16,6 +18,8 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.GeoPackageProgress;
+import mil.nga.geopackage.projection.Projection;
+import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.wkb.geom.Geometry;
 import mil.nga.wkb.geom.GeometryEnvelope;
 import mil.nga.wkb.util.GeometryEnvelopeBuilder;
@@ -36,6 +40,16 @@ public class FeatureIndexer {
     private final FeatureDao featureDao;
 
     /**
+     * Database connection to the metadata
+     */
+    private final GeoPackageMetadataDb db;
+
+    /**
+     * Geometry Metadata Data Source
+     */
+    private final GeometryMetadataDataSource geometryMetadataDataSource;
+
+    /**
      * Progress
      */
     private GeoPackageProgress progress;
@@ -49,6 +63,18 @@ public class FeatureIndexer {
     public FeatureIndexer(Context context, FeatureDao featureDao) {
         this.context = context;
         this.featureDao = featureDao;
+        db = new GeoPackageMetadataDb(context);
+        db.open();
+        geometryMetadataDataSource = new GeometryMetadataDataSource(db);
+    }
+
+    /**
+     * Close the database connection in the feature indexer
+     *
+     * @since 1.1.0
+     */
+    public void close() {
+        db.close();
     }
 
     /**
@@ -88,21 +114,17 @@ public class FeatureIndexer {
      * maintained as the last indexed time is updated.
      *
      * @param row
+     * @return true if indexed
      */
-    public void index(FeatureRow row) {
+    public boolean index(FeatureRow row) {
 
-        GeoPackageMetadataDb db = new GeoPackageMetadataDb(context);
-        db.open();
-        try {
-            GeometryMetadataDataSource geomDs = new GeometryMetadataDataSource(db);
-            long geoPackageId = geomDs.getGeoPackageId(featureDao.getDatabase());
-            index(geomDs, geoPackageId, row, true);
+        long geoPackageId = geometryMetadataDataSource.getGeoPackageId(featureDao.getDatabase());
+        boolean indexed = index(geoPackageId, row, true);
 
-            // Update the last indexed time
-            updateLastIndexed(db, geoPackageId);
-        } finally {
-            db.close();
-        }
+        // Update the last indexed time
+        updateLastIndexed(db, geoPackageId);
+
+        return indexed;
     }
 
     /**
@@ -114,38 +136,33 @@ public class FeatureIndexer {
 
         int count = 0;
 
-        GeoPackageMetadataDb db = new GeoPackageMetadataDb(context);
-        db.open();
+        // Get or create the table metadata
+        TableMetadataDataSource tableDs = new TableMetadataDataSource(db);
+        TableMetadata metadata = tableDs.getOrCreate(featureDao.getDatabase(), featureDao.getTableName());
+
+        // Delete existing index rows
+        geometryMetadataDataSource.delete(featureDao.getDatabase(), featureDao.getTableName());
+
+        // Index all features
+        FeatureCursor cursor = featureDao.queryForAll();
         try {
-            // Get or create the table metadata
-            TableMetadataDataSource tableDs = new TableMetadataDataSource(db);
-            TableMetadata metadata = tableDs.getOrCreate(featureDao.getDatabase(), featureDao.getTableName());
-
-            // Delete existing index rows
-            GeometryMetadataDataSource geomDs = new GeometryMetadataDataSource(db);
-            geomDs.delete(featureDao.getDatabase(), featureDao.getTableName());
-
-            // Index all features
-            FeatureCursor cursor = featureDao.queryForAll();
-            try {
-                while ((progress == null || progress.isActive()) && cursor.moveToNext()) {
+            while ((progress == null || progress.isActive()) && cursor.moveToNext()) {
+                FeatureRow row = cursor.getRow();
+                boolean indexed = index(metadata.getGeoPackageId(), row, false);
+                if (indexed) {
                     count++;
-                    FeatureRow row = cursor.getRow();
-                    index(geomDs, metadata.getGeoPackageId(), row, false);
-                    if (progress != null) {
-                        progress.addProgress(1);
-                    }
                 }
-            } finally {
-                cursor.close();
-            }
-
-            // Update the last indexed time
-            if (progress == null || progress.isActive()) {
-                updateLastIndexed(db, metadata.getGeoPackageId());
+                if (progress != null) {
+                    progress.addProgress(1);
+                }
             }
         } finally {
-            db.close();
+            cursor.close();
+        }
+
+        // Update the last indexed time
+        if (progress == null || progress.isActive()) {
+            updateLastIndexed(db, metadata.getGeoPackageId());
         }
 
         return count;
@@ -154,12 +171,15 @@ public class FeatureIndexer {
     /**
      * Index the feature row
      *
-     * @param geomDs
      * @param geoPackageId
      * @param row
      * @param possibleUpdate
+     * @return true if indexed
      */
-    private void index(GeometryMetadataDataSource geomDs, long geoPackageId, FeatureRow row, boolean possibleUpdate) {
+    private boolean index(long geoPackageId, FeatureRow row, boolean possibleUpdate) {
+
+        boolean indexed = false;
+
         GeoPackageGeometryData geomData = row.getGeometry();
         if (geomData != null) {
 
@@ -176,14 +196,17 @@ public class FeatureIndexer {
 
             // Create the new index row
             if (envelope != null) {
-                GeometryMetadata metadata = geomDs.populate(geoPackageId, featureDao.getTableName(), row.getId(), envelope);
+                GeometryMetadata metadata = geometryMetadataDataSource.populate(geoPackageId, featureDao.getTableName(), row.getId(), envelope);
                 if (possibleUpdate) {
-                    geomDs.createOrUpdate(metadata);
+                    geometryMetadataDataSource.createOrUpdate(metadata);
                 } else {
-                    geomDs.create(metadata);
+                    geometryMetadataDataSource.create(metadata);
                 }
+                indexed = true;
             }
         }
+
+        return indexed;
     }
 
     /**
@@ -205,31 +228,241 @@ public class FeatureIndexer {
     }
 
     /**
+     * Delete the feature table index
+     *
+     * @return true if index deleted
+     * @since 1.1.0
+     */
+    public boolean deleteIndex() {
+        TableMetadataDataSource tableMetadataDataSource = new TableMetadataDataSource(db);
+        boolean deleted = tableMetadataDataSource.delete(featureDao.getDatabase(), featureDao.getTableName());
+        return deleted;
+    }
+
+    /**
+     * Delete the index for the feature row
+     *
+     * @param row
+     * @return true if deleted
+     * @since 1.1.0
+     */
+    public boolean deleteIndex(FeatureRow row) {
+        return deleteIndex(row.getId());
+    }
+
+    /**
+     * Delete the index for the geometry id
+     *
+     * @param geomId
+     * @return true if deleted
+     */
+    public boolean deleteIndex(long geomId) {
+        boolean deleted = geometryMetadataDataSource.delete(
+                featureDao.getDatabase(), featureDao.getTableName(), geomId);
+        return deleted;
+    }
+
+    /**
      * Determine if the database table is indexed after database modifications
      *
-     * @return
+     * @return true if indexed
      */
     public boolean isIndexed() {
 
         boolean indexed = false;
 
-        Contents contents = featureDao.getGeometryColumns().getContents();
-        Date lastChange = contents.getLastChange();
-
-        GeoPackageMetadataDb db = new GeoPackageMetadataDb(context);
-        db.open();
-        try {
-            TableMetadataDataSource ds = new TableMetadataDataSource(db);
-            TableMetadata metadata = ds.get(featureDao.getDatabase(), featureDao.getTableName());
-            if (metadata != null) {
-                Long lastIndexed = metadata.getLastIndexed();
-                indexed = lastIndexed != null && lastIndexed >= lastChange.getTime();
-            }
-        } finally {
-            db.close();
+        Date lastIndexed = getLastIndexed();
+        if (lastIndexed != null) {
+            Contents contents = featureDao.getGeometryColumns().getContents();
+            Date lastChange = contents.getLastChange();
+            indexed = lastIndexed.equals(lastChange) || lastIndexed.after(lastChange);
         }
 
         return indexed;
+    }
+
+    /**
+     * Get the date last indexed
+     *
+     * @return last indexed date or null
+     * @since 1.1.0
+     */
+    public Date getLastIndexed() {
+        Date date = null;
+        TableMetadataDataSource ds = new TableMetadataDataSource(db);
+        TableMetadata metadata = ds.get(featureDao.getDatabase(), featureDao.getTableName());
+        if (metadata != null) {
+            Long lastIndexed = metadata.getLastIndexed();
+            if (lastIndexed != null) {
+                date = new Date(lastIndexed);
+            }
+        }
+        return date;
+    }
+
+    /**
+     * Query for all Geometry Metadata
+     *
+     * @return geometry metadata cursor
+     * @since 1.1.0
+     */
+    public Cursor query() {
+        Cursor cursor = geometryMetadataDataSource.query(featureDao.getDatabase(), featureDao.getTableName());
+        return cursor;
+    }
+
+    /**
+     * Query for all Geometry Metadata count
+     *
+     * @return count
+     * @since 1.1.0
+     */
+    public int count() {
+        int count = geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName());
+        return count;
+    }
+
+    /**
+     * Query for Geometry Metadata within the bounding box, projected
+     * correctly
+     *
+     * @param boundingBox
+     * @return geometry metadata cursor
+     * @since 1.1.0
+     */
+    public Cursor query(BoundingBox boundingBox) {
+        Cursor cursor = geometryMetadataDataSource.query(featureDao.getDatabase(), featureDao.getTableName(), boundingBox);
+        return cursor;
+    }
+
+    /**
+     * Query for Geometry Metadata count within the bounding box, projected
+     * correctly
+     *
+     * @param boundingBox
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(BoundingBox boundingBox) {
+        int count = geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName(), boundingBox);
+        return count;
+    }
+
+    /**
+     * Query for Geometry Metadata within the Geometry Envelope
+     *
+     * @param envelope
+     * @return geometry metadata cursor
+     * @since 1.1.0
+     */
+    public Cursor query(GeometryEnvelope envelope) {
+        Cursor cursor = geometryMetadataDataSource.query(featureDao.getDatabase(), featureDao.getTableName(), envelope);
+        return cursor;
+    }
+
+    /**
+     * Query for Geometry Metadata count within the Geometry Envelope
+     *
+     * @param envelope
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(GeometryEnvelope envelope) {
+        int count = geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName(), envelope);
+        return count;
+    }
+
+    /**
+     * Query for Geometry Metadata within the bounding box in
+     * the provided projection
+     *
+     * @param boundingBox
+     * @param projection  projection of the provided bounding box
+     * @return geometry metadata cursor
+     * @since 1.1.0
+     */
+    public Cursor query(BoundingBox boundingBox,
+                        Projection projection) {
+
+        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
+                projection);
+
+        Cursor cursor = query(featureBoundingBox);
+
+        return cursor;
+    }
+
+    /**
+     * Query for Geometry Metadata count within the bounding box in
+     * the provided projection
+     *
+     * @param boundingBox
+     * @param projection  projection of the provided bounding box
+     * @return count
+     * @since 1.1.0
+     */
+    public long count(BoundingBox boundingBox, Projection projection) {
+
+        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
+                projection);
+
+        long count = count(featureBoundingBox);
+
+        return count;
+    }
+
+    /**
+     * Get the bounding box in the feature projection from the bounding box in
+     * the provided projection
+     *
+     * @param boundingBox
+     * @param projection
+     * @return feature projected bounding box
+     */
+    private BoundingBox getFeatureBoundingBox(BoundingBox boundingBox,
+                                              Projection projection) {
+        ProjectionTransform projectionTransform = projection
+                .getTransformation(featureDao.getProjection());
+        BoundingBox featureBoundingBox = projectionTransform
+                .transform(boundingBox);
+        return featureBoundingBox;
+    }
+
+    /**
+     * Get the Geometry Metadata for the current place in the cursor
+     *
+     * @param cursor
+     * @return geometry metadata
+     * @since 1.1.0
+     */
+    public GeometryMetadata getGeometryMetadata(Cursor cursor) {
+        GeometryMetadata geometryMetadata = GeometryMetadataDataSource.createGeometryMetadata(cursor);
+        return geometryMetadata;
+    }
+
+    /**
+     * Get the feature row for the current place in the cursor
+     *
+     * @param cursor
+     * @return feature row
+     * @since 1.1.0
+     */
+    public FeatureRow getFeatureRow(Cursor cursor) {
+        GeometryMetadata geometryMetadata = getGeometryMetadata(cursor);
+        FeatureRow featureRow = getFeatureRow(geometryMetadata);
+        return featureRow;
+    }
+
+    /**
+     * Get the feature row for the Geometry Metadata
+     *
+     * @param geometryMetadata
+     * @return feature row
+     * @since 1.1.0
+     */
+    public FeatureRow getFeatureRow(GeometryMetadata geometryMetadata) {
+        FeatureRow featureRow = featureDao.queryForIdRow(geometryMetadata.getId());
+        return featureRow;
     }
 
 }

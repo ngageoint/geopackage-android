@@ -342,6 +342,18 @@ public class GeometryMetadataDataSource {
     }
 
     /**
+     * Query for all table geometry metadata count
+     *
+     * @param geoPackage
+     * @param tableName
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(String geoPackage, String tableName) {
+        return count(getGeoPackageId(geoPackage), tableName);
+    }
+
+    /**
      * Query for all table geometry metadata
      *
      * @param geoPackageId
@@ -359,6 +371,21 @@ public class GeometryMetadataDataSource {
     }
 
     /**
+     * Query for all table geometry metadata count
+     *
+     * @param geoPackageId
+     * @param tableName
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(long geoPackageId, String tableName) {
+        Cursor cursor = query(geoPackageId, tableName);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
+    /**
      * Query for all table geometry metadata matching the bounding box in the same projection
      *
      * @param geoPackage
@@ -368,6 +395,19 @@ public class GeometryMetadataDataSource {
      */
     public Cursor query(String geoPackage, String tableName, BoundingBox boundingBox) {
         return query(getGeoPackageId(geoPackage), tableName, boundingBox);
+    }
+
+    /**
+     * Query for all table geometry metadata count matching the bounding box in the same projection
+     *
+     * @param geoPackage
+     * @param tableName
+     * @param boundingBox
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(String geoPackage, String tableName, BoundingBox boundingBox) {
+        return count(getGeoPackageId(geoPackage), tableName, boundingBox);
     }
 
     /**
@@ -388,6 +428,22 @@ public class GeometryMetadataDataSource {
     }
 
     /**
+     * Query for all table geometry metadata count matching the bounding box in the same projection
+     *
+     * @param geoPackageId
+     * @param tableName
+     * @param boundingBox
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(long geoPackageId, String tableName, BoundingBox boundingBox) {
+        Cursor cursor = query(geoPackageId, tableName, boundingBox);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
+    /**
      * Query for all table geometry metadata matching the envelope
      *
      * @param geoPackage
@@ -397,6 +453,19 @@ public class GeometryMetadataDataSource {
      */
     public Cursor query(String geoPackage, String tableName, GeometryEnvelope envelope) {
         return query(getGeoPackageId(geoPackage), tableName, envelope);
+    }
+
+    /**
+     * Query for all table geometry metadata count matching the envelope
+     *
+     * @param geoPackage
+     * @param tableName
+     * @param envelope
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(String geoPackage, String tableName, GeometryEnvelope envelope) {
+        return count(getGeoPackageId(geoPackage), tableName, envelope);
     }
 
     /**
@@ -449,6 +518,22 @@ public class GeometryMetadataDataSource {
     }
 
     /**
+     * Query for all table geometry metadata count matching the envelope
+     *
+     * @param geoPackageId
+     * @param tableName
+     * @param envelope
+     * @return count
+     * @since 1.1.0
+     */
+    public int count(long geoPackageId, String tableName, GeometryEnvelope envelope) {
+        Cursor cursor = query(geoPackageId, tableName, envelope);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
+    /**
      * Get a GeoPackage id from the name
      *
      * @param geoPackage
@@ -470,7 +555,7 @@ public class GeometryMetadataDataSource {
      * @param cursor
      * @return
      */
-    public GeometryMetadata createGeometryMetadata(Cursor cursor) {
+    public static GeometryMetadata createGeometryMetadata(Cursor cursor) {
         GeometryMetadata metadata = new GeometryMetadata();
         metadata.setGeoPackageId(cursor.getLong(0));
         metadata.setTableName(cursor.getString(1));

@@ -2,6 +2,8 @@ package mil.nga.geopackage.test.db;
 
 import android.database.Cursor;
 
+import junit.framework.TestCase;
+
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -135,7 +137,7 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
         FeatureTileUtils.updateLastChange(geoPackage, featureDao);
         FeatureRow polygonRow = featureDao.queryForIdRow(id3);
         assertNotNull(polygonRow);
-        indexer.index(polygonRow);
+        TestCase.assertTrue(indexer.index(polygonRow));
         assertTrue(indexer.isIndexed());
 
         // Update the point coordinates
@@ -144,7 +146,7 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
         FeatureTileUtils.setPoint(pointRow, maxX, minY);
         assertTrue(featureDao.update(pointRow) > 0);
         FeatureTileUtils.updateLastChange(geoPackage, featureDao);
-        indexer.index(pointRow);
+        TestCase.assertTrue(indexer.index(pointRow));
         assertTrue(indexer.isIndexed());
 
         GeometryEnvelope envelope = new GeometryEnvelope();
@@ -170,7 +172,7 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
                 assertTrue(count >= 3);
                 while (cursor.moveToNext()) {
 
-                    GeometryMetadata metadata = ds.createGeometryMetadata(cursor);
+                    GeometryMetadata metadata = GeometryMetadataDataSource.createGeometryMetadata(cursor);
                     long id = metadata.getId();
 
                     FeatureRow queryRow = featureDao.queryForIdRow(id);
