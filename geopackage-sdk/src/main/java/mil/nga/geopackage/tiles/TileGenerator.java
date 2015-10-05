@@ -651,56 +651,60 @@ public abstract class TileGenerator {
                 }
 
                 try {
-                    // Create the tile
-                    byte[] tileBytes = createTile(zoomLevel, x, y);
-
-                    Bitmap bitmap = null;
-
-                    // Compress the image
-                    if (compressFormat != null) {
-                        bitmap = BitmapConverter.toBitmap(tileBytes, options);
-                        if (bitmap != null) {
-                            tileBytes = BitmapConverter.toBytes(bitmap,
-                                    compressFormat, compressQuality);
-                        }
-                    }
 
                     // If an update, delete an existing row
                     if (update) {
                         tileDao.deleteTile(x, y, zoomLevel);
                     }
 
-                    // Create a new tile row
-                    TileRow newRow = tileDao.newRow();
-                    newRow.setZoomLevel(zoomLevel);
+                    // Create the tile
+                    byte[] tileBytes = createTile(zoomLevel, x, y);
 
-                    long tileColumn = x;
-                    long tileRow = y;
+                    if (tileBytes != null) {
 
-                    // Update the column and row to the local tile grid location
-                    if (localTileGrid != null) {
-                        tileColumn = (x - tileGrid.getMinX())
-                                + localTileGrid.getMinX();
-                        tileRow = (y - tileGrid.getMinY())
-                                + localTileGrid.getMinY();
-                    }
+                        Bitmap bitmap = null;
 
-                    newRow.setTileColumn(tileColumn);
-                    newRow.setTileRow(tileRow);
-                    newRow.setTileData(tileBytes);
-                    tileDao.create(newRow);
-
-                    count++;
-
-                    // Determine the tile width and height
-                    if (tileWidth == null) {
-                        if (bitmap == null) {
-                            bitmap = BitmapConverter.toBitmap(tileBytes,
-                                    options);
+                        // Compress the image
+                        if (compressFormat != null) {
+                            bitmap = BitmapConverter.toBitmap(tileBytes, options);
+                            if (bitmap != null) {
+                                tileBytes = BitmapConverter.toBytes(bitmap,
+                                        compressFormat, compressQuality);
+                            }
                         }
-                        if (bitmap != null) {
-                            tileWidth = bitmap.getWidth();
-                            tileHeight = bitmap.getHeight();
+
+                        // Create a new tile row
+                        TileRow newRow = tileDao.newRow();
+                        newRow.setZoomLevel(zoomLevel);
+
+                        long tileColumn = x;
+                        long tileRow = y;
+
+                        // Update the column and row to the local tile grid location
+                        if (localTileGrid != null) {
+                            tileColumn = (x - tileGrid.getMinX())
+                                    + localTileGrid.getMinX();
+                            tileRow = (y - tileGrid.getMinY())
+                                    + localTileGrid.getMinY();
+                        }
+
+                        newRow.setTileColumn(tileColumn);
+                        newRow.setTileRow(tileRow);
+                        newRow.setTileData(tileBytes);
+                        tileDao.create(newRow);
+
+                        count++;
+
+                        // Determine the tile width and height
+                        if (tileWidth == null) {
+                            if (bitmap == null) {
+                                bitmap = BitmapConverter.toBitmap(tileBytes,
+                                        options);
+                            }
+                            if (bitmap != null) {
+                                tileWidth = bitmap.getWidth();
+                                tileHeight = bitmap.getHeight();
+                            }
                         }
                     }
                 } catch (Exception e) {

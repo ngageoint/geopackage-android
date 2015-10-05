@@ -23,6 +23,11 @@ class FeatureIndexGeoPackageResults implements FeatureIndexResults {
     private final FeatureTableIndex featureTableIndex;
 
     /**
+     * Total count of the results
+     */
+    private final long count;
+
+    /**
      * Iterator of Geometry Index results
      */
     private final CloseableIterator<GeometryIndex> geometryIndices;
@@ -31,10 +36,12 @@ class FeatureIndexGeoPackageResults implements FeatureIndexResults {
      * Constructor
      *
      * @param featureTableIndex
+     * @param count
      * @param geometryIndices
      */
-    public FeatureIndexGeoPackageResults(FeatureTableIndex featureTableIndex, CloseableIterator<GeometryIndex> geometryIndices) {
+    public FeatureIndexGeoPackageResults(FeatureTableIndex featureTableIndex, long count, CloseableIterator<GeometryIndex> geometryIndices) {
         this.featureTableIndex = featureTableIndex;
+        this.count = count;
         this.geometryIndices = geometryIndices;
     }
 
@@ -66,8 +73,17 @@ class FeatureIndexGeoPackageResults implements FeatureIndexResults {
     }
 
     /**
-     * Close the results
+     * {@inheritDoc}
      */
+    @Override
+    public long count() {
+        return count;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void close() {
         geometryIndices.closeQuietly();
     }

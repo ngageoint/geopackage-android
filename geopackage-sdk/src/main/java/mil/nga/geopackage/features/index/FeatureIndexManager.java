@@ -413,8 +413,9 @@ public class FeatureIndexManager {
         FeatureIndexResults results = null;
         switch (getIndexedType()) {
             case GEOPACKAGE:
+                long count = featureTableIndex.count();
                 CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query();
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, geometryIndices);
+                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
                 break;
             case METADATA:
                 Cursor geometryMetadata = featureIndexer.query();
@@ -453,8 +454,9 @@ public class FeatureIndexManager {
         FeatureIndexResults results = null;
         switch (getIndexedType()) {
             case GEOPACKAGE:
+                long count = featureTableIndex.count(boundingBox);
                 CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(boundingBox);
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, geometryIndices);
+                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
                 break;
             case METADATA:
                 Cursor geometryMetadata = featureIndexer.query(boundingBox);
@@ -494,8 +496,9 @@ public class FeatureIndexManager {
         FeatureIndexResults results = null;
         switch (getIndexedType()) {
             case GEOPACKAGE:
+                long count = featureTableIndex.count(envelope);
                 CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(envelope);
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, geometryIndices);
+                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
                 break;
             case METADATA:
                 Cursor geometryMetadata = featureIndexer.query(envelope);
@@ -536,8 +539,9 @@ public class FeatureIndexManager {
         FeatureIndexResults results = null;
         switch (getIndexedType()) {
             case GEOPACKAGE:
+                long count = featureTableIndex.count(boundingBox, projection);
                 CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(boundingBox, projection);
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, geometryIndices);
+                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
                 break;
             case METADATA:
                 Cursor geometryMetadata = featureIndexer.query(boundingBox, projection);

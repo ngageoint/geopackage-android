@@ -68,6 +68,14 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
      * {@inheritDoc}
      */
     @Override
+    public long count(){
+        return geometryMetadata.getCount();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void close() {
         geometryMetadata.close();
     }

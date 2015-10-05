@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 /**
  * Point icon in place of a drawn circle
+ *
+ * @author osbornb
  */
 public class FeatureTilePointIcon {
 

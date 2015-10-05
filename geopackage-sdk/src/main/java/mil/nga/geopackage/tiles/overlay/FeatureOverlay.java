@@ -118,8 +118,10 @@ public class FeatureOverlay implements TileProvider {
             // Draw the tile
             byte[] tileData = featureTiles.drawTileBytes(x, y, zoom);
 
-            // Create the tile
-            tile = new Tile(featureTiles.getTileWidth(), featureTiles.getTileHeight(), tileData);
+            if (tileData != null) {
+                // Create the tile
+                tile = new Tile(featureTiles.getTileWidth(), featureTiles.getTileHeight(), tileData);
+            }
         }
 
         return tile;

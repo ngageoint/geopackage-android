@@ -133,6 +133,18 @@ public class FeatureTiles {
     private float widthOverlap;
 
     /**
+     * Optional max features per tile. When more features than this value exist for creating a
+     * single tile, the tile is not created
+     */
+    private Integer maxFeaturesPerTile;
+
+    /**
+     * When not null and the number of features is greater than the max features per tile,
+     * used to draw tiles for those tiles with more features than the max
+     */
+    private CustomFeaturesTile maxFeaturesTileDraw;
+
+    /**
      * Constructor
      *
      * @param context
@@ -454,27 +466,73 @@ public class FeatureTiles {
     }
 
     /**
+     * Get the max features per tile
+     *
+     * @return max features per tile or null
+     * @since 1.1.0
+     */
+    public Integer getMaxFeaturesPerTile() {
+        return maxFeaturesPerTile;
+    }
+
+    /**
+     * Set the max features per tile. When more features are returned in a query to create a
+     * single tile, the tile is not created.
+     *
+     * @param maxFeaturesPerTile
+     * @since 1.1.0
+     */
+    public void setMaxFeaturesPerTile(Integer maxFeaturesPerTile) {
+        this.maxFeaturesPerTile = maxFeaturesPerTile;
+    }
+
+    /**
+     * Get the max features tile draw, the custom tile drawing implementation for tiles with more
+     * features than the max at #getMaxFeaturesPerTile
+     *
+     * @return max features tile draw or null
+     * @since 1.1.0
+     */
+    public CustomFeaturesTile getMaxFeaturesTileDraw() {
+        return maxFeaturesTileDraw;
+    }
+
+    /**
+     * Set the max features tile draw, used to draw tiles when more features for a single tile
+     * than the max at #getMaxFeaturesPerTile exist
+     *
+     * @param maxFeaturesTileDraw
+     * @since 1.1.0
+     */
+    public void setMaxFeaturesTileDraw(CustomFeaturesTile maxFeaturesTileDraw) {
+        this.maxFeaturesTileDraw = maxFeaturesTileDraw;
+    }
+
+    /**
      * Draw the tile and get the bytes from the x, y, and zoom level
      *
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return tile bytes, or null
      */
     public byte[] drawTileBytes(int x, int y, int zoom) {
 
         Bitmap bitmap = drawTile(x, y, zoom);
 
-        // Convert the bitmap to bytes
         byte[] tileData = null;
-        try {
-            tileData = BitmapConverter.toBytes(
-                    bitmap, compressFormat);
-        } catch (IOException e) {
-            Log.e(FeatureTiles.class.getSimpleName(), "Failed to create tile. x: " + x + ", y: "
-                    + y + ", zoom: " + zoom, e);
-        } finally {
-            bitmap.recycle();
+
+        // Convert the bitmap to bytes
+        if (bitmap != null) {
+            try {
+                tileData = BitmapConverter.toBytes(
+                        bitmap, compressFormat);
+            } catch (IOException e) {
+                Log.e(FeatureTiles.class.getSimpleName(), "Failed to create tile. x: " + x + ", y: "
+                        + y + ", zoom: " + zoom, e);
+            } finally {
+                bitmap.recycle();
+            }
         }
 
         return tileData;
@@ -486,7 +544,7 @@ public class FeatureTiles {
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return tile bitmap, or null
      */
     public Bitmap drawTile(int x, int y, int zoom) {
         Bitmap bitmap;
@@ -505,7 +563,7 @@ public class FeatureTiles {
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return drawn bitmap, or null
      */
     public Bitmap drawTileQueryIndex(int x, int y, int zoom) {
 
@@ -524,24 +582,40 @@ public class FeatureTiles {
                 minLatitude,
                 maxLatitude);
 
-        // Create bitmap and canvas
-        Bitmap bitmap = Bitmap.createBitmap(tileWidth,
-                tileHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-
-        // WGS84 to web mercator projection and google shape converter
-        ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
-        GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
-                featureDao.getProjection());
+        Bitmap bitmap = null;
 
         // Query for geometries matching the bounds in the index
         FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
-        try {
-            for (FeatureRow featureRow : results) {
-                drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, featureRow, converter);
+
+        Long count = null;
+        if (maxFeaturesPerTile != null) {
+            count = results.count();
+        }
+
+        if (maxFeaturesPerTile == null || count <= maxFeaturesPerTile.longValue()) {
+
+            // Create bitmap and canvas
+            bitmap = Bitmap.createBitmap(tileWidth,
+                    tileHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+
+            // WGS84 to web mercator projection and google shape converter
+            ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+            GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+                    featureDao.getProjection());
+
+            try {
+                for (FeatureRow featureRow : results) {
+                    drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, featureRow, converter);
+                }
+            } finally {
+                results.close();
             }
-        } finally {
-            results.close();
+
+        } else if (maxFeaturesTileDraw != null) {
+
+            // Draw the max features tile
+            bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, count);
         }
 
         return bitmap;
@@ -554,18 +628,33 @@ public class FeatureTiles {
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return drawn bitmap, or null
      */
     public Bitmap drawTileQueryAll(int x, int y, int zoom) {
 
         BoundingBox boundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(x, y, zoom);
 
+        Bitmap bitmap = null;
+
         // Query for all features
         FeatureCursor cursor = featureDao.queryForAll();
 
-        // Draw the tile bitmap
-        Bitmap bitmap = drawTile(boundingBox, cursor);
+        Integer count = null;
+        if (maxFeaturesPerTile != null) {
+            count = cursor.getCount();
+        }
+
+        if (maxFeaturesPerTile == null || count <= maxFeaturesPerTile) {
+
+            // Draw the tile bitmap
+            bitmap = drawTile(boundingBox, cursor);
+
+        } else if (maxFeaturesTileDraw != null) {
+
+            // Draw the max features tile
+            bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, count);
+        }
 
         return bitmap;
     }

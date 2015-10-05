@@ -11,6 +11,13 @@ import mil.nga.geopackage.features.user.FeatureRow;
 public interface FeatureIndexResults extends Iterable<FeatureRow> {
 
     /**
+     * Get the count of results
+     *
+     * @return count
+     */
+    public long count();
+
+    /**
      * Close the results
      */
     public void close();
