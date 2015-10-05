@@ -141,6 +141,9 @@ public class FeatureTiles {
     /**
      * When not null and the number of features is greater than the max features per tile,
      * used to draw tiles for those tiles with more features than the max
+     *
+     * @see CustomFeaturesTile
+     * @see mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile custom features tile implementation
      */
     private CustomFeaturesTile maxFeaturesTileDraw;
 
@@ -491,6 +494,8 @@ public class FeatureTiles {
      * features than the max at #getMaxFeaturesPerTile
      *
      * @return max features tile draw or null
+     * @see CustomFeaturesTile
+     * @see mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile custom features tile implementation
      * @since 1.1.0
      */
     public CustomFeaturesTile getMaxFeaturesTileDraw() {
@@ -502,6 +507,8 @@ public class FeatureTiles {
      * than the max at #getMaxFeaturesPerTile exist
      *
      * @param maxFeaturesTileDraw
+     * @see CustomFeaturesTile
+     * @see mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile custom features tile implementation
      * @since 1.1.0
      */
     public void setMaxFeaturesTileDraw(CustomFeaturesTile maxFeaturesTileDraw) {
@@ -587,35 +594,36 @@ public class FeatureTiles {
         // Query for geometries matching the bounds in the index
         FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
 
-        Long count = null;
-        if (maxFeaturesPerTile != null) {
-            count = results.count();
-        }
+        try {
 
-        if (maxFeaturesPerTile == null || count <= maxFeaturesPerTile.longValue()) {
+            Long tileCount = null;
+            if (maxFeaturesPerTile != null) {
+                tileCount = results.count();
+            }
 
-            // Create bitmap and canvas
-            bitmap = Bitmap.createBitmap(tileWidth,
-                    tileHeight, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
+            if (maxFeaturesPerTile == null || tileCount <= maxFeaturesPerTile.longValue()) {
 
-            // WGS84 to web mercator projection and google shape converter
-            ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
-            GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
-                    featureDao.getProjection());
+                // Create bitmap and canvas
+                bitmap = Bitmap.createBitmap(tileWidth,
+                        tileHeight, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
 
-            try {
+                // WGS84 to web mercator projection and google shape converter
+                ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+                GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+                        featureDao.getProjection());
+
                 for (FeatureRow featureRow : results) {
                     drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, featureRow, converter);
                 }
-            } finally {
-                results.close();
+
+            } else if (maxFeaturesTileDraw != null) {
+
+                // Draw the max features tile
+                bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, tileCount, results);
             }
-
-        } else if (maxFeaturesTileDraw != null) {
-
-            // Draw the max features tile
-            bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, count);
+        } finally {
+            results.close();
         }
 
         return bitmap;
@@ -640,20 +648,25 @@ public class FeatureTiles {
         // Query for all features
         FeatureCursor cursor = featureDao.queryForAll();
 
-        Integer count = null;
-        if (maxFeaturesPerTile != null) {
-            count = cursor.getCount();
-        }
+        try {
 
-        if (maxFeaturesPerTile == null || count <= maxFeaturesPerTile) {
+            Integer totalCount = null;
+            if (maxFeaturesPerTile != null) {
+                totalCount = cursor.getCount();
+            }
 
-            // Draw the tile bitmap
-            bitmap = drawTile(boundingBox, cursor);
+            if (maxFeaturesPerTile == null || totalCount <= maxFeaturesPerTile) {
 
-        } else if (maxFeaturesTileDraw != null) {
+                // Draw the tile bitmap
+                bitmap = drawTile(boundingBox, cursor);
 
-            // Draw the max features tile
-            bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, count);
+            } else if (maxFeaturesTileDraw != null) {
+
+                // Draw the unindexed max features tile
+                bitmap = maxFeaturesTileDraw.drawUnindexedTile(tileWidth, tileHeight, totalCount, cursor);
+            }
+        } finally {
+            cursor.close();
         }
 
         return bitmap;

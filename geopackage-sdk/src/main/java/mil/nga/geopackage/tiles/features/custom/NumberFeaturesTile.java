@@ -10,10 +10,16 @@ import android.util.TypedValue;
 
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.R;
+import mil.nga.geopackage.features.index.FeatureIndexResults;
+import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.tiles.features.CustomFeaturesTile;
 
 /**
- * Draws a tile with the the number of features in a circle in the middle of the tile
+ * Draws a tile indicating the number of features that exist within the tile, visible when zoomed
+ * in closer. The number is drawn in the center of the tile and by default is surrounded by a colored
+ * circle with border.  By default a tile border is drawn and the tile is colored (transparently
+ * most likely). The paint objects for each draw type can be modified to or set to null (except for
+ * the text paint object).
  *
  * @author osbornb
  * @since 1.1.0
@@ -28,12 +34,22 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Circle paint object
      */
-    private Paint circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint circlePaint = null;
 
     /**
      * Circle fill paint object
      */
-    private Paint circleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint circleFillPaint = null;
+
+    /**
+     * Tile border paint object
+     */
+    private Paint tileBorderPaint = null;
+
+    /**
+     * Tile fill paint object
+     */
+    private Paint tileFillPaint = null;
 
     /**
      * The percentage of border to include around the edges of the text in the circle
@@ -41,13 +57,16 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     private float circlePaddingPercentage;
 
     /**
+     * Flag indicating whether tiles should be drawn for feature tables that are not indexed
+     */
+    private boolean drawUnindexedTiles;
+
+    /**
      * Constructor
      *
      * @param context
      */
     public NumberFeaturesTile(Context context) {
-        circlePaint.setStyle(Paint.Style.STROKE);
-        circleFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
         Resources resources = context.getResources();
 
@@ -59,20 +78,49 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
         textPaint.setTextSize(textSize.getFloat() * resources.getDisplayMetrics().density);
 
         // Set the default circle paint values
-        circlePaint.setColor(resources.getColor(R.color.number_features_tile_circle_color));
-        TypedValue circleStrokeWidth = new TypedValue();
-        resources.getValue(R.dimen.number_features_tile_circle_stroke_width,
-                circleStrokeWidth, true);
-        circlePaint.setStrokeWidth(circleStrokeWidth.getFloat());
+        if (resources.getBoolean(R.bool.number_features_tile_circle_draw)) {
+            circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            circlePaint.setStyle(Paint.Style.STROKE);
+            circlePaint.setColor(resources.getColor(R.color.number_features_tile_circle_color));
+            TypedValue circleStrokeWidth = new TypedValue();
+            resources.getValue(R.dimen.number_features_tile_circle_stroke_width,
+                    circleStrokeWidth, true);
+            circlePaint.setStrokeWidth(circleStrokeWidth.getFloat());
+        }
 
         // Set the default circle fill paint values
-        circleFillPaint.setColor(resources.getColor(R.color.number_features_tile_circle_fill_color));
+        if (resources.getBoolean(R.bool.number_features_tile_circle_fill_draw)) {
+            circleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            circleFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            circleFillPaint.setColor(resources.getColor(R.color.number_features_tile_circle_fill_color));
+        }
+
+        // Set the default tile border paint values
+        if (resources.getBoolean(R.bool.number_features_tile_border_draw)) {
+            tileBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            tileBorderPaint.setStyle(Paint.Style.STROKE);
+            tileBorderPaint.setColor(resources.getColor(R.color.number_features_tile_border_color));
+            TypedValue tileBorderStrokeWidth = new TypedValue();
+            resources.getValue(R.dimen.number_features_tile_border_stroke_width,
+                    tileBorderStrokeWidth, true);
+            tileBorderPaint.setStrokeWidth(tileBorderStrokeWidth.getFloat());
+        }
+
+        // Set the default tile fill paint values
+        if (resources.getBoolean(R.bool.number_features_tile_fill_draw)) {
+            tileFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            tileFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            tileFillPaint.setColor(resources.getColor(R.color.number_features_tile_fill_color));
+        }
 
         // Set the default circle padding percentage
         TypedValue circlePadding = new TypedValue();
         resources.getValue(R.dimen.number_features_tile_circle_padding_percentage,
                 circlePadding, true);
         circlePaddingPercentage = circlePadding.getFloat();
+
+        // Set the default draw unindexed tiles value
+        drawUnindexedTiles = resources.getBoolean(R.bool.number_features_tile_unindexed_draw);
     }
 
     /**
@@ -155,25 +203,120 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     }
 
     /**
+     * Get the tile border paint object used to draw a border around the tile
+     *
+     * @return tile border paint
+     */
+    public Paint getTileBorderPaint() {
+        return tileBorderPaint;
+    }
+
+    /**
+     * Set the tile border paint object used to draw a border around the tile
+     *
+     * @param tileBorderPaint
+     */
+    public void setTileBorderPaint(Paint tileBorderPaint) {
+        this.tileBorderPaint = tileBorderPaint;
+    }
+
+    /**
+     * Get the tile fill paint object used to color the entire tile
+     *
+     * @return tile fill paint
+     */
+    public Paint getTileFillPaint() {
+        return tileFillPaint;
+    }
+
+    /**
+     * Set the tile fill paint object used to color the entire tile
+     *
+     * @param tileFillPaint
+     */
+    public void setTileFillPaint(Paint tileFillPaint) {
+        this.tileFillPaint = tileFillPaint;
+    }
+
+    /**
+     * Is the draw unindexed tiles option enabled
+     *
+     * @return true if drawing unindexed tiles
+     */
+    public boolean isDrawUnindexedTiles() {
+        return drawUnindexedTiles;
+    }
+
+    /**
+     * Set the draw unindexed tiles option
+     *
+     * @param drawUnindexedTiles
+     */
+    public void setDrawUnindexedTiles(boolean drawUnindexedTiles) {
+        this.drawUnindexedTiles = drawUnindexedTiles;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public Bitmap drawTile(int tileWidth, int tileHeight, long features) {
+    public Bitmap drawTile(int tileWidth, int tileHeight, long tileFeatureCount, FeatureIndexResults featureIndexResults) {
 
-        String featureText = String.valueOf(features);
+        String featureText = String.valueOf(tileFeatureCount);
+        Bitmap bitmap = drawTile(tileWidth, tileHeight, featureText);
+
+        return bitmap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Bitmap drawUnindexedTile(int tileWidth, int tileHeight, long totalFeatureCount, FeatureCursor allFeatureResults) {
+
+        Bitmap bitmap = null;
+
+        if (drawUnindexedTiles) {
+            // Draw a tile indicating we have no idea if there are features inside.
+            // The table is not indexed and more features exist than the max feature count set.
+            bitmap = drawTile(tileWidth, tileHeight, "?");
+        }
+
+        return bitmap;
+    }
+
+    /**
+     * Draw a tile with the provided text label in the middle
+     *
+     * @param tileWidth
+     * @param tileHeight
+     * @param text
+     * @return
+     */
+    private Bitmap drawTile(int tileWidth, int tileHeight, String text) {
 
         // Create bitmap and canvas
         Bitmap bitmap = Bitmap.createBitmap(tileWidth,
                 tileHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
 
+        // Draw the tile fill paint
+        if (tileFillPaint != null) {
+            canvas.drawRect(0, 0, tileWidth, tileHeight, tileFillPaint);
+        }
+
+        // Draw the tile border
+        if (tileBorderPaint != null) {
+            canvas.drawRect(0, 0, tileWidth, tileHeight, tileBorderPaint);
+        }
+
         // Determine the text bounds
         Rect textBounds = new Rect();
-        textPaint.getTextBounds(featureText, 0, featureText.length(), textBounds);
+        textPaint.getTextBounds(text, 0, text.length(), textBounds);
 
         // Determine the center of the tile
-        int x = (bitmap.getWidth() - textBounds.width()) / 2;
-        int y = (bitmap.getHeight() + textBounds.height()) / 2;
+        int centerX = (int) (bitmap.getWidth() / 2.0f);
+        int centerY = (int) (bitmap.getHeight() / 2.0f);
 
         // Draw the circle
         if (circlePaint != null || circleFillPaint != null) {
@@ -183,18 +326,18 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
 
             // Draw the filled circle
             if (circleFillPaint != null) {
-                canvas.drawCircle(x, y, radius, circleFillPaint);
+                canvas.drawCircle(centerX, centerY, radius, circleFillPaint);
             }
 
             // Draw the circle
             if (circlePaint != null) {
-                canvas.drawCircle(x, y, radius, circlePaint);
+                canvas.drawCircle(centerX, centerY, radius, circlePaint);
             }
 
         }
 
         // Draw the text
-        canvas.drawText(featureText, x - textBounds.exactCenterX(), y - textBounds.exactCenterY(), textPaint);
+        canvas.drawText(text, centerX - textBounds.exactCenterX(), centerY - textBounds.exactCenterY(), textPaint);
 
         return bitmap;
     }
