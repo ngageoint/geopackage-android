@@ -125,6 +125,14 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BoundingBox getBoundingBox() {
+        return tileMatrixSet.getBoundingBox();
+    }
+
+    /**
      * Adjust the tile matrix lengths if needed. Check if the tile matrix width
      * and height need to expand to account for pixel * number of pixels fitting
      * into the tile matrix lengths
