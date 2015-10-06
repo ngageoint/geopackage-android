@@ -324,7 +324,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                     progress.setMax(streamLength);
                 }
             } catch (IOException e) {
-                Log.w("Could not determine stream available size. Database: " + database, e);
+                Log.w(GeoPackageManagerImpl.class.getSimpleName(), "Could not determine stream available size. Database: " + database, e);
             }
         }
 

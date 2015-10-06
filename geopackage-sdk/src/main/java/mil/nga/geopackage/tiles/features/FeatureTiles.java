@@ -2,7 +2,6 @@ package mil.nga.geopackage.tiles.features;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Canvas;
@@ -19,9 +18,8 @@ import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.R;
-import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
-import mil.nga.geopackage.db.metadata.GeometryMetadata;
-import mil.nga.geopackage.db.metadata.GeometryMetadataDataSource;
+import mil.nga.geopackage.features.index.FeatureIndexManager;
+import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
@@ -70,9 +68,9 @@ public class FeatureTiles {
     private final FeatureDao featureDao;
 
     /**
-     * When true, features are retrieved from the geometry index. When false all geometries are queried
+     * When not null, features are retrieved using a feature index
      */
-    private boolean indexQuery = true;
+    private FeatureIndexManager indexManager;
 
     /**
      * Tile height
@@ -133,6 +131,21 @@ public class FeatureTiles {
      * Width overlapping pixels between tile images
      */
     private float widthOverlap;
+
+    /**
+     * Optional max features per tile. When more features than this value exist for creating a
+     * single tile, the tile is not created
+     */
+    private Integer maxFeaturesPerTile;
+
+    /**
+     * When not null and the number of features is greater than the max features per tile,
+     * used to draw tiles for those tiles with more features than the max
+     *
+     * @see CustomFeaturesTile
+     * @see mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile custom features tile implementation
+     */
+    private CustomFeaturesTile maxFeaturesTileDraw;
 
     /**
      * Constructor
@@ -249,19 +262,30 @@ public class FeatureTiles {
     /**
      * Is index query
      *
-     * @return
+     * @return true if an index query
      */
     public boolean isIndexQuery() {
-        return indexQuery;
+        return indexManager != null && indexManager.isIndexed();
     }
 
     /**
-     * Set the index query
+     * Get the index manager
      *
-     * @param indexQuery
+     * @return index manager or null
+     * @since 1.1.0
      */
-    public void setIndexQuery(boolean indexQuery) {
-        this.indexQuery = indexQuery;
+    public FeatureIndexManager getIndexManager() {
+        return indexManager;
+    }
+
+    /**
+     * Set the index
+     *
+     * @param indexManager
+     * @since 1.1.0
+     */
+    public void setIndexManager(FeatureIndexManager indexManager) {
+        this.indexManager = indexManager;
     }
 
     /**
@@ -445,27 +469,77 @@ public class FeatureTiles {
     }
 
     /**
+     * Get the max features per tile
+     *
+     * @return max features per tile or null
+     * @since 1.1.0
+     */
+    public Integer getMaxFeaturesPerTile() {
+        return maxFeaturesPerTile;
+    }
+
+    /**
+     * Set the max features per tile. When more features are returned in a query to create a
+     * single tile, the tile is not created.
+     *
+     * @param maxFeaturesPerTile
+     * @since 1.1.0
+     */
+    public void setMaxFeaturesPerTile(Integer maxFeaturesPerTile) {
+        this.maxFeaturesPerTile = maxFeaturesPerTile;
+    }
+
+    /**
+     * Get the max features tile draw, the custom tile drawing implementation for tiles with more
+     * features than the max at #getMaxFeaturesPerTile
+     *
+     * @return max features tile draw or null
+     * @see CustomFeaturesTile
+     * @see mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile custom features tile implementation
+     * @since 1.1.0
+     */
+    public CustomFeaturesTile getMaxFeaturesTileDraw() {
+        return maxFeaturesTileDraw;
+    }
+
+    /**
+     * Set the max features tile draw, used to draw tiles when more features for a single tile
+     * than the max at #getMaxFeaturesPerTile exist
+     *
+     * @param maxFeaturesTileDraw
+     * @see CustomFeaturesTile
+     * @see mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile custom features tile implementation
+     * @since 1.1.0
+     */
+    public void setMaxFeaturesTileDraw(CustomFeaturesTile maxFeaturesTileDraw) {
+        this.maxFeaturesTileDraw = maxFeaturesTileDraw;
+    }
+
+    /**
      * Draw the tile and get the bytes from the x, y, and zoom level
      *
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return tile bytes, or null
      */
     public byte[] drawTileBytes(int x, int y, int zoom) {
 
         Bitmap bitmap = drawTile(x, y, zoom);
 
-        // Convert the bitmap to bytes
         byte[] tileData = null;
-        try {
-            tileData = BitmapConverter.toBytes(
-                    bitmap, compressFormat);
-        } catch (IOException e) {
-            Log.e("Failed to create tile. x: " + x + ", y: "
-                    + y + ", zoom: " + zoom, e.getMessage());
-        } finally {
-            bitmap.recycle();
+
+        // Convert the bitmap to bytes
+        if (bitmap != null) {
+            try {
+                tileData = BitmapConverter.toBytes(
+                        bitmap, compressFormat);
+            } catch (IOException e) {
+                Log.e(FeatureTiles.class.getSimpleName(), "Failed to create tile. x: " + x + ", y: "
+                        + y + ", zoom: " + zoom, e);
+            } finally {
+                bitmap.recycle();
+            }
         }
 
         return tileData;
@@ -477,11 +551,11 @@ public class FeatureTiles {
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return tile bitmap, or null
      */
     public Bitmap drawTile(int x, int y, int zoom) {
         Bitmap bitmap;
-        if (indexQuery) {
+        if (isIndexQuery()) {
             bitmap = drawTileQueryIndex(x, y, zoom);
         } else {
             bitmap = drawTileQueryAll(x, y, zoom);
@@ -496,7 +570,7 @@ public class FeatureTiles {
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return drawn bitmap, or null
      */
     public Bitmap drawTileQueryIndex(int x, int y, int zoom) {
 
@@ -515,38 +589,41 @@ public class FeatureTiles {
                 minLatitude,
                 maxLatitude);
 
-        // Convert to the projection bounding box to query the index
-        ProjectionTransform webMercatorToProjectionTransform = WEB_MERCATOR_PROJECTION.getTransformation(featureDao.getProjection());
-        BoundingBox projectionBoundingBox = webMercatorToProjectionTransform.transform(expandedQueryBoundingBox);
+        Bitmap bitmap = null;
 
-        // Create bitmap and canvas
-        Bitmap bitmap = Bitmap.createBitmap(tileWidth,
-                tileHeight, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
+        // Query for geometries matching the bounds in the index
+        FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
 
-        // WGS84 to web mercator projection and google shape converter
-        ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
-        GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
-                featureDao.getProjection());
-
-        GeoPackageMetadataDb db = new GeoPackageMetadataDb(context);
-        db.open();
         try {
-            // Query for geometries matching the bounds in the index
-            GeometryMetadataDataSource ds = new GeometryMetadataDataSource(db);
-            Cursor cursor = ds.query(featureDao.getDatabase(), featureDao.getTableName(), projectionBoundingBox);
-            try {
-                while (cursor.moveToNext()) {
-                    GeometryMetadata metadata = ds.createGeometryMetadata(cursor);
-                    long id = metadata.getId();
-                    FeatureRow row = featureDao.queryForIdRow(id);
-                    drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, row, converter);
+
+            Long tileCount = null;
+            if (maxFeaturesPerTile != null) {
+                tileCount = results.count();
+            }
+
+            if (maxFeaturesPerTile == null || tileCount <= maxFeaturesPerTile.longValue()) {
+
+                // Create bitmap and canvas
+                bitmap = Bitmap.createBitmap(tileWidth,
+                        tileHeight, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+
+                // WGS84 to web mercator projection and google shape converter
+                ProjectionTransform wgs84ToWebMercatorTransform = WGS_84_PROJECTION.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+                GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+                        featureDao.getProjection());
+
+                for (FeatureRow featureRow : results) {
+                    drawFeature(webMercatorBoundingBox, wgs84ToWebMercatorTransform, canvas, featureRow, converter);
                 }
-            } finally {
-                cursor.close();
+
+            } else if (maxFeaturesTileDraw != null) {
+
+                // Draw the max features tile
+                bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, tileCount, results);
             }
         } finally {
-            db.close();
+            results.close();
         }
 
         return bitmap;
@@ -559,18 +636,38 @@ public class FeatureTiles {
      * @param x
      * @param y
      * @param zoom
-     * @return
+     * @return drawn bitmap, or null
      */
     public Bitmap drawTileQueryAll(int x, int y, int zoom) {
 
         BoundingBox boundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(x, y, zoom);
 
+        Bitmap bitmap = null;
+
         // Query for all features
         FeatureCursor cursor = featureDao.queryForAll();
 
-        // Draw the tile bitmap
-        Bitmap bitmap = drawTile(boundingBox, cursor);
+        try {
+
+            Integer totalCount = null;
+            if (maxFeaturesPerTile != null) {
+                totalCount = cursor.getCount();
+            }
+
+            if (maxFeaturesPerTile == null || totalCount <= maxFeaturesPerTile) {
+
+                // Draw the tile bitmap
+                bitmap = drawTile(boundingBox, cursor);
+
+            } else if (maxFeaturesTileDraw != null) {
+
+                // Draw the unindexed max features tile
+                bitmap = maxFeaturesTileDraw.drawUnindexedTile(tileWidth, tileHeight, totalCount, cursor);
+            }
+        } finally {
+            cursor.close();
+        }
 
         return bitmap;
     }

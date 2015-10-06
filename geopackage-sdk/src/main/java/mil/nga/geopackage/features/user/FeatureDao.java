@@ -1,5 +1,6 @@
 package mil.nga.geopackage.features.user;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
@@ -55,6 +56,14 @@ public class FeatureDao extends
 
         projection = ProjectionFactory.getProjection(geometryColumns.getSrs()
                 .getOrganizationCoordsysId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BoundingBox getBoundingBox() {
+        return geometryColumns.getContents().getBoundingBox();
     }
 
     /**
