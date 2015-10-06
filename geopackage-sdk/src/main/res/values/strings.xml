@@ -21,7 +21,7 @@
     <bool name="feature_tiles_polygon_fill">false</bool>
     <integer name="feature_tiles_polygon_fill_alpha">25</integer>
 
-    <item name="number_features_tile_text_size" type="dimen" format="float">8.0</item>
+    <item name="number_features_tile_text_size" type="dimen" format="float">7.0</item>
     <bool name="number_features_tile_circle_draw">true</bool>
     <item name="number_features_tile_circle_stroke_width" type="dimen" format="float">5.0</item>
     <bool name="number_features_tile_circle_fill_draw">true</bool>
