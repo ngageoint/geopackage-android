@@ -564,8 +564,7 @@ public class FeatureTiles {
     }
 
     /**
-     * Draw a tile bitmap from the x, y, and zoom level by querying all features. This could
-     * be very slow if there are a lot of features
+     * Draw a tile bitmap from the x, y, and zoom level by querying features in the tile location
      *
      * @param x
      * @param y
@@ -578,21 +577,10 @@ public class FeatureTiles {
         BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(x, y, zoom);
 
-        // Create an expanded bounding box to handle features outside the tile that overlap
-        double minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, 0 - widthOverlap);
-        double maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, tileWidth + widthOverlap);
-        double maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
-        double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
-        BoundingBox expandedQueryBoundingBox = new BoundingBox(
-                minLongitude,
-                maxLongitude,
-                minLatitude,
-                maxLatitude);
-
         Bitmap bitmap = null;
 
         // Query for geometries matching the bounds in the index
-        FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
+        FeatureIndexResults results = queryIndexedFeatures(webMercatorBoundingBox);
 
         try {
 
@@ -627,6 +615,61 @@ public class FeatureTiles {
         }
 
         return bitmap;
+    }
+
+    /**
+     * Draw a tile bitmap from the x, y, and zoom level by querying features in the tile location
+     *
+     * @param x
+     * @param y
+     * @param zoom
+     * @return feature count
+     * @since 1.1.0
+     */
+    public long queryIndexedFeaturesCount(int x, int y, int zoom) {
+
+        // Get the web mercator bounding box
+        BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
+                .getWebMercatorBoundingBox(x, y, zoom);
+
+        // Query for geometries matching the bounds in the index
+        FeatureIndexResults results = queryIndexedFeatures(webMercatorBoundingBox);
+
+        long count = 0;
+
+        try {
+            count = results.count();
+        } finally {
+            results.close();
+        }
+
+        return count;
+    }
+
+    /**
+     * Query for feature results in the x, y, and zoom level by querying features in the tile location
+     *
+     * @param webMercatorBoundingBox
+     * @return feature index results
+     * @since 1.1.0
+     */
+    public FeatureIndexResults queryIndexedFeatures(BoundingBox webMercatorBoundingBox) {
+
+        // Create an expanded bounding box to handle features outside the tile that overlap
+        double minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, 0 - widthOverlap);
+        double maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, tileWidth + widthOverlap);
+        double maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
+        double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
+        BoundingBox expandedQueryBoundingBox = new BoundingBox(
+                minLongitude,
+                maxLongitude,
+                minLatitude,
+                maxLatitude);
+
+        // Query for geometries matching the bounds in the index
+        FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
+
+        return results;
     }
 
     /**
