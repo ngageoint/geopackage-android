@@ -4,9 +4,13 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.0.2 (TBD)
+## [1.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.1.0) (10-08-2015)
 
-* TBD
+* NGA Table Index Extension implementation - http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html
+* Feature Index Manager to combine existing metadata indexing with the NGA Table Index Extension
+* Feature Tile improvements, including max features per tile settings and custom max feature tile drawing
+* Feature and Tile DAO get bounding box method
+* Feature Overlay Query for querying the features behind the drawn feature tiles
 
 ## [1.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.0.1) (09-23-2015)
 
