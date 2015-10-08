@@ -12,23 +12,9 @@
     <string name="tile_generator_variable_min_lon">\\{minLon\\}</string>
     <string name="tile_generator_variable_max_lon">\\{maxLon\\}</string>
 
-    <integer name="feature_tiles_width">256</integer>
-    <integer name="feature_tiles_height">256</integer>
     <string name="feature_tiles_compress_format">PNG</string>
     <string name="feature_tiles_point_radius">2.0</string>
     <string name="feature_tiles_line_stroke_width">2.0</string>
     <string name="feature_tiles_polygon_stroke_width">2.0</string>
-    <bool name="feature_tiles_polygon_fill">false</bool>
-    <integer name="feature_tiles_polygon_fill_alpha">25</integer>
-
-    <item name="number_features_tile_text_size" type="dimen" format="float">7.0</item>
-    <bool name="number_features_tile_circle_draw">true</bool>
-    <item name="number_features_tile_circle_stroke_width" type="dimen" format="float">5.0</item>
-    <bool name="number_features_tile_circle_fill_draw">true</bool>
-    <item name="number_features_tile_circle_padding_percentage" type="dimen" format="float">.1</item>
-    <bool name="number_features_tile_border_draw">true</bool>
-    <item name="number_features_tile_border_stroke_width" type="dimen" format="float">2.0</item>
-    <bool name="number_features_tile_fill_draw">true</bool>
-    <bool name="number_features_tile_unindexed_draw">true</bool>
 
 </resources>
