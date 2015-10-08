@@ -406,18 +406,31 @@ public class FeatureOverlayQuery {
     }
 
     /**
-     * Query for features in the bounding box
+     * Query for features in the WGS84 projected bounding box
      *
-     * @param boundingBox query bounding box
+     * @param boundingBox query bounding box in WGS84 projection
      * @return feature index results, must be closed
      */
     public FeatureIndexResults queryFeatures(BoundingBox boundingBox) {
+        mil.nga.geopackage.projection.Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+        FeatureIndexResults results = queryFeatures(boundingBox, projection);
+        return results;
+    }
+
+    /**
+     * Query for features in the bounding box
+     *
+     * @param boundingBox query bounding box
+     * @param projection  bounding box projection
+     * @return feature index results, must be closed
+     */
+    public FeatureIndexResults queryFeatures(BoundingBox boundingBox, mil.nga.geopackage.projection.Projection projection) {
         // Query for features
         FeatureIndexManager indexManager = featureTiles.getIndexManager();
         if (indexManager == null) {
             throw new GeoPackageException("Index Manager is not set on the Feature Tiles and is required to query indexed features");
         }
-        FeatureIndexResults results = indexManager.query(boundingBox, ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM));
+        FeatureIndexResults results = indexManager.query(boundingBox, projection);
         return results;
     }
 
