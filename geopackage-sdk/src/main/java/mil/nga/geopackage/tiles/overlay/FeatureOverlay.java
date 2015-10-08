@@ -47,6 +47,16 @@ public class FeatureOverlay implements TileProvider {
     }
 
     /**
+     * Get the feature tiles
+     *
+     * @return feature tiles
+     * @since 1.1.0
+     */
+    public FeatureTiles getFeatureTiles() {
+        return featureTiles;
+    }
+
+    /**
      * Get the min zoom
      *
      * @return

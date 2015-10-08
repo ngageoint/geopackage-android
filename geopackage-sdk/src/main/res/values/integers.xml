@@ -1,0 +1,10 @@
+<resources>
+
+    <integer name="feature_tiles_width">256</integer>
+    <integer name="feature_tiles_height">256</integer>
+    <integer name="feature_tiles_polygon_fill_alpha">25</integer>
+
+    <integer name="map_feature_overlay_max_point_detailed_info">10</integer>
+    <integer name="map_feature_overlay_max_feature_detailed_info">10</integer>
+
+</resources>

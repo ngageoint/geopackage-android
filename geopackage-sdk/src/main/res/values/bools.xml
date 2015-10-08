@@ -1,0 +1,16 @@
+<resources>
+
+    <bool name="feature_tiles_polygon_fill">false</bool>
+
+    <bool name="number_features_tile_circle_draw">true</bool>
+    <bool name="number_features_tile_circle_fill_draw">true</bool>
+    <bool name="number_features_tile_border_draw">true</bool>
+    <bool name="number_features_tile_fill_draw">true</bool>
+    <bool name="number_features_tile_unindexed_draw">true</bool>
+
+    <bool name="map_feature_overlay_max_features_info">true</bool>
+    <bool name="map_feature_overlay_features_info">true</bool>
+    <bool name="map_feature_overlay_detailed_info_print_points">true</bool>
+    <bool name="map_feature_overlay_detailed_info_print_features">false</bool>
+
+</resources>
