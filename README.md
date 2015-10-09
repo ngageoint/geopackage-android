@@ -106,20 +106,30 @@ The [Mobile Awareness GEOINT Environment (MAGE)](https://github.com/ngageoint/ma
     overlayOptions.zIndex(-1);
     map.addTileOverlay(overlayOptions);
     
-    // Feature Tile Provider
+    // Index Features
+    FeatureIndexManager featureIndexManager = new FeatureIndexManager(context, geoPackage, featureDao);
+    indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
+    int indexedCount = indexer.index();
+    
+    // Feature Tile Provider (dynamically draw tiles from features)
     FeatureTiles featureTiles = new FeatureTiles(context, featureDao);
-    TileProvider featureOverlay = new FeatureOverlay(featureTiles);
+    featureTiles.setMaxFeaturesPerTile(1000); // Set max features to draw per tile
+    NumberFeaturesTile numberFeaturesTile = new NumberFeaturesTile(context); // Custom feature tile implementation
+    featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
+    featureTiles.setIndexManager(featureIndexManager); // Set index manager to query feature indices
+    FeatureOverlay featureOverlay = new FeatureOverlay(featureTiles);
+    featureOverlay.setMinZoom(featureDao.getZoomLevel()); // Set zoom level to start showing tiles
     TileOverlayOptions featureOverlayOptions = new TileOverlayOptions();
     featureOverlayOptions.tileProvider(featureOverlay);
-    featureOverlayOptions.zIndex(-1);
+    featureOverlayOptions.zIndex(-1); // Draw the feature tiles behind map markers
     map.addTileOverlay(featureOverlayOptions);
     
-    // URL Tile Generator
+    // URL Tile Generator (generate tiles from a URL)
     TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,
                     "url_tile_table", "http://url/{z}/{x}/{y}.png", 2, 7);
     int urlTileCount = urlTileGenerator.generateTiles();
     
-    // Feature Tile Generator
+    // Feature Tile Generator (generate tiles from features)
     TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
                     featureTable + "_tiles", featureTiles, 10, 15);
     int featureTileCount = featureTileGenerator.generateTiles();
