@@ -19,9 +19,15 @@ The GeoPackage SDK provides the ability to manage GeoPackage files providing rea
 
 View the latest [Javadoc](http://ngageoint.github.io/geopackage-android/docs/api/)
 
-#### GeoPackage MapCache ####
+#### Implementations ####
+
+##### GeoPackage MapCache #####
 
 The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-android) app provides an extensive standalone example on how to use the SDK.
+
+##### MAGE #####
+
+The [Mobile Awareness GEOINT Environment (MAGE)](https://github.com/ngageoint/mage-android) app provides mobile situational awareness capabilities. It [uses the SDK](https://github.com/ngageoint/mage-android/search?q=GeoPackage&type=Code) to provide GeoPackage functionality.
 
 #### Example ####
 
