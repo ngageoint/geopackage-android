@@ -39,6 +39,7 @@ android {
     }
 
     task javadoc(type: Javadoc) {
+        title = "$archivesBaseName $version API"
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         destinationDir = file("../javadoc/")
