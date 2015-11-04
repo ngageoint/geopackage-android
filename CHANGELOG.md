@@ -6,6 +6,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.1.1 (TBD)
 
+* Javadoc project name
+* Project Feature DAO bounding box when not in the same projection
 * TBD
 
 ## [1.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.1.0) (10-08-2015)
