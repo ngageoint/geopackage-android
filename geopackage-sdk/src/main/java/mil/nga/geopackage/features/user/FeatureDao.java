@@ -6,7 +6,9 @@ import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.features.columns.GeometryColumns;
+import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionFactory;
+import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.user.UserDao;
 import mil.nga.wkb.geom.GeometryType;
 
@@ -63,7 +65,18 @@ public class FeatureDao extends
      */
     @Override
     public BoundingBox getBoundingBox() {
-        return geometryColumns.getContents().getBoundingBox();
+        Contents contents = geometryColumns.getContents();
+        Projection contentsProjection = ProjectionFactory
+                .getProjection(contents.getSrs().getOrganizationCoordsysId());
+
+        BoundingBox boundingBox = contents.getBoundingBox();
+        if (projection.getEpsg() != contentsProjection.getEpsg()) {
+            ProjectionTransform transform = contentsProjection
+                    .getTransformation(projection);
+            boundingBox = transform.transform(boundingBox);
+        }
+
+        return boundingBox;
     }
 
     /**
