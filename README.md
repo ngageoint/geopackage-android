@@ -107,7 +107,7 @@ The [Mobile Awareness GEOINT Environment (MAGE)](https://github.com/ngageoint/ma
     map.addTileOverlay(overlayOptions);
     
     // Index Features
-    FeatureIndexManager featureIndexManager = new FeatureIndexManager(context, geoPackage, featureDao);
+    FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
     indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
     int indexedCount = indexer.index();
     
@@ -116,7 +116,7 @@ The [Mobile Awareness GEOINT Environment (MAGE)](https://github.com/ngageoint/ma
     featureTiles.setMaxFeaturesPerTile(1000); // Set max features to draw per tile
     NumberFeaturesTile numberFeaturesTile = new NumberFeaturesTile(context); // Custom feature tile implementation
     featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
-    featureTiles.setIndexManager(featureIndexManager); // Set index manager to query feature indices
+    featureTiles.setIndexManager(indexer); // Set index manager to query feature indices
     FeatureOverlay featureOverlay = new FeatureOverlay(featureTiles);
     featureOverlay.setMinZoom(featureDao.getZoomLevel()); // Set zoom level to start showing tiles
     TileOverlayOptions featureOverlayOptions = new TileOverlayOptions();
