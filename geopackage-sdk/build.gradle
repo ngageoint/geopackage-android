@@ -47,12 +47,15 @@ android {
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         classpath += configurations.javadocDeps
+        classpath += files("${android.sdkDirectory}/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar")
+        classpath += files("${android.sdkDirectory}/extras/android/support/v4/android-support-v4.jar")
         options.links("http://ngageoint.github.io/geopackage-core-java/docs/api/");
         options.links("http://ngageoint.github.io/geopackage-wkb-java/docs/api/");
         options.links("http://ormlite.com/javadoc/ormlite-core/");
         options.links("http://ormlite.com/javadoc/ormlite-android/");
         options.links("http://docs.oracle.com/javase/7/docs/api/");
         options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/docs/reference");
+        options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/extras/google/google_play_services/docs/reference");
         destinationDir = file("../javadoc/")
         failOnError false
     }
