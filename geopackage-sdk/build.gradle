@@ -19,6 +19,10 @@ android {
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
     }
 
+    configurations {
+        javadocDeps
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -42,6 +46,13 @@ android {
         title = "$archivesBaseName $version API"
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += configurations.javadocDeps
+        options.links("http://ngageoint.github.io/geopackage-core-java/docs/api/");
+        options.links("http://ngageoint.github.io/geopackage-wkb-java/docs/api/");
+        options.links("http://ormlite.com/javadoc/ormlite-core/");
+        options.links("http://ormlite.com/javadoc/ormlite-android/");
+        options.links("http://docs.oracle.com/javase/7/docs/api/");
+        options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/docs/reference");
         destinationDir = file("../javadoc/")
         failOnError false
     }
@@ -136,4 +147,6 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'mil.nga.geopackage:geopackage-core:1.1.0'
+    javadocDeps 'com.j256.ormlite:ormlite-android:4.48',
+            'mil.nga.geopackage:geopackage-core:1.1.0'
 }
