@@ -55,7 +55,7 @@ android {
         options.links("http://ormlite.com/javadoc/ormlite-android/");
         options.links("http://docs.oracle.com/javase/7/docs/api/");
         options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/docs/reference");
-        options.linksOffline("https://developers.google.com/android/reference","${android.sdkDirectory}/extras/google/google_play_services/docs/reference");
+        options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/extras/google/google_play_services/docs/reference");
         destinationDir = file("../javadoc/")
         failOnError false
     }
