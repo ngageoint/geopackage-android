@@ -435,6 +435,15 @@ public class FeatureOverlayQuery {
     }
 
     /**
+     * Check if the features are indexed
+     *
+     * @return true if indexed
+     */
+    public boolean isIndexed(){
+        return featureTiles.isIndexQuery();
+    }
+
+    /**
      * Get a max features information message
      *
      * @param tileFeaturesCount
@@ -594,7 +603,8 @@ public class FeatureOverlayQuery {
     public String buildMapClickMessage(LatLng latLng, View view, GoogleMap map) {
         String message = null;
 
-        if (maxFeaturesInfo || featuresInfo) {
+        // Verify the features are indexed and we are getting information
+        if (isIndexed() && (maxFeaturesInfo || featuresInfo)) {
 
             // Get the current map zoom and verify it is within the overlays zoom range
             float zoom = getCurrentZoom(map);
