@@ -9,6 +9,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Javadoc project name and external API links
 * Project Feature DAO bounding box when not in the same projection
 * Feature Overlay Query message builder, check if features are indexed first
+* geopackage-core version updated to 1.1.1
+* min and max column query methods
+* TileDao methods, query for tile grid or bounding box at zoom level
 * TBD
 
 ## [1.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.1.0) (10-08-2015)
