@@ -86,4 +86,15 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test tileMatrixBoundingBox
+	 *
+	 * @throws SQLException
+	 */
+	public void testTileMatrixBoundingBox() throws SQLException {
+
+		TileUtils.testTileMatrixBoundingBox(geoPackage);
+
+	}
+
 }

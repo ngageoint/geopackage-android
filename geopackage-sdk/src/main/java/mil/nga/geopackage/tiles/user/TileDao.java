@@ -133,6 +133,45 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     }
 
     /**
+     * Get the bounding box of tiles
+     *
+     * @param zoomLevel zoom level
+     * @return bounding box of zoom level, or null if no tiles
+     * @since 1.1.1
+     */
+    public BoundingBox getBoundingBox(long zoomLevel) {
+        BoundingBox boundingBox = null;
+        TileMatrix tileMatrix = getTileMatrix(zoomLevel);
+        if (tileMatrix != null) {
+            TileGrid tileGrid = queryForTileGrid(zoomLevel);
+            if (tileGrid != null) {
+                BoundingBox matrixSetBoundingBox = getBoundingBox();
+                boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(
+                        matrixSetBoundingBox, tileMatrix, tileGrid);
+            }
+
+        }
+        return boundingBox;
+    }
+
+    /**
+     * Get the tile grid of the zoom level
+     *
+     * @param zoomLevel zoom level
+     * @return tile grid at zoom level, null if not tile matrix at zoom level
+     * @since 1.1.1
+     */
+    public TileGrid getTileGrid(long zoomLevel) {
+        TileGrid tileGrid = null;
+        TileMatrix tileMatrix = getTileMatrix(zoomLevel);
+        if (tileMatrix != null) {
+            tileGrid = new TileGrid(0, tileMatrix.getMatrixWidth() - 1, 0,
+                    tileMatrix.getMatrixHeight() - 1);
+        }
+        return tileGrid;
+    }
+
+    /**
      * Adjust the tile matrix lengths if needed. Check if the tile matrix width
      * and height need to expand to account for pixel * number of pixels fitting
      * into the tile matrix lengths
@@ -340,6 +379,31 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         }
 
         return tileCursor;
+    }
+
+    /**
+     * Query for the bounding
+     *
+     * @param zoomLevel
+     * @return tile grid of tiles at the zoom level
+     * @since 1.1.1
+     */
+    public TileGrid queryForTileGrid(long zoomLevel) {
+
+        String where = buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
+        String[] whereArgs = buildWhereArgs(new Object[]{zoomLevel});
+
+        Integer minX = min(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
+        Integer maxX = max(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
+        Integer minY = min(TileTable.COLUMN_TILE_ROW, where, whereArgs);
+        Integer maxY = max(TileTable.COLUMN_TILE_ROW, where, whereArgs);
+
+        TileGrid tileGrid = null;
+        if (minX != null && maxX != null && minY != null && maxY != null) {
+            tileGrid = new TileGrid(minX, maxX, minY, maxY);
+        }
+
+        return tileGrid;
     }
 
     /**
