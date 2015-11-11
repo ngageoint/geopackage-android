@@ -275,6 +275,113 @@ public interface GeoPackageManager {
     public GeoPackage open(String database);
 
     /**
+     * Is import database header validation enabled.
+     * This causes a small time increase when importing a database to check the header bytes.
+     * On by default.
+     *
+     * @return true if enabled
+     * @since 1.1.1
+     */
+    public boolean isImportHeaderValidation();
+
+    /**
+     * Set the import database header validation setting.
+     * This causes a small time increase when importing a database to check the header bytes.
+     * On by default.
+     *
+     * @param enabled true to enable, false to disable
+     * @since 1.1.1
+     */
+    public void setImportHeaderValidation(boolean enabled);
+
+    /**
+     * Is import database integrity validation enabled.
+     * This causes a noticeable time increase when importing a database to check the database integrity.
+     * Off by default.
+     *
+     * @return true if enabled
+     * @since 1.1.1
+     */
+    public boolean isImportIntegrityValidation();
+
+    /**
+     * Set the import database integrity validation setting.
+     * This causes a noticeable time increase when importing a database to check the database integrity.
+     * Off by default.
+     *
+     * @param enabled true to enable, false to disable
+     * @since 1.1.1
+     */
+    public void setImportIntegrityValidation(boolean enabled);
+
+    /**
+     * Is open database header validation enabled.
+     * This causes a small time increase when opening a database to check the header bytes.
+     * Off by default.
+     *
+     * @return true if enabled
+     * @since 1.1.1
+     */
+    public boolean isOpenHeaderValidation();
+
+    /**
+     * Set the open database header validation setting.
+     * This causes a small time increase when opening a database to check the header bytes.
+     * Off by default.
+     *
+     * @param enabled true to enable, false to disable
+     * @since 1.1.1
+     */
+    public void setOpenHeaderValidation(boolean enabled);
+
+    /**
+     * Is open database integrity validation enabled.
+     * This causes a noticeable time increase when opening a database to check the database integrity.
+     * Off by default.
+     *
+     * @return true if enabled
+     * @since 1.1.1
+     */
+    public boolean isOpenIntegrityValidation();
+
+    /**
+     * Set the open database integrity validation setting.
+     * This causes a noticeable time increase when opening a database to check the database integrity.
+     * Off by default.
+     *
+     * @param enabled true to enable, false to disable
+     * @since 1.1.1
+     */
+    public void setOpenIntegrityValidation(boolean enabled);
+
+    /**
+     * Validate the database header and integrity.
+     *
+     * @param database
+     * @return true if valid, false if not
+     * @since 1.1.1
+     */
+    public boolean validate(String database);
+
+    /**
+     * Validate the database header. Checks the beginning bytes for the SQLite header string.
+     *
+     * @param database
+     * @return true if valid, false if not
+     * @since 1.1.1
+     */
+    public boolean validateHeader(String database);
+
+    /**
+     * Validate the database integrity. Performs a database integrity ok check.
+     *
+     * @param database
+     * @return true if valid, false if not
+     * @since 1.1.1
+     */
+    public boolean validateIntegrity(String database);
+
+    /**
      * Copy the database
      *
      * @param database
