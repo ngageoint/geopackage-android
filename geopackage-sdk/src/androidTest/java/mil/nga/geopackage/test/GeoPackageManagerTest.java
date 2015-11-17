@@ -277,6 +277,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
 		manager.setOpenIntegrityValidation(!manager.isOpenIntegrityValidation());
 
 		// Import
+		importUrl = new URL(TestConstants.IMPORT_URL);
 		assertTrue("Database not imported", manager.importGeoPackage(
 				TestConstants.IMPORT_DB_NAME, importUrl));
 		assertTrue("Database does not exist",
