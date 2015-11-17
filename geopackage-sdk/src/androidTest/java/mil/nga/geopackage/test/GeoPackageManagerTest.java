@@ -76,6 +76,13 @@ public class GeoPackageManagerTest extends BaseTestCase {
 		assertNotNull("Failed to open database", geoPackage);
 		geoPackage.close();
 
+		// Open with inverse validation
+		manager.setOpenHeaderValidation(!manager.isOpenHeaderValidation());
+		manager.setOpenIntegrityValidation(!manager.isOpenIntegrityValidation());
+		geoPackage = manager.open(TestConstants.TEST_DB_NAME);
+		assertNotNull("Failed to open database", geoPackage);
+		geoPackage.close();
+
 		// Delete
 		assertTrue("Database not deleted",
 				manager.delete(TestConstants.TEST_DB_NAME));
@@ -181,6 +188,36 @@ public class GeoPackageManagerTest extends BaseTestCase {
 			// Expected
 		}
 
+		// Import and Open with inverse validation
+		manager.setImportHeaderValidation(!manager.isImportHeaderValidation());
+		manager.setImportIntegrityValidation(!manager.isImportIntegrityValidation());
+		manager.setOpenHeaderValidation(!manager.isOpenHeaderValidation());
+		manager.setOpenIntegrityValidation(!manager.isOpenIntegrityValidation());
+
+		// Import
+		assertTrue("Database not imported",
+				manager.importGeoPackage(importFile));
+		assertTrue("Database does not exist",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertTrue("Database not returned in the set", manager.databaseSet()
+				.contains(TestConstants.IMPORT_DB_NAME));
+		assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
+		assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
+		assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
+
+		// Open
+		geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+		assertNotNull("Failed to open database", geoPackage);
+		geoPackage.close();
+
+		// Delete
+		assertTrue("Database not deleted",
+				manager.delete(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database exists after delete",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database returned in the set after delete", manager
+				.databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+
 		// Delete the files
 		assertTrue("Import file could not be deleted", importFile.delete());
 		assertTrue("Corrupt Import file could not be deleted",
@@ -233,6 +270,32 @@ public class GeoPackageManagerTest extends BaseTestCase {
 			// expected
 		}
 
+		// Import and Open with inverse validation
+		manager.setImportHeaderValidation(!manager.isImportHeaderValidation());
+		manager.setImportIntegrityValidation(!manager.isImportIntegrityValidation());
+		manager.setOpenHeaderValidation(!manager.isOpenHeaderValidation());
+		manager.setOpenIntegrityValidation(!manager.isOpenIntegrityValidation());
+
+		// Import
+		assertTrue("Database not imported", manager.importGeoPackage(
+				TestConstants.IMPORT_DB_NAME, importUrl));
+		assertTrue("Database does not exist",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertTrue("Database not returned in the set", manager.databaseSet()
+				.contains(TestConstants.IMPORT_DB_NAME));
+
+		// Open
+		geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+		assertNotNull("Failed to open database", geoPackage);
+		geoPackage.close();
+
+		// Delete
+		assertTrue("Database not deleted",
+				manager.delete(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database exists after delete",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database returned in the set after delete", manager
+				.databaseSet().contains(TestConstants.IMPORT_DB_NAME));
 	}
 
 	/**
@@ -404,6 +467,36 @@ public class GeoPackageManagerTest extends BaseTestCase {
 		} catch (GeoPackageException e) {
 			// Expected
 		}
+
+		// Import and Open with inverse validation
+		manager.setImportHeaderValidation(!manager.isImportHeaderValidation());
+		manager.setImportIntegrityValidation(!manager.isImportIntegrityValidation());
+		manager.setOpenHeaderValidation(!manager.isOpenHeaderValidation());
+		manager.setOpenIntegrityValidation(!manager.isOpenIntegrityValidation());
+
+		// Import
+		assertTrue("Database not imported",
+				manager.importGeoPackageAsExternalLink(importFile, TestConstants.IMPORT_DB_NAME));
+		assertTrue("Database does not exist",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertTrue("Database not returned in the set", manager.databaseSet()
+				.contains(TestConstants.IMPORT_DB_NAME));
+		assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
+		assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
+		assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
+
+		// Open
+		geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+		assertNotNull("Failed to open database", geoPackage);
+		geoPackage.close();
+
+		// Delete
+		assertTrue("Database not deleted",
+				manager.delete(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database exists after delete",
+				manager.exists(TestConstants.IMPORT_DB_NAME));
+		assertFalse("Database returned in the set after delete", manager
+				.databaseSet().contains(TestConstants.IMPORT_DB_NAME));
 
 		// Delete the files
 		assertTrue("Import file could not be deleted", importFile.delete());

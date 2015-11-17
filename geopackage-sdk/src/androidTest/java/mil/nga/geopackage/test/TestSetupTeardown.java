@@ -70,7 +70,7 @@ public class TestSetupTeardown {
 
 	/**
 	 * Set up the create database
-	 * 
+	 *
 	 * @param activity
 	 * @param testContext
 	 * @param features
@@ -80,7 +80,25 @@ public class TestSetupTeardown {
 	 * @throws IOException
 	 */
 	public static GeoPackage setUpCreate(Activity activity,
-			Context testContext, boolean features, boolean tiles)
+										 Context testContext, boolean features, boolean tiles)
+			throws SQLException, IOException {
+		return setUpCreate(activity, testContext, features, true, tiles);
+	}
+
+	/**
+	 * Set up the create database
+	 * 
+	 * @param activity
+	 * @param testContext
+	 * @param features
+	 * @param allowEmptyFeatures
+	 * @param tiles
+	 * @return
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	public static GeoPackage setUpCreate(Activity activity,
+			Context testContext, boolean features, boolean allowEmptyFeatures, boolean tiles)
 			throws SQLException, IOException {
 
 		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -98,7 +116,7 @@ public class TestSetupTeardown {
 		}
 
 		if (features) {
-			setUpCreateFeatures(geoPackage);
+			setUpCreateFeatures(geoPackage, allowEmptyFeatures);
 		}
 
 		if (tiles) {
@@ -205,9 +223,10 @@ public class TestSetupTeardown {
 	 * Set up create for features test
 	 * 
 	 * @param geoPackage
+	 * @param allowEmptyFeatures
 	 * @throws SQLException
 	 */
-	private static void setUpCreateFeatures(GeoPackage geoPackage)
+	private static void setUpCreateFeatures(GeoPackage geoPackage, boolean allowEmptyFeatures)
 			throws SQLException {
 
 		// Get existing SRS objects
@@ -343,15 +362,15 @@ public class TestSetupTeardown {
 
 		// Populate the feature tables with rows
 		TestUtils.addRowsToFeatureTable(geoPackage, point2dGeometryColumns,
-				point2dTable, 3, false, false);
+				point2dTable, 3, false, false, allowEmptyFeatures);
 		TestUtils.addRowsToFeatureTable(geoPackage, polygon2dGeometryColumns,
-				polygon2dTable, 3, false, false);
+				polygon2dTable, 3, false, false, allowEmptyFeatures);
 		TestUtils.addRowsToFeatureTable(geoPackage, point3dGeometryColumns,
-				point3dTable, 3, true, false);
+				point3dTable, 3, true, false, allowEmptyFeatures);
 		TestUtils
 				.addRowsToFeatureTable(geoPackage,
 						lineString3dMGeometryColumns, lineString3dMTable, 3,
-						true, true);
+						true, true, allowEmptyFeatures);
 
 	}
 

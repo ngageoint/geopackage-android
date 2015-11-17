@@ -12,7 +12,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * geopackage-core version updated to 1.1.1
 * min and max column query methods
 * TileDao methods, query for tile grid or bounding box at zoom level
-* Database header and integrity validation options and methods. Validate externally linked GeoPackage headers by default.
+* Database header and integrity validation options and methods. Validate imported GeoPackage headers by default.
 * TBD
 
 ## [1.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.1.0) (10-08-2015)

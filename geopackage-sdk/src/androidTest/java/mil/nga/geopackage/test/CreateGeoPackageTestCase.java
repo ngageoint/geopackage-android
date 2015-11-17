@@ -42,4 +42,14 @@ public abstract class CreateGeoPackageTestCase extends GeoPackageTestCase {
 		super.tearDown();
 	}
 
+	/**
+	 * Return true to allow a chance that a feature will be created with an
+	 * empty geometry
+	 *
+	 * @return
+	 */
+	public boolean allowEmptyFeatures() {
+		return true;
+	}
+
 }

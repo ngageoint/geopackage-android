@@ -40,7 +40,7 @@ public class GeoPackageTestUtils {
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, 45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
 
 		SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
 				.createWebMercator();
@@ -66,7 +66,7 @@ public class GeoPackageTestUtils {
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, 45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
 
 		SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
 				.createWebMercator();
@@ -88,12 +88,12 @@ public class GeoPackageTestUtils {
 			GeoPackage geoPackage) throws SQLException {
 
 		GeometryColumns geometryColumns = new GeometryColumns();
-		geometryColumns.setId(new TableColumnKey("feature_metadata", "geom"));
+		geometryColumns.setId(new TableColumnKey("feature_metadata3", "geom3"));
 		geometryColumns.setGeometryType(GeometryType.POINT);
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, 45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
 
 		List<FeatureColumn> additionalColumns = getFeatureColumns();
 
@@ -117,12 +117,12 @@ public class GeoPackageTestUtils {
 			GeoPackage geoPackage) throws SQLException {
 
 		GeometryColumns geometryColumns = new GeometryColumns();
-		geometryColumns.setId(new TableColumnKey("feature_metadata", "geom"));
+		geometryColumns.setId(new TableColumnKey("feature_metadata4", "geom4"));
 		geometryColumns.setGeometryType(GeometryType.POINT);
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, 45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
 
 		List<FeatureColumn> additionalColumns = getFeatureColumns();
 
