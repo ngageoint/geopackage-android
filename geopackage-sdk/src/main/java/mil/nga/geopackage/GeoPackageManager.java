@@ -75,6 +75,24 @@ public interface GeoPackageManager {
     public boolean isExternal(String database);
 
     /**
+     * Determine if a database exists at the provided external file
+     *
+     * @param file database file
+     * @return true if exists
+     * @since 1.1.1
+     */
+    public boolean existsAtExternalFile(File file);
+
+    /**
+     * Determine if a database exists at the provided external file path
+     *
+     * @param path database file path
+     * @return true if exists
+     * @since 1.1.1
+     */
+    public boolean existsAtExternalPath(String path);
+
+    /**
      * Get the path of the database
      *
      * @param database
@@ -89,6 +107,24 @@ public interface GeoPackageManager {
      * @return
      */
     public File getFile(String database);
+
+    /**
+     * Get the database name at the external file
+     *
+     * @param file database file
+     * @return database name or null if does not exist
+     * @since 1.1.1
+     */
+    public String getDatabaseAtExternalFile(File file);
+
+    /**
+     * Get the database name at the external file path
+     *
+     * @param path database file path
+     * @return database name or null if does not exist
+     * @since 1.1.1
+     */
+    public String getDatabaseAtExternalPath(String path);
 
     /**
      * Get a readable version of the database size
@@ -119,6 +155,14 @@ public interface GeoPackageManager {
      * @return true if deleted
      */
     public boolean deleteAllExternal();
+
+    /**
+     * Delete all external GeoPackages where the external file can no longer be found
+     *
+     * @return true if any were deleted
+     * @since 1.1.1
+     */
+    public boolean deleteAllMissingExternal();
 
     /**
      * Create a new GeoPackage database

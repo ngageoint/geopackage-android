@@ -177,6 +177,23 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public boolean existsAtExternalFile(File file) {
+        return existsAtExternalPath(file.getAbsolutePath());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean existsAtExternalPath(String path) {
+        GeoPackageMetadata metadata = getGeoPackageMetadataAtExternalPath(path);
+        return metadata != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getPath(String database) {
         File dbFile = getFile(database);
         String path = dbFile.getAbsolutePath();
@@ -202,6 +219,27 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         }
 
         return dbFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDatabaseAtExternalFile(File file) {
+        return getDatabaseAtExternalPath(file.getAbsolutePath());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDatabaseAtExternalPath(String path) {
+        String database = null;
+        GeoPackageMetadata metadata = getGeoPackageMetadataAtExternalPath(path);
+        if (metadata != null) {
+            database = metadata.getName();
+        }
+        return database;
     }
 
     /**
@@ -262,6 +300,24 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
         for (String database : externalDatabaseSet()) {
             deleted = delete(database) && deleted;
+        }
+
+        return deleted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean deleteAllMissingExternal() {
+
+        boolean deleted = false;
+
+        List<GeoPackageMetadata> externalGeoPackages = getExternalGeoPackages();
+        for (GeoPackageMetadata external : externalGeoPackages) {
+            if (!new File(external.getExternalPath()).exists()) {
+                deleted = delete(external.getName()) || deleted;
+            }
         }
 
         return deleted;
@@ -1054,6 +1110,28 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
             metadata = dataSource.get(database);
+        } finally {
+            metadataDb.close();
+        }
+
+        return metadata;
+    }
+
+    /**
+     * Get the GeoPackage metadata of the database at the external path
+     *
+     * @param path external database path
+     * @return metadata or null
+     */
+    private GeoPackageMetadata getGeoPackageMetadataAtExternalPath(String path) {
+        GeoPackageMetadata metadata = null;
+
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            metadata = dataSource.getExternalAtPath(path);
         } finally {
             metadataDb.close();
         }

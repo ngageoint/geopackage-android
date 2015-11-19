@@ -13,6 +13,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * min and max column query methods - [Issue #15](https://github.com/ngageoint/geopackage-android/issues/15)
 * TileDao methods, query for tile grid or bounding box at zoom level - [Issue #14](https://github.com/ngageoint/geopackage-android/issues/14)
 * Database header and integrity validation options and methods. Validate imported GeoPackage headers by default. - [Issue #16](https://github.com/ngageoint/geopackage-android/issues/16)
+* Manager methods - delete all externally linked databases with missing files, retrieve database name by externally linked path
 * TBD
 
 ## [1.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.1.0) (10-08-2015)
