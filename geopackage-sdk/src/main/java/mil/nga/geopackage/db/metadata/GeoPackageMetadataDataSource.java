@@ -254,6 +254,28 @@ public class GeoPackageMetadataDataSource {
     }
 
     /**
+     * Get external GeoPackage metadata by external path
+     *
+     * @return
+     */
+    public GeoPackageMetadata getExternalAtPath(String path) {
+        GeoPackageMetadata metadata = null;
+        String selection = GeoPackageMetadata.COLUMN_EXTERNAL_PATH + " = ?";
+        String[] selectionArgs = new String[]{path};
+        Cursor cursor = db.query(
+                GeoPackageMetadata.TABLE_NAME,
+                GeoPackageMetadata.COLUMNS, selection, selectionArgs, null, null, null);
+        try {
+            if (cursor.moveToNext()) {
+                metadata = createGeoPackageMetadata(cursor);
+            }
+        } finally {
+            cursor.close();
+        }
+        return metadata;
+    }
+
+    /**
      * Create a GeoPackage metadata from the current cursor location
      *
      * @param cursor

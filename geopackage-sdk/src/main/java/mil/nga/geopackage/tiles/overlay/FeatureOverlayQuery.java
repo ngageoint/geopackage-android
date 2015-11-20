@@ -438,6 +438,7 @@ public class FeatureOverlayQuery {
      * Check if the features are indexed
      *
      * @return true if indexed
+     * @since 1.1.1
      */
     public boolean isIndexed(){
         return featureTiles.isIndexQuery();

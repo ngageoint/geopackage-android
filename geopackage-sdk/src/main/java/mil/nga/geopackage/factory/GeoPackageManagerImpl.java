@@ -1,6 +1,7 @@
 package mil.nga.geopackage.factory;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -36,6 +37,7 @@ import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
 import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.validate.GeoPackageValidate;
+import mil.nga.wkb.io.ByteReader;
 
 /**
  * GeoPackage Database management implementation
@@ -50,12 +52,38 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     private final Context context;
 
     /**
+     * Validate the database header of an imported database
+     */
+    private boolean importHeaderValidation;
+
+    /**
+     * Validate the database integrity of a imported database
+     */
+    private boolean importIntegrityValidation;
+
+    /**
+     * Validate the database header when opening a database
+     */
+    private boolean openHeaderValidation;
+
+    /**
+     * Validate the database integrity when opening a database
+     */
+    private boolean openIntegrityValidation;
+
+    /**
      * Constructor
      *
      * @param context
      */
     GeoPackageManagerImpl(Context context) {
         this.context = context;
+
+        Resources resources = context.getResources();
+        importHeaderValidation = resources.getBoolean(R.bool.manager_validation_import_header);
+        importIntegrityValidation = resources.getBoolean(R.bool.manager_validation_import_integrity);
+        openHeaderValidation = resources.getBoolean(R.bool.manager_validation_open_header);
+        openIntegrityValidation = resources.getBoolean(R.bool.manager_validation_open_integrity);
     }
 
     /**
@@ -149,6 +177,23 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public boolean existsAtExternalFile(File file) {
+        return existsAtExternalPath(file.getAbsolutePath());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean existsAtExternalPath(String path) {
+        GeoPackageMetadata metadata = getGeoPackageMetadataAtExternalPath(path);
+        return metadata != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getPath(String database) {
         File dbFile = getFile(database);
         String path = dbFile.getAbsolutePath();
@@ -174,6 +219,27 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         }
 
         return dbFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDatabaseAtExternalFile(File file) {
+        return getDatabaseAtExternalPath(file.getAbsolutePath());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDatabaseAtExternalPath(String path) {
+        String database = null;
+        GeoPackageMetadata metadata = getGeoPackageMetadataAtExternalPath(path);
+        if (metadata != null) {
+            database = metadata.getName();
+        }
+        return database;
     }
 
     /**
@@ -213,11 +279,11 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteAll(){
+    public boolean deleteAll() {
 
         boolean deleted = true;
 
-        for(String database: databaseSet()){
+        for (String database : databaseSet()) {
             deleted = delete(database) && deleted;
         }
 
@@ -228,12 +294,30 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteAllExternal(){
+    public boolean deleteAllExternal() {
 
         boolean deleted = true;
 
-        for(String database: externalDatabaseSet()){
+        for (String database : externalDatabaseSet()) {
             deleted = delete(database) && deleted;
+        }
+
+        return deleted;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean deleteAllMissingExternal() {
+
+        boolean deleted = false;
+
+        List<GeoPackageMetadata> externalGeoPackages = getExternalGeoPackages();
+        for (GeoPackageMetadata external : externalGeoPackages) {
+            if (!new File(external.getExternalPath()).exists()) {
+                deleted = delete(external.getName()) || deleted;
+            }
         }
 
         return deleted;
@@ -500,12 +584,154 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                 sqlite = context.openOrCreateDatabase(database,
                         Context.MODE_PRIVATE, cursorFactory);
             }
+
+            // Validate the database if validation is enabled
+            validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
+
             GeoPackageConnection connection = new GeoPackageConnection(sqlite);
             GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
             db = new GeoPackageImpl(database, path, connection, cursorFactory, tableCreator, writable);
         }
 
         return db;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isImportHeaderValidation() {
+        return importHeaderValidation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setImportHeaderValidation(boolean enabled) {
+        this.importHeaderValidation = enabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isImportIntegrityValidation() {
+        return importIntegrityValidation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setImportIntegrityValidation(boolean enabled) {
+        this.importIntegrityValidation = enabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isOpenHeaderValidation() {
+        return openHeaderValidation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setOpenHeaderValidation(boolean enabled) {
+        this.openHeaderValidation = enabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isOpenIntegrityValidation() {
+        return openIntegrityValidation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setOpenIntegrityValidation(boolean enabled) {
+        this.openIntegrityValidation = enabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean validate(String database) {
+        boolean valid = isValid(database, true, true);
+        return valid;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean validateHeader(String database) {
+        boolean valid = isValid(database, true, false);
+        return valid;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean validateIntegrity(String database) {
+        boolean valid = isValid(database, false, true);
+        return valid;
+    }
+
+    /**
+     * Validate the GeoPackage database
+     *
+     * @param database
+     * @param validateHeader    true to validate the header of the database
+     * @param validateIntegrity true to validate the integrity of the database
+     * @return true if valid
+     */
+    private boolean isValid(String database, boolean validateHeader, boolean validateIntegrity) {
+
+        boolean valid = false;
+
+        if (exists(database)) {
+            GeoPackageCursorFactory cursorFactory = new GeoPackageCursorFactory();
+            String path = null;
+            SQLiteDatabase sqlite;
+            GeoPackageMetadata metadata = getGeoPackageMetadata(database);
+            if (metadata != null && metadata.isExternal()) {
+                path = metadata.getExternalPath();
+                try {
+                    sqlite = SQLiteDatabase.openDatabase(path,
+                            cursorFactory, SQLiteDatabase.OPEN_READWRITE
+                                    | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+                } catch (Exception e) {
+                    sqlite = SQLiteDatabase.openDatabase(path,
+                            cursorFactory, SQLiteDatabase.OPEN_READONLY
+                                    | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+                }
+            } else {
+                path = context.getDatabasePath(database).getAbsolutePath();
+                sqlite = context.openOrCreateDatabase(database,
+                        Context.MODE_PRIVATE, cursorFactory);
+            }
+
+            try {
+                valid = (!validateHeader || isDatabaseHeaderValid(sqlite))
+                        && (!validateIntegrity || sqlite.isDatabaseIntegrityOk());
+            } catch (Exception e) {
+                Log.e(GeoPackageManagerImpl.class.getSimpleName(), "Failed to validate database", e);
+            } finally {
+                sqlite.close();
+            }
+        }
+
+        return valid;
     }
 
     /**
@@ -576,7 +802,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             SQLiteDatabase sqlite = SQLiteDatabase.openDatabase(path, null,
                     SQLiteDatabase.OPEN_READONLY
                             | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-            sqlite.close();
+            validateDatabaseAndClose(sqlite, importHeaderValidation, importIntegrityValidation);
         } catch (SQLiteException e) {
             throw new GeoPackageException(
                     "Failed to import GeoPackage database as external link: "
@@ -615,6 +841,118 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         }
 
         return exists(database);
+    }
+
+    /**
+     * Validate the database and close when validation fails. Throw an error when not valid.
+     *
+     * @param sqliteDatabase    database
+     * @param validateHeader    validate the header
+     * @param validateIntegrity validate the integrity
+     */
+    private void validateDatabaseAndCloseOnError(SQLiteDatabase sqliteDatabase, boolean validateHeader, boolean validateIntegrity) {
+        validateDatabase(sqliteDatabase, validateHeader, validateIntegrity, false, true);
+    }
+
+    /**
+     * Validate the database and close it. Throw an error when not valid.
+     *
+     * @param sqliteDatabase    database
+     * @param validateHeader    validate the header
+     * @param validateIntegrity validate the integrity
+     */
+    private void validateDatabaseAndClose(SQLiteDatabase sqliteDatabase, boolean validateHeader, boolean validateIntegrity) {
+        validateDatabase(sqliteDatabase, validateHeader, validateIntegrity, true, true);
+    }
+
+    /**
+     * Validate the database header and integrity.  Throw an error when not valid.
+     *
+     * @param sqliteDatabase    database
+     * @param validateHeader    validate the header
+     * @param validateIntegrity validate the integrity
+     * @param close             close the database after validation
+     * @param closeOnError      close the database if validation fails
+     */
+    private void validateDatabase(SQLiteDatabase sqliteDatabase, boolean validateHeader, boolean validateIntegrity, boolean close, boolean closeOnError) {
+        try {
+            if (validateHeader) {
+                validateDatabaseHeader(sqliteDatabase);
+            }
+            if (validateIntegrity) {
+                validateDatabaseIntegrity(sqliteDatabase);
+            }
+        } catch (Exception e) {
+            if (closeOnError) {
+                sqliteDatabase.close();
+            }
+            throw e;
+        }
+
+        if (close) {
+            sqliteDatabase.close();
+        }
+    }
+
+    /**
+     * Validate the header of the database file to verify it is a sqlite database
+     *
+     * @param sqliteDatabase database
+     */
+    private void validateDatabaseHeader(SQLiteDatabase sqliteDatabase) {
+
+        boolean validHeader = isDatabaseHeaderValid(sqliteDatabase);
+        if (!validHeader) {
+            throw new GeoPackageException(
+                    "GeoPackage SQLite header is not valid: " + sqliteDatabase.getPath());
+        }
+    }
+
+    /**
+     * Determine if the header of the database file is valid
+     *
+     * @param sqliteDatabase database
+     * @return true if valid
+     */
+    private boolean isDatabaseHeaderValid(SQLiteDatabase sqliteDatabase) {
+
+        boolean validHeader = false;
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(sqliteDatabase.getPath());
+            byte[] headerBytes = new byte[16];
+            if (fis.read(headerBytes) == 16) {
+                ByteReader byteReader = new ByteReader(headerBytes);
+                String header = byteReader.readString(headerBytes.length);
+                String headerPrefix = header.substring(0, GeoPackageConstants.SQLITE_HEADER_PREFIX.length());
+                validHeader = headerPrefix.equalsIgnoreCase(GeoPackageConstants.SQLITE_HEADER_PREFIX);
+            }
+        } catch (Exception e) {
+            Log.e(GeoPackageManagerImpl.class.getSimpleName(), "Failed to retrieve database header", e);
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    // eat
+                }
+            }
+        }
+
+        return validHeader;
+    }
+
+    /**
+     * Validate the integrity of the database
+     *
+     * @param sqliteDatabase database
+     */
+    private void validateDatabaseIntegrity(SQLiteDatabase sqliteDatabase) {
+
+        if (!sqliteDatabase.isDatabaseIntegrityOk()) {
+            throw new GeoPackageException(
+                    "GeoPackage SQLite file integrity failed: " + sqliteDatabase.getPath());
+        }
     }
 
     /**
@@ -693,7 +1031,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                             public void onCorruption(SQLiteDatabase dbObj) {
                             }
                         });
-                sqlite.close();
+                validateDatabaseAndClose(sqlite, importHeaderValidation, importIntegrityValidation);
             } catch (Exception e) {
                 delete(database);
                 throw new GeoPackageException(
@@ -772,6 +1110,28 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
             metadata = dataSource.get(database);
+        } finally {
+            metadataDb.close();
+        }
+
+        return metadata;
+    }
+
+    /**
+     * Get the GeoPackage metadata of the database at the external path
+     *
+     * @param path external database path
+     * @return metadata or null
+     */
+    private GeoPackageMetadata getGeoPackageMetadataAtExternalPath(String path) {
+        GeoPackageMetadata metadata = null;
+
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            metadata = dataSource.getExternalAtPath(path);
         } finally {
             metadataDb.close();
         }

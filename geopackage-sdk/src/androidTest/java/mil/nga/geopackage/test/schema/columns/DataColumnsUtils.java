@@ -33,14 +33,14 @@ import com.j256.ormlite.stmt.UpdateBuilder;
 
 /**
  * Tile Data Columns Utility test methods
- * 
+ *
  * @author osbornb
  */
 public class DataColumnsUtils {
 
 	/**
 	 * Test read
-	 * 
+	 *
 	 * @param geoPackage
 	 * @param expectedResults
 	 * @throws SQLException
@@ -91,6 +91,13 @@ public class DataColumnsUtils {
 				TestCase.assertNotNull(queryDataColumns);
 				TestCase.assertEquals(dataColumns.getId(),
 						queryDataColumns.getId());
+
+                // Query by id shortcut method
+                DataColumns queryDataColumns2 = dao.getDataColumn(dataColumns.getTableName(),
+                        dataColumns.getColumnName());
+                TestCase.assertNotNull(queryDataColumns2);
+                TestCase.assertEquals(dataColumns.getId(),
+                        queryDataColumns2.getId());
 
 				// Query for equal
 				List<DataColumns> queryDataColumnsList = dao.queryForEq(
@@ -156,7 +163,7 @@ public class DataColumnsUtils {
 
 	/**
 	 * Test update
-	 * 
+	 *
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
@@ -218,7 +225,7 @@ public class DataColumnsUtils {
 
 	/**
 	 * Test create
-	 * 
+	 *
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
@@ -379,7 +386,7 @@ public class DataColumnsUtils {
 
 	/**
 	 * Test delete
-	 * 
+	 *
 	 * @param geoPackage
 	 * @throws SQLException
 	 */

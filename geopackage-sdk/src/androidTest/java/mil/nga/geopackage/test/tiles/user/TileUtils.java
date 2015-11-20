@@ -937,4 +937,97 @@ public class TileUtils {
 
 	}
 
+
+	/**
+	 * Test querying for the bounding box at a tile matrix zoom level
+	 *
+	 * @param geoPackage
+	 * @throws SQLException
+	 */
+	public static void testTileMatrixBoundingBox(GeoPackage geoPackage)
+			throws SQLException {
+
+		TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+
+		if (tileMatrixSetDao.isTableExists()) {
+			List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+
+			for (TileMatrixSet tileMatrixSet : results) {
+
+				TileDao dao = geoPackage.getTileDao(tileMatrixSet);
+				TestCase.assertNotNull(dao);
+
+				BoundingBox totalBoundingBox = tileMatrixSet.getBoundingBox();
+				TestCase.assertEquals(totalBoundingBox, dao.getBoundingBox());
+
+				List<TileMatrix> tileMatrices = dao.getTileMatrices();
+
+				for (TileMatrix tileMatrix : tileMatrices) {
+
+					long zoomLevel = tileMatrix.getZoomLevel();
+					int count = dao.count(zoomLevel);
+					TileGrid totalTileGrid = dao.getTileGrid(zoomLevel);
+					TileGrid tileGrid = dao.queryForTileGrid(zoomLevel);
+					BoundingBox boundingBox = dao.getBoundingBox(zoomLevel);
+
+					if (totalTileGrid.equals(tileGrid)) {
+						TestCase.assertEquals(totalBoundingBox, boundingBox);
+					} else {
+						TestCase.assertTrue(totalBoundingBox.getMinLongitude() <= boundingBox
+								.getMinLongitude());
+						TestCase.assertTrue(totalBoundingBox.getMaxLongitude() >= boundingBox
+								.getMaxLongitude());
+						TestCase.assertTrue(totalBoundingBox.getMinLatitude() <= boundingBox
+								.getMinLatitude());
+						TestCase.assertTrue(totalBoundingBox.getMaxLatitude() >= boundingBox
+								.getMaxLatitude());
+					}
+
+					int deleted = 0;
+					if(tileMatrix.getMatrixHeight() > 1 || tileMatrix.getMatrixWidth() > 1){
+
+						for(int column = 0; column < tileMatrix.getMatrixWidth(); column++){
+							TestCase.assertEquals(1, dao.deleteTile(column, 0, zoomLevel));
+							TestCase.assertEquals(1, dao.deleteTile(column, tileMatrix.getMatrixHeight()-1, zoomLevel));
+							deleted += 2;
+						}
+
+						for(int row = 1; row < tileMatrix.getMatrixHeight() -1; row++){
+							TestCase.assertEquals(1, dao.deleteTile(0, row, zoomLevel));
+							TestCase.assertEquals(1, dao.deleteTile(tileMatrix.getMatrixWidth()-1, row, zoomLevel));
+							deleted += 2;
+						}
+					}else{
+						TestCase.assertEquals(1, dao.deleteTile(0, 0, zoomLevel));
+						deleted++;
+					}
+
+					int updatedCount = dao.count(zoomLevel);
+					TestCase.assertEquals(count - deleted, updatedCount);
+
+					TileGrid updatedTileGrid = dao.queryForTileGrid(zoomLevel);
+					BoundingBox updatedBoundingBox = dao.getBoundingBox(zoomLevel);
+
+					if(tileMatrix.getMatrixHeight() <= 2 && tileMatrix.getMatrixWidth() <= 2){
+						TestCase.assertNull(updatedTileGrid);
+						TestCase.assertNull(updatedBoundingBox);
+					}else{
+						TestCase.assertNotNull(updatedTileGrid);
+						TestCase.assertNotNull(updatedBoundingBox);
+
+						TestCase.assertEquals(tileGrid.getMinX() + 1, updatedTileGrid.getMinX());
+						TestCase.assertEquals(tileGrid.getMaxX() - 1, updatedTileGrid.getMaxX());
+						TestCase.assertEquals(tileGrid.getMinY() + 1, updatedTileGrid.getMinY());
+						TestCase.assertEquals(tileGrid.getMaxY() - 1, updatedTileGrid.getMaxY());
+
+						BoundingBox tileGridBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(totalBoundingBox, tileMatrix, updatedTileGrid);
+						TestCase.assertEquals(tileGridBoundingBox, updatedBoundingBox);
+					}
+				}
+
+			}
+		}
+
+	}
+
 }

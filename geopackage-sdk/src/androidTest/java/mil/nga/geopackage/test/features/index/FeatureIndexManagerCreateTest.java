@@ -29,4 +29,9 @@ public class FeatureIndexManagerCreateTest extends CreateGeoPackageTestCase {
 
     }
 
+    @Override
+    public boolean allowEmptyFeatures() {
+        return false;
+    }
+
 }
