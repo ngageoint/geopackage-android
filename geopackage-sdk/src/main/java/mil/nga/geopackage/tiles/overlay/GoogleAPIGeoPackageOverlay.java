@@ -1,51 +1,45 @@
 package mil.nga.geopackage.tiles.overlay;
 
-import mil.nga.geopackage.tiles.matrix.TileMatrix;
-import mil.nga.geopackage.tiles.user.TileDao;
-import mil.nga.geopackage.tiles.user.TileRow;
-
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
+
+import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
+import mil.nga.geopackage.tiles.retriever.GoogleAPIGeoPackageTileRetriever;
+import mil.nga.geopackage.tiles.retriever.TileRetriever;
+import mil.nga.geopackage.tiles.user.TileDao;
 
 /**
  * GeoPackage Map Overlay Tile Provider, assumes the Google Maps API zoom level
  * and grid
- * 
+ *
  * @author osbornb
  */
 public class GoogleAPIGeoPackageOverlay implements TileProvider {
 
-	/**
-	 * Tile data access object
-	 */
-	private final TileDao tileDao;
+    /**
+     * Tile retriever
+     */
+    private final TileRetriever retriever;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param tileDao
-	 */
-	public GoogleAPIGeoPackageOverlay(TileDao tileDao) {
-		this.tileDao = tileDao;
-	}
+    /**
+     * Constructor
+     *
+     * @param tileDao
+     */
+    public GoogleAPIGeoPackageOverlay(TileDao tileDao) {
+        this.retriever = new GoogleAPIGeoPackageTileRetriever(tileDao);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Tile getTile(int x, int y, int zoom) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Tile getTile(int x, int y, int zoom) {
 
-		Tile tile = null;
+        GeoPackageTile geoPackageTile = retriever.getTile(x, y, zoom);
+        Tile tile = GeoPackageOverlayFactory.getTile(geoPackageTile);
 
-		TileRow tileRow = tileDao.queryForTile(x, y, zoom);
-		if (tileRow != null) {
-			TileMatrix tileMatrix = tileDao.getTileMatrix(zoom);
-			int tileWidth = (int) tileMatrix.getTileWidth();
-			int tileHeight = (int) tileMatrix.getTileHeight();
-			tile = new Tile(tileWidth, tileHeight, tileRow.getTileData());
-		}
-
-		return tile;
-	}
+        return tile;
+    }
 
 }
