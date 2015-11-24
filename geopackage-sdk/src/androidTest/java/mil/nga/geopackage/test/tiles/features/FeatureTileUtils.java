@@ -21,6 +21,7 @@ import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.schema.TableColumnKey;
 import mil.nga.geopackage.tiles.features.FeatureTilePointIcon;
 import mil.nga.geopackage.tiles.features.FeatureTiles;
+import mil.nga.geopackage.tiles.features.MapFeatureTiles;
 import mil.nga.wkb.geom.GeometryType;
 import mil.nga.wkb.geom.LineString;
 import mil.nga.wkb.geom.Point;
@@ -95,7 +96,7 @@ public class FeatureTileUtils {
      */
     public static FeatureTiles createFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
 
-        FeatureTiles featureTiles = new FeatureTiles(context, featureDao);
+        FeatureTiles featureTiles = new MapFeatureTiles(context, featureDao);
 
         Paint pointPaint = featureTiles.getPointPaint();
         //pointPaint.setColor(Color.BLUE);

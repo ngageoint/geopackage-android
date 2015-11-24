@@ -4,9 +4,12 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.1.2 (TBD)
+## 1.2.0 (TBD)
 
-* TBD
+* Separation of Google Play Services Google Maps logic from GeoPackage functionality
+* Tile retrieval logic separated from overlays
+* Feature Tiles Map specific tile drawing separated into child implementation
+* Separation of Map specific Tile Bounding Box utilities
 
 ## [1.1.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.1.1) (11-20-2015)
 
