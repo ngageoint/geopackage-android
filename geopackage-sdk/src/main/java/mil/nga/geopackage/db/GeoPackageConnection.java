@@ -160,4 +160,16 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
         db.close();
     }
 
+    /**
+     * Perform a raw database query
+     *
+     * @param sql
+     * @param args
+     * @return cursor
+     * @since 1.2.1
+     */
+    public Cursor rawQuery(String sql, String[] args) {
+        return db.rawQuery(sql, args);
+    }
+
 }

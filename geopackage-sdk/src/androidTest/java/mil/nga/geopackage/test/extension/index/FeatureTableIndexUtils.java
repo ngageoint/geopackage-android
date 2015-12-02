@@ -26,6 +26,7 @@ import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.projection.ProjectionTransform;
+import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.io.TestGeoPackageProgress;
 import mil.nga.wkb.geom.Geometry;
 import mil.nga.wkb.geom.GeometryEnvelope;
@@ -82,10 +83,14 @@ public class FeatureTableIndexUtils {
             TestCase.assertNull(featureTableIndex.getLastIndexed());
             Date currentDate = new Date();
 
+            TestUtils.validateGeoPackage(geoPackage);
+
             // Test indexing
             TestGeoPackageProgress progress = new TestGeoPackageProgress();
             featureTableIndex.setProgress(progress);
             int indexCount = featureTableIndex.index();
+            TestUtils.validateGeoPackage(geoPackage);
+
             TestCase.assertEquals(expectedCount, indexCount);
             TestCase.assertEquals(featureDao.count(), progress.getProgress());
             TestCase.assertNotNull(featureTableIndex.getLastIndexed());

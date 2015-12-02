@@ -47,7 +47,7 @@ import android.database.sqlite.SQLiteException;
 
 /**
  * Test utility methods
- * 
+ *
  * @author osbornb
  */
 public class TestUtils {
@@ -74,7 +74,7 @@ public class TestUtils {
 
 	/**
 	 * Get test context
-	 * 
+	 *
 	 * @param activity
 	 * @return
 	 * @throws NameNotFoundException
@@ -87,7 +87,7 @@ public class TestUtils {
 
 	/**
 	 * Copy the asset file to the internal memory storage
-	 * 
+	 *
 	 * @param context
 	 * @param assetPath
 	 */
@@ -107,7 +107,7 @@ public class TestUtils {
 
 	/**
 	 * Get the internal storage location of the asset file
-	 * 
+	 *
 	 * @param context
 	 * @param assetPath
 	 * @return
@@ -119,7 +119,7 @@ public class TestUtils {
 
 	/**
 	 * Copy the asset file to the provided file path
-	 * 
+	 *
 	 * @param testContext
 	 * @param assetPath
 	 * @param filePath
@@ -146,7 +146,7 @@ public class TestUtils {
 
 	/**
 	 * Get asset file bytes
-	 * 
+	 *
 	 * @param testContext
 	 * @param assetPath
 	 * @return
@@ -175,7 +175,7 @@ public class TestUtils {
 
 	/**
 	 * Get the asset file input stream
-	 * 
+	 *
 	 * @param testContext
 	 * @param assetPath
 	 * @return
@@ -188,7 +188,7 @@ public class TestUtils {
 
 	/**
 	 * Create the feature table with data columns entry
-	 * 
+	 *
 	 * @param geoPackage
 	 * @param contents
 	 * @param geometryColumn
@@ -230,7 +230,7 @@ public class TestUtils {
 
 	/**
 	 * Build an example feature table
-	 * 
+	 *
 	 * @param tableName
 	 * @param geometryColumn
 	 * @param geometryType
@@ -266,7 +266,7 @@ public class TestUtils {
 
 	/**
 	 * Build an example tile table
-	 * 
+	 *
 	 * @param tableName
 	 * @return
 	 */
@@ -281,7 +281,7 @@ public class TestUtils {
 
 	/**
 	 * Add rows to the feature table
-	 * 
+	 *
 	 * @param geoPackage
 	 * @param geometryColumns
 	 * @param table
@@ -394,7 +394,7 @@ public class TestUtils {
 
 	/**
 	 * Add rows to the tile table
-	 * 
+	 *
 	 * @param geoPackage
 	 * @param tileMatrix
 	 * @param tileData
@@ -424,7 +424,7 @@ public class TestUtils {
 
 	/**
 	 * Create a random point
-	 * 
+	 *
 	 * @param hasZ
 	 * @param hasM
 	 * @return
@@ -451,7 +451,7 @@ public class TestUtils {
 
 	/**
 	 * Create a random line string
-	 * 
+	 *
 	 * @param hasZ
 	 * @param hasM
 	 * @param ring
@@ -477,7 +477,7 @@ public class TestUtils {
 
 	/**
 	 * Create a random polygon
-	 * 
+	 *
 	 * @param hasZ
 	 * @param hasM
 	 * @return
@@ -497,7 +497,7 @@ public class TestUtils {
 
 	/**
 	 * Validate the integer value with the data type
-	 * 
+	 *
 	 * @param value
 	 * @param dataType
 	 * @return
@@ -531,7 +531,7 @@ public class TestUtils {
 
 	/**
 	 * Validate the float value with the data type
-	 * 
+	 *
 	 * @param value
 	 * @param dataType
 	 * @return
@@ -558,7 +558,7 @@ public class TestUtils {
 	 * Determine if the exception is caused from a missing function or module in
 	 * SQLite versions 4.2.0 and later. Lollipop uses version 3.8.4.3 so these
 	 * are not supported in Android.
-	 * 
+	 *
 	 * @param e
 	 * @return
 	 */
@@ -570,7 +570,7 @@ public class TestUtils {
 
 	/**
 	 * Create Data Column Constraints
-	 * 
+	 *
 	 * @param geoPackage
 	 * @throws SQLException
 	 */
@@ -625,6 +625,17 @@ public class TestUtils {
 		sampleGlob.setConstraintType(DataColumnConstraintType.GLOB);
 		sampleGlob.setValue("[1-2][0-9][0-9][0-9]");
 		dao.create(sampleGlob);
+	}
+
+	/**
+	 * Validate the integrity and keys of the GeoPackage
+	 *
+	 * @param geoPackage
+	 */
+	public static void validateGeoPackage(GeoPackage geoPackage) {
+		TestCase.assertNull(geoPackage.foreignKeyCheck());
+		TestCase.assertNull(geoPackage.integrityCheck());
+		TestCase.assertNull(geoPackage.quickCheck());
 	}
 
 }

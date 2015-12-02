@@ -1,5 +1,7 @@
 package mil.nga.geopackage;
 
+import android.database.Cursor;
+
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -60,5 +62,39 @@ public interface GeoPackage extends GeoPackageCore {
      * @return
      */
     public TileDao getTileDao(String tableName);
+
+    /**
+     * Perform a raw query on the database
+     *
+     * @param sql
+     * @param args
+     * @return cursor
+     * @since 1.2.1
+     */
+    public Cursor rawQuery(String sql, String[] args);
+
+    /**
+     * Perform a foreign key check on the database
+     *
+     * @return null if check passed, open cursor with results if failed
+     * @since 1.2.1
+     */
+    public Cursor foreignKeyCheck();
+
+    /**
+     * Perform an integrity check on the database
+     *
+     * @return null if check passed, open cursor with results if failed
+     * @since 1.2.1
+     */
+    public Cursor integrityCheck();
+
+    /**
+     * Perform a quick integrity check on the database
+     *
+     * @return null if check passed, open cursor with results if failed
+     * @since 1.2.1
+     */
+    public Cursor quickCheck();
 
 }
