@@ -104,6 +104,7 @@ public class UrlTileGenerator extends TileGenerator {
      * Is TMS URL
      *
      * @return true if TMS URL
+     * @since 1.2.1
      */
     public boolean isTms() {
         return tms;
@@ -113,6 +114,7 @@ public class UrlTileGenerator extends TileGenerator {
      * Set the TMS URL flag
      *
      * @param tms true if a TMS URL
+     * @since 1.2.1
      */
     public void setTms(boolean tms) {
         this.tms = tms;
