@@ -264,4 +264,67 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         return getTileDao(tileMatrixSetList.get(0));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void execSQL(String sql) {
+        database.execSQL(sql);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cursor rawQuery(String sql, String[] args) {
+        return database.rawQuery(sql, args);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cursor foreignKeyCheck() {
+        Cursor cursor = rawQuery("PRAGMA foreign_key_check", null);
+        if (!cursor.moveToNext()) {
+            cursor.close();
+            cursor = null;
+        }
+        return cursor;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cursor integrityCheck() {
+        return integrityCheck(rawQuery("PRAGMA integrity_check", null));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cursor quickCheck() {
+        return integrityCheck(rawQuery("PRAGMA quick_check", null));
+    }
+
+    /**
+     * Check the cursor returned from the integrity check to see if things are "ok"
+     *
+     * @param cursor
+     * @return null if ok, else the open cursor
+     */
+    private Cursor integrityCheck(Cursor cursor) {
+        if (cursor.moveToNext()) {
+            String value = cursor.getString(0);
+            if (value.equals("ok")) {
+                cursor.close();
+                cursor = null;
+            }
+        }
+        return cursor;
+    }
+
 }

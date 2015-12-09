@@ -6,7 +6,11 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.2.1 (TBD)
 
-* TBD
+* geopackage-core version updated to 1.1.2 - [Core Issue #14](https://github.com/ngageoint/geopackage-core-java/issues/14)
+* GeoPackage methods: execute SQL, query, foreign key check, integrity check, quick integrity check
+* URL Tile Generator TMS support
+* ORMLite log level changed from debug to info
+* Tile Generator fix for updating a GeoPackage and replacing an existing tile
 
 ## [1.2.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.0) (11-24-2015)
 
