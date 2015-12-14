@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.2.1 (TBD)
+## [1.2.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.1) (12-14-2015)
 
 * geopackage-core version updated to 1.1.2 - [Core Issue #14](https://github.com/ngageoint/geopackage-core-java/issues/14)
 * GeoPackage methods: execute SQL, query, foreign key check, integrity check, quick integrity check
