@@ -9,11 +9,17 @@ import java.util.List;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.geopackage.projection.Projection;
+import mil.nga.geopackage.projection.ProjectionConstants;
+import mil.nga.geopackage.projection.ProjectionFactory;
+import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.wkb.geom.CircularString;
 import mil.nga.wkb.geom.CompoundCurve;
 import mil.nga.wkb.geom.CurvePolygon;
@@ -135,6 +141,88 @@ public class GeoPackageGeometryDataUtils {
 	}
 
 	/**
+	 * Test transforming geometries between projections
+	 *
+	 * @param geoPackage
+	 * @throws SQLException
+	 * @throws IOException
+	 */
+	public static void testGeometryProjectionTransform(GeoPackage geoPackage)
+			throws SQLException, IOException {
+
+		GeometryColumnsDao geometryColumnsDao = geoPackage
+				.getGeometryColumnsDao();
+
+		if (geometryColumnsDao.isTableExists()) {
+			List<GeometryColumns> results = geometryColumnsDao.queryForAll();
+
+			for (GeometryColumns geometryColumns : results) {
+
+				FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
+				TestCase.assertNotNull(dao);
+
+				FeatureCursor cursor = dao.queryForAll();
+
+				while (cursor.moveToNext()) {
+
+					GeoPackageGeometryData geometryData = cursor.getGeometry();
+					if (geometryData != null) {
+
+						Geometry geometry = geometryData.getGeometry();
+
+						if (geometry != null) {
+
+							SpatialReferenceSystemDao srsDao = geoPackage
+									.getSpatialReferenceSystemDao();
+							long srsId = geometryData.getSrsId();
+							SpatialReferenceSystem srs = srsDao
+									.getOrCreate(srsId);
+
+							long epsg = srs.getOrganizationCoordsysId();
+							Projection projection = ProjectionFactory
+									.getProjection(epsg);
+							long toEpsg = -1;
+							if (epsg == ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM) {
+								toEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
+							} else {
+								toEpsg = ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM;
+							}
+							ProjectionTransform transformTo = projection
+									.getTransformation(toEpsg);
+							ProjectionTransform transformFrom = transformTo
+									.getToProjection().getTransformation(epsg);
+
+							byte[] bytes = geometryData.getWkbBytes();
+
+							Geometry projectedGeometry = transformTo
+									.transform(geometry);
+							GeoPackageGeometryData projectedGeometryData = new GeoPackageGeometryData(
+									-1);
+							projectedGeometryData
+									.setGeometry(projectedGeometry);
+							projectedGeometryData.toBytes();
+							byte[] projectedBytes = projectedGeometryData
+									.getWkbBytes();
+
+							if (epsg > 0) {
+								TestCase.assertFalse(equalByteArrays(bytes,
+										projectedBytes));
+							}
+
+							Geometry restoredGeometry = transformFrom
+									.transform(projectedGeometry);
+
+							compareGeometries(geometry, restoredGeometry, .001);
+						}
+					}
+
+				}
+				cursor.close();
+			}
+		}
+	}
+
+	/**
 	 * Compare two geometry datas and verify they are equal
 	 * 
 	 * @param expected
@@ -198,11 +286,23 @@ public class GeoPackageGeometryDataUtils {
 
 	/**
 	 * Compare two geometries and verify they are equal
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
 	 */
 	public static void compareGeometries(Geometry expected, Geometry actual) {
+		compareGeometries(expected, actual, 0.0);
+	}
+
+	/**
+	 * Compare two geometries and verify they are equal
+	 *
+	 * @param expected
+	 * @param actual
+	 * @param delta
+	 */
+	public static void compareGeometries(Geometry expected, Geometry actual,
+										 double delta) {
 		if (expected == null) {
 			TestCase.assertNull(actual);
 		} else {
@@ -211,82 +311,84 @@ public class GeoPackageGeometryDataUtils {
 			GeometryType geometryType = expected.getGeometryType();
 			switch (geometryType) {
 
-			case GEOMETRY:
-				TestCase.fail("Unexpected Geometry Type of "
-						+ geometryType.name() + " which is abstract");
-			case POINT:
-				comparePoint((Point) actual, (Point) expected);
-				break;
-			case LINESTRING:
-				compareLineString((LineString) expected, (LineString) actual);
-				break;
-			case POLYGON:
-				comparePolygon((Polygon) expected, (Polygon) actual);
-				break;
-			case MULTIPOINT:
-				compareMultiPoint((MultiPoint) expected, (MultiPoint) actual);
-				break;
-			case MULTILINESTRING:
-				compareMultiLineString((MultiLineString) expected,
-						(MultiLineString) actual);
-				break;
-			case MULTIPOLYGON:
-				compareMultiPolygon((MultiPolygon) expected,
-						(MultiPolygon) actual);
-				break;
-			case GEOMETRYCOLLECTION:
-				compareGeometryCollection((GeometryCollection<?>) expected,
-						(GeometryCollection<?>) actual);
-				break;
-			case CIRCULARSTRING:
-				compareCircularString((CircularString) expected,
-						(CircularString) actual);
-				break;
-			case COMPOUNDCURVE:
-				compareCompoundCurve((CompoundCurve) expected,
-						(CompoundCurve) actual);
-				break;
-			case CURVEPOLYGON:
-				compareCurvePolygon((CurvePolygon<?>) expected,
-						(CurvePolygon<?>) actual);
-				break;
-			case MULTICURVE:
-				TestCase.fail("Unexpected Geometry Type of "
-						+ geometryType.name() + " which is abstract");
-			case MULTISURFACE:
-				TestCase.fail("Unexpected Geometry Type of "
-						+ geometryType.name() + " which is abstract");
-			case CURVE:
-				TestCase.fail("Unexpected Geometry Type of "
-						+ geometryType.name() + " which is abstract");
-			case SURFACE:
-				TestCase.fail("Unexpected Geometry Type of "
-						+ geometryType.name() + " which is abstract");
-			case POLYHEDRALSURFACE:
-				comparePolyhedralSurface((PolyhedralSurface) expected,
-						(PolyhedralSurface) actual);
-				break;
-			case TIN:
-				compareTIN((TIN) expected, (TIN) actual);
-				break;
-			case TRIANGLE:
-				compareTriangle((Triangle) expected, (Triangle) actual);
-				break;
-			default:
-				throw new GeoPackageException("Geometry Type not supported: "
-						+ geometryType);
+				case GEOMETRY:
+					TestCase.fail("Unexpected Geometry Type of "
+							+ geometryType.name() + " which is abstract");
+				case POINT:
+					comparePoint((Point) expected, (Point) actual, delta);
+					break;
+				case LINESTRING:
+					compareLineString((LineString) expected, (LineString) actual,
+							delta);
+					break;
+				case POLYGON:
+					comparePolygon((Polygon) expected, (Polygon) actual, delta);
+					break;
+				case MULTIPOINT:
+					compareMultiPoint((MultiPoint) expected, (MultiPoint) actual,
+							delta);
+					break;
+				case MULTILINESTRING:
+					compareMultiLineString((MultiLineString) expected,
+							(MultiLineString) actual, delta);
+					break;
+				case MULTIPOLYGON:
+					compareMultiPolygon((MultiPolygon) expected,
+							(MultiPolygon) actual, delta);
+					break;
+				case GEOMETRYCOLLECTION:
+					compareGeometryCollection((GeometryCollection<?>) expected,
+							(GeometryCollection<?>) actual, delta);
+					break;
+				case CIRCULARSTRING:
+					compareCircularString((CircularString) expected,
+							(CircularString) actual, delta);
+					break;
+				case COMPOUNDCURVE:
+					compareCompoundCurve((CompoundCurve) expected,
+							(CompoundCurve) actual, delta);
+					break;
+				case CURVEPOLYGON:
+					compareCurvePolygon((CurvePolygon<?>) expected,
+							(CurvePolygon<?>) actual, delta);
+					break;
+				case MULTICURVE:
+					TestCase.fail("Unexpected Geometry Type of "
+							+ geometryType.name() + " which is abstract");
+				case MULTISURFACE:
+					TestCase.fail("Unexpected Geometry Type of "
+							+ geometryType.name() + " which is abstract");
+				case CURVE:
+					TestCase.fail("Unexpected Geometry Type of "
+							+ geometryType.name() + " which is abstract");
+				case SURFACE:
+					TestCase.fail("Unexpected Geometry Type of "
+							+ geometryType.name() + " which is abstract");
+				case POLYHEDRALSURFACE:
+					comparePolyhedralSurface((PolyhedralSurface) expected,
+							(PolyhedralSurface) actual, delta);
+					break;
+				case TIN:
+					compareTIN((TIN) expected, (TIN) actual, delta);
+					break;
+				case TRIANGLE:
+					compareTriangle((Triangle) expected, (Triangle) actual, delta);
+					break;
+				default:
+					throw new GeoPackageException("Geometry Type not supported: "
+							+ geometryType);
 			}
 		}
 	}
 
 	/**
 	 * Compare to the base attribiutes of two geometries
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
 	 */
 	private static void compareBaseGeometryAttributes(Geometry expected,
-			Geometry actual) {
+													  Geometry actual) {
 		TestCase.assertEquals(expected.getGeometryType(),
 				actual.getGeometryType());
 		TestCase.assertEquals(expected.hasZ(), actual.hasZ());
@@ -296,214 +398,242 @@ public class GeoPackageGeometryDataUtils {
 
 	/**
 	 * Compare the two points for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
 	 */
-	private static void comparePoint(Point expected, Point actual) {
+	private static void comparePoint(Point expected, Point actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
-		TestCase.assertEquals(expected.getX(), actual.getX());
-		TestCase.assertEquals(expected.getY(), actual.getY());
-		TestCase.assertEquals(expected.getZ(), actual.getZ());
-		TestCase.assertEquals(expected.getM(), actual.getM());
+		TestCase.assertEquals(expected.getX(), actual.getX(), delta);
+		TestCase.assertEquals(expected.getY(), actual.getY(), delta);
+		if (expected.getZ() == null) {
+			TestCase.assertEquals(expected.getZ(), actual.getZ());
+		} else {
+			TestCase.assertEquals(expected.getZ(), actual.getZ(), delta);
+		}
+		if (expected.getM() == null) {
+			TestCase.assertEquals(expected.getM(), actual.getM());
+		} else {
+			TestCase.assertEquals(expected.getM(), actual.getM(), delta);
+		}
 	}
 
 	/**
 	 * Compare the two line strings for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @parma delta
 	 */
-	private static void compareLineString(LineString expected, LineString actual) {
+	private static void compareLineString(LineString expected,
+										  LineString actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
 		for (int i = 0; i < expected.numPoints(); i++) {
-			comparePoint(expected.getPoints().get(i), actual.getPoints().get(i));
+			comparePoint(expected.getPoints().get(i),
+					actual.getPoints().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two polygons for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
-	private static void comparePolygon(Polygon expected, Polygon actual) {
+	private static void comparePolygon(Polygon expected, Polygon actual,
+									   double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());
 		for (int i = 0; i < expected.numRings(); i++) {
 			compareLineString(expected.getRings().get(i), actual.getRings()
-					.get(i));
+					.get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two multi points for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
-	private static void compareMultiPoint(MultiPoint expected, MultiPoint actual) {
+	private static void compareMultiPoint(MultiPoint expected,
+										  MultiPoint actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
 		for (int i = 0; i < expected.numPoints(); i++) {
-			comparePoint(expected.getPoints().get(i), actual.getPoints().get(i));
+			comparePoint(expected.getPoints().get(i),
+					actual.getPoints().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two multi line strings for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @parma delta
 	 */
 	private static void compareMultiLineString(MultiLineString expected,
-			MultiLineString actual) {
+											   MultiLineString actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numLineStrings(),
 				actual.numLineStrings());
 		for (int i = 0; i < expected.numLineStrings(); i++) {
 			compareLineString(expected.getLineStrings().get(i), actual
-					.getLineStrings().get(i));
+					.getLineStrings().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two multi polygons for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
 	private static void compareMultiPolygon(MultiPolygon expected,
-			MultiPolygon actual) {
+											MultiPolygon actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPolygons(), actual.numPolygons());
 		for (int i = 0; i < expected.numPolygons(); i++) {
 			comparePolygon(expected.getPolygons().get(i), actual.getPolygons()
-					.get(i));
+					.get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two geometry collections for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
 	private static void compareGeometryCollection(
-			GeometryCollection<?> expected, GeometryCollection<?> actual) {
+			GeometryCollection<?> expected, GeometryCollection<?> actual,
+			double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numGeometries(), actual.numGeometries());
 		for (int i = 0; i < expected.numGeometries(); i++) {
 			compareGeometries(expected.getGeometries().get(i), actual
-					.getGeometries().get(i));
+					.getGeometries().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two circular strings for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @parma delta
 	 */
 	private static void compareCircularString(CircularString expected,
-			CircularString actual) {
+											  CircularString actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPoints(), actual.numPoints());
 		for (int i = 0; i < expected.numPoints(); i++) {
-			comparePoint(expected.getPoints().get(i), actual.getPoints().get(i));
+			comparePoint(expected.getPoints().get(i),
+					actual.getPoints().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two compound curves for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @parma delta
 	 */
 	private static void compareCompoundCurve(CompoundCurve expected,
-			CompoundCurve actual) {
+											 CompoundCurve actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numLineStrings(),
 				actual.numLineStrings());
 		for (int i = 0; i < expected.numLineStrings(); i++) {
 			compareLineString(expected.getLineStrings().get(i), actual
-					.getLineStrings().get(i));
+					.getLineStrings().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two curve polygons for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
 	private static void compareCurvePolygon(CurvePolygon<?> expected,
-			CurvePolygon<?> actual) {
+											CurvePolygon<?> actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());
 		for (int i = 0; i < expected.numRings(); i++) {
 			compareGeometries(expected.getRings().get(i), actual.getRings()
-					.get(i));
+					.get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two polyhedral surfaces for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
 	private static void comparePolyhedralSurface(PolyhedralSurface expected,
-			PolyhedralSurface actual) {
+												 PolyhedralSurface actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPolygons(), actual.numPolygons());
 		for (int i = 0; i < expected.numPolygons(); i++) {
 			compareGeometries(expected.getPolygons().get(i), actual
-					.getPolygons().get(i));
+					.getPolygons().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two TINs for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
-	private static void compareTIN(TIN expected, TIN actual) {
+	private static void compareTIN(TIN expected, TIN actual, double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numPolygons(), actual.numPolygons());
 		for (int i = 0; i < expected.numPolygons(); i++) {
 			compareGeometries(expected.getPolygons().get(i), actual
-					.getPolygons().get(i));
+					.getPolygons().get(i), delta);
 		}
 	}
 
 	/**
 	 * Compare the two triangles for equality
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
+	 * @param delta
 	 */
-	private static void compareTriangle(Triangle expected, Triangle actual) {
+	private static void compareTriangle(Triangle expected, Triangle actual,
+										double delta) {
 
 		compareBaseGeometryAttributes(expected, actual);
 		TestCase.assertEquals(expected.numRings(), actual.numRings());
 		for (int i = 0; i < expected.numRings(); i++) {
 			compareLineString(expected.getRings().get(i), actual.getRings()
-					.get(i));
+					.get(i), delta);
 		}
 	}
 
