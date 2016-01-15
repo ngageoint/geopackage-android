@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## [1.2.3](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.3) (TBD)
+## [1.2.3](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.3) (01-15-2016)
 
 * geopackage-core version updated to 1.1.4 for proj4j dependency location change
 * Removed intermediate projection conversions in the map shape converter. Fixes EPSG 27700 (British National Grid) conversions.
