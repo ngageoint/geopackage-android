@@ -45,11 +45,6 @@ public class GoogleMapShapeConverter {
     private final Projection projection;
 
     /**
-     * Transformation to Web Mercator
-     */
-    private final ProjectionTransform toWebMercator;
-
-    /**
      * Transformation to WGS 84
      */
     private final ProjectionTransform toWgs84;
@@ -60,11 +55,6 @@ public class GoogleMapShapeConverter {
     private final ProjectionTransform fromWgs84;
 
     /**
-     * Transformation from Web Mercator
-     */
-    private final ProjectionTransform fromWebMercator;
-
-    /**
      * Constructor with specified projection, see
      * {@link FeatureDao#getProjection}
      *
@@ -73,19 +63,13 @@ public class GoogleMapShapeConverter {
     public GoogleMapShapeConverter(Projection projection) {
         this.projection = projection;
         if (projection != null) {
-            toWebMercator = projection
-                    .getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
-            Projection webMercator = toWebMercator.getToProjection();
-            toWgs84 = webMercator
+            toWgs84 = projection
                     .getTransformation(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
             Projection wgs84 = toWgs84.getToProjection();
-            fromWgs84 = wgs84.getTransformation(webMercator);
-            fromWebMercator = webMercator.getTransformation(projection);
+            fromWgs84 = wgs84.getTransformation(projection);
         } else {
-            toWebMercator = null;
             toWgs84 = null;
             fromWgs84 = null;
-            fromWebMercator = null;
         }
     }
 
@@ -107,7 +91,6 @@ public class GoogleMapShapeConverter {
      */
     public Point toWgs84(Point point) {
         if (projection != null) {
-            point = toWebMercator.transform(point);
             point = toWgs84.transform(point);
         }
         return point;
@@ -122,7 +105,6 @@ public class GoogleMapShapeConverter {
     public Point toProjection(Point point) {
         if (projection != null) {
             point = fromWgs84.transform(point);
-            point = fromWebMercator.transform(point);
         }
         return point;
     }
@@ -309,7 +291,7 @@ public class GoogleMapShapeConverter {
     /**
      * Convert a {@link Polygon} to a {@link PolygonOptions}
      *
-     * @param lineString
+     * @param polygon
      * @return
      */
     public PolygonOptions toPolygon(Polygon polygon) {
@@ -359,7 +341,7 @@ public class GoogleMapShapeConverter {
      * Convert a {@link com.google.android.gms.maps.model.Polygon} to a
      * {@link Polygon}
      *
-     * @param mapPolygon
+     * @param polygon
      * @return
      */
     public Polygon toPolygon(com.google.android.gms.maps.model.Polygon polygon) {
