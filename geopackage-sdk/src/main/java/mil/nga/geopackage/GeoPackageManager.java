@@ -23,6 +23,14 @@ public interface GeoPackageManager {
     public List<String> databases();
 
     /**
+     * List all internal GeoPackage databases sorted alphabetically
+     *
+     * @return internal database list
+     * @since 1.2.4
+     */
+    public List<String> internalDatabases();
+
+    /**
      * List all external GeoPackage databases sorted alphabetically
      *
      * @return external database list
@@ -37,11 +45,35 @@ public interface GeoPackageManager {
     public int count();
 
     /**
+     * Get the count of internal GeoPackage databases
+     *
+     * @return internal count
+     * @since 1.2.4
+     */
+    public int internalCount();
+
+    /**
+     * Get the count of external GeoPackage databases
+     *
+     * @return external count
+     * @since 1.2.4
+     */
+    public int externalCount();
+
+    /**
      * Set of all GeoPackage databases
      *
      * @return database set
      */
     public Set<String> databaseSet();
+
+    /**
+     * Set of all internal GeoPackage databases
+     *
+     * @return internal database set
+     * @since 1.2.4
+     */
+    public Set<String> internalDatabaseSet();
 
     /**
      * Set of all external GeoPackage databases
