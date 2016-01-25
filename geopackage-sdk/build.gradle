@@ -8,12 +8,12 @@ version = "1.2.4"
 def remotePublish = false
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 23
 
         testApplicationId 'mil.nga.geopackage.test'
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
@@ -145,7 +145,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:21.0.2'
+    compile 'com.android.support:support-v13:23.1.1'
     compile 'com.google.android.gms:play-services:6.1.71'
     compile 'com.google.maps.android:android-maps-utils:0.3.3'
     compile 'com.j256.ormlite:ormlite-android:4.48'

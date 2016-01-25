@@ -6,7 +6,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.2.4 (TBD)
 
-* TBD
+* Updated Android compile and target SDK version to 23 (Marshmallow)
+* Fixed GeoPackage Manager count to also include external GeoPackages
+* Added methods for retrieving and counting only internal or external GeoPackages
 
 ## [1.2.3](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.3) (01-15-2016)
 

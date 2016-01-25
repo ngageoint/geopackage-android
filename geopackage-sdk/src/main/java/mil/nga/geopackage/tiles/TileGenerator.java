@@ -235,7 +235,7 @@ public abstract class TileGenerator {
      */
     public int getTileCount() {
         if (tileCount == null) {
-            int count = 0;
+            long count = 0;
             BoundingBox requestWebMercatorBoundingBox = TileBoundingBoxUtils
                     .toWebMercator(boundingBox);
             for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
@@ -246,7 +246,7 @@ public abstract class TileGenerator {
                 tileGrids.put(zoom, tileGrid);
             }
 
-            tileCount = count;
+            tileCount = (int) Math.min(count, Integer.MAX_VALUE);
         }
         return tileCount;
     }

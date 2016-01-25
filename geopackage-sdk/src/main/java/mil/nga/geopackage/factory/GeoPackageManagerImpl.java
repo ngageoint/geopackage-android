@@ -102,6 +102,18 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public List<String> internalDatabases() {
+        Set<String> sortedDatabases = new TreeSet<String>();
+        addInternalDatabases(sortedDatabases);
+        List<String> databases = new ArrayList<String>();
+        databases.addAll(sortedDatabases);
+        return databases;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<String> externalDatabases() {
         Set<String> sortedDatabases = new TreeSet<String>();
         addExternalDatabases(sortedDatabases);
@@ -114,7 +126,21 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     public int count() {
-        return context.databaseList().length;
+        return databaseSet().size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int internalCount() {
+        return internalDatabaseSet().size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int externalCount() {
+        return externalDatabaseSet().size();
     }
 
     /**
@@ -124,6 +150,17 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public Set<String> databaseSet() {
         Set<String> databases = new HashSet<String>();
         addDatabases(databases);
+        return databases;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> internalDatabaseSet() {
+        Set<String> databases = new HashSet<String>();
+        addInternalDatabases(databases);
         return databases;
     }
 
@@ -961,6 +998,20 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * @param databases
      */
     private void addDatabases(Collection<String> databases) {
+
+        // Add the internal databases
+        addInternalDatabases(databases);
+
+        // Add the external databases
+        addExternalDatabases(databases);
+    }
+
+    /**
+     * Add all internal databases to the collection
+     *
+     * @param databases
+     */
+    private void addInternalDatabases(Collection<String> databases) {
         String[] databaseArray = context.databaseList();
         for (String database : databaseArray) {
             if (!isTemporary(database)
@@ -969,9 +1020,6 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                 databases.add(database);
             }
         }
-
-        // Add the external databases
-        addExternalDatabases(databases);
     }
 
     /**
