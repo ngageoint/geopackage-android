@@ -4,6 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## 1.2.5 (TBD)
+
+* TBD
+
 ## [1.2.4](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.4) (01-25-2016)
 
 * Updated Android compile and target SDK version to 23 (Marshmallow)
