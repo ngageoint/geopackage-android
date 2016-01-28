@@ -27,7 +27,7 @@ import mil.nga.wkb.geom.Point;
 import mil.nga.wkb.util.GeometryPrinter;
 
 /**
- * Used to query the features represented by the tiles drawn in a FeatureOverlay
+ * Used to query the features represented by tiles, either being drawn from or linked to the features
  *
  * @author osbornb
  * @since 1.1.0
@@ -40,9 +40,9 @@ public class FeatureOverlayQuery {
     private final Context context;
 
     /**
-     * Feature Overlay
+     * Bounded Overlay
      */
-    private final FeatureOverlay featureOverlay;
+    private final BoundedOverlay boundedOverlay;
 
     /**
      * Feature Tiles
@@ -102,9 +102,21 @@ public class FeatureOverlayQuery {
      * @param featureOverlay
      */
     public FeatureOverlayQuery(Context context, FeatureOverlay featureOverlay) {
+        this(context, featureOverlay, featureOverlay.getFeatureTiles());
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context
+     * @param boundedOverlay
+     * @param featureTiles
+     * @since 1.2.5
+     */
+    public FeatureOverlayQuery(Context context, BoundedOverlay boundedOverlay, FeatureTiles featureTiles) {
         this.context = context;
-        this.featureOverlay = featureOverlay;
-        this.featureTiles = featureOverlay.getFeatureTiles();
+        this.boundedOverlay = boundedOverlay;
+        this.featureTiles = featureTiles;
 
         FeatureDao featureDao = featureTiles.getFeatureDao();
         geometryType = featureDao.getGeometryType();
@@ -128,12 +140,13 @@ public class FeatureOverlayQuery {
     }
 
     /**
-     * Get the feature overlay
+     * Get the bounded overlay
      *
-     * @return feature overlay
+     * @return bounded overlay
+     * @since 1.2.5
      */
-    public FeatureOverlay getFeatureOverlay() {
-        return featureOverlay;
+    public BoundedOverlay getBoundedOverlay() {
+        return boundedOverlay;
     }
 
     /**
@@ -294,9 +307,7 @@ public class FeatureOverlayQuery {
      * @return true if on
      */
     public boolean isOnAtCurrentZoom(float zoom) {
-        boolean on = (featureOverlay.getMinZoom() == null || zoom >= featureOverlay.getMinZoom())
-                && (featureOverlay.getMaxZoom() == null || zoom <= featureOverlay.getMaxZoom());
-        return on;
+        return boundedOverlay.isWithinZoom(zoom);
     }
 
     /**
@@ -440,7 +451,7 @@ public class FeatureOverlayQuery {
      * @return true if indexed
      * @since 1.1.1
      */
-    public boolean isIndexed(){
+    public boolean isIndexed() {
         return featureTiles.isIndexQuery();
     }
 

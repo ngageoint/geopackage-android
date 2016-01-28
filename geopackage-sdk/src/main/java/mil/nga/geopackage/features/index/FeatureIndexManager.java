@@ -33,6 +33,11 @@ import mil.nga.wkb.geom.GeometryEnvelope;
 public class FeatureIndexManager {
 
     /**
+     * Feature DAO
+     */
+    private final FeatureDao featureDao;
+
+    /**
      * Feature Table Index, for indexing within a GeoPackage extension
      */
     private final FeatureTableIndex featureTableIndex;
@@ -61,6 +66,7 @@ public class FeatureIndexManager {
      * @param featureDao
      */
     public FeatureIndexManager(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
+        this.featureDao = featureDao;
         featureTableIndex = new FeatureTableIndex(geoPackage, featureDao);
         featureIndexer = new FeatureIndexer(context, featureDao);
 
@@ -75,6 +81,16 @@ public class FeatureIndexManager {
     public void close() {
         featureTableIndex.close();
         featureIndexer.close();
+    }
+
+    /**
+     * Get the feature DAO
+     *
+     * @return feature DAO
+     * @since 1.2.5
+     */
+    public FeatureDao getFeatureDao() {
+        return featureDao;
     }
 
     /**

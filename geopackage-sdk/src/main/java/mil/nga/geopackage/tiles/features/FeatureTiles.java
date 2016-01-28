@@ -25,7 +25,8 @@ import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 
 /**
- * Tiles generated from features
+ * Tiles drawn from or linked to features. Used to query features and optionally draw tiles
+ * from those features.
  *
  * @author osbornb
  */

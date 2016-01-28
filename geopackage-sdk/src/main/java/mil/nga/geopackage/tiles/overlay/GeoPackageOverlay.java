@@ -1,7 +1,6 @@
 package mil.nga.geopackage.tiles.overlay;
 
 import com.google.android.gms.maps.model.Tile;
-import com.google.android.gms.maps.model.TileProvider;
 
 import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.GeoPackageTileRetriever;
@@ -13,7 +12,7 @@ import mil.nga.geopackage.tiles.user.TileDao;
  *
  * @author osbornb
  */
-public class GeoPackageOverlay implements TileProvider {
+public class GeoPackageOverlay extends BoundedOverlay {
 
     /**
      * Tile retriever
@@ -44,7 +43,7 @@ public class GeoPackageOverlay implements TileProvider {
      * {@inheritDoc}
      */
     @Override
-    public Tile getTile(int x, int y, int zoom) {
+    public Tile retrieveTile(int x, int y, int zoom) {
 
         GeoPackageTile geoPackageTile = retriever.getTile(x, y, zoom);
         Tile tile = GeoPackageOverlayFactory.getTile(geoPackageTile);

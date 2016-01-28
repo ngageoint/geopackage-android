@@ -20,16 +20,27 @@ public class GeoPackageOverlayFactory {
      * @return
      */
     public static TileProvider getTileProvider(TileDao tileDao) {
+        return getBoundedOverlay(tileDao);
+    }
 
-        TileProvider provider = null;
+    /**
+     * Get a Bounded Overlay Tile Provider for the Tile DAO
+     *
+     * @param tileDao
+     * @return bounded overlay
+     * @since 1.2.5
+     */
+    public static BoundedOverlay getBoundedOverlay(TileDao tileDao) {
+
+        BoundedOverlay overlay = null;
 
         if (tileDao.isGoogleTiles()) {
-            provider = new GoogleAPIGeoPackageOverlay(tileDao);
+            overlay = new GoogleAPIGeoPackageOverlay(tileDao);
         } else {
-            provider = new GeoPackageOverlay(tileDao);
+            overlay = new GeoPackageOverlay(tileDao);
         }
 
-        return provider;
+        return overlay;
     }
 
     /**
