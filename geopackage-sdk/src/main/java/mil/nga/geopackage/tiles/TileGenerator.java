@@ -19,6 +19,7 @@ import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.io.GeoPackageProgress;
+import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.projection.ProjectionTransform;
@@ -164,6 +165,46 @@ public abstract class TileGenerator {
     }
 
     /**
+     * Get the GeoPackage
+     *
+     * @return GeoPackage
+     * @since 1.2.5
+     */
+    public GeoPackage getGeoPackage() {
+        return geoPackage;
+    }
+
+    /**
+     * Get the table name
+     *
+     * @return table name
+     * @since 1.2.5
+     */
+    public String getTableName() {
+        return tableName;
+    }
+
+    /**
+     * Get the min zoom
+     *
+     * @return min zoom
+     * @since 1.2.5
+     */
+    public int getMinZoom() {
+        return minZoom;
+    }
+
+    /**
+     * Get the max zoom
+     *
+     * @return max zoom
+     * @since 1.2.5
+     */
+    public int getMaxZoom() {
+        return maxZoom;
+    }
+
+    /**
      * Set the tile bounding box
      *
      * @param boundingBox
@@ -177,12 +218,67 @@ public abstract class TileGenerator {
     }
 
     /**
+     * Get the tile bounding box in WGS84 projection
+     *
+     * @return WGS84 bounding box
+     * @since 1.2.5
+     */
+    public BoundingBox getTileBoundingBox() {
+        return boundingBox;
+    }
+
+    /**
+     * Set the tile bounding box specified in the provided projection
+     *
+     * @param boundingBox
+     * @param projection
+     * @since 1.2.5
+     */
+    public void setTileBoundingBox(BoundingBox boundingBox,
+                                   Projection projection) {
+        BoundingBox bbox = null;
+        if (projection != null) {
+            ProjectionTransform transform = projection
+                    .getTransformation(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+            bbox = transform.transform(boundingBox);
+        } else {
+            bbox = boundingBox;
+        }
+        setTileBoundingBox(bbox);
+    }
+
+    /**
+     * Get the tile bounding box in specified projection
+     *
+     * @param projection
+     *            requested projection
+     * @return bounding box
+     * @since 1.2.5
+     */
+    public BoundingBox getTileBoundingBox(Projection projection) {
+        ProjectionTransform transform = ProjectionFactory.getProjection(
+                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+                .getTransformation(projection);
+        return transform.transform(boundingBox);
+    }
+
+    /**
      * Set the compress format
      *
      * @param compressFormat
      */
     public void setCompressFormat(CompressFormat compressFormat) {
         this.compressFormat = compressFormat;
+    }
+
+    /**
+     * Get the compress format
+     *
+     * @return compress format
+     * @since 1.2.5
+     */
+    public CompressFormat getCompressFormat() {
+        return compressFormat;
     }
 
     /**
@@ -198,12 +294,32 @@ public abstract class TileGenerator {
     }
 
     /**
+     * Get the compress quality
+     *
+     * @return compress quality or null
+     * @since 1.2.5
+     */
+    public Integer getCompressQuality() {
+        return compressQuality;
+    }
+
+    /**
      * Set the progress tracker
      *
      * @param progress
      */
     public void setProgress(GeoPackageProgress progress) {
         this.progress = progress;
+    }
+
+    /**
+     * Get the progress tracker
+     *
+     * @return progress
+     * @since 1.2.5
+     */
+    public GeoPackageProgress getProgress() {
+        return progress;
     }
 
     /**
@@ -226,6 +342,16 @@ public abstract class TileGenerator {
      */
     public void setGoogleTiles(boolean googleTiles) {
         this.googleTiles = googleTiles;
+    }
+
+    /**
+     * Is the Google Tiles flag set to generate Google tile format tiles.
+     *
+     * @return true if Google Tiles format, false if GeoPackage
+     * @since 1.2.5
+     */
+    public boolean isGoogleTiles() {
+        return googleTiles;
     }
 
     /**
@@ -301,7 +427,9 @@ public abstract class TileGenerator {
             updateTileBounds(tileMatrixSet);
         }
 
-        // Download and create the tiles
+        preTileGeneration();
+
+        // Create the tiles
         try {
             Contents contents = tileMatrixSet.getContents();
             TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
@@ -786,6 +914,12 @@ public abstract class TileGenerator {
 
         return count;
     }
+
+    /**
+     * Called after set up and right before tile generation starts for the first
+     * zoom level
+     */
+    protected abstract void preTileGeneration();
 
     /**
      * Create the tile
