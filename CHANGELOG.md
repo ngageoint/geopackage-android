@@ -4,10 +4,11 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.2.5 (TBD)
+## [1.2.5](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.5) (02-02-2016)
 
 * geopackage-core version updated to 1.1.5
 * Feature Tile Generator linking between feature and tile tables
+* Feature Overlay Query updates to support linked feature and tile tables
 
 ## [1.2.4](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.4) (01-25-2016)
 
