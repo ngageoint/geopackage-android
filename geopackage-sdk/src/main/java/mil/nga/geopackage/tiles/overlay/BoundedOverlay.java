@@ -119,8 +119,8 @@ public abstract class BoundedOverlay implements TileProvider {
 
         Tile tile = null;
 
-        // Check if generating tiles for the zoom level and is within the bounding box
-        if (isWithinBounds(x, y, zoom)) {
+        // Check if there is a tile
+        if (hasTile(x, y, zoom)) {
 
             // Retrieve the tile
             tile = retrieveTile(x, y, zoom);
@@ -128,6 +128,37 @@ public abstract class BoundedOverlay implements TileProvider {
 
         return tile;
     }
+
+    /**
+     * Determine if there is a tile for the x, y, and zoom
+     *
+     * @param x    x coordinate
+     * @param y    y coordinate
+     * @param zoom zoom value
+     * @return true if there is a tile
+     * @since 1.2.6
+     */
+    public boolean hasTile(int x, int y, int zoom) {
+
+        // Check if generating tiles for the zoom level and is within the bounding box
+        boolean hasTile = isWithinBounds(x, y, zoom);
+        if (hasTile) {
+            // Check if there is a tile to retrieve
+            hasTile = hasTileToRetrieve(x, y, zoom);
+        }
+
+        return hasTile;
+    }
+
+    /**
+     * Check if there is a tile to retrieve
+     *
+     * @param x    x coordinate
+     * @param y    y coordinate
+     * @param zoom zoom value
+     * @return true if there is a tile
+     */
+    protected abstract boolean hasTileToRetrieve(int x, int y, int zoom);
 
     /**
      * Retrieve the tile

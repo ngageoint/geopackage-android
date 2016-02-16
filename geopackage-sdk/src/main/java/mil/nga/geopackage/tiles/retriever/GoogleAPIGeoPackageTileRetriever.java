@@ -31,11 +31,19 @@ public class GoogleAPIGeoPackageTileRetriever implements TileRetriever {
      * {@inheritDoc}
      */
     @Override
+    public boolean hasTile(int x, int y, int zoom) {
+        return retrieveTileRow(x, y, zoom) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public GeoPackageTile getTile(int x, int y, int zoom) {
 
         GeoPackageTile tile = null;
 
-        TileRow tileRow = tileDao.queryForTile(x, y, zoom);
+        TileRow tileRow = retrieveTileRow(x, y, zoom);
         if (tileRow != null) {
             TileMatrix tileMatrix = tileDao.getTileMatrix(zoom);
             int tileWidth = (int) tileMatrix.getTileWidth();
@@ -44,6 +52,18 @@ public class GoogleAPIGeoPackageTileRetriever implements TileRetriever {
         }
 
         return tile;
+    }
+
+    /**
+     * Retrieve the tile row
+     *
+     * @param x
+     * @param y
+     * @param zoom
+     * @return
+     */
+    private TileRow retrieveTileRow(int x, int y, int zoom) {
+        return tileDao.queryForTile(x, y, zoom);
     }
 
 }

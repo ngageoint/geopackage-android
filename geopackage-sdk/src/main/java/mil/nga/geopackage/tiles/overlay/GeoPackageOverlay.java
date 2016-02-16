@@ -43,6 +43,14 @@ public class GeoPackageOverlay extends BoundedOverlay {
      * {@inheritDoc}
      */
     @Override
+    public boolean hasTileToRetrieve(int x, int y, int zoom) {
+        return retriever.hasTile(x, y, zoom);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Tile retrieveTile(int x, int y, int zoom) {
 
         GeoPackageTile geoPackageTile = retriever.getTile(x, y, zoom);

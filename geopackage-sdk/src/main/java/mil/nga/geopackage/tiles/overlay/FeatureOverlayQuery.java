@@ -289,25 +289,34 @@ public class FeatureOverlayQuery {
     }
 
     /**
-     * Determine if the the feature overlay is on for the current zoom level of the map
+     * Determine if the the feature overlay is on for the current zoom level of the map at the location
      *
      * @param map
+     * @param latLng lat lon location
      * @return true if on
+     * @since 1.2.6
      */
-    public boolean isOnAtCurrentZoom(GoogleMap map) {
+    public boolean isOnAtCurrentZoom(GoogleMap map, LatLng latLng) {
         float zoom = getCurrentZoom(map);
-        boolean on = isOnAtCurrentZoom(zoom);
+        boolean on = isOnAtCurrentZoom(zoom, latLng);
         return on;
     }
 
     /**
-     * Determine if the feature overlay is on for the provided zoom level
+     * Determine if the feature overlay is on for the provided zoom level at the location
      *
-     * @param zoom
+     * @param zoom   zoom level
+     * @param latLng lat lon location
      * @return true if on
+     * @since 1.2.6
      */
-    public boolean isOnAtCurrentZoom(float zoom) {
-        return boundedOverlay.isWithinZoom(zoom);
+    public boolean isOnAtCurrentZoom(float zoom, LatLng latLng) {
+
+        Point point = new Point(latLng.longitude, latLng.latitude);
+        TileGrid tileGrid = TileBoundingBoxUtils.getTileGridFromWGS84(point, (int) zoom);
+
+        boolean on = boundedOverlay.hasTile((int) tileGrid.getMinX(), (int) tileGrid.getMinY(), (int) zoom);
+        return on;
     }
 
     /**
@@ -620,7 +629,7 @@ public class FeatureOverlayQuery {
 
             // Get the current map zoom and verify it is within the overlays zoom range
             float zoom = getCurrentZoom(map);
-            if (isOnAtCurrentZoom(zoom)) {
+            if (isOnAtCurrentZoom(zoom, latLng)) {
 
                 // Get the number of features in the tile location
                 long tileFeatureCount = tileFeatureCount(latLng, zoom);

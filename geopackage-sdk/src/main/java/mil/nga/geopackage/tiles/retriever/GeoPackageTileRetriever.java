@@ -99,6 +99,33 @@ public class GeoPackageTileRetriever implements TileRetriever {
      * {@inheritDoc}
      */
     @Override
+    public boolean hasTile(int x, int y, int zoom) {
+
+        boolean hasTile = false;
+
+        // Get the bounding box of the requested tile
+        BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
+                .getWebMercatorBoundingBox(x, y, zoom);
+
+        TileMatrix tileMatrix = getTileMatrix(webMercatorBoundingBox);
+
+        TileCursor tileResults = retrieveTileResults(webMercatorBoundingBox, tileMatrix);
+        if (tileResults != null) {
+
+            try {
+                hasTile = tileResults.getCount() > 0;
+            } finally {
+                tileResults.close();
+            }
+        }
+
+        return hasTile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public GeoPackageTile getTile(int x, int y, int zoom) {
 
         GeoPackageTile tile = null;
@@ -107,31 +134,14 @@ public class GeoPackageTileRetriever implements TileRetriever {
         BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(x, y, zoom);
 
-        // Check if the request overlaps the tile matrix set
-        if (TileBoundingBoxUtils.overlap(webMercatorBoundingBox,
-                setWebMercatorBoundingBox) != null) {
+        TileMatrix tileMatrix = getTileMatrix(webMercatorBoundingBox);
 
-            // Get the tile distance
-            double distance = webMercatorBoundingBox.getMaxLongitude()
-                    - webMercatorBoundingBox.getMinLongitude();
+        TileCursor tileResults = retrieveTileResults(webMercatorBoundingBox, tileMatrix);
+        if (tileResults != null) {
 
-            // Get the zoom level to request based upon the tile size
-            Long zoomLevel = tileDao.getZoomLevel(distance);
+            try {
 
-            // If there is a matching zoom level
-            if (zoomLevel != null) {
-
-                TileMatrix tileMatrix = tileDao.getTileMatrix(zoomLevel);
-
-                // Get the tile grid
-                TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
-                        setWebMercatorBoundingBox, tileMatrix.getMatrixWidth(),
-                        tileMatrix.getMatrixHeight(), webMercatorBoundingBox);
-
-                // Query for matching tiles in the tile grid
-                TileCursor tileCursor = tileDao.queryByTileGrid(tileGrid,
-                        zoomLevel);
-                if (tileCursor != null) {
+                if (tileResults.getCount() > 0) {
 
                     // Get the requested tile dimensions
                     int tileWidth = width != null ? width : (int) tileMatrix
@@ -143,10 +153,10 @@ public class GeoPackageTileRetriever implements TileRetriever {
                     Bitmap tileBitmap = null;
                     Canvas canvas = null;
                     Paint paint = null;
-                    while (tileCursor.moveToNext()) {
+                    while (tileResults.moveToNext()) {
 
                         // Get the next tile
-                        TileRow tileRow = tileCursor.getRow();
+                        TileRow tileRow = tileResults.getRow();
                         Bitmap tileDataBitmap = tileRow.getTileDataBitmap();
 
                         // Get the bounding box of the tile
@@ -188,7 +198,6 @@ public class GeoPackageTileRetriever implements TileRetriever {
                             canvas.drawBitmap(tileDataBitmap, src, dest, paint);
                         }
                     }
-                    tileCursor.close();
 
                     // Create the tile
                     if (tileBitmap != null) {
@@ -203,10 +212,69 @@ public class GeoPackageTileRetriever implements TileRetriever {
                     }
 
                 }
+            } finally {
+                tileResults.close();
             }
         }
 
         return tile;
+    }
+
+    /**
+     * Get the tile matrix at the zoom level that fits the provided bounding box
+     *
+     * @param webMercatorBoundingBox web mercator bounding box
+     * @return tile matrix or null
+     */
+    private TileMatrix getTileMatrix(BoundingBox webMercatorBoundingBox) {
+
+        TileMatrix tileMatrix = null;
+
+        // Check if the request overlaps the tile matrix set
+        if (TileBoundingBoxUtils.overlap(webMercatorBoundingBox,
+                setWebMercatorBoundingBox) != null) {
+
+            // Get the tile distance
+            double distance = webMercatorBoundingBox.getMaxLongitude()
+                    - webMercatorBoundingBox.getMinLongitude();
+
+            // Get the zoom level to request based upon the tile size
+            Long zoomLevel = tileDao.getZoomLevel(distance);
+
+            // If there is a matching zoom level
+            if (zoomLevel != null) {
+                tileMatrix = tileDao.getTileMatrix(zoomLevel);
+            }
+        }
+
+        return tileMatrix;
+    }
+
+    /**
+     * Query for tile results using the bounding box and tile matrix
+     *
+     * @param webMercatorBoundingBox web mercator bounding box
+     * @param tileMatrix             tile matrix
+     * @return tile cursor or null
+     */
+    private TileCursor retrieveTileResults(BoundingBox webMercatorBoundingBox, TileMatrix tileMatrix) {
+
+        TileCursor tileResults = null;
+
+        if (tileMatrix != null) {
+
+            // Get the tile grid
+            TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
+                    setWebMercatorBoundingBox, tileMatrix.getMatrixWidth(),
+                    tileMatrix.getMatrixHeight(), webMercatorBoundingBox);
+
+            // Query for matching tiles in the tile grid
+            tileResults = tileDao.queryByTileGrid(tileGrid,
+                    tileMatrix.getZoomLevel());
+
+        }
+
+        return tileResults;
     }
 
 }
