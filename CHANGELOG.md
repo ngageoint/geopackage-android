@@ -11,6 +11,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Bounded Overlay check if a specified tile exists
 * Feature Overlay ignore drawing tiles that already exist in a linked tile table
 * Feature Overlay Query improved determination if a tile exists before querying features
+* Manager create GeoPackage as an external file methods
 
 ## [1.2.5](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.5) (02-02-2016)
 
