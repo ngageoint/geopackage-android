@@ -199,10 +199,39 @@ public interface GeoPackageManager {
     /**
      * Create a new GeoPackage database
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return true if created
      */
     public boolean create(String database);
+
+    /**
+     * Create a new GeoPackage database at the provided directory path
+     *
+     * @param database database name
+     * @param path     directory path
+     * @return true if created
+     * @since 1.2.6
+     */
+    public boolean createAtPath(String database, File path);
+
+    /**
+     * Create a new GeoPackage database at the specified file location
+     *
+     * @param file GeoPackage file path
+     * @return true if created
+     * @since 1.2.6
+     */
+    public boolean createFile(File file);
+
+    /**
+     * Create a new GeoPackage database at the specified file location with the provided name
+     *
+     * @param database database name
+     * @param file     GeoPackage file path
+     * @return true if created
+     * @since 1.2.6
+     */
+    public boolean createFile(String database, File file);
 
     /**
      * Import a GeoPackage file

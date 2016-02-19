@@ -374,19 +374,101 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         } else {
             SQLiteDatabase db = context.openOrCreateDatabase(database,
                     Context.MODE_PRIVATE, null);
-            GeoPackageConnection connection = new GeoPackageConnection(db);
-
-            // Set the application id as a GeoPackage
-            connection.setApplicationId();
-
-            // Create the minimum required tables
-            GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
-            tableCreator.createRequired();
-
-            connection.close();
+            createAndCloseGeoPackage(db);
             created = true;
         }
 
+        return created;
+    }
+
+    /**
+     * Create the required GeoPackage application id and tables in the newly created and open database connection.  Then close the connection.
+     *
+     * @param db
+     */
+    private void createAndCloseGeoPackage(SQLiteDatabase db) {
+
+        GeoPackageConnection connection = new GeoPackageConnection(db);
+
+        // Set the application id as a GeoPackage
+        connection.setApplicationId();
+
+        // Create the minimum required tables
+        GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
+        tableCreator.createRequired();
+
+        connection.close();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean createAtPath(String database, File path) {
+
+        // Create the absolute file path
+        File file = new File(path, database + "." + GeoPackageConstants.GEOPACKAGE_EXTENSION);
+
+        // Create the GeoPackage
+        boolean created = createFile(database, file);
+
+        return created;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean createFile(File file) {
+
+        // Get the database name
+        String database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
+
+        // Create the GeoPackage
+        boolean created = createFile(database, file);
+
+        return created;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean createFile(String database, File file) {
+
+        boolean created = false;
+
+        if (exists(database)) {
+            throw new GeoPackageException("GeoPackage already exists: "
+                    + database);
+        } else {
+
+            // Check if the path is an absolute path to the GeoPackage file to create
+            if (!GeoPackageValidate.hasGeoPackageExtension(file)) {
+
+                // Make sure this isn't a path to another file extension
+                if (GeoPackageIOUtils.getFileExtension(file) != null) {
+                    throw new GeoPackageException("File can not have a non GeoPackage extension. Invalid File: "
+                            + file.getAbsolutePath());
+                }
+
+                // Add the extension
+                file = new File(file.getParentFile(), file.getName() + "." + GeoPackageConstants.GEOPACKAGE_EXTENSION);
+            }
+
+            // Make sure the file does not already exist
+            if (file.exists()) {
+                throw new GeoPackageException("GeoPackage file already exists: "
+                        + file.getAbsolutePath());
+            }
+
+            // Create the new GeoPackage file
+            SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(file, null);
+            createAndCloseGeoPackage(db);
+
+            // Import the GeoPackage
+            created = importGeoPackageAsExternalLink(file, database);
+        }
         return created;
     }
 
