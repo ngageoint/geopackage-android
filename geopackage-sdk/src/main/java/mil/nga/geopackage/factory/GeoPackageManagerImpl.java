@@ -902,7 +902,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean importGeoPackageAsExternalLink(File path, String database) {
-        return importGeoPackageAsExternalLink(path.getAbsolutePath(), database);
+        return importGeoPackageAsExternalLink(path, database, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(File path, String database, boolean override) {
+        return importGeoPackageAsExternalLink(path.getAbsolutePath(), database, override);
     }
 
     /**
@@ -910,10 +918,25 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean importGeoPackageAsExternalLink(String path, String database) {
+        return importGeoPackageAsExternalLink(path, database, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(String path, String database, boolean override) {
 
         if (exists(database)) {
-            throw new GeoPackageException(
-                    "GeoPackage database already exists: " + database);
+            if(override){
+                if(!delete(database)){
+                    throw new GeoPackageException(
+                            "Failed to delete existing database: " + database);
+                }
+            }else {
+                throw new GeoPackageException(
+                        "GeoPackage database already exists: " + database);
+            }
         }
 
         // Verify the file is a database and can be opened

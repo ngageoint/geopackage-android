@@ -518,8 +518,30 @@ public interface GeoPackageManager {
      *
      * @param path     full file path
      * @param database name to reference the database
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 1.2.7
+     */
+    public boolean importGeoPackageAsExternalLink(File path, String database, boolean override);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param path     full file path
+     * @param database name to reference the database
      * @return true if imported successfully
      */
     public boolean importGeoPackageAsExternalLink(String path, String database);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param path     full file path
+     * @param database name to reference the database
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 1.2.7
+     */
+    public boolean importGeoPackageAsExternalLink(String path, String database, boolean override);
 
 }
