@@ -102,6 +102,63 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public List<String> databasesLike(String like){
+        List<String> databases = null;
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            databases = dataSource.getMetadataWhereNameLike(like, GeoPackageMetadata.COLUMN_NAME);
+        } finally {
+            metadataDb.close();
+        }
+
+        databases = deleteMissingDatabases(databases);
+
+        return databases;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> databasesNotLike(String notLike){
+        List<String> databases = null;
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            databases = dataSource.getMetadataWhereNameNotLike(notLike, GeoPackageMetadata.COLUMN_NAME);
+        } finally {
+            metadataDb.close();
+        }
+
+        databases = deleteMissingDatabases(databases);
+
+        return databases;
+    }
+
+    /**
+     *
+     * @param databases
+     * @return
+     */
+    private List<String> deleteMissingDatabases(List<String> databases){
+        List<String> filesExist = new ArrayList<>();
+        for(String database: databases){
+            if(exists(database)){
+                filesExist.add(database);
+            }
+        }
+        return filesExist;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<String> internalDatabases() {
         Set<String> sortedDatabases = new TreeSet<String>();
         addInternalDatabases(sortedDatabases);
@@ -179,7 +236,25 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean exists(String database) {
-        return databaseSet().contains(database);
+        boolean exists = false;
+
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            GeoPackageMetadata metadata = dataSource.get(database);
+            if(metadata != null){
+                if(metadata.getExternalPath() != null && !new File(metadata.getExternalPath()).exists()){
+                    delete(database);
+                }else{
+                    exists = true;
+                }
+            }
+        } finally {
+            metadataDb.close();
+        }
+        return exists;
     }
 
     /**

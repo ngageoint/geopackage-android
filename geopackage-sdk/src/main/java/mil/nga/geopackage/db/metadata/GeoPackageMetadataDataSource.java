@@ -276,6 +276,57 @@ public class GeoPackageMetadataDataSource {
     }
 
     /**
+     * Get metadata where the name is like
+     *
+     * @param like       like argument
+     * @param sortColumn sort by column
+     * @return metadata names
+     * @since 1.2.7
+     */
+    public List<String> getMetadataWhereNameLike(String like, String sortColumn) {
+        return getMetadataWhereNameLike(like, sortColumn, false);
+    }
+
+    /**
+     * Get metadata where the name is not like
+     *
+     * @param notLike    not like argument
+     * @param sortColumn sort by column
+     * @return metadata names
+     * @since 1.2.7
+     */
+    public List<String> getMetadataWhereNameNotLike(String notLike, String sortColumn) {
+        return getMetadataWhereNameLike(notLike, sortColumn, true);
+    }
+
+    /**
+     * Get metadata where the name is like or not like
+     *
+     * @param like       like or not like argument
+     * @param sortColumn sort by column
+     * @param notLike    true if a not like query
+     * @return metadata names
+     */
+    private List<String> getMetadataWhereNameLike(String like, String sortColumn, boolean notLike) {
+        List<String> names = new ArrayList<>();
+        StringBuilder where = new StringBuilder(GeoPackageMetadata.COLUMN_NAME);
+        if (notLike) {
+            where.append(" not");
+        }
+        where.append(" like ?");
+        String[] whereArgs = new String[]{like};
+        Cursor cursor = db.query(GeoPackageMetadata.TABLE_NAME, new String[]{GeoPackageMetadata.COLUMN_NAME}, where.toString(), whereArgs, null, null, sortColumn);
+        try {
+            while (cursor.moveToNext()) {
+                names.add(cursor.getString(0));
+            }
+        } finally {
+            cursor.close();
+        }
+        return names;
+    }
+
+    /**
      * Create a GeoPackage metadata from the current cursor location
      *
      * @param cursor

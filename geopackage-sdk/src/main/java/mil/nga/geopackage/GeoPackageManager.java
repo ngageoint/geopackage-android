@@ -23,6 +23,24 @@ public interface GeoPackageManager {
     public List<String> databases();
 
     /**
+     * List GeoPackage databases that match the provided like argument
+     *
+     * @param like like argument, using % as a wild card
+     * @return database names
+     * @since 1.2.7
+     */
+    public List<String> databasesLike(String like);
+
+    /**
+     * List GeoPackage databases that do not match the provided like argument
+     *
+     * @param notLike not like argument, using % as a wild card
+     * @return database names
+     * @since 1.2.7
+     */
+    public List<String> databasesNotLike(String notLike);
+
+    /**
      * List all internal GeoPackage databases sorted alphabetically
      *
      * @return internal database list
