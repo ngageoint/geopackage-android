@@ -236,23 +236,25 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean exists(String database) {
-        boolean exists = false;
+        boolean exists = internalDatabaseSet().contains(database);
 
-        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
-        metadataDb.open();
-        try {
-            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
-            GeoPackageMetadata metadata = dataSource.get(database);
-            if(metadata != null){
-                if(metadata.getExternalPath() != null && !new File(metadata.getExternalPath()).exists()){
-                    delete(database);
-                }else{
-                    exists = true;
+        if(!exists) {
+            GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                    context);
+            metadataDb.open();
+            try {
+                GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+                GeoPackageMetadata metadata = dataSource.get(database);
+                if (metadata != null) {
+                    if (metadata.getExternalPath() != null && !new File(metadata.getExternalPath()).exists()) {
+                        delete(database);
+                    } else {
+                        exists = true;
+                    }
                 }
+            } finally {
+                metadataDb.close();
             }
-        } finally {
-            metadataDb.close();
         }
         return exists;
     }
