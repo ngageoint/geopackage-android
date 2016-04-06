@@ -452,6 +452,18 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             SQLiteDatabase db = context.openOrCreateDatabase(database,
                     Context.MODE_PRIVATE, null);
             createAndCloseGeoPackage(db);
+            GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                    context);
+            metadataDb.open();
+            try {
+                GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+                // Save in metadata
+                GeoPackageMetadata metadata = new GeoPackageMetadata();
+                metadata.setName(database);
+                dataSource.create(metadata);
+            } finally {
+                metadataDb.close();
+            }
             created = true;
         }
 
@@ -1262,6 +1274,19 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                             }
                         });
                 validateDatabaseAndClose(sqlite, importHeaderValidation, importIntegrityValidation);
+
+                GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                        context);
+                metadataDb.open();
+                try {
+                    GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+                    // Save in metadata
+                    GeoPackageMetadata metadata = new GeoPackageMetadata();
+                    metadata.setName(database);
+                    dataSource.create(metadata);
+                } finally {
+                    metadataDb.close();
+                }
             } catch (Exception e) {
                 delete(database);
                 throw new GeoPackageException(
