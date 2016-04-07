@@ -153,6 +153,17 @@ public class FeatureOverlayQuery {
     }
 
     /**
+     * Close the feature overlay query connection
+     *
+     * @since 1.2.7
+     */
+    public void close() {
+        if (featureTiles != null) {
+            featureTiles.close();
+        }
+    }
+
+    /**
      * Get the bounded overlay
      *
      * @return bounded overlay

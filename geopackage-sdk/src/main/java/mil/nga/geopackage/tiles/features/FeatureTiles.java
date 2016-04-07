@@ -170,6 +170,17 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Close the feature tiles connection
+     *
+     * @since 1.2.7
+     */
+    public void close() {
+        if (indexManager != null) {
+            indexManager.close();
+        }
+    }
+
+    /**
      * Call after making changes to the point icon, point radius, or paint stroke widths.
      * Determines the pixel overlap between tiles
      */
