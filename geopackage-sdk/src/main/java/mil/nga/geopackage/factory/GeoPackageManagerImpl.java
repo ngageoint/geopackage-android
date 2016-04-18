@@ -141,9 +141,10 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     }
 
     /**
+     * Delete all databases that do not exist or the database file does not exist
      *
-     * @param databases
-     * @return
+     * @param databases list of databases
+     * @return databases that exist
      */
     private List<String> deleteMissingDatabases(List<String> databases){
         List<String> filesExist = new ArrayList<>();

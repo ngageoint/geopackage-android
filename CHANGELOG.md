@@ -4,9 +4,16 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.2.7 (TBD)
+## [1.2.7](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.7) (04-18-2016)
 
-* TBD
+* geopackage-core version updated to 1.1.7
+* GeoPackage Manager name like queries
+* GeoPackage Manager import as external link with override option methods
+* GeoPackage Manager automatically delete database records where the file no longer exists
+* Get longitude distance bug fix in Tile Bounding Box Map Utilities
+* Feature Overlay Query and Feature Tiles close methods to close wrapped Index Manager connections
+* Feature Overlay Query map click message improvements and map click Feature Table Data implementations
+* Map click Feature Table Data JSON compatible conversions
 
 ## [1.2.6](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.6) (02-19-2016)
 
