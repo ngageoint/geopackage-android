@@ -102,6 +102,64 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public List<String> databasesLike(String like){
+        List<String> databases = null;
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            databases = dataSource.getMetadataWhereNameLike(like, GeoPackageMetadata.COLUMN_NAME);
+        } finally {
+            metadataDb.close();
+        }
+
+        databases = deleteMissingDatabases(databases);
+
+        return databases;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> databasesNotLike(String notLike){
+        List<String> databases = null;
+        GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                context);
+        metadataDb.open();
+        try {
+            GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+            databases = dataSource.getMetadataWhereNameNotLike(notLike, GeoPackageMetadata.COLUMN_NAME);
+        } finally {
+            metadataDb.close();
+        }
+
+        databases = deleteMissingDatabases(databases);
+
+        return databases;
+    }
+
+    /**
+     * Delete all databases that do not exist or the database file does not exist
+     *
+     * @param databases list of databases
+     * @return databases that exist
+     */
+    private List<String> deleteMissingDatabases(List<String> databases){
+        List<String> filesExist = new ArrayList<>();
+        for(String database: databases){
+            if(exists(database)){
+                filesExist.add(database);
+            }
+        }
+        return filesExist;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<String> internalDatabases() {
         Set<String> sortedDatabases = new TreeSet<String>();
         addInternalDatabases(sortedDatabases);
@@ -179,7 +237,27 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean exists(String database) {
-        return databaseSet().contains(database);
+        boolean exists = internalDatabaseSet().contains(database);
+
+        if(!exists) {
+            GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                    context);
+            metadataDb.open();
+            try {
+                GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+                GeoPackageMetadata metadata = dataSource.get(database);
+                if (metadata != null) {
+                    if (metadata.getExternalPath() != null && !new File(metadata.getExternalPath()).exists()) {
+                        delete(database);
+                    } else {
+                        exists = true;
+                    }
+                }
+            } finally {
+                metadataDb.close();
+            }
+        }
+        return exists;
     }
 
     /**
@@ -375,6 +453,18 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             SQLiteDatabase db = context.openOrCreateDatabase(database,
                     Context.MODE_PRIVATE, null);
             createAndCloseGeoPackage(db);
+            GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                    context);
+            metadataDb.open();
+            try {
+                GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+                // Save in metadata
+                GeoPackageMetadata metadata = new GeoPackageMetadata();
+                metadata.setName(database);
+                dataSource.create(metadata);
+            } finally {
+                metadataDb.close();
+            }
             created = true;
         }
 
@@ -902,7 +992,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean importGeoPackageAsExternalLink(File path, String database) {
-        return importGeoPackageAsExternalLink(path.getAbsolutePath(), database);
+        return importGeoPackageAsExternalLink(path, database, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(File path, String database, boolean override) {
+        return importGeoPackageAsExternalLink(path.getAbsolutePath(), database, override);
     }
 
     /**
@@ -910,10 +1008,25 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean importGeoPackageAsExternalLink(String path, String database) {
+        return importGeoPackageAsExternalLink(path, database, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(String path, String database, boolean override) {
 
         if (exists(database)) {
-            throw new GeoPackageException(
-                    "GeoPackage database already exists: " + database);
+            if(override){
+                if(!delete(database)){
+                    throw new GeoPackageException(
+                            "Failed to delete existing database: " + database);
+                }
+            }else {
+                throw new GeoPackageException(
+                        "GeoPackage database already exists: " + database);
+            }
         }
 
         // Verify the file is a database and can be opened
@@ -1162,6 +1275,19 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                             }
                         });
                 validateDatabaseAndClose(sqlite, importHeaderValidation, importIntegrityValidation);
+
+                GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
+                        context);
+                metadataDb.open();
+                try {
+                    GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
+                    // Save in metadata
+                    GeoPackageMetadata metadata = new GeoPackageMetadata();
+                    metadata.setName(database);
+                    dataSource.create(metadata);
+                } finally {
+                    metadataDb.close();
+                }
             } catch (Exception e) {
                 delete(database);
                 throw new GeoPackageException(

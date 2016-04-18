@@ -23,6 +23,24 @@ public interface GeoPackageManager {
     public List<String> databases();
 
     /**
+     * List GeoPackage databases that match the provided like argument
+     *
+     * @param like like argument, using % as a wild card
+     * @return database names
+     * @since 1.2.7
+     */
+    public List<String> databasesLike(String like);
+
+    /**
+     * List GeoPackage databases that do not match the provided like argument
+     *
+     * @param notLike not like argument, using % as a wild card
+     * @return database names
+     * @since 1.2.7
+     */
+    public List<String> databasesNotLike(String notLike);
+
+    /**
      * List all internal GeoPackage databases sorted alphabetically
      *
      * @return internal database list
@@ -518,8 +536,30 @@ public interface GeoPackageManager {
      *
      * @param path     full file path
      * @param database name to reference the database
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 1.2.7
+     */
+    public boolean importGeoPackageAsExternalLink(File path, String database, boolean override);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param path     full file path
+     * @param database name to reference the database
      * @return true if imported successfully
      */
     public boolean importGeoPackageAsExternalLink(String path, String database);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param path     full file path
+     * @param database name to reference the database
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 1.2.7
+     */
+    public boolean importGeoPackageAsExternalLink(String path, String database, boolean override);
 
 }

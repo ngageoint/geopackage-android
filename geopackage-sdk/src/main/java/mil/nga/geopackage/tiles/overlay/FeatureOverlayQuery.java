@@ -8,10 +8,20 @@ import android.view.View;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.SphericalUtil;
+import com.j256.ormlite.dao.DaoManager;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.R;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -19,9 +29,12 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
+import mil.nga.geopackage.projection.ProjectionTransform;
+import mil.nga.geopackage.tiles.TileBoundingBoxMapUtils;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGrid;
 import mil.nga.geopackage.tiles.features.FeatureTiles;
+import mil.nga.wkb.geom.Geometry;
 import mil.nga.wkb.geom.GeometryType;
 import mil.nga.wkb.geom.Point;
 import mil.nga.wkb.util.GeometryPrinter;
@@ -137,6 +150,17 @@ public class FeatureOverlayQuery {
 
         detailedInfoPrintPoints = resources.getBoolean(R.bool.map_feature_overlay_detailed_info_print_points);
         detailedInfoPrintFeatures = resources.getBoolean(R.bool.map_feature_overlay_detailed_info_print_features);
+    }
+
+    /**
+     * Close the feature overlay query connection
+     *
+     * @since 1.2.7
+     */
+    public void close() {
+        if (featureTiles != null) {
+            featureTiles.close();
+        }
     }
 
     /**
@@ -310,7 +334,7 @@ public class FeatureOverlayQuery {
      * @return true if on
      * @since 1.2.6
      */
-    public boolean isOnAtCurrentZoom(float zoom, LatLng latLng) {
+    public boolean isOnAtCurrentZoom(double zoom, LatLng latLng) {
 
         Point point = new Point(latLng.longitude, latLng.latitude);
         TileGrid tileGrid = TileBoundingBoxUtils.getTileGridFromWGS84(point, (int) zoom);
@@ -326,7 +350,7 @@ public class FeatureOverlayQuery {
      * @param zoom   zoom level
      * @return
      */
-    public long tileFeatureCount(LatLng latLng, float zoom) {
+    public long tileFeatureCount(LatLng latLng, double zoom) {
         int zoomValue = (int) zoom;
         long tileFeaturesCount = tileFeatureCount(latLng, zoomValue);
         return tileFeaturesCount;
@@ -352,7 +376,7 @@ public class FeatureOverlayQuery {
      * @param zoom  zoom level
      * @return
      */
-    public long tileFeatureCount(Point point, float zoom) {
+    public long tileFeatureCount(Point point, double zoom) {
         int zoomValue = (int) zoom;
         long tileFeaturesCount = tileFeatureCount(point, zoomValue);
         return tileFeaturesCount;
@@ -426,14 +450,38 @@ public class FeatureOverlayQuery {
     }
 
     /**
+     *  Build a bounding box using the location coordinate click location and map view bounds
+     *
+     *  @param latLng  click location
+     *  @param mapBounds map bounds
+     *
+     *  @return bounding box
+     *  @since 1.2.7
+     */
+    public BoundingBox buildClickBoundingBox(LatLng latLng, BoundingBox mapBounds){
+
+        // Get the screen width and height a click occurs from a feature
+        double width = TileBoundingBoxMapUtils.getLongitudeDistance(mapBounds) * screenClickPercentage;
+        double height = TileBoundingBoxMapUtils.getLatitudeDistance(mapBounds) * screenClickPercentage;
+
+        LatLng leftCoordinate = SphericalUtil.computeOffset(latLng, width, 270);
+        LatLng upCoordinate = SphericalUtil.computeOffset(latLng, height, 0);
+        LatLng rightCoordinate = SphericalUtil.computeOffset(latLng, width, 90);
+        LatLng downCoordinate = SphericalUtil.computeOffset(latLng, height, 180);
+
+        BoundingBox boundingBox = new BoundingBox(leftCoordinate.longitude, rightCoordinate.longitude, downCoordinate.latitude, upCoordinate.latitude);
+
+        return boundingBox;
+    }
+
+    /**
      * Query for features in the WGS84 projected bounding box
      *
      * @param boundingBox query bounding box in WGS84 projection
      * @return feature index results, must be closed
      */
     public FeatureIndexResults queryFeatures(BoundingBox boundingBox) {
-        mil.nga.geopackage.projection.Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-        FeatureIndexResults results = queryFeatures(boundingBox, projection);
+        FeatureIndexResults results = queryFeatures(boundingBox, null);
         return results;
     }
 
@@ -445,6 +493,11 @@ public class FeatureOverlayQuery {
      * @return feature index results, must be closed
      */
     public FeatureIndexResults queryFeatures(BoundingBox boundingBox, mil.nga.geopackage.projection.Projection projection) {
+
+        if(projection == null){
+            projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+        }
+
         // Query for features
         FeatureIndexManager indexManager = featureTiles.getIndexManager();
         if (indexManager == null) {
@@ -477,11 +530,23 @@ public class FeatureOverlayQuery {
     /**
      * Build a feature results information message and close the results
      *
-     * @param results
+     * @param results feature index results
      * @return results message or null if no results
      */
     public String buildResultsInfoMessageAndClose(FeatureIndexResults results) {
-        return buildResultsInfoMessageAndClose(results, null);
+        return buildResultsInfoMessageAndClose(results, null, null);
+    }
+
+    /**
+     * Build a feature results information message and close the results
+     *
+     * @param results feature index results
+     * @param projection desired geometry projection
+     * @return results message or null if no results
+     * @since 1.2.7
+     */
+    public String buildResultsInfoMessageAndClose(FeatureIndexResults results, mil.nga.geopackage.projection.Projection projection) {
+        return buildResultsInfoMessageAndClose(results, null, projection);
     }
 
     /**
@@ -492,11 +557,23 @@ public class FeatureOverlayQuery {
      * @return results message or null if no results
      */
     public String buildResultsInfoMessageAndClose(FeatureIndexResults results, LatLng clickLocation) {
+        return buildResultsInfoMessageAndClose(results, clickLocation, null);
+    }
 
+    /**
+     * Build a feature results information message and close the results
+     *
+     * @param results
+     * @param clickLocation
+     * @param projection desired geometry projection
+     * @return results message or null if no results
+     * @since 1.2.7
+     */
+    public String buildResultsInfoMessageAndClose(FeatureIndexResults results, LatLng clickLocation, mil.nga.geopackage.projection.Projection projection) {
         String message = null;
 
         try {
-            message = buildResultsInfoMessage(results, clickLocation);
+            message = buildResultsInfoMessage(results, clickLocation, projection);
         } finally {
             results.close();
         }
@@ -511,7 +588,19 @@ public class FeatureOverlayQuery {
      * @return results message or null if no results
      */
     public String buildResultsInfoMessage(FeatureIndexResults results) {
-        return buildResultsInfoMessage(results, null);
+        return buildResultsInfoMessage(results, null, null);
+    }
+
+    /**
+     * Build a feature results information message
+     *
+     * @param results
+     * @param projection desired geometry projection
+     * @return results message or null if no results
+     * @since 1.2.7
+     */
+    public String buildResultsInfoMessage(FeatureIndexResults results, mil.nga.geopackage.projection.Projection projection) {
+        return buildResultsInfoMessage(results, null, projection);
     }
 
     /**
@@ -522,6 +611,19 @@ public class FeatureOverlayQuery {
      * @return results message or null if no results
      */
     public String buildResultsInfoMessage(FeatureIndexResults results, LatLng clickLocation) {
+        return buildResultsInfoMessage(results, clickLocation, null);
+    }
+
+    /**
+     * Build a feature results information message
+     *
+     * @param results
+     * @param clickLocation
+     * @param projection desired geometry projection
+     * @return results message or null if no results
+     * @since 1.2.7
+     */
+    public String buildResultsInfoMessage(FeatureIndexResults results, LatLng clickLocation, mil.nga.geopackage.projection.Projection projection) {
 
         String message = null;
 
@@ -541,13 +643,6 @@ public class FeatureOverlayQuery {
                         .append("\n");
 
                 int featureNumber = 0;
-
-                boolean printFeatures = false;
-                if (geometryType == GeometryType.POINT) {
-                    printFeatures = detailedInfoPrintPoints;
-                } else {
-                    printFeatures = detailedInfoPrintFeatures;
-                }
 
                 for (FeatureRow featureRow : results) {
 
@@ -572,7 +667,6 @@ public class FeatureOverlayQuery {
                                 .append("\n");
                     }
 
-                    GeoPackageGeometryData geomData = featureRow.getGeometry();
                     int geometryColumn = featureRow.getGeometryColumnIndex();
                     for (int i = 0; i < featureRow.columnCount(); i++) {
                         if (i != geometryColumn) {
@@ -586,10 +680,23 @@ public class FeatureOverlayQuery {
                         }
                     }
 
-                    if (printFeatures) {
-                        messageBuilder.append("\n\n");
-                        messageBuilder.append(GeometryPrinter.getGeometryString(geomData
-                                .getGeometry()));
+                    GeoPackageGeometryData geomData = featureRow.getGeometry();
+                    if(geomData != null && geomData.getGeometry() != null){
+
+                        boolean printFeatures = false;
+                        if (geomData.getGeometry().getGeometryType() == GeometryType.POINT) {
+                            printFeatures = detailedInfoPrintPoints;
+                        } else {
+                            printFeatures = detailedInfoPrintFeatures;
+                        }
+
+                        if(printFeatures){
+                            if(projection != null){
+                                projectGeometry(geomData, projection);
+                            }
+                            messageBuilder.append("\n\n");
+                            messageBuilder.append(GeometryPrinter.getGeometryString(geomData.getGeometry()));
+                        }
                     }
 
                 }
@@ -614,21 +721,200 @@ public class FeatureOverlayQuery {
     }
 
     /**
+     * Build a feature results information message
+     *
+     * @param results
+     * @param clickLocation
+     * @return feature table data or null if not results
+     * @since 1.2.7
+     */
+    public FeatureTableData buildTableDataAndClose(FeatureIndexResults results, LatLng clickLocation) {
+        return buildTableDataAndClose(results, clickLocation, null);
+    }
+
+    /**
+     * Build a feature results information message
+     *
+     * @param results
+     * @param clickLocation
+     * @param projection desired geometry projection
+     * @return feature table data or null if not results
+     * @since 1.2.7
+     */
+    public FeatureTableData buildTableDataAndClose(FeatureIndexResults results, LatLng clickLocation, mil.nga.geopackage.projection.Projection projection) {
+
+        FeatureTableData tableData = null;
+
+        long featureCount = results.count();
+        if (featureCount > 0) {
+
+            int maxFeatureInfo = 0;
+            if (geometryType == GeometryType.POINT) {
+                maxFeatureInfo = maxPointDetailedInfo;
+            } else {
+                maxFeatureInfo = maxFeatureDetailedInfo;
+            }
+
+            if (featureCount <= maxFeatureInfo) {
+
+                List<FeatureRowData> rows = new ArrayList<>();
+
+                for (FeatureRow featureRow : results) {
+
+                    Map<String, Object> values = new HashMap<>();
+                    String geometryColumnName = null;
+
+                    int geometryColumn = featureRow.getGeometryColumnIndex();
+                    for (int i = 0; i < featureRow.columnCount(); i++) {
+
+                        Object value = featureRow.getValue(i);
+
+                        String columnName = featureRow.getColumnName(i);
+                        if(i == geometryColumn){
+                            geometryColumnName = columnName;
+                            if(projection != null && value != null){
+                                GeoPackageGeometryData geomData = (GeoPackageGeometryData) value;
+                                projectGeometry(geomData, projection);
+                            }
+                        }
+
+                        if(value != null){
+                            values.put(columnName, value);
+                        }
+                    }
+
+                    FeatureRowData featureRowData = new FeatureRowData(values, geometryColumnName);
+                    rows.add(featureRowData);
+                }
+
+                tableData = new FeatureTableData(featureTiles.getFeatureDao().getTableName(), featureCount, rows);
+            } else {
+                tableData = new FeatureTableData(featureTiles.getFeatureDao().getTableName(), featureCount);
+            }
+        }
+
+        results.close();
+
+        return tableData;
+    }
+
+    /**
+     * Project the geometry into the provided projection
+     *
+     * @param geometryData
+     * @param projection
+     * @since 1.2.7
+     */
+    public void projectGeometry(GeoPackageGeometryData geometryData, mil.nga.geopackage.projection.Projection projection){
+
+        if(geometryData.getGeometry() != null){
+
+            try {
+                SpatialReferenceSystemDao srsDao = DaoManager.createDao(featureTiles.getFeatureDao().getDb().getConnectionSource(), SpatialReferenceSystem.class);
+                int srsId = geometryData.getSrsId();
+                SpatialReferenceSystem srs = srsDao.getOrCreate(srsId);
+
+                long epsg = srs.getOrganizationCoordsysId();
+
+                if(projection.getEpsg() != epsg){
+
+                    mil.nga.geopackage.projection.Projection geomProjection = ProjectionFactory.getProjection(epsg);
+                    ProjectionTransform transform = geomProjection.getTransformation(projection);
+
+                    Geometry projectedGeometry = transform.transform(geometryData.getGeometry());
+                    geometryData.setGeometry(projectedGeometry);
+                    geometryData.setSrsId((int)projection.getEpsg());
+                }
+            }catch(SQLException e){
+                throw new GeoPackageException("Failed to project geometry to projection with EPSG: " + projection.getEpsg(), e);
+            }
+        }
+
+    }
+
+    /**
      * Perform a query based upon the map click location and build a info message
      *
-     * @param latLng
-     * @param view
-     * @param map
+     * @param latLng location
+     * @param view view
+     * @param map Google Map
      * @return information message on what was clicked, or null
      */
     public String buildMapClickMessage(LatLng latLng, View view, GoogleMap map) {
+        return buildMapClickMessage(latLng, view, map, null);
+    }
+
+    /**
+     * Perform a query based upon the map click location and build a info message
+     *
+     * @param latLng location
+     * @param view view
+     * @param map Google Map
+     * @param projection desired geometry projection
+     * @return information message on what was clicked, or null
+     * @since 1.2.7
+     */
+    public String buildMapClickMessage(LatLng latLng, View view, GoogleMap map, mil.nga.geopackage.projection.Projection projection) {
+
+        // Get the zoom level
+        double zoom = getCurrentZoom(map);
+
+        // Build a bounding box to represent the click location
+        BoundingBox boundingBox = buildClickBoundingBox(latLng, view, map);
+
+        String message = buildMapClickMessage(latLng, zoom, boundingBox, projection);
+
+        return message;
+    }
+
+    /**
+     * Perform a query based upon the map click location and build a info message
+     *
+     * @param latLng location
+     * @param zoom current zoom level
+     * @param mapBounds map view bounds
+     * @return information message on what was clicked, or nil
+     * @since 1.2.7
+     */
+    public String buildMapClickMessageWithMapBounds(LatLng latLng, double zoom, BoundingBox mapBounds) {
+        return buildMapClickMessageWithMapBounds(latLng, zoom, mapBounds, null);
+    }
+
+    /**
+     * Perform a query based upon the map click location and build a info message
+     *
+     * @param latLng location
+     * @param zoom current zoom level
+     * @param mapBounds map view bounds
+     * @param projection desired geometry projection
+     * @return information message on what was clicked, or nil
+     * @since 1.2.7
+     */
+    public String buildMapClickMessageWithMapBounds(LatLng latLng, double zoom, BoundingBox mapBounds, mil.nga.geopackage.projection.Projection projection) {
+
+        // Build a bounding box to represent the click location
+        BoundingBox boundingBox = buildClickBoundingBox(latLng, mapBounds);
+
+        String message = buildMapClickMessage(latLng, zoom, boundingBox, projection);
+
+        return message;
+    }
+
+    /**
+     * Perform a query based upon the map click location and build a info message
+     *
+     * @param latLng location
+     * @param zoom current zoom level
+     * @param boundingBox click bounding box
+     * @param projection desired geometry projection
+     * @return information message on what was clicked, or null
+     */
+    private String buildMapClickMessage(LatLng latLng, double zoom, BoundingBox boundingBox, mil.nga.geopackage.projection.Projection projection) {
         String message = null;
 
         // Verify the features are indexed and we are getting information
         if (isIndexed() && (maxFeaturesInfo || featuresInfo)) {
 
-            // Get the current map zoom and verify it is within the overlays zoom range
-            float zoom = getCurrentZoom(map);
             if (isOnAtCurrentZoom(zoom, latLng)) {
 
                 // Get the number of features in the tile location
@@ -646,12 +932,9 @@ public class FeatureOverlayQuery {
                 // Else, query for the features near the click
                 else if (featuresInfo) {
 
-                    // Build a bounding box to represent the click location
-                    BoundingBox boundingBox = buildClickBoundingBox(latLng, view, map);
-
                     // Query for results and build the message
-                    FeatureIndexResults results = queryFeatures(boundingBox);
-                    message = buildResultsInfoMessageAndClose(results, latLng);
+                    FeatureIndexResults results = queryFeatures(boundingBox, projection);
+                    message = buildResultsInfoMessageAndClose(results, latLng, projection);
 
                 }
 
@@ -660,4 +943,117 @@ public class FeatureOverlayQuery {
 
         return message;
     }
+
+    /**
+     * Perform a query based upon the map click location and build feature table data
+     *
+     * @param latLng location
+     * @param view view
+     * @param map Google Map
+     * @return table data on what was clicked, or null
+     * @since 1.2.7
+     */
+    public FeatureTableData buildMapClickTableData(LatLng latLng, View view, GoogleMap map) {
+        return buildMapClickTableData(latLng, view, map, null);
+    }
+
+    /**
+     * Perform a query based upon the map click location and build feature table data
+     *
+     * @param latLng location
+     * @param view view
+     * @param map Google Map
+     * @param projection desired geometry projection
+     * @return table data on what was clicked, or null
+     * @since 1.2.7
+     */
+    public FeatureTableData buildMapClickTableData(LatLng latLng, View view, GoogleMap map, mil.nga.geopackage.projection.Projection projection) {
+
+        // Get the zoom level
+        double zoom = getCurrentZoom(map);
+
+        // Build a bounding box to represent the click location
+        BoundingBox boundingBox = buildClickBoundingBox(latLng, view, map);
+
+        FeatureTableData tableData = buildMapClickTableData(latLng, zoom, boundingBox, projection);
+
+        return tableData;
+    }
+
+    /**
+     * Perform a query based upon the map click location and build feature table data
+     *
+     * @param latLng location
+     * @param zoom current zoom level
+     * @param mapBounds map view bounds
+     * @return table data on what was clicked, or null
+     * @since 1.2.7
+     */
+    public FeatureTableData buildMapClickTableDataWithMapBounds(LatLng latLng, double zoom, BoundingBox mapBounds) {
+        return buildMapClickTableDataWithMapBounds(latLng, zoom, mapBounds, null);
+    }
+
+    /**
+     * Perform a query based upon the map click location and build feature table data
+     *
+     * @param latLng location
+     * @param zoom current zoom level
+     * @param mapBounds map view bounds
+     * @param projection desired geometry projection
+     * @return table data on what was clicked, or null
+     * @since 1.2.7
+     */
+    public FeatureTableData buildMapClickTableDataWithMapBounds(LatLng latLng, double zoom, BoundingBox mapBounds, mil.nga.geopackage.projection.Projection projection) {
+
+        // Build a bounding box to represent the click location
+        BoundingBox boundingBox = buildClickBoundingBox(latLng, mapBounds);
+
+        FeatureTableData tableData = buildMapClickTableData(latLng, zoom, boundingBox, projection);
+
+        return tableData;
+    }
+
+    /**
+     * Perform a query based upon the map click location and build feature table data
+     *
+     * @param latLng location
+     * @param zoom current zoom level
+     * @param boundingBox click bounding box
+     * @param projection desired geometry projection
+     * @return table data on what was clicked, or null
+     */
+    private FeatureTableData buildMapClickTableData(LatLng latLng, double zoom, BoundingBox boundingBox, mil.nga.geopackage.projection.Projection projection) {
+        FeatureTableData tableData = null;
+
+        // Verify the features are indexed and we are getting information
+        if (isIndexed() && (maxFeaturesInfo || featuresInfo)) {
+
+            if (isOnAtCurrentZoom(zoom, latLng)) {
+
+                // Get the number of features in the tile location
+                long tileFeatureCount = tileFeatureCount(latLng, zoom);
+
+                // If more than a configured max features to draw
+                if (isMoreThanMaxFeatures(tileFeatureCount)) {
+
+                    // Build the max features message
+                    if (maxFeaturesInfo) {
+                        tableData = new FeatureTableData(featureTiles.getFeatureDao().getTableName(), tileFeatureCount);
+                    }
+
+                }
+                // Else, query for the features near the click
+                else if (featuresInfo) {
+
+                    // Query for results and build the message
+                    FeatureIndexResults results = queryFeatures(boundingBox, projection);
+                    tableData = buildTableDataAndClose(results, latLng, projection);
+                }
+
+            }
+        }
+
+        return tableData;
+    }
+
 }
