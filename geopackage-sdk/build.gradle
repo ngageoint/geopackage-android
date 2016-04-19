@@ -145,7 +145,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v13:23.3.0'
+    compile 'com.android.support:support-v13:23.2.1'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.google.maps.android:android-maps-utils:0.4.3'
     compile 'com.j256.ormlite:ormlite-android:4.48'
