@@ -1247,9 +1247,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     private boolean importGeoPackage(String database, boolean override,
                                      InputStream geoPackageStream, GeoPackageProgress progress) {
 
-        if (!override && exists(database)) {
-            throw new GeoPackageException(
-                    "GeoPackage database already exists: " + database);
+        if (exists(database)) {
+            if(override){
+                if(!delete(database)){
+                    throw new GeoPackageException(
+                            "Failed to delete existing database: " + database);
+                }
+            }else {
+                throw new GeoPackageException(
+                        "GeoPackage database already exists: " + database);
+            }
         }
 
         // Copy the geopackage over as a database

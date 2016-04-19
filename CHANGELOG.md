@@ -4,9 +4,11 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.2.8 (TBD)
+## [1.2.8](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.8) (04-19-2016)
 
-* TBD
+* GeoPackage Manager import GeoPackage as override fix to prevent multiple same named metadata entries
+* GeoPackage metadata unique constraint added to name column
+* Gradle and Android library updates
 
 ## [1.2.7](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.7) (04-18-2016)
 
