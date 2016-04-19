@@ -42,7 +42,7 @@ public class GeoPackageMetadata {
             + TABLE_NAME
             + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_NAME + " TEXT NOT NULL, "
+            + COLUMN_NAME + " TEXT NOT NULL UNIQUE, "
             + COLUMN_EXTERNAL_PATH + " TEXT"
             + ");";
 
