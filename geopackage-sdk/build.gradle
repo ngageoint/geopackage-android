@@ -9,7 +9,7 @@ def remotePublish = false
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         minSdkVersion 14
@@ -145,9 +145,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v13:23.1.1'
-    compile 'com.google.android.gms:play-services:6.1.71'
-    compile 'com.google.maps.android:android-maps-utils:0.3.3'
+    compile 'com.android.support:support-v13:23.3.0'
+    compile 'com.google.android.gms:play-services:8.4.0'
+    compile 'com.google.maps.android:android-maps-utils:0.4.3'
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'mil.nga.geopackage:geopackage-core:1.1.7'
     javadocDeps 'com.j256.ormlite:ormlite-android:4.48',
