@@ -6,6 +6,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.2.9 (TBD)
 
+* geopackage-core version updated to 1.1.8
 * Feature Overlay Query use of Data Column names in place of the column name when available
 
 ## [1.2.8](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.8) (04-19-2016)
