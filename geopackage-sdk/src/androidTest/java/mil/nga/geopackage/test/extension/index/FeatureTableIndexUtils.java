@@ -13,7 +13,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
-import mil.nga.geopackage.extension.NGAExtensions;
+import mil.nga.geopackage.extension.GeoPackageExtensions;
 import mil.nga.geopackage.extension.index.FeatureTableIndex;
 import mil.nga.geopackage.extension.index.GeometryIndex;
 import mil.nga.geopackage.extension.index.GeometryIndexDao;
@@ -129,11 +129,11 @@ public class FeatureTableIndexUtils {
             envelope.setMaxX(envelope.getMaxX() + .000001);
             envelope.setMinY(envelope.getMinY() - .000001);
             envelope.setMaxY(envelope.getMaxY() + .000001);
-            if(envelope.hasZ()){
+            if (envelope.hasZ()) {
                 envelope.setMinZ(envelope.getMinZ() - .000001);
                 envelope.setMaxZ(envelope.getMaxZ() + .000001);
             }
-            if(envelope.hasM()){
+            if (envelope.hasM()) {
                 envelope.setMinM(envelope.getMinM() - .000001);
                 envelope.setMaxM(envelope.getMaxM() + .000001);
             }
@@ -257,7 +257,7 @@ public class FeatureTableIndexUtils {
             TestCase.assertEquals(geometryCount, featureTableIndex.count());
 
             // Test deleting a single geometry index
-            if(everyOther){
+            if (everyOther) {
                 FeatureCursor featureCursor = featureDao.queryForAll();
                 while (featureCursor.moveToNext()) {
                     FeatureRow featureRow = featureCursor.getRow();
@@ -267,14 +267,14 @@ public class FeatureTableIndexUtils {
                             .getGeometry() != null)) {
                         featureCursor.close();
                         TestCase.assertEquals(1, featureTableIndex.deleteIndex(featureRow));
-                        TestCase.assertEquals(geometryCount-1, featureTableIndex.count());
+                        TestCase.assertEquals(geometryCount - 1, featureTableIndex.count());
                         break;
                     }
                 }
                 featureCursor.close();
             }
 
-            NGAExtensions.deleteTableExtensions(geoPackage, featureTable);
+            GeoPackageExtensions.deleteTableExtensions(geoPackage, featureTable);
 
             TestCase.assertFalse(featureTableIndex.isIndexed());
             TestCase.assertEquals(0,
@@ -293,7 +293,7 @@ public class FeatureTableIndexUtils {
                 FeatureTableIndex.EXTENSION_NAME).size() > 0);
 
         // Test deleting all NGA extensions
-        NGAExtensions.deleteExtensions(geoPackage);
+        GeoPackageExtensions.deleteExtensions(geoPackage);
 
         TestCase.assertFalse(geometryIndexDao.isTableExists());
         TestCase.assertFalse(tableIndexDao.isTableExists());
@@ -302,6 +302,54 @@ public class FeatureTableIndexUtils {
                         .queryByExtension(FeatureTableIndex.EXTENSION_NAME)
                         .size());
 
+    }
+
+    /**
+     * Test table index delete all
+     *
+     * @param geoPackage
+     * @throws SQLException
+     */
+    public static void testDeleteAll(GeoPackage geoPackage) throws SQLException {
+
+        // Test indexing each feature table
+        List<String> featureTables = geoPackage.getFeatureTables();
+        for (String featureTable : featureTables) {
+
+            FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+            FeatureTableIndex featureTableIndex = new FeatureTableIndex(
+                    geoPackage, featureDao);
+
+            TestCase.assertFalse(featureTableIndex.isIndexed());
+
+            TestUtils.validateGeoPackage(geoPackage);
+
+            // Test indexing
+            featureTableIndex.index();
+            TestUtils.validateGeoPackage(geoPackage);
+
+            TestCase.assertTrue(featureTableIndex.isIndexed());
+
+        }
+
+        ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
+        GeometryIndexDao geometryIndexDao = geoPackage.getGeometryIndexDao();
+        TableIndexDao tableIndexDao = geoPackage.getTableIndexDao();
+
+        TestCase.assertTrue(geometryIndexDao.isTableExists());
+        TestCase.assertTrue(tableIndexDao.isTableExists());
+        TestCase.assertTrue(extensionsDao.queryByExtension(
+                FeatureTableIndex.EXTENSION_NAME).size() > 0);
+
+        TestCase.assertTrue(geometryIndexDao.countOf() > 0);
+        long count = tableIndexDao.countOf();
+        TestCase.assertTrue(count > 0);
+
+        int deleteCount = tableIndexDao.deleteAllCascade();
+        TestCase.assertEquals(count, deleteCount);
+
+        TestCase.assertTrue(geometryIndexDao.countOf() == 0);
+        TestCase.assertTrue(tableIndexDao.countOf() == 0);
     }
 
     /**

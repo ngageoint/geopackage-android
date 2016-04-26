@@ -14,6 +14,11 @@ import com.j256.ormlite.support.ConnectionSource;
 public class GeoPackageConnection extends GeoPackageCoreConnection {
 
     /**
+     * Name column
+     */
+    private static final String NAME_COLUMN = "name";
+
+    /**
      * Database connection
      */
     private final SQLiteDatabase db;
@@ -158,6 +163,51 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     public void close() {
         connectionSource.closeQuietly();
         db.close();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean columnExists(String tableName, String columnName) {
+
+        boolean exists = false;
+
+        Cursor cursor = rawQuery("PRAGMA table_info(" + tableName + ")", null);
+        try {
+            int nameIndex = cursor.getColumnIndex(NAME_COLUMN);
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(nameIndex);
+                if (columnName.equals(name)) {
+                    exists = true;
+                    break;
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return exists;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String querySingleStringResult(String sql, String[] args) {
+
+        Cursor cursor = db.rawQuery(sql, args);
+
+        String result = null;
+        try {
+            if (cursor.moveToFirst()) {
+                result = cursor.getString(0);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return result;
     }
 
     /**
