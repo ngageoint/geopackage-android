@@ -81,8 +81,6 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
         wgs84Srs = srsDao
                 .queryForId((long) ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
         assertNotNull(wgs84Srs);
-        assertNull(wgs84Srs.getDefinition_12_163());
-        srsDao.setDefinition_12_163(wgs84Srs);
         assertNotNull(wgs84Srs.getDefinition_12_163());
         assertEquals(wgs84Srs.getDefinition_12_163(),
                 GeoPackageProperties.getProperty(PropertyConstants.WGS_84,
@@ -91,8 +89,6 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
         undefinedCartesianSrs = srsDao
                 .queryForId((long) ProjectionConstants.UNDEFINED_CARTESIAN);
         assertNotNull(undefinedCartesianSrs);
-        assertNull(undefinedCartesianSrs.getDefinition_12_163());
-        srsDao.setDefinition_12_163(undefinedCartesianSrs);
         assertNotNull(undefinedCartesianSrs.getDefinition_12_163());
         assertEquals(undefinedCartesianSrs.getDefinition_12_163(),
                 GeoPackageProperties.getProperty(
@@ -102,8 +98,6 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
         undefinedGeographicSrs = srsDao
                 .queryForId((long) ProjectionConstants.UNDEFINED_GEOGRAPHIC);
         assertNotNull(undefinedGeographicSrs);
-        assertNull(undefinedGeographicSrs.getDefinition_12_163());
-        srsDao.setDefinition_12_163(undefinedGeographicSrs);
         assertNotNull(undefinedGeographicSrs.getDefinition_12_163());
         assertEquals(undefinedGeographicSrs.getDefinition_12_163(),
                 GeoPackageProperties.getProperty(
@@ -112,8 +106,6 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
 
         newSrs = srsDao.queryForId(newSrs.getSrsId());
         assertNotNull(newSrs);
-        assertNull(newSrs.getDefinition_12_163());
-        srsDao.setDefinition_12_163(newSrs);
         assertNotNull(newSrs.getDefinition_12_163());
         assertEquals(newSrs.getDefinition_12_163(), "undefined");
 
@@ -168,8 +160,6 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
         srsDao.create(newSrs2);
         newSrs2 = srsDao.queryForId(newSrs2.getSrsId());
         assertNotNull(newSrs2);
-        assertNull(newSrs2.getDefinition_12_163());
-        srsDao.setDefinition_12_163(newSrs2);
         assertNotNull(newSrs2.getDefinition_12_163());
         assertEquals(newSrs2.getDefinition_12_163(), "definition_12_163");
 
@@ -184,8 +174,6 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
         srsDao.create(newSrs3);
         newSrs3 = srsDao.queryForId(newSrs3.getSrsId());
         assertNotNull(newSrs3);
-        assertNull(newSrs3.getDefinition_12_163());
-        srsDao.setDefinition_12_163(newSrs3);
         assertNotNull(newSrs3.getDefinition_12_163());
         assertEquals(newSrs3.getDefinition_12_163(), "undefined");
 
