@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.IOException;
 
 import mil.nga.geopackage.BoundingBox;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
@@ -69,9 +70,8 @@ public class GeoPackageTileRetriever implements TileRetriever {
         Projection webMercator = ProjectionFactory
                 .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
 
-        long epsg = tileDao.getTileMatrixSet().getSrs()
-                .getOrganizationCoordsysId();
-        Projection projection = ProjectionFactory.getProjection(epsg);
+        SpatialReferenceSystem srs = tileDao.getTileMatrixSet().getSrs();
+        Projection projection = ProjectionFactory.getProjection(srs);
 
         ProjectionTransform projectionToWebMercator = projection
                 .getTransformation(webMercator);

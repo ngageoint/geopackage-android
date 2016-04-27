@@ -830,7 +830,7 @@ public class FeatureOverlayQuery {
 
                 if(projection.getEpsg() != epsg){
 
-                    mil.nga.geopackage.projection.Projection geomProjection = ProjectionFactory.getProjection(epsg);
+                    mil.nga.geopackage.projection.Projection geomProjection = ProjectionFactory.getProjection(srs);
                     ProjectionTransform transform = geomProjection.getTransformation(projection);
 
                     Geometry projectedGeometry = transform.transform(geometryData.getGeometry());

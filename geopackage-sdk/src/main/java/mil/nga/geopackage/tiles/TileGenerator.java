@@ -572,7 +572,7 @@ public abstract class TileGenerator {
         Contents contents = tileMatrixSet.getContents();
 
         ProjectionTransform transformContentsToWgs84 = ProjectionFactory.getProjection(
-                contents.getSrs().getOrganizationCoordsysId())
+                contents.getSrs())
                 .getTransformation(
                         ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
@@ -587,7 +587,7 @@ public abstract class TileGenerator {
             ProjectionTransform transformContentsToProjection = ProjectionFactory
                     .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
                     .getTransformation(
-                            contents.getSrs().getOrganizationCoordsysId());
+                            contents.getSrs());
             contents.setBoundingBox(transformContentsToProjection
                     .transform(boundingBox));
             ContentsDao contentsDao = geoPackage.getContentsDao();
@@ -599,7 +599,7 @@ public abstract class TileGenerator {
         if (!googleTiles) {
 
             ProjectionTransform transformTileMatrixSetToWgs84 = ProjectionFactory.getProjection(
-                    tileMatrixSet.getSrs().getOrganizationCoordsysId())
+                    tileMatrixSet.getSrs())
                     .getTransformation(
                             ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
             BoundingBox previousTileMatrixSetBoundingBox = transformTileMatrixSetToWgs84
@@ -618,7 +618,7 @@ public abstract class TileGenerator {
                 ProjectionTransform transformTileMatrixSetToProjection = ProjectionFactory
                         .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
                         .getTransformation(
-                                tileMatrixSet.getSrs().getOrganizationCoordsysId());
+                                tileMatrixSet.getSrs());
                 tileMatrixSet.setBoundingBox(transformTileMatrixSetToProjection
                         .transform(tileMatrixSetBoundingBox));
                 TileMatrixSetDao tileMatrixSetDao = geoPackage

@@ -86,8 +86,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         this.widths = new double[tileMatrices.size()];
         this.heights = new double[tileMatrices.size()];
 
-        projection = ProjectionFactory.getProjection(tileMatrixSet.getSrs()
-                .getOrganizationCoordsysId());
+        projection = ProjectionFactory.getProjection(tileMatrixSet.getSrs());
 
         // Set the min and max zoom levels
         if (!tileMatrices.isEmpty()) {
