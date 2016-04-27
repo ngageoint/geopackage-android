@@ -6,7 +6,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.2.9 (TBD)
 
+* GeoPackage 1.1.0 spec updates
 * geopackage-core version updated to 1.1.8
+* GeoPackage Connection column exists and query single result method implementations
+* Use updated projection calls by passing Spatial Reference Systems
 * Feature Overlay Query use of Data Column names in place of the column name when available
 
 ## [1.2.8](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.8) (04-19-2016)
