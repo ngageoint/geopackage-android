@@ -56,8 +56,7 @@ public class FeatureDao extends
                     + SpatialReferenceSystem.class.getSimpleName());
         }
 
-        projection = ProjectionFactory.getProjection(geometryColumns.getSrs()
-                .getOrganizationCoordsysId());
+        projection = ProjectionFactory.getProjection(geometryColumns.getSrs());
     }
 
     /**
@@ -67,7 +66,7 @@ public class FeatureDao extends
     public BoundingBox getBoundingBox() {
         Contents contents = geometryColumns.getContents();
         Projection contentsProjection = ProjectionFactory
-                .getProjection(contents.getSrs().getOrganizationCoordsysId());
+                .getProjection(contents.getSrs());
 
         BoundingBox boundingBox = contents.getBoundingBox();
         if (projection.getEpsg() != contentsProjection.getEpsg()) {

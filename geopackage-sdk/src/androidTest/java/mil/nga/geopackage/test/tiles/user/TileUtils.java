@@ -856,8 +856,7 @@ public class TileUtils {
 							.getBoundingBox();
 					BoundingBox setWebMercatorBoundingBox = ProjectionFactory
 							.getProjection(
-									tileMatrixSet.getSrs()
-											.getOrganizationCoordsysId())
+									tileMatrixSet.getSrs())
 							.getTransformation(
 									ProjectionConstants.EPSG_WEB_MERCATOR)
 							.transform(setProjectionBoundingBox);

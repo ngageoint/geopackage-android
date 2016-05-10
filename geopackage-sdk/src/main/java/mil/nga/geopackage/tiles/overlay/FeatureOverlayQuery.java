@@ -2,6 +2,7 @@ package mil.nga.geopackage.tiles.overlay;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -30,6 +31,8 @@ import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.projection.ProjectionTransform;
+import mil.nga.geopackage.schema.columns.DataColumns;
+import mil.nga.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.tiles.TileBoundingBoxMapUtils;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGrid;
@@ -644,6 +647,8 @@ public class FeatureOverlayQuery {
 
                 int featureNumber = 0;
 
+                DataColumnsDao dataColumnsDao = getDataColumnsDao();
+
                 for (FeatureRow featureRow : results) {
 
                     featureNumber++;
@@ -672,8 +677,10 @@ public class FeatureOverlayQuery {
                         if (i != geometryColumn) {
                             Object value = featureRow.getValue(i);
                             if (value != null) {
+                                String columnName = featureRow.getColumnName(i);
+                                columnName = getColumnName(dataColumnsDao, featureRow, columnName);
                                 messageBuilder.append("\n")
-                                        .append(featureRow.getColumnName(i))
+                                        .append(columnName)
                                         .append(": ")
                                         .append(value);
                             }
@@ -757,6 +764,8 @@ public class FeatureOverlayQuery {
 
             if (featureCount <= maxFeatureInfo) {
 
+                DataColumnsDao dataColumnsDao = getDataColumnsDao();
+
                 List<FeatureRowData> rows = new ArrayList<>();
 
                 for (FeatureRow featureRow : results) {
@@ -770,6 +779,9 @@ public class FeatureOverlayQuery {
                         Object value = featureRow.getValue(i);
 
                         String columnName = featureRow.getColumnName(i);
+
+                        columnName = getColumnName(dataColumnsDao, featureRow, columnName);
+
                         if(i == geometryColumn){
                             geometryColumnName = columnName;
                             if(projection != null && value != null){
@@ -818,7 +830,7 @@ public class FeatureOverlayQuery {
 
                 if(projection.getEpsg() != epsg){
 
-                    mil.nga.geopackage.projection.Projection geomProjection = ProjectionFactory.getProjection(epsg);
+                    mil.nga.geopackage.projection.Projection geomProjection = ProjectionFactory.getProjection(srs);
                     ProjectionTransform transform = geomProjection.getTransformation(projection);
 
                     Geometry projectedGeometry = transform.transform(geometryData.getGeometry());
@@ -1054,6 +1066,51 @@ public class FeatureOverlayQuery {
         }
 
         return tableData;
+    }
+
+    /**
+     * Get a Data Columns DAO
+     * @return data columns dao
+     */
+    private DataColumnsDao getDataColumnsDao(){
+        DataColumnsDao dataColumnsDao = null;
+        try {
+            dataColumnsDao = DaoManager.createDao(featureTiles.getFeatureDao().getDb().getConnectionSource(), DataColumns.class);
+            if(!dataColumnsDao.isTableExists()){
+                dataColumnsDao = null;
+            }
+        }catch(SQLException e){
+            dataColumnsDao = null;
+            Log.e(FeatureOverlayQuery.class.getSimpleName(), "Failed to get a Data Columns DAO", e);
+        }
+        return dataColumnsDao;
+    }
+
+    /**
+     * Get the column name by checkign for a DataColumns name, otherwise returns the provided column name
+     * @param dataColumnsDao data columns dao
+     * @param featureRow feature row
+     * @param columnName column name
+     * @return column name
+     */
+    private String getColumnName(DataColumnsDao dataColumnsDao, FeatureRow featureRow, String columnName){
+
+        String newColumnName = columnName;
+
+        if(dataColumnsDao != null) {
+            try {
+                DataColumns dataColumn = dataColumnsDao.getDataColumn(featureRow.getTable().getTableName(), columnName);
+                if (dataColumn != null) {
+                    newColumnName = dataColumn.getName();
+                }
+            } catch (SQLException e) {
+                Log.e(FeatureOverlayQuery.class.getSimpleName(),
+                        "Failed to search for Data Column name for column: " + columnName
+                                + ", Feature Table: " + featureRow.getTable().getTableName(), e);
+            }
+        }
+
+        return newColumnName;
     }
 
 }
