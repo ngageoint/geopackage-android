@@ -662,7 +662,7 @@ public abstract class TileGenerator {
 
                             // Get the bounding box of the existing tile
                             BoundingBox tileBoundingBox = TileBoundingBoxUtils
-                                    .getWebMercatorBoundingBox(
+                                    .getBoundingBox(
                                             previousTileMatrixSetWebMercatorBoundingBox,
                                             tileMatrix, tileRow.getTileColumn(), tileRow.getTileRow());
 

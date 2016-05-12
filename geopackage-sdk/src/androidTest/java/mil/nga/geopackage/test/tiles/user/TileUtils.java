@@ -1,5 +1,15 @@
 package mil.nga.geopackage.test.tiles.user;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
+
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+
+import junit.framework.TestCase;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
@@ -8,13 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
-import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
@@ -31,13 +40,6 @@ import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.geopackage.user.ColumnValue;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
-import android.graphics.Bitmap;
-
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
 
 /**
  * Tiles Utility test methods
@@ -1019,7 +1021,7 @@ public class TileUtils {
 						TestCase.assertEquals(tileGrid.getMinY() + 1, updatedTileGrid.getMinY());
 						TestCase.assertEquals(tileGrid.getMaxY() - 1, updatedTileGrid.getMaxY());
 
-						BoundingBox tileGridBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(totalBoundingBox, tileMatrix, updatedTileGrid);
+						BoundingBox tileGridBoundingBox = TileBoundingBoxUtils.getBoundingBox(totalBoundingBox, tileMatrix, updatedTileGrid);
 						TestCase.assertEquals(tileGridBoundingBox, updatedBoundingBox);
 					}
 				}

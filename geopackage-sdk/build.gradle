@@ -149,7 +149,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.google.maps.android:android-maps-utils:0.4.3'
     compile 'com.j256.ormlite:ormlite-android:4.48'
-    compile 'mil.nga.geopackage:geopackage-core:1.1.8'
+    compile 'mil.nga.geopackage:geopackage-core:1.2.0'
     javadocDeps 'com.j256.ormlite:ormlite-android:4.48',
-            'mil.nga.geopackage:geopackage-core:1.1.8'
+            'mil.nga.geopackage:geopackage-core:1.2.0'
 }
