@@ -7,6 +7,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
 
+import org.osgeo.proj4j.ProjCoordinate;
+
 import java.io.IOException;
 
 import mil.nga.geopackage.BoundingBox;
@@ -66,16 +68,6 @@ public class TileCreator {
     public final Projection tilesProjection;
 
     /**
-     * Projection transform from the request projection to the tiles projection
-     */
-    public final ProjectionTransform transformRequestToTiles;
-
-    /**
-     * Projection transform from the tiles projection to the request projection
-     */
-    public final ProjectionTransform transformTilesToRequest;
-
-    /**
      * Tile Set bounding box
      */
     public final BoundingBox tileSetBoundingBox;
@@ -103,9 +95,6 @@ public class TileCreator {
         this.requestProjection = requestProjection;
         this.tilesProjection = tilesProjection;
 
-        this.transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
-        this.transformTilesToRequest = tilesProjection.getTransformation(requestProjection);
-
         tileSetBoundingBox = tileMatrixSet.getBoundingBox();
 
         // Check if the projections have the same from meters value
@@ -123,6 +112,7 @@ public class TileCreator {
         boolean hasTile = false;
 
         // Transform to the projection of the tiles
+        ProjectionTransform transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
         BoundingBox tilesBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
 
         TileMatrix tileMatrix = getTileMatrix(tilesBoundingBox);
@@ -151,6 +141,7 @@ public class TileCreator {
         GeoPackageTile tile = null;
 
         // Transform to the projection of the tiles
+        ProjectionTransform transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
         BoundingBox tilesBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
 
         TileMatrix tileMatrix = getTileMatrix(tilesBoundingBox);
@@ -164,70 +155,42 @@ public class TileCreator {
 
                     BoundingBox requestProjectedBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
 
-                    // TODO Handle tiles in a different projection
-
-                    // Get the requested tile dimensions
-                    int tileWidth = width != null ? width : (int) tileMatrix
+                    // Determine the requested tile dimensions, or use the dimensions of a single tile matrix tile
+                    int requestedTileWidth = width != null ? width : (int) tileMatrix
                             .getTileWidth();
-                    int tileHeight = height != null ? height : (int) tileMatrix
+                    int requestedTileHeight = height != null ? height : (int) tileMatrix
                             .getTileHeight();
 
-                    // Draw the resulting bitmap with the matching tiles
-                    Bitmap tileBitmap = null;
-                    Canvas canvas = null;
-                    Paint paint = null;
-                    while (tileResults.moveToNext()) {
-
-                        // Get the next tile
-                        TileRow tileRow = tileResults.getRow();
-                        Bitmap tileDataBitmap = tileRow.getTileDataBitmap();
-
-                        // Get the bounding box of the tile
-                        BoundingBox tileBoundingBox = TileBoundingBoxUtils
-                                .getBoundingBox(
-                                        tileSetBoundingBox, tileMatrix,
-                                        tileRow.getTileColumn(), tileRow.getTileRow());
-
-                        // Get the bounding box where the requested image and
-                        // tile overlap
-                        BoundingBox overlap = TileBoundingBoxUtils.overlap(
-                                requestProjectedBoundingBox,
-                                tileBoundingBox);
-
-                        // If the tile overlaps with the requested box
-                        if (overlap != null) {
-
-                            // Get the rectangle of the tile image to draw
-                            Rect src = TileBoundingBoxAndroidUtils
-                                    .getRectangle(tileMatrix.getTileWidth(),
-                                            tileMatrix.getTileHeight(),
-                                            tileBoundingBox, overlap);
-
-                            // Get the rectangle of where to draw the tile in
-                            // the resulting image
-                            RectF dest = TileBoundingBoxAndroidUtils
-                                    .getFloatRectangle(tileWidth, tileHeight,
-                                            requestProjectedBoundingBox, overlap);
-
-                            // Create the bitmap first time through
-                            if (tileBitmap == null) {
-                                tileBitmap = Bitmap.createBitmap(tileWidth,
-                                        tileHeight, Bitmap.Config.ARGB_8888);
-                                canvas = new Canvas(tileBitmap);
-                                paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                            }
-
-                            // Draw the tile to the bitmap
-                            canvas.drawBitmap(tileDataBitmap, src, dest, paint);
-                        }
+                    // Determine the size of the tile to initially draw
+                    int tileWidth = requestedTileWidth;
+                    int tileHeight = requestedTileHeight;
+                    if (!sameProjection) {
+                        tileWidth = (int) Math.round(
+                                (requestProjectedBoundingBox.getMaxLongitude() - requestProjectedBoundingBox.getMinLongitude())
+                                        / tileMatrix.getPixelXSize());
+                        tileHeight = (int) Math.round(
+                                (requestProjectedBoundingBox.getMaxLatitude() - requestProjectedBoundingBox.getMinLatitude())
+                                        / tileMatrix.getPixelYSize());
                     }
+
+                    // Draw the resulting bitmap with the matching tiles
+                    Bitmap tileBitmap = drawTile(tileMatrix, tileResults, requestProjectedBoundingBox, tileWidth, tileHeight);
 
                     // Create the tile
                     if (tileBitmap != null) {
+
+                        // Project the tile if needed
+                        if (!sameProjection) {
+                            Bitmap reprojectTile = reprojectTile(tileBitmap, requestedTileWidth, requestedTileHeight, requestBoundingBox, transformRequestToTiles, tilesBoundingBox);
+                            tileBitmap.recycle();
+                            tileBitmap = reprojectTile;
+                        }
+
                         try {
                             byte[] tileData = BitmapConverter.toBytes(
                                     tileBitmap, COMPRESS_FORMAT);
-                            tile = new GeoPackageTile(tileWidth, tileHeight, tileData);
+                            tileBitmap.recycle();
+                            tile = new GeoPackageTile(requestedTileWidth, requestedTileHeight, tileData);
                         } catch (IOException e) {
                             Log.e(TileCreator.class.getSimpleName(), "Failed to create tile. min lat: "
                                     + requestBoundingBox.getMinLatitude()
@@ -244,6 +207,129 @@ public class TileCreator {
         }
 
         return tile;
+    }
+
+    /**
+     * Draw the tile from the tile results
+     *
+     * @param tileMatrix
+     * @param tileResults
+     * @param requestProjectedBoundingBox
+     * @param tileWidth
+     * @param tileHeight
+     * @return tile bitmap
+     */
+    private Bitmap drawTile(TileMatrix tileMatrix, TileCursor tileResults, BoundingBox requestProjectedBoundingBox, int tileWidth, int tileHeight) {
+
+        // Draw the resulting bitmap with the matching tiles
+        Bitmap tileBitmap = null;
+        Canvas canvas = null;
+        Paint paint = null;
+        while (tileResults.moveToNext()) {
+
+            // Get the next tile
+            TileRow tileRow = tileResults.getRow();
+            Bitmap tileDataBitmap = tileRow.getTileDataBitmap();
+
+            // Get the bounding box of the tile
+            BoundingBox tileBoundingBox = TileBoundingBoxUtils
+                    .getBoundingBox(
+                            tileSetBoundingBox, tileMatrix,
+                            tileRow.getTileColumn(), tileRow.getTileRow());
+
+            // Get the bounding box where the requested image and
+            // tile overlap
+            BoundingBox overlap = TileBoundingBoxUtils.overlap(
+                    requestProjectedBoundingBox,
+                    tileBoundingBox);
+
+            // If the tile overlaps with the requested box
+            if (overlap != null) {
+
+                // Get the rectangle of the tile image to draw
+                Rect src = TileBoundingBoxAndroidUtils
+                        .getRectangle(tileMatrix.getTileWidth(),
+                                tileMatrix.getTileHeight(),
+                                tileBoundingBox, overlap);
+
+                // Get the rectangle of where to draw the tile in
+                // the resulting image
+                RectF dest = TileBoundingBoxAndroidUtils
+                        .getFloatRectangle(tileWidth, tileHeight,
+                                requestProjectedBoundingBox, overlap);
+
+                // Create the bitmap first time through
+                if (tileBitmap == null) {
+                    tileBitmap = Bitmap.createBitmap(tileWidth,
+                            tileHeight, Bitmap.Config.ARGB_8888);
+                    canvas = new Canvas(tileBitmap);
+                    paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                }
+
+                // Draw the tile to the bitmap
+                canvas.drawBitmap(tileDataBitmap, src, dest, paint);
+            }
+        }
+
+        return tileBitmap;
+    }
+
+    /**
+     * Reproject the tile to the requested projection
+     *
+     * @param tile                    tile in the tile matrix projection
+     * @param requestedTileWidth      requested tile width
+     * @param requestedTileHeight     requested tile height
+     * @param requestBoundingBox      request bounding box in the request projection
+     * @param transformRequestToTiles transformation from request to tiles
+     * @param tilesBoundingBox        request bounding box in the tile matrix projection
+     * @return projected tile
+     */
+    private Bitmap reprojectTile(Bitmap tile, int requestedTileWidth, int requestedTileHeight, BoundingBox requestBoundingBox, ProjectionTransform transformRequestToTiles, BoundingBox tilesBoundingBox) {
+
+        final double requestedWidthUnitsPerPixel = (requestBoundingBox.getMaxLongitude() - requestBoundingBox.getMinLongitude()) / requestedTileWidth;
+        final double requestedHeightUnitsPerPixel = (requestBoundingBox.getMaxLatitude() - requestBoundingBox.getMinLatitude()) / requestedTileHeight;
+
+        final double tilesDistanceWidth = tilesBoundingBox.getMaxLongitude() - tilesBoundingBox.getMinLongitude();
+        final double tilesDistanceHeight = tilesBoundingBox.getMaxLatitude() - tilesBoundingBox.getMinLatitude();
+
+        final int width = tile.getWidth();
+        final int height = tile.getHeight();
+
+        // Tile pixels of the tile matrix tiles
+        int[] pixels = new int[width * height];
+        tile.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        // Projected tile pixels to draw the reprojected tile
+        int[] projectedPixels = new int[requestedTileWidth * requestedTileHeight];
+
+        // Retrieve each pixel in the new tile from the unprojected tile
+        for (int y = 0; y < requestedTileHeight; y++) {
+            for (int x = 0; x < requestedTileWidth; x++) {
+
+                double longitude = requestBoundingBox.getMinLongitude() + (x * requestedWidthUnitsPerPixel);
+                double latitude = requestBoundingBox.getMaxLatitude() - (y * requestedHeightUnitsPerPixel);
+                ProjCoordinate fromCoord = new ProjCoordinate(longitude, latitude);
+                ProjCoordinate toCoord = transformRequestToTiles.transform(fromCoord);
+                double projectedLongitude = toCoord.x;
+                double projectedLatitude = toCoord.y;
+
+                int xPixel = (int) Math.round(((projectedLongitude - tilesBoundingBox.getMinLongitude()) / tilesDistanceWidth) * width);
+                int yPixel = (int) Math.round(((tilesBoundingBox.getMaxLatitude() - projectedLatitude) / tilesDistanceHeight) * height);
+
+                if (xPixel >= 0 && xPixel < width && yPixel >= 0 && yPixel < height) {
+                    int color = pixels[(yPixel * width) + xPixel];
+                    projectedPixels[(y * requestedTileWidth) + x] = color;
+                }
+            }
+        }
+
+        // Draw the new tile bitmap
+        Bitmap projectedTileBitmap = Bitmap.createBitmap(requestedTileWidth,
+                requestedTileHeight, tile.getConfig());
+        projectedTileBitmap.setPixels(projectedPixels, 0, requestedTileWidth, 0, 0, requestedTileWidth, requestedTileHeight);
+
+        return projectedTileBitmap;
     }
 
     /**
