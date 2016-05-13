@@ -317,10 +317,14 @@ public class TileCreator {
                 int xPixel = (int) Math.round(((projectedLongitude - tilesBoundingBox.getMinLongitude()) / tilesDistanceWidth) * width);
                 int yPixel = (int) Math.round(((tilesBoundingBox.getMaxLatitude() - projectedLatitude) / tilesDistanceHeight) * height);
 
-                if (xPixel >= 0 && xPixel < width && yPixel >= 0 && yPixel < height) {
-                    int color = pixels[(yPixel * width) + xPixel];
-                    projectedPixels[(y * requestedTileWidth) + x] = color;
-                }
+                xPixel = Math.max(0, xPixel);
+                xPixel = Math.min(width - 1, xPixel);
+
+                yPixel = Math.max(0, yPixel);
+                yPixel = Math.min(height - 1, yPixel);
+
+                int color = pixels[(yPixel * width) + xPixel];
+                projectedPixels[(y * requestedTileWidth) + x] = color;
             }
         }
 
