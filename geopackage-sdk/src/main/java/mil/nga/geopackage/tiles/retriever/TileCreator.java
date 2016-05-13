@@ -255,7 +255,7 @@ public class TileCreator {
                 // Get the rectangle of where to draw the tile in
                 // the resulting image
                 RectF dest = TileBoundingBoxAndroidUtils
-                        .getFloatRectangle(tileWidth, tileHeight,
+                        .getRoundedFloatRectangle(tileWidth, tileHeight,
                                 requestProjectedBoundingBox, overlap);
 
                 // Create the bitmap first time through
