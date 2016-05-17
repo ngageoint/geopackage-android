@@ -21,17 +21,17 @@ import mil.nga.geopackage.tiles.retriever.TileCreator;
 import mil.nga.geopackage.tiles.user.TileDao;
 
 /**
- * Test GeoPackage Overlay from a created database
+ * Test Tile Creator from a GeoPackage with tiles
  *
  * @author osbornb
  */
-public class TileCreatorTest extends TilesGeoPackageTestCase {
+public class TileCreatorGetTileTest extends TilesGeoPackageTestCase {
 
     /**
      * Constructor
      */
-    public TileCreatorTest() {
-
+    public TileCreatorGetTileTest() {
+        super(TestConstants.TILES_DB_NAME, TestConstants.TILES_DB_FILE_NAME);
     }
 
     /**

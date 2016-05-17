@@ -11,65 +11,69 @@ import mil.nga.geopackage.factory.GeoPackageFactory;
 
 /**
  * Abstract Test Case for Tile GeoPackage tests
- * 
+ *
  * @author osbornb
  */
 public abstract class TilesGeoPackageTestCase extends GeoPackageTestCase {
 
-	/**
-	 * Constructor
-	 */
-	public TilesGeoPackageTestCase() {
+    private final String name;
+    private final String file;
 
-	}
+    /**
+     * Constructor
+     */
+    public TilesGeoPackageTestCase(String name, String file) {
+        this.name = name;
+        this.file = file;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @throws IOException
-	 * @throws SQLException
-	 */
-	@Override
-	protected GeoPackage getGeoPackage() throws Exception {
-		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IOException
+     * @throws SQLException
+     */
+    @Override
+    protected GeoPackage getGeoPackage() throws Exception {
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
-		// Delete
-		manager.delete(TestConstants.TILES_DB_NAME);
+        // Delete
+        manager.delete(name);
 
-		// Copy the test db file from assets to the internal storage
-		TestUtils.copyAssetFileToInternalStorage(activity, testContext,
-				TestConstants.TILES_DB_FILE_NAME);
+        // Copy the test db file from assets to the internal storage
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext,
+                file);
 
-		// Import
-		String importLocation = TestUtils.getAssetFileInternalStorageLocation(
-				activity, TestConstants.TILES_DB_FILE_NAME);
-		manager.importGeoPackage(new File(importLocation));
+        // Import
+        String importLocation = TestUtils.getAssetFileInternalStorageLocation(
+                activity, file);
+        manager.importGeoPackage(new File(importLocation));
 
-		// Open
-		GeoPackage geoPackage = manager.open(TestConstants.TILES_DB_NAME);
-		if (geoPackage == null) {
-			throw new GeoPackageException("Failed to open database");
-		}
+        // Open
+        GeoPackage geoPackage = manager.open(name);
+        if (geoPackage == null) {
+            throw new GeoPackageException("Failed to open database");
+        }
 
-		return geoPackage;
-	}
+        return geoPackage;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void tearDown() throws Exception {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void tearDown() throws Exception {
 
-		// Close
-		if (geoPackage != null) {
-			geoPackage.close();
-		}
+        // Close
+        if (geoPackage != null) {
+            geoPackage.close();
+        }
 
-		// Delete
-		GeoPackageManager manager = GeoPackageFactory.getManager(activity);
-		manager.delete(TestConstants.TILES_DB_NAME);
+        // Delete
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+        manager.delete(name);
 
-		super.tearDown();
-	}
+        super.tearDown();
+    }
 
 }
