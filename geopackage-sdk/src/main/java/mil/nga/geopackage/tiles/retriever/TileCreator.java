@@ -14,6 +14,7 @@ import java.io.IOException;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.projection.Projection;
+import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.tiles.TileBoundingBoxAndroidUtils;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
@@ -83,18 +84,16 @@ public class TileCreator {
      * @param tileDao
      * @param width
      * @param height
-     * @param tileMatrixSet
      * @param requestProjection
-     * @param tilesProjection
      */
-    public TileCreator(TileDao tileDao, Integer width, Integer height, TileMatrixSet tileMatrixSet, Projection requestProjection, Projection tilesProjection) {
+    public TileCreator(TileDao tileDao, Integer width, Integer height, Projection requestProjection) {
         this.tileDao = tileDao;
         this.width = width;
         this.height = height;
-        this.tileMatrixSet = tileMatrixSet;
         this.requestProjection = requestProjection;
-        this.tilesProjection = tilesProjection;
 
+        tileMatrixSet = tileDao.getTileMatrixSet();
+        tilesProjection = ProjectionFactory.getProjection(tileDao.getTileMatrixSet().getSrs());
         tileSetBoundingBox = tileMatrixSet.getBoundingBox();
 
         // Check if the projections have the same from meters value

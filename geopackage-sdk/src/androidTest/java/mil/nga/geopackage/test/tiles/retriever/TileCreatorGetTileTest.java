@@ -7,7 +7,6 @@ import junit.framework.TestCase;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
@@ -15,7 +14,6 @@ import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TilesGeoPackageTestCase;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
-import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.TileCreator;
 import mil.nga.geopackage.tiles.user.TileDao;
@@ -49,14 +47,9 @@ public class TileCreatorGetTileTest extends TilesGeoPackageTestCase {
         Projection wgs84 = ProjectionFactory
                 .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
-        SpatialReferenceSystem srs = tileDao.getTileMatrixSet().getSrs();
-        Projection projection = ProjectionFactory.getProjection(srs);
-
-        TileMatrixSet tileMatrixSet = tileDao.getTileMatrixSet();
-
         int width = 256;
         int height = 140;
-        TileCreator tileCreator = new TileCreator(tileDao, width, height, tileMatrixSet, wgs84, projection);
+        TileCreator tileCreator = new TileCreator(tileDao, width, height, wgs84);
 
         BoundingBox boundingBox = new BoundingBox();
         boundingBox = TileBoundingBoxUtils.boundWgs84BoundingBoxWithWebMercatorLimits(boundingBox);

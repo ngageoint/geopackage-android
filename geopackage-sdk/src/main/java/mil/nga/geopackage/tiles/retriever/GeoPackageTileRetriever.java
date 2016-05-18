@@ -1,12 +1,10 @@
 package mil.nga.geopackage.tiles.retriever;
 
 import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
-import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileDao;
 
 /**
@@ -45,12 +43,7 @@ public class GeoPackageTileRetriever implements TileRetriever {
         Projection webMercator = ProjectionFactory
                 .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
 
-        SpatialReferenceSystem srs = tileDao.getTileMatrixSet().getSrs();
-        Projection projection = ProjectionFactory.getProjection(srs);
-
-        TileMatrixSet tileMatrixSet = tileDao.getTileMatrixSet();
-
-        tileCreator = new TileCreator(tileDao, width, height, tileMatrixSet, webMercator, projection);
+        tileCreator = new TileCreator(tileDao, width, height, webMercator);
     }
 
     /**
