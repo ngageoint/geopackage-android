@@ -2,6 +2,7 @@ package mil.nga.geopackage.test.tiles.retriever;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 
 import junit.framework.TestCase;
 
@@ -28,6 +29,8 @@ import mil.nga.geopackage.tiles.user.TileDao;
  * @author osbornb
  */
 public class TileCreatorImageTest extends TilesGeoPackageTestCase {
+
+    private final int COLOR_TOLERANCE = 19;
 
     /**
      * Constructor
@@ -103,21 +106,70 @@ public class TileCreatorImageTest extends TilesGeoPackageTestCase {
         String wgs84TestImage = TestUtils.getAssetFileInternalStorageLocation(activity, TestConstants.TILES2_WGS84_TEST_IMAGE);
         Bitmap wgs84TestBitmap = BitmapFactory.decodeFile(wgs84TestImage);
 
+        int redDiff = 0;
+        int greenDiff = 0;
+        int blueDiff = 0;
+
         // Compare the image pixels with the expected test image pixels
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
 
                 int webMercatorPixel = webMercatorBitmap.getPixel(x, y);
                 int webMercatorPixelTestPixel = webMercatorTestBitmap.getPixel(x, y);
-                TestCase.assertEquals(webMercatorPixelTestPixel, webMercatorPixel);
+
+                int webMercatorRed = Color.red(webMercatorPixel);
+                int webMercatorGreen = Color.green(webMercatorPixel);
+                int webMercatorBlue = Color.blue(webMercatorPixel);
+                int webMercatorAlpha = Color.alpha(webMercatorPixel);
+
+                int webMercatorTestRed = Color.red(webMercatorPixelTestPixel);
+                int webMercatorTestGreen = Color.green(webMercatorPixelTestPixel);
+                int webMercatorTestBlue = Color.blue(webMercatorPixelTestPixel);
+                int webMercatorTestAlpha = Color.alpha(webMercatorPixelTestPixel);
+                
+                // Colors differ between phones and emulators, try to validate within a tolerance range the colors are as expected
+                TestCase.assertTrue("Web Meractor Red pixel " + webMercatorRed + " is not within the " + COLOR_TOLERANCE + " range of test red pixel " + webMercatorTestRed,
+                        Math.abs(webMercatorRed - webMercatorTestRed) <= COLOR_TOLERANCE);
+                TestCase.assertTrue("Web Meractor Green pixel " + webMercatorGreen + " is not within the " + COLOR_TOLERANCE + " range of test green pixel " + webMercatorTestGreen,
+                        Math.abs(webMercatorGreen - webMercatorTestGreen) <= COLOR_TOLERANCE);
+                TestCase.assertTrue("Web Meractor Blue pixel " + webMercatorBlue + " is not within the " + COLOR_TOLERANCE + " range of test blue pixel " + webMercatorTestBlue,
+                        Math.abs(webMercatorBlue - webMercatorTestBlue) <= COLOR_TOLERANCE);
+                TestCase.assertTrue("Web Meractor Alpha pixel " + webMercatorAlpha + " is not within the " + COLOR_TOLERANCE + " range of test alpha pixel " + webMercatorTestAlpha,
+                        Math.abs(webMercatorAlpha - webMercatorTestAlpha) <= COLOR_TOLERANCE);
 
                 int wgs84Pixel = wgs84Bitmap.getPixel(x, y);
                 int wgs84PixelTestPixel = wgs84TestBitmap.getPixel(x, y);
-                TestCase.assertEquals(wgs84PixelTestPixel, wgs84Pixel);
 
-                TestCase.assertNotSame(webMercatorPixel, wgs84Pixel);
+                int wgs84Red = Color.red(wgs84Pixel);
+                int wgs84Green = Color.green(wgs84Pixel);
+                int wgs84Blue = Color.blue(wgs84Pixel);
+                int wgs84Alpha = Color.alpha(wgs84Pixel);
+
+                int wgs84TestRed = Color.red(wgs84PixelTestPixel);
+                int wgs84TestGreen = Color.green(wgs84PixelTestPixel);
+                int wgs84TestBlue = Color.blue(wgs84PixelTestPixel);
+                int wgs84TestAlpha = Color.alpha(wgs84PixelTestPixel);
+
+                // Colors differ between phones and emulators, try to validate within a tolerance range the colors are as expected
+                TestCase.assertTrue("WGS84 Red pixel " + wgs84Red + " is not within the " + COLOR_TOLERANCE + " range of test red pixel " + wgs84TestRed,
+                        Math.abs(wgs84Red - wgs84TestRed) <= COLOR_TOLERANCE);
+                TestCase.assertTrue("WGS84 Green pixel " + wgs84Green + " is not within the " + COLOR_TOLERANCE + " range of test green pixel " + wgs84TestGreen,
+                        Math.abs(wgs84Green - wgs84TestGreen) <= COLOR_TOLERANCE);
+                TestCase.assertTrue("WGS84 Blue pixel " + wgs84Blue + " is not within the " + COLOR_TOLERANCE + " range of test blue pixel " + wgs84TestBlue,
+                        Math.abs(wgs84Blue - wgs84TestBlue) <= COLOR_TOLERANCE);
+                TestCase.assertTrue("WGS84 Alpha pixel " + wgs84Alpha + " is not within the " + COLOR_TOLERANCE + " range of test alpha pixel " + wgs84TestAlpha,
+                        Math.abs(wgs84Alpha - wgs84TestAlpha) <= COLOR_TOLERANCE);
+
+                redDiff = Math.max(redDiff, Math.abs(webMercatorRed - wgs84Red));
+                greenDiff = Math.max(greenDiff, Math.abs(webMercatorGreen - wgs84Green));
+                blueDiff = Math.max(blueDiff, Math.abs(webMercatorBlue - wgs84Blue));
             }
         }
+
+        // Verify the web mercator and wgs84 images were different
+        TestCase.assertTrue(redDiff > COLOR_TOLERANCE);
+        TestCase.assertTrue(greenDiff > COLOR_TOLERANCE);
+        TestCase.assertTrue(blueDiff > COLOR_TOLERANCE);
 
         // To save the images to the external storage if the test images need to change, requires READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE permissions
         /*
