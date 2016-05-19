@@ -103,9 +103,9 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
             TileMatrix tileMatrix = tileMatrices.get(i);
             zoomLevelToTileMatrix.put(tileMatrix.getZoomLevel(), tileMatrix);
             widths[tileMatrices.size() - i - 1] = tileMatrix.getPixelXSize()
-                            * tileMatrix.getTileWidth();
+                    * tileMatrix.getTileWidth();
             heights[tileMatrices.size() - i - 1] = tileMatrix.getPixelYSize()
-                            * tileMatrix.getTileHeight();
+                    * tileMatrix.getTileHeight();
         }
 
         if (tileMatrixSet.getContents() == null) {
@@ -441,6 +441,26 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         String where = buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
         String[] whereArgs = buildWhereArgs(zoomLevel);
         return count(where, whereArgs);
+    }
+
+    /**
+     * Get the max length in default units that contains tiles
+     *
+     * @return max distance length with tiles
+     * @since 1.3.0
+     */
+    public double getMaxLength() {
+        return TileDaoUtils.getMaxLength(widths, heights);
+    }
+
+    /**
+     * Get the min length in default units that contains tiles
+     *
+     * @return min distance length with tiles
+     * @since 1.3.0
+     */
+    public double getMinLength() {
+        return TileDaoUtils.getMinLength(widths, heights);
     }
 
     /**

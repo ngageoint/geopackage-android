@@ -29,7 +29,7 @@ import mil.nga.geopackage.tiles.user.TileRow;
  * Tile Creator, creates a tile from a tile matrix to the desired projection
  *
  * @author osbornb
- * @since 1.2.10
+ * @since 1.3.0
  */
 public class TileCreator {
 

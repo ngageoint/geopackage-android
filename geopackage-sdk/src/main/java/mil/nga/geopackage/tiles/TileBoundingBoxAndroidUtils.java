@@ -44,7 +44,7 @@ public class TileBoundingBoxAndroidUtils {
      * @param boundingBox        full bounding box
      * @param boundingBoxSection rectangle bounding box section
      * @return floating point rectangle
-     * @since 1.2.10
+     * @since 1.3.0
      */
     public static RectF getRoundedFloatRectangle(long width, long height,
                                                  BoundingBox boundingBox, BoundingBox boundingBoxSection) {
