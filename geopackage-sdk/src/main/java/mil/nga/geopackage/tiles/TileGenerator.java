@@ -410,7 +410,7 @@ public abstract class TileGenerator {
                 || !tileMatrixSetDao.idExists(tableName)) {
             // Create the web mercator srs if needed
             SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
-            srsDao.getOrCreate(ProjectionConstants.EPSG_WEB_MERCATOR);
+            srsDao.getOrCreateFromEpsg(ProjectionConstants.EPSG_WEB_MERCATOR);
             // Create the tile table
             tileMatrixSet = geoPackage.createTileTableWithMetadata(
                     tableName,
