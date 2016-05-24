@@ -79,12 +79,12 @@ public class TileCreator {
     public final boolean sameProjection;
 
     /**
-     * Constructor
+     * Constructor, specified tile size and projection
      *
-     * @param tileDao
-     * @param width
-     * @param height
-     * @param requestProjection
+     * @param tileDao           tile dao
+     * @param width             requested width
+     * @param height            requested height
+     * @param requestProjection requested projection
      */
     public TileCreator(TileDao tileDao, Integer width, Integer height, Projection requestProjection) {
         this.tileDao = tileDao;
@@ -98,6 +98,36 @@ public class TileCreator {
 
         // Check if the projections have the same from meters value
         sameProjection = (requestProjection.getUnit().name.equals(tilesProjection.getUnit().name));
+    }
+
+    /**
+     * Constructor, tile tables tile size and projection
+     *
+     * @param tileDao tile dao
+     */
+    public TileCreator(TileDao tileDao) {
+        this(tileDao, null, null, tileDao.getProjection());
+    }
+
+    /**
+     * Constructor, tile tables projection with specified tile size
+     *
+     * @param tileDao tile dao
+     * @param width   requested width
+     * @param height  requested height
+     */
+    public TileCreator(TileDao tileDao, Integer width, Integer height) {
+        this(tileDao, width, height, tileDao.getProjection());
+    }
+
+    /**
+     * Constructor, tile tables tile size and requested projection
+     *
+     * @param tileDao           tile dao
+     * @param requestProjection requested projection
+     */
+    public TileCreator(TileDao tileDao, Projection requestProjection) {
+        this(tileDao, null, null, requestProjection);
     }
 
     /**

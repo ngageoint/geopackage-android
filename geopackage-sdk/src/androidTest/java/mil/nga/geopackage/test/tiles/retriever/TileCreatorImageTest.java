@@ -55,7 +55,7 @@ public class TileCreatorImageTest extends TilesGeoPackageTestCase {
         int width = 256;
         int height = 256;
         TileCreator webMeractorTileCreator = new TileCreator(tileDao, width, height, webMercator);
-        TileCreator wgs84TileCreator = new TileCreator(tileDao, width, height, wgs84);
+        TileCreator wgs84TileCreator = new TileCreator(tileDao, width, height);
 
         BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(0, 4, 4);
