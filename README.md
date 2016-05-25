@@ -29,6 +29,10 @@ The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-andro
 
 The [Mobile Awareness GEOINT Environment (MAGE)](https://github.com/ngageoint/mage-android) app provides mobile situational awareness capabilities. It [uses the SDK](https://github.com/ngageoint/mage-android/search?q=GeoPackage&type=Code) to provide GeoPackage functionality.
 
+##### DICE #####
+
+The [Disconnected Interactive Content Explorer (DICE)](https://github.com/ngageoint/disconnected-content-explorer-android) app allows users to load and display interactive content without a network connection. It [uses the SDK](https://github.com/ngageoint/disconnected-content-explorer-android/search?q=GeoPackage&type=Code) to provide GeoPackage functionality on the map and within reports.
+
 #### Example ####
 
     // Context context = ...;
