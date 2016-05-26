@@ -119,7 +119,7 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
                         PropertyConstants.DEFINITION_12_163));
 
         undefinedCartesianSrs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.UNDEFINED_CARTESIAN);
+                .getOrCreate(ProjectionConstants.UNDEFINED_CARTESIAN);
         assertNotNull(undefinedCartesianSrs);
         assertNotNull(undefinedCartesianSrs.getDefinition_12_163());
         assertEquals(undefinedCartesianSrs.getDefinition_12_163(),
@@ -128,7 +128,7 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
                         PropertyConstants.DEFINITION_12_163));
 
         undefinedGeographicSrs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.UNDEFINED_GEOGRAPHIC);
+                .getOrCreate(ProjectionConstants.UNDEFINED_GEOGRAPHIC);
         assertNotNull(undefinedGeographicSrs);
         assertNotNull(undefinedGeographicSrs.getDefinition_12_163());
         assertEquals(undefinedGeographicSrs.getDefinition_12_163(),
