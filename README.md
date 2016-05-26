@@ -35,111 +35,115 @@ The [Disconnected Interactive Content Explorer (DICE)](https://github.com/ngageo
 
 #### Example ####
 
-    // Context context = ...;
-    // File geoPackageFile = ...;
-    // GoogleMap map = ...;
-    
-    // Get a manager
-    GeoPackageManager manager = GeoPackageFactory.getManager(context);
-    
-    // Available databases
-    List<String> databases = manager.databases();
-    
-    // Import database
-    boolean imported = manager.importGeoPackage(geoPackageFile);
-    
-    // Open database
-    GeoPackage geoPackage = manager.open(databases.get(0));
-    
-    // GeoPackage Table DAOs
-    SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
-    ContentsDao contentsDao = geoPackage.getContentsDao();
-    GeometryColumnsDao geomColumnsDao = geoPackage.getGeometryColumnsDao();
-    TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
-    TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
-    DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
-    DataColumnConstraintsDao dataColumnConstraintsDao = geoPackage.getDataColumnConstraintsDao();
-    MetadataDao metadataDao = geoPackage.getMetadataDao();
-    MetadataReferenceDao metadataReferenceDao = geoPackage.getMetadataReferenceDao();
-    ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
-    
-    // Feature and tile tables
-    List<String> features = geoPackage.getFeatureTables();
-    List<String> tiles = geoPackage.getTileTables();
-    
-    // Query Features
-    String featureTable = features.get(0);
-    FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
-    GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
-            featureDao.getProjection());
-    FeatureCursor featureCursor = featureDao.queryForAll();
-    try{
-        while(featureCursor.moveToNext()){
-            FeatureRow featureRow = featureCursor.getRow();
-            GeoPackageGeometryData geometryData = featureRow.getGeometry();
-            Geometry geometry = geometryData.getGeometry();
-            GoogleMapShape shape = converter.toShape(geometry);
-            GoogleMapShape mapShape = GoogleMapShapeConverter
-                    .addShapeToMap(map, shape);
-            // ...
-        }
-    }finally{
-        featureCursor.close();
+```java
+
+// Context context = ...;
+// File geoPackageFile = ...;
+// GoogleMap map = ...;
+
+// Get a manager
+GeoPackageManager manager = GeoPackageFactory.getManager(context);
+
+// Available databases
+List<String> databases = manager.databases();
+
+// Import database
+boolean imported = manager.importGeoPackage(geoPackageFile);
+
+// Open database
+GeoPackage geoPackage = manager.open(databases.get(0));
+
+// GeoPackage Table DAOs
+SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
+ContentsDao contentsDao = geoPackage.getContentsDao();
+GeometryColumnsDao geomColumnsDao = geoPackage.getGeometryColumnsDao();
+TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
+DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
+DataColumnConstraintsDao dataColumnConstraintsDao = geoPackage.getDataColumnConstraintsDao();
+MetadataDao metadataDao = geoPackage.getMetadataDao();
+MetadataReferenceDao metadataReferenceDao = geoPackage.getMetadataReferenceDao();
+ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
+
+// Feature and tile tables
+List<String> features = geoPackage.getFeatureTables();
+List<String> tiles = geoPackage.getTileTables();
+
+// Query Features
+String featureTable = features.get(0);
+FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
+        featureDao.getProjection());
+FeatureCursor featureCursor = featureDao.queryForAll();
+try{
+    while(featureCursor.moveToNext()){
+        FeatureRow featureRow = featureCursor.getRow();
+        GeoPackageGeometryData geometryData = featureRow.getGeometry();
+        Geometry geometry = geometryData.getGeometry();
+        GoogleMapShape shape = converter.toShape(geometry);
+        GoogleMapShape mapShape = GoogleMapShapeConverter
+                .addShapeToMap(map, shape);
+        // ...
     }
-    
-    // Query Tiles
-    String tileTable = tiles.get(0);
-    TileDao tileDao = geoPackage.getTileDao(tileTable);
-    TileCursor tileCursor = tileDao.queryForAll();
-    try{
-        while(tileCursor.moveToNext()){
-            TileRow tileRow = tileCursor.getRow();
-            byte[] tileBytes = tileRow.getTileData();
-            Bitmap tileBitmap = tileRow.getTileDataBitmap();
-            // ...
-        }
-    }finally{
-        tileCursor.close();
+}finally{
+    featureCursor.close();
+}
+
+// Query Tiles
+String tileTable = tiles.get(0);
+TileDao tileDao = geoPackage.getTileDao(tileTable);
+TileCursor tileCursor = tileDao.queryForAll();
+try{
+    while(tileCursor.moveToNext()){
+        TileRow tileRow = tileCursor.getRow();
+        byte[] tileBytes = tileRow.getTileData();
+        Bitmap tileBitmap = tileRow.getTileDataBitmap();
+        // ...
     }
-    
-    // Tile Provider (GeoPackage or Google API)
-    TileProvider overlay = GeoPackageOverlayFactory
-            .getTileProvider(tileDao);
-    TileOverlayOptions overlayOptions = new TileOverlayOptions();
-    overlayOptions.tileProvider(overlay);
-    overlayOptions.zIndex(-1);
-    map.addTileOverlay(overlayOptions);
-    
-    // Index Features
-    FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
-    indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
-    int indexedCount = indexer.index();
-    
-    // Feature Tile Provider (dynamically draw tiles from features)
-    FeatureTiles featureTiles = new FeatureTiles(context, featureDao);
-    featureTiles.setMaxFeaturesPerTile(1000); // Set max features to draw per tile
-    NumberFeaturesTile numberFeaturesTile = new NumberFeaturesTile(context); // Custom feature tile implementation
-    featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
-    featureTiles.setIndexManager(indexer); // Set index manager to query feature indices
-    FeatureOverlay featureOverlay = new FeatureOverlay(featureTiles);
-    featureOverlay.setMinZoom(featureDao.getZoomLevel()); // Set zoom level to start showing tiles
-    TileOverlayOptions featureOverlayOptions = new TileOverlayOptions();
-    featureOverlayOptions.tileProvider(featureOverlay);
-    featureOverlayOptions.zIndex(-1); // Draw the feature tiles behind map markers
-    map.addTileOverlay(featureOverlayOptions);
-    
-    // URL Tile Generator (generate tiles from a URL)
-    TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,
-                    "url_tile_table", "http://url/{z}/{x}/{y}.png", 2, 7);
-    int urlTileCount = urlTileGenerator.generateTiles();
-    
-    // Feature Tile Generator (generate tiles from features)
-    TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
-                    featureTable + "_tiles", featureTiles, 10, 15);
-    int featureTileCount = featureTileGenerator.generateTiles();
-    
-    // Close database when done
-    geoPackage.close();
+}finally{
+    tileCursor.close();
+}
+
+// Tile Provider (GeoPackage or Google API)
+TileProvider overlay = GeoPackageOverlayFactory
+        .getTileProvider(tileDao);
+TileOverlayOptions overlayOptions = new TileOverlayOptions();
+overlayOptions.tileProvider(overlay);
+overlayOptions.zIndex(-1);
+map.addTileOverlay(overlayOptions);
+
+// Index Features
+FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
+indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
+int indexedCount = indexer.index();
+
+// Feature Tile Provider (dynamically draw tiles from features)
+FeatureTiles featureTiles = new FeatureTiles(context, featureDao);
+featureTiles.setMaxFeaturesPerTile(1000); // Set max features to draw per tile
+NumberFeaturesTile numberFeaturesTile = new NumberFeaturesTile(context); // Custom feature tile implementation
+featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
+featureTiles.setIndexManager(indexer); // Set index manager to query feature indices
+FeatureOverlay featureOverlay = new FeatureOverlay(featureTiles);
+featureOverlay.setMinZoom(featureDao.getZoomLevel()); // Set zoom level to start showing tiles
+TileOverlayOptions featureOverlayOptions = new TileOverlayOptions();
+featureOverlayOptions.tileProvider(featureOverlay);
+featureOverlayOptions.zIndex(-1); // Draw the feature tiles behind map markers
+map.addTileOverlay(featureOverlayOptions);
+
+// URL Tile Generator (generate tiles from a URL)
+TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,
+                "url_tile_table", "http://url/{z}/{x}/{y}.png", 2, 7);
+int urlTileCount = urlTileGenerator.generateTiles();
+
+// Feature Tile Generator (generate tiles from features)
+TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
+                featureTable + "_tiles", featureTiles, 10, 15);
+int featureTileCount = featureTileGenerator.generateTiles();
+
+// Close database when done
+geoPackage.close();
+
+```
 
 ### Installation ###
 
