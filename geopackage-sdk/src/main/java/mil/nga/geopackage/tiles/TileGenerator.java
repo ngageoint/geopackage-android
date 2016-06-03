@@ -16,6 +16,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.io.GeoPackageProgress;
@@ -410,14 +411,15 @@ public abstract class TileGenerator {
                 || !tileMatrixSetDao.idExists(tableName)) {
             // Create the web mercator srs if needed
             SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
-            srsDao.getOrCreateFromEpsg(ProjectionConstants.EPSG_WEB_MERCATOR);
+            SpatialReferenceSystem webMercatorSrs = srsDao.getOrCreateFromEpsg(ProjectionConstants.EPSG_WEB_MERCATOR);
+            SpatialReferenceSystem wgs84Srs = srsDao.getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
             // Create the tile table
             tileMatrixSet = geoPackage.createTileTableWithMetadata(
                     tableName,
                     boundingBox,
-                    ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM,
+                    wgs84Srs.getSrsId(),
                     webMercatorBoundingBox,
-                    ProjectionConstants.EPSG_WEB_MERCATOR);
+                    webMercatorSrs.getSrsId());
         } else {
             update = true;
             // Query to get the Tile Matrix Set
