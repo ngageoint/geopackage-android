@@ -2,8 +2,10 @@ package mil.nga.geopackage.tiles.features;
 
 import android.content.Context;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.extension.link.FeatureTileTableLinker;
+import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.tiles.TileGenerator;
 
 /**
@@ -26,16 +28,19 @@ public class FeatureTileGenerator extends TileGenerator {
     /**
      * Constructor
      *
-     * @param context
-     * @param geoPackage
-     * @param tableName
-     * @param featureTiles
-     * @param minZoom
-     * @param maxZoom
+     * @param context      app context
+     * @param geoPackage   GeoPackage
+     * @param tableName    table name
+     * @param featureTiles feature tiles
+     * @param minZoom      min zoom
+     * @param maxZoom      max zoom
+     * @param boundingBox  tiles bounding box
+     * @param projection   tiles projection
+     * @since 1.3.0
      */
     public FeatureTileGenerator(Context context, GeoPackage geoPackage,
-                                String tableName, FeatureTiles featureTiles, int minZoom, int maxZoom) {
-        super(context, geoPackage, tableName, minZoom, maxZoom);
+                                String tableName, FeatureTiles featureTiles, int minZoom, int maxZoom, BoundingBox boundingBox, Projection projection) {
+        super(context, geoPackage, tableName, minZoom, maxZoom, boundingBox, projection);
         this.featureTiles = featureTiles;
     }
 

@@ -62,16 +62,19 @@ public class UrlTileGenerator extends TileGenerator {
     /**
      * Constructor
      *
-     * @param context
-     * @param geoPackage
-     * @param tableName
-     * @param tileUrl
-     * @param minZoom
-     * @param maxZoom
+     * @param context     app context
+     * @param geoPackage  GeoPackage
+     * @param tableName   table name
+     * @param tileUrl     tile url
+     * @param minZoom     min zoom
+     * @param maxZoom     max zoom
+     * @param boundingBox tiles bounding box
+     * @param projection  tiles projection
+     * @since 1.3.0
      */
     public UrlTileGenerator(Context context, GeoPackage geoPackage,
-                            String tableName, String tileUrl, int minZoom, int maxZoom) {
-        super(context, geoPackage, tableName, minZoom, maxZoom);
+                            String tableName, String tileUrl, int minZoom, int maxZoom, BoundingBox boundingBox, Projection projection) {
+        super(context, geoPackage, tableName, minZoom, maxZoom, boundingBox, projection);
 
         try {
             this.tileUrl = URLDecoder.decode(tileUrl, "UTF-8");
@@ -82,16 +85,16 @@ public class UrlTileGenerator extends TileGenerator {
 
         this.urlHasXYZ = hasXYZ(tileUrl);
         this.urlHasBoundingBox = hasBoundingBox(tileUrl);
-        Projection projection = null;
+        Projection tempProjection = null;
         if (urlHasBoundingBox) {
             Matcher matcher = URL_EPSG_PATTERN.matcher(tileUrl);
             if (matcher.find()) {
                 String epsgString = matcher.group(1);
                 long epsg = Long.valueOf(epsgString);
-                projection = ProjectionFactory.getProjection(epsg);
+                tempProjection = ProjectionFactory.getProjection(epsg);
             }
         }
-        urlProjection = projection;
+        urlProjection = tempProjection;
 
         if (!this.urlHasXYZ && !this.urlHasBoundingBox) {
             throw new GeoPackageException(

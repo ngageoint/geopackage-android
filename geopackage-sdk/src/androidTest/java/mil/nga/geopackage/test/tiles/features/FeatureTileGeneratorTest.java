@@ -3,7 +3,10 @@ package mil.nga.geopackage.test.tiles.features;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.features.user.FeatureDao;
+import mil.nga.geopackage.projection.ProjectionConstants;
+import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
@@ -41,9 +44,14 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
 
         FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, geoPackage, featureDao);
 
+        BoundingBox boundingBox = new BoundingBox();
+        boundingBox = TileBoundingBoxUtils.boundWgs84BoundingBoxWithWebMercatorLimits(boundingBox);
+        boundingBox = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+                .getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR)
+                .transform(boundingBox);
         TileGenerator tileGenerator = new FeatureTileGenerator(activity, geoPackage,
-                "gen_feature_tiles", featureTiles, minZoom, maxZoom);
-        //tileGenerator.setTileBoundingBox(boundingBox);
+                "gen_feature_tiles", featureTiles, minZoom, maxZoom, boundingBox,
+                ProjectionFactory.getProjection(ProjectionConstants.EPSG_WEB_MERCATOR));
         tileGenerator.setGoogleTiles(false);
 
         int tiles = tileGenerator.generateTiles();
