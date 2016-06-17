@@ -71,7 +71,7 @@ public abstract class TileGenerator {
     /**
      * Tiles projection
      */
-    private Projection projection;
+    protected Projection projection;
 
     /**
      * Total tile count

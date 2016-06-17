@@ -9,8 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
@@ -18,7 +16,6 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.R;
 import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.projection.ProjectionFactory;
 
 /**
  * Creates a set of tiles within a GeoPackage by downloading the tiles from a
@@ -27,12 +24,6 @@ import mil.nga.geopackage.projection.ProjectionFactory;
  * @author osbornb
  */
 public class UrlTileGenerator extends TileGenerator {
-
-    /**
-     * URL EPSG pattern for finding the EPSG code in a url
-     */
-    private static final Pattern URL_EPSG_PATTERN = Pattern.compile(
-            "EPSG:(\\d+)", Pattern.CASE_INSENSITIVE);
 
     /**
      * Tile URL
@@ -48,11 +39,6 @@ public class UrlTileGenerator extends TileGenerator {
      * True if the URL has bounding box variables
      */
     private final boolean urlHasBoundingBox;
-
-    /**
-     * Projection
-     */
-    private final Projection urlProjection;
 
     /**
      * TMS URL flag, when true x,y,z converted to TMS when requesting the tile
@@ -85,16 +71,6 @@ public class UrlTileGenerator extends TileGenerator {
 
         this.urlHasXYZ = hasXYZ(tileUrl);
         this.urlHasBoundingBox = hasBoundingBox(tileUrl);
-        Projection tempProjection = null;
-        if (urlHasBoundingBox) {
-            Matcher matcher = URL_EPSG_PATTERN.matcher(tileUrl);
-            if (matcher.find()) {
-                String epsgString = matcher.group(1);
-                long epsg = Long.valueOf(epsgString);
-                tempProjection = ProjectionFactory.getProjection(epsg);
-            }
-        }
-        urlProjection = tempProjection;
 
         if (!this.urlHasXYZ && !this.urlHasBoundingBox) {
             throw new GeoPackageException(
@@ -186,7 +162,7 @@ public class UrlTileGenerator extends TileGenerator {
     private String replaceBoundingBox(String url, int z, long x, long y) {
 
         BoundingBox boundingBox = TileBoundingBoxUtils.getProjectedBoundingBox(
-                urlProjection, x, y, z);
+                projection, x, y, z);
 
         url = replaceBoundingBox(url, boundingBox);
 
