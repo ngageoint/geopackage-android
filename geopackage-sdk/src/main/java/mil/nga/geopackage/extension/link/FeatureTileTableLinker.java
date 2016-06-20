@@ -64,8 +64,10 @@ public class FeatureTileTableLinker extends FeatureTileTableCoreLinker {
 
         List<String> featureTables = getFeatureTablesForTileTable(tileTable);
         for (String featureTable : featureTables) {
-            FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
-            featureDaos.add(featureDao);
+            if(geoPackage.isFeatureTable(featureTable)) {
+                FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+                featureDaos.add(featureDao);
+            }
         }
 
         return featureDaos;
