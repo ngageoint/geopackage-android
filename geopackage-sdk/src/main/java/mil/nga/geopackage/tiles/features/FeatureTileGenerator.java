@@ -71,12 +71,15 @@ public class FeatureTileGenerator extends TileGenerator {
     @Override
     protected void preTileGeneration() {
 
-        // Link the feature and tile table
-        if (linkTables) {
+        // Link the feature and tile table if they are in the same GeoPackage
+        GeoPackage geoPackage = getGeoPackage();
+        String featureTable = featureTiles.getFeatureDao().getTableName();
+        String tileTable = getTableName();
+        if (linkTables && geoPackage.isFeatureTable(featureTable)
+                && geoPackage.isTileTable(tileTable)) {
             FeatureTileTableLinker linker = new FeatureTileTableLinker(
-                    getGeoPackage());
-            linker.link(featureTiles.getFeatureDao().getTableName(),
-                    getTableName());
+                    geoPackage);
+            linker.link(featureTable, tileTable);
         }
 
     }
