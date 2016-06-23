@@ -44,8 +44,10 @@ public class FeatureTileTableLinker extends FeatureTileTableCoreLinker {
 
         List<String> tileTables = getTileTablesForFeatureTable(featureTable);
         for (String tileTable : tileTables) {
-            TileDao tileDao = geoPackage.getTileDao(tileTable);
-            tileDaos.add(tileDao);
+            if (geoPackage.isTileTable(tileTable)) {
+                TileDao tileDao = geoPackage.getTileDao(tileTable);
+                tileDaos.add(tileDao);
+            }
         }
 
         return tileDaos;
@@ -64,8 +66,10 @@ public class FeatureTileTableLinker extends FeatureTileTableCoreLinker {
 
         List<String> featureTables = getFeatureTablesForTileTable(tileTable);
         for (String featureTable : featureTables) {
-            FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
-            featureDaos.add(featureDao);
+            if (geoPackage.isFeatureTable(featureTable)) {
+                FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+                featureDaos.add(featureDao);
+            }
         }
 
         return featureDaos;

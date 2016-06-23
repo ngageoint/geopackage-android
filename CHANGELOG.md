@@ -4,9 +4,15 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.2.10 (TBD)
+## 1.3.0 (TBD)
 
-* TBD
+* geopackage-core version updated to 1.2.0
+* Improved tile drawing on bounds for tiles not lining up with requests
+* Tile Creator providing common tile generation functionality
+* Tile reprojections between different unit types (ex. WGS84 GeoPackage tiles)
+* Tile DAO changed to work with any projection units
+* Tile Generator support for multiple projections, such as WGS84 in addition to Web Mercator
+* URL Tile Generator changed to use provided projection in place of parsing URL
 
 ## [1.2.9](https://github.com/ngageoint/geopackage-android/releases/tag/1.2.9) (05-10-2016)
 

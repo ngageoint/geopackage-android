@@ -111,7 +111,7 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
 
         // Test the get or create auto set
         wgs84Srs = srsDao
-                .getOrCreate(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM) ;
         assertNotNull(wgs84Srs);
         assertNotNull(wgs84Srs.getDefinition_12_163());
         assertEquals(wgs84Srs.getDefinition_12_163(),
@@ -138,12 +138,12 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
 
         // Create the web mercator srs and test
         SpatialReferenceSystem webMercator = srsDao
-                .getOrCreate(ProjectionConstants.EPSG_WEB_MERCATOR);
+                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WEB_MERCATOR);
         assertNotNull(webMercator.getDefinition_12_163());
 
         // Read the web mercator srs and test
         SpatialReferenceSystem webMercator2 = srsDao
-                .getOrCreate(ProjectionConstants.EPSG_WEB_MERCATOR);
+                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WEB_MERCATOR);
         assertNotNull(webMercator2.getDefinition_12_163());
         assertEquals(webMercator.getDefinition_12_163(),
                 webMercator2.getDefinition_12_163());

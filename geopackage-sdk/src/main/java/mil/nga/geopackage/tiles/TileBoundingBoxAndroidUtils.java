@@ -16,11 +16,11 @@ public class TileBoundingBoxAndroidUtils {
      * Get a rectangle using the tile width, height, bounding box, and the
      * bounding box section within the outer box to build the rectangle from
      *
-     * @param width
-     * @param height
-     * @param boundingBox
-     * @param boundingBoxSection
-     * @return
+     * @param width              width
+     * @param height             height
+     * @param boundingBox        full bounding box
+     * @param boundingBoxSection rectangle bounding box section
+     * @return rectangle
      */
     public static Rect getRectangle(long width, long height,
                                     BoundingBox boundingBox, BoundingBox boundingBoxSection) {
@@ -35,15 +35,38 @@ public class TileBoundingBoxAndroidUtils {
     }
 
     /**
+     * Get a rectangle with rounded floating point boundaries using the tile width,
+     * height, bounding box, and the bounding box section within the outer box
+     * to build the rectangle from
+     *
+     * @param width              width
+     * @param height             height
+     * @param boundingBox        full bounding box
+     * @param boundingBoxSection rectangle bounding box section
+     * @return floating point rectangle
+     * @since 1.3.0
+     */
+    public static RectF getRoundedFloatRectangle(long width, long height,
+                                                 BoundingBox boundingBox, BoundingBox boundingBoxSection) {
+
+        Rect rect = getRectangle(width, height, boundingBox,
+                boundingBoxSection);
+
+        RectF rectF = new RectF(rect);
+
+        return rectF;
+    }
+
+    /**
      * Get a rectangle with floating point boundaries using the tile width,
      * height, bounding box, and the bounding box section within the outer box
      * to build the rectangle from
      *
-     * @param width
-     * @param height
-     * @param boundingBox
-     * @param boundingBoxSection
-     * @return
+     * @param width              width
+     * @param height             height
+     * @param boundingBox        full bounding box
+     * @param boundingBoxSection rectangle bounding box section
+     * @return floating point rectangle
      */
     public static RectF getFloatRectangle(long width, long height,
                                           BoundingBox boundingBox, BoundingBox boundingBoxSection) {

@@ -57,12 +57,12 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     private final long maxZoom;
 
     /**
-     * Array of widths of the tiles at each zoom level in meters
+     * Array of widths of the tiles at each zoom level in default units
      */
     private final double[] widths;
 
     /**
-     * Array of heights of the tiles at each zoom level in meters
+     * Array of heights of the tiles at each zoom level in default units
      */
     private final double[] heights;
 
@@ -102,12 +102,10 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         for (int i = 0; i < tileMatrices.size(); i++) {
             TileMatrix tileMatrix = tileMatrices.get(i);
             zoomLevelToTileMatrix.put(tileMatrix.getZoomLevel(), tileMatrix);
-            widths[tileMatrices.size() - i - 1] = projection
-                    .toMeters(tileMatrix.getPixelXSize()
-                            * tileMatrix.getTileWidth());
-            heights[tileMatrices.size() - i - 1] = projection
-                    .toMeters(tileMatrix.getPixelYSize()
-                            * tileMatrix.getTileHeight());
+            widths[tileMatrices.size() - i - 1] = tileMatrix.getPixelXSize()
+                    * tileMatrix.getTileWidth();
+            heights[tileMatrices.size() - i - 1] = tileMatrix.getPixelYSize()
+                    * tileMatrix.getTileHeight();
         }
 
         if (tileMatrixSet.getContents() == null) {
@@ -145,7 +143,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
             TileGrid tileGrid = queryForTileGrid(zoomLevel);
             if (tileGrid != null) {
                 BoundingBox matrixSetBoundingBox = getBoundingBox();
-                boundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(
+                boundingBox = TileBoundingBoxUtils.getBoundingBox(
                         matrixSetBoundingBox, tileMatrix, tileGrid);
             }
 
@@ -327,7 +325,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     /**
      * Get the zoom level for the provided width and height in the default units
      *
-     * @param length in meters
+     * @param length in default units
      * @return
      */
     public Long getZoomLevel(double length) {
@@ -443,6 +441,26 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         String where = buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
         String[] whereArgs = buildWhereArgs(zoomLevel);
         return count(where, whereArgs);
+    }
+
+    /**
+     * Get the max length in default units that contains tiles
+     *
+     * @return max distance length with tiles
+     * @since 1.3.0
+     */
+    public double getMaxLength() {
+        return TileDaoUtils.getMaxLength(widths, heights);
+    }
+
+    /**
+     * Get the min length in default units that contains tiles
+     *
+     * @return min distance length with tiles
+     * @since 1.3.0
+     */
+    public double getMinLength() {
+        return TileDaoUtils.getMinLength(widths, heights);
     }
 
     /**
