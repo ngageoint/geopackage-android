@@ -118,7 +118,7 @@ indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
 int indexedCount = indexer.index();
 
 // Feature Tile Provider (dynamically draw tiles from features)
-FeatureTiles featureTiles = new FeatureTiles(context, featureDao);
+FeatureTiles featureTiles = new MapFeatureTiles(context, featureDao);
 featureTiles.setMaxFeaturesPerTile(1000); // Set max features to draw per tile
 NumberFeaturesTile numberFeaturesTile = new NumberFeaturesTile(context); // Custom feature tile implementation
 featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
@@ -169,19 +169,19 @@ Include as repositories in your project build.gradle:
 Include the dependency in your module build.gradle with desired version number:
 
     compile "mil.nga.geopackage:geopackage-android:1.3.0"
-    
+
 As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
-    
+
 ##### Local Build #####
 
 Replace the normal build dependency in your module build.gradle with:
 
     compile project(':geopackage-sdk')
-    
+
 Include in your settings.gradle:
 
     include ':geopackage-sdk'
-    
+
 From your project directory, link the cloned SDK directory:
 
     ln -s ../geopackage-android/geopackage-sdk geopackage-sdk
