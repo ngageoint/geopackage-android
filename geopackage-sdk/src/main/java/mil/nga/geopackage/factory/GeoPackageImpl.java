@@ -13,6 +13,7 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageTableCreator;
+import mil.nga.geopackage.db.SQLUtils;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureConnection;
@@ -86,8 +87,16 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         FeatureConnection userDb = new FeatureConnection(database);
         FeatureDao dao = new FeatureDao(getName(), database, userDb, geometryColumns, featureTable);
 
-        // Register the table to wrap cursors with the feature cursor
+        // Register the table name (with and without quotes) to wrap cursors with the feature cursor
         cursorFactory.registerTable(geometryColumns.getTableName(),
+                new GeoPackageCursorWrapper() {
+
+                    @Override
+                    public Cursor wrapCursor(Cursor cursor) {
+                        return new FeatureCursor(featureTable, cursor);
+                    }
+                });
+        cursorFactory.registerTable(SQLUtils.quoteWrap(geometryColumns.getTableName()),
                 new GeoPackageCursorWrapper() {
 
                     @Override
@@ -198,8 +207,16 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         TileDao dao = new TileDao(getName(), database, userDb, tileMatrixSet, tileMatrices,
                 tileTable);
 
-        // Register the table to wrap cursors with the tile cursor
+        // Register the table name (with and without quotes) to wrap cursors with the tile cursor
         cursorFactory.registerTable(tileMatrixSet.getTableName(),
+                new GeoPackageCursorWrapper() {
+
+                    @Override
+                    public Cursor wrapCursor(Cursor cursor) {
+                        return new TileCursor(tileTable, cursor);
+                    }
+                });
+        cursorFactory.registerTable(SQLUtils.quoteWrap(tileMatrixSet.getTableName()),
                 new GeoPackageCursorWrapper() {
 
                     @Override

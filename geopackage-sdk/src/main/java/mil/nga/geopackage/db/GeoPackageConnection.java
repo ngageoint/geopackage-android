@@ -78,7 +78,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     public int count(String table, String where, String[] args) {
 
         StringBuilder countQuery = new StringBuilder();
-        countQuery.append("select count(*) from " + table);
+        countQuery.append("select count(*) from ").append(SQLUtils.quoteWrap(table));
         if (where != null) {
             countQuery.append(" where ").append(where);
         }
@@ -98,8 +98,8 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
         Integer min = null;
         if (count(table, where, args) > 0) {
             StringBuilder minQuery = new StringBuilder();
-            minQuery.append("select min(").append(column).append(") from ")
-                    .append(table);
+            minQuery.append("select min(").append(SQLUtils.quoteWrap(column)).append(") from ")
+                    .append(SQLUtils.quoteWrap(table));
             if (where != null) {
                 minQuery.append(" where ").append(where);
             }
@@ -120,8 +120,8 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
         Integer max = null;
         if (count(table, where, args) > 0) {
             StringBuilder maxQuery = new StringBuilder();
-            maxQuery.append("select max(").append(column).append(") from ")
-                    .append(table);
+            maxQuery.append("select max(").append(SQLUtils.quoteWrap(column)).append(") from ")
+                    .append(SQLUtils.quoteWrap(table));
             if (where != null) {
                 maxQuery.append(" where ").append(where);
             }
@@ -173,7 +173,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
 
         boolean exists = false;
 
-        Cursor cursor = rawQuery("PRAGMA table_info(" + tableName + ")", null);
+        Cursor cursor = rawQuery("PRAGMA table_info(" + SQLUtils.quoteWrap(tableName) + ")", null);
         try {
             int nameIndex = cursor.getColumnIndex(NAME_COLUMN);
             while (cursor.moveToNext()) {
