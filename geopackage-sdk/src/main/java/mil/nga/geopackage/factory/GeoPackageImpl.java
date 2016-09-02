@@ -96,14 +96,6 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                         return new FeatureCursor(featureTable, cursor);
                     }
                 });
-        cursorFactory.registerTable(CoreSQLUtils.quoteWrap(geometryColumns.getTableName()),
-                new GeoPackageCursorWrapper() {
-
-                    @Override
-                    public Cursor wrapCursor(Cursor cursor) {
-                        return new FeatureCursor(featureTable, cursor);
-                    }
-                });
 
         // TODO
         // GeoPackages created with SQLite version 4.2.0+ with GeoPackage support are not supported
@@ -209,14 +201,6 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
         // Register the table name (with and without quotes) to wrap cursors with the tile cursor
         cursorFactory.registerTable(tileMatrixSet.getTableName(),
-                new GeoPackageCursorWrapper() {
-
-                    @Override
-                    public Cursor wrapCursor(Cursor cursor) {
-                        return new TileCursor(tileTable, cursor);
-                    }
-                });
-        cursorFactory.registerTable(CoreSQLUtils.quoteWrap(tileMatrixSet.getTableName()),
                 new GeoPackageCursorWrapper() {
 
                     @Override
