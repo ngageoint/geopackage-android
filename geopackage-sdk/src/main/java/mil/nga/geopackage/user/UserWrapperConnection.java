@@ -1,9 +1,9 @@
 package mil.nga.geopackage.user;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 
 /**
  * GeoPackage Connection used to define common functionality within different
@@ -21,7 +21,7 @@ public abstract class UserWrapperConnection<TColumn extends UserColumn, TTable e
     /**
      * Database connection
      */
-    private final SQLiteDatabase database;
+    private final GeoPackageDatabase database;
 
     /**
      * Constructor

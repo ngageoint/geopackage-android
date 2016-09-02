@@ -2,9 +2,9 @@ package mil.nga.geopackage.db.metadata;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 
 /**
  * Table metadata Data Source
@@ -16,7 +16,7 @@ public class TableMetadataDataSource {
     /**
      * Database
      */
-    private SQLiteDatabase db;
+    private GeoPackageDatabase db;
 
     /**
      * Constructor
@@ -32,7 +32,7 @@ public class TableMetadataDataSource {
      *
      * @param db
      */
-    TableMetadataDataSource(SQLiteDatabase db) {
+    TableMetadataDataSource(GeoPackageDatabase db) {
         this.db = db;
     }
 

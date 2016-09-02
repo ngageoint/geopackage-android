@@ -11,9 +11,9 @@ import java.util.List;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageTableCreator;
-import mil.nga.geopackage.db.SQLUtils;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureConnection;
@@ -96,7 +96,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                         return new FeatureCursor(featureTable, cursor);
                     }
                 });
-        cursorFactory.registerTable(SQLUtils.quoteWrap(geometryColumns.getTableName()),
+        cursorFactory.registerTable(CoreSQLUtils.quoteWrap(geometryColumns.getTableName()),
                 new GeoPackageCursorWrapper() {
 
                     @Override
@@ -216,7 +216,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                         return new TileCursor(tileTable, cursor);
                     }
                 });
-        cursorFactory.registerTable(SQLUtils.quoteWrap(tileMatrixSet.getTableName()),
+        cursorFactory.registerTable(CoreSQLUtils.quoteWrap(tileMatrixSet.getTableName()),
                 new GeoPackageCursorWrapper() {
 
                     @Override

@@ -30,6 +30,7 @@ import mil.nga.geopackage.R;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 import mil.nga.geopackage.db.GeoPackageTableCreator;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadata;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDataSource;
@@ -102,7 +103,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
-    public List<String> databasesLike(String like){
+    public List<String> databasesLike(String like) {
         List<String> databases = null;
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                 context);
@@ -123,7 +124,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
-    public List<String> databasesNotLike(String notLike){
+    public List<String> databasesNotLike(String notLike) {
         List<String> databases = null;
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                 context);
@@ -146,10 +147,10 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * @param databases list of databases
      * @return databases that exist
      */
-    private List<String> deleteMissingDatabases(List<String> databases){
+    private List<String> deleteMissingDatabases(List<String> databases) {
         List<String> filesExist = new ArrayList<>();
-        for(String database: databases){
-            if(exists(database)){
+        for (String database : databases) {
+            if (exists(database)) {
                 filesExist.add(database);
             }
         }
@@ -239,7 +240,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public boolean exists(String database) {
         boolean exists = internalDatabaseSet().contains(database);
 
-        if(!exists) {
+        if (!exists) {
             GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                     context);
             metadataDb.open();
@@ -450,8 +451,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             throw new GeoPackageException("GeoPackage already exists: "
                     + database);
         } else {
-            SQLiteDatabase db = context.openOrCreateDatabase(database,
-                    Context.MODE_PRIVATE, null);
+            GeoPackageDatabase db = new GeoPackageDatabase(context.openOrCreateDatabase(database,
+                    Context.MODE_PRIVATE, null));
             createAndCloseGeoPackage(db);
             GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                     context);
@@ -476,7 +477,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      *
      * @param db
      */
-    private void createAndCloseGeoPackage(SQLiteDatabase db) {
+    private void createAndCloseGeoPackage(GeoPackageDatabase db) {
 
         GeoPackageConnection connection = new GeoPackageConnection(db);
 
@@ -553,7 +554,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             }
 
             // Create the new GeoPackage file
-            SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(file, null);
+            GeoPackageDatabase db = new GeoPackageDatabase(SQLiteDatabase.openOrCreateDatabase(file, null));
             createAndCloseGeoPackage(db);
 
             // Import the GeoPackage
@@ -797,7 +798,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             // Validate the database if validation is enabled
             validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
 
-            GeoPackageConnection connection = new GeoPackageConnection(sqlite);
+            GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite));
             GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
             db = new GeoPackageImpl(database, path, connection, cursorFactory, tableCreator, writable);
         }
@@ -1018,12 +1019,12 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public boolean importGeoPackageAsExternalLink(String path, String database, boolean override) {
 
         if (exists(database)) {
-            if(override){
-                if(!delete(database)){
+            if (override) {
+                if (!delete(database)) {
                     throw new GeoPackageException(
                             "Failed to delete existing database: " + database);
                 }
-            }else {
+            } else {
                 throw new GeoPackageException(
                         "GeoPackage database already exists: " + database);
             }
@@ -1248,12 +1249,12 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                                      InputStream geoPackageStream, GeoPackageProgress progress) {
 
         if (exists(database)) {
-            if(override){
-                if(!delete(database)){
+            if (override) {
+                if (!delete(database)) {
                     throw new GeoPackageException(
                             "Failed to delete existing database: " + database);
                 }
-            }else {
+            } else {
                 throw new GeoPackageException(
                         "GeoPackage database already exists: " + database);
             }

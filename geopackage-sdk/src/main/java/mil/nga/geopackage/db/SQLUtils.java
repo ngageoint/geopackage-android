@@ -1,7 +1,13 @@
 package mil.nga.geopackage.db;
 
+import android.content.ContentValues;
+import android.os.Parcel;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * SQL Utility methods
+ * Core SQL Utility methods
  *
  * @author osbornb
  * @since 1.3.1
@@ -9,34 +15,28 @@ package mil.nga.geopackage.db;
 public class SQLUtils {
 
     /**
-     * Wrap the name in double quotes
+     * Wrap the content values names in quotes
      *
-     * @param name name
-     * @return quoted name
+     * @param values content values
+     * @return quoted content values
      */
-    public static String quoteWrap(String name) {
-        String quoteName = null;
-        if (name != null) {
-            quoteName = "\"" + name + "\"";
-        }
-        return quoteName;
-    }
+    public static ContentValues quoteWrap(ContentValues values) {
+        ContentValues quoteValues = null;
+        if (values != null) {
 
-    /**
-     * Wrap the names in double quotes
-     *
-     * @param names names
-     * @return quoted names
-     */
-    public static String[] quoteWrap(String[] names) {
-        String[] quoteNames = null;
-        if (names != null) {
-            quoteNames = new String[names.length];
-            for (int i = 0; i < names.length; i++) {
-                quoteNames[i] = quoteWrap(names[i]);
+            Map<String, Object> quoteMap = new HashMap<>();
+            for (Map.Entry<String, Object> value : values.valueSet()) {
+                quoteMap.put(CoreSQLUtils.quoteWrap(value.getKey()), value.getValue());
             }
+
+            Parcel parcel = Parcel.obtain();
+            parcel.writeMap(quoteMap);
+            parcel.setDataPosition(0);
+            quoteValues = ContentValues.CREATOR.createFromParcel(parcel);
+            parcel.recycle();
         }
-        return quoteNames;
+
+        return quoteValues;
     }
 
 }

@@ -2,10 +2,10 @@ package mil.nga.geopackage.db.metadata;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 import mil.nga.wkb.geom.GeometryEnvelope;
 
 /**
@@ -18,7 +18,7 @@ public class GeometryMetadataDataSource {
     /**
      * Database
      */
-    private SQLiteDatabase db;
+    private GeoPackageDatabase db;
 
     /**
      * Constructor
@@ -34,7 +34,7 @@ public class GeometryMetadataDataSource {
      *
      * @param db
      */
-    GeometryMetadataDataSource(SQLiteDatabase db) {
+    GeometryMetadataDataSource(GeoPackageDatabase db) {
         this.db = db;
     }
 
