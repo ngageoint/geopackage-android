@@ -85,4 +85,48 @@ public class TileBoundingBoxAndroidUtils {
         return rect;
     }
 
+    /**
+     * Check if the rectangle is valid
+     *
+     * @param rect rectangle
+     * @return true if valid
+     * @since 1.3.1
+     */
+    public static boolean isValid(Rect rect) {
+        return rect.left < rect.right && rect.top < rect.bottom;
+    }
+
+    /**
+     * Check if the rectangle is valid allowing empty ranges
+     *
+     * @param rect rectangle
+     * @return true if valid
+     * @since 1.3.1
+     */
+    public static boolean isValidAllowEmpty(Rect rect) {
+        return rect.left <= rect.right && rect.top <= rect.bottom;
+    }
+
+    /**
+     * Check if the rectangle is valid
+     *
+     * @param rectF rectangle
+     * @return true if valid
+     * @since 1.3.1
+     */
+    public static boolean isValid(RectF rectF) {
+        return rectF.left < rectF.right && rectF.top < rectF.bottom;
+    }
+
+    /**
+     * Check if the rectangle is valid allowing empty ranges
+     *
+     * @param rectF rectangle
+     * @return true if valid
+     * @since 1.3.1
+     */
+    public static boolean isValidAllowEmpty(RectF rectF) {
+        return rectF.left <= rectF.right && rectF.top <= rectF.bottom;
+    }
+
 }

@@ -326,7 +326,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the zoom level for the provided width and height in the default units
      *
      * @param length in default units
-     * @return
+     * @return zoom level
      */
     public Long getZoomLevel(double length) {
 
@@ -335,14 +335,83 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     }
 
     /**
+     * Get the zoom level for the provided width and height in the default units
+     *
+     * @param width
+     *            in default units
+     * @param height
+     *            in default units
+     * @return zoom level
+     * @since 1.3.1
+     */
+    public Long getZoomLevel(double width, double height) {
+
+        Long zoomLevel = TileDaoUtils.getZoomLevel(widths, heights,
+                tileMatrices, width, height);
+        return zoomLevel;
+    }
+
+    /**
+     * Get the closest zoom level for the provided width and height in the
+     * default units
+     *
+     * @param length
+     *            in default units
+     * @return zoom level
+     * @since 1.3.1
+     */
+    public Long getClosestZoomLevel(double length) {
+
+        Long zoomLevel = TileDaoUtils.getClosestZoomLevel(widths, heights,
+                tileMatrices, length);
+        return zoomLevel;
+    }
+
+    /**
+     * Get the closest zoom level for the provided width and height in the
+     * default units
+     *
+     * @param width
+     *            in default units
+     * @param height
+     *            in default units
+     * @return zoom level
+     * @since 1.3.1
+     */
+    public Long getClosestZoomLevel(double width, double height) {
+
+        Long zoomLevel = TileDaoUtils.getClosestZoomLevel(widths, heights,
+                tileMatrices, width, height);
+        return zoomLevel;
+    }
+
+    /**
      * Query by tile grid and zoom level
      *
-     * @param tileGrid
-     * @param zoomLevel
+     * @param tileGrid tile grid
+     * @param zoomLevel zoom level
      * @return cursor from query or null if the zoom level tile ranges do not
      * overlap the bounding box
      */
     public TileCursor queryByTileGrid(TileGrid tileGrid, long zoomLevel) {
+        return queryByTileGrid(tileGrid, zoomLevel, null);
+    }
+
+    /**
+     * Query by tile grid and zoom level
+     *
+     * @param tileGrid
+     *            tile grid
+     * @param zoomLevel
+     *            zoom level
+     * @param orderBy
+     *            order by
+     * @return cursor from query or null if the zoom level tile ranges do not
+     *         overlap the bounding box
+     * @since 1.3.1
+     */
+    public TileCursor queryByTileGrid(TileGrid tileGrid, long zoomLevel,
+                                         String orderBy) {
 
         TileCursor tileCursor = null;
 
@@ -372,7 +441,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
                     tileGrid.getMinX(), tileGrid.getMaxX(), tileGrid.getMinY(),
                     tileGrid.getMaxY()});
 
-            tileCursor = query(where.toString(), whereArgs);
+            tileCursor = query(where.toString(), whereArgs, null, null, orderBy);
         }
 
         return tileCursor;
