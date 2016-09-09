@@ -1,7 +1,12 @@
 package mil.nga.geopackage.extension.elevation;
 
-import android.graphics.Bitmap;
+import java.io.ByteArrayInputStream;
 
+import ar.com.hjg.pngj.ImageInfo;
+import ar.com.hjg.pngj.ImageLineInt;
+import ar.com.hjg.pngj.PngReader;
+import ar.com.hjg.pngj.PngReaderInt;
+import ar.com.hjg.pngj.PngWriter;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
@@ -81,8 +86,8 @@ public class ElevationTiles extends ElevationTilesCommon {
     @Override
     public double getElevationValue(GriddedTile griddedTile, TileRow tileRow,
                                     int x, int y) {
-        Bitmap image = tileRow.getTileDataBitmap();
-        double elevation = getElevationValue(griddedTile, image, x, y);
+        byte[] imageBytes = tileRow.getTileData();
+        double elevation = getElevationValue(griddedTile, imageBytes, x, y);
         return elevation;
     }
 
@@ -92,103 +97,86 @@ public class ElevationTiles extends ElevationTilesCommon {
     @Override
     public Double getElevationValue(GriddedTile griddedTile,
                                     ElevationImage image, int x, int y) {
-        return getElevationValue(griddedTile, image.getImage(), x, y);
-    }
-
-    /**
-     * Get the pixel value as an "unsigned short" from the bitmap and the
-     * coordinate
-     *
-     * @param image image
-     * @param x     x coordinate
-     * @param y     y coordinate
-     * @return "unsigned short" pixel value
-     */
-    public short getPixelValue(Bitmap image, int x, int y) {
-        validateImageType(image);
-        /*
-        Object pixelData = raster.getDataElements(x, y, null);
-        short sdata[] = (short[]) pixelData;
-        if (sdata.length != 1) {
-            throw new UnsupportedOperationException(
-                    "This method is not supported by this color model");
+        Double elevation = null;
+        if (image.getReader() != null) {
+            int pixelValue = image.getPixel(x, y);
+            elevation = getElevationValue(griddedTile, pixelValue);
+        } else {
+            elevation = getElevationValue(griddedTile, image.getImageBytes(), x, y);
         }
-        short pixelValue = sdata[0];
-
-        return pixelValue;
-        */
-        return 0; //TODO
+        return elevation;
     }
 
     /**
      * Get the pixel value as a 16 bit unsigned integer value
      *
-     * @param image image
-     * @param x     x coordinate
-     * @param y     y coordinate
-     * @return unsigned integer pixel value
+     * @param imageBytes image bytes
+     * @param x          x coordinate
+     * @param y          y coordinate
+     * @return pixel value
      */
-    public int getUnsignedPixelValue(Bitmap image, int x, int y) {
-        short pixelValue = getPixelValue(image, x, y);
-        int unsignedPixelValue = getUnsignedPixelValue(pixelValue);
-        return unsignedPixelValue;
-    }
+    public int getPixelValue(byte[] imageBytes, int x, int y) {
 
-    /**
-     * Get the pixel values of the image as "unsigned shorts"
-     *
-     * @param image image
-     * @return "unsigned short" pixel values
-     */
-    public short[] getPixelValues(Bitmap image) {
-        validateImageType(image);
-        //DataBufferUShort buffer = (DataBufferUShort) raster.getDataBuffer();
-        //short[] pixelValues = buffer.getData();
-        //return pixelValues;
-        return null; // TODO
+        PngReaderInt reader = new PngReaderInt(new ByteArrayInputStream(imageBytes));
+        validateImageType(reader);
+        ImageLineInt row = (ImageLineInt) reader.readRow(y);
+        int pixelValue = row.getScanline()[x];
+        reader.close();
+
+        return pixelValue;
     }
 
     /**
      * Get the pixel values of the image as 16 bit unsigned integer values
      *
-     * @param image image
-     * @return unsigned integer pixel values
+     * @param imageBytes image bytes
+     * @return 16 bit unsigned integer pixel values
      */
-    public int[] getUnsignedPixelValues(Bitmap image) {
-        short[] pixelValues = getPixelValues(image);
-        int[] unsignedPixelValues = getUnsignedPixelValues(pixelValues);
-        return unsignedPixelValues;
+    public int[] getPixelValues(byte[] imageBytes) {
+
+        PngReaderInt reader = new PngReaderInt(new ByteArrayInputStream(imageBytes));
+        validateImageType(reader);
+        int[] pixels = new int[reader.imgInfo.cols * reader.imgInfo.rows];
+        int rowNumber = 0;
+        while (reader.hasMoreRows()) {
+            ImageLineInt row = reader.readRowInt();
+            int[] rowValues = row.getScanline();
+            System.arraycopy(rowValues, 0, pixels, rowNumber * reader.imgInfo.cols, rowValues.length);
+            rowNumber++;
+        }
+        reader.close();
+
+        return pixels;
     }
 
     /**
-     * Validate that the image type is an unsigned short
+     * Validate that the image type is single channel 16 bit
      *
-     * @param image tile image
+     * @param reader png reader
      */
-    public void validateImageType(Bitmap image) {
-        if (image == null) {
+    public void validateImageType(PngReader reader) {
+        if (reader == null) {
             throw new GeoPackageException("The image is null");
         }
-        //if (image.getColorModel().getTransferType() != DataBuffer.TYPE_USHORT) {
-        //    throw new GeoPackageException(
-        //            "The elevation tile is expected to be a 16 bit unsigned short, actual: "
-        //                    + image.getColorModel().getTransferType());
-        //}
-        // TODO
+        if (reader.imgInfo.channels != 1 || reader.imgInfo.bitDepth != 16) {
+            throw new GeoPackageException(
+                    "The elevation tile is expected to be a single channel 16 bit unsigned short, channels: "
+                            + reader.imgInfo.channels + ", bits: " + reader.imgInfo.bitDepth);
+        }
     }
 
     /**
      * Get the elevation value
      *
      * @param griddedTile gridded tile
-     * @param image       image
+     * @param imageBytes  image bytes
      * @param x           x coordinate
      * @param y           y coordinate
      * @return elevation value
      */
     public Double getElevationValue(GriddedTile griddedTile,
-                                    Bitmap image, int x, int y) {
-        short pixelValue = getPixelValue(image, x, y);
+                                    byte[] imageBytes, int x, int y) {
+        int pixelValue = getPixelValue(imageBytes, x, y);
         Double elevation = getElevationValue(griddedTile, pixelValue);
         return elevation;
     }
@@ -197,12 +185,12 @@ public class ElevationTiles extends ElevationTilesCommon {
      * Get the elevation values
      *
      * @param griddedTile gridded tile
-     * @param image       tile image
+     * @param imageBytes  image bytes
      * @return elevation values
      */
     public Double[] getElevationValues(GriddedTile griddedTile,
-                                       Bitmap image) {
-        short[] pixelValues = getPixelValues(image);
+                                       byte[] imageBytes) {
+        int[] pixelValues = getPixelValues(imageBytes);
         Double[] elevations = getElevationValues(griddedTile, pixelValues);
         return elevations;
     }
@@ -217,16 +205,22 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param tileHeight  tile height
      * @return elevation image tile
      */
-    public Bitmap drawTile(short[] pixelValues, int tileWidth,
-                           int tileHeight) {
+    public ElevationImage drawTile(short[] pixelValues, int tileWidth,
+                                   int tileHeight) {
 
-        Bitmap image = createImage(tileWidth, tileHeight);
-        for (int x = 0; x < tileWidth; x++) {
-            for (int y = 0; y < tileHeight; y++) {
+        ElevationImage image = createImage(tileWidth, tileHeight);
+        PngWriter writer = image.getWriter();
+        for (int y = 0; y < tileHeight; y++) {
+            ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
+            int[] rowLine = row.getScanline();
+            for (int x = 0; x < tileWidth; x++) {
                 short pixelValue = pixelValues[(y * tileWidth) + x];
-                setPixelValue(image, x, y, pixelValue);
+                setPixelValue(rowLine, x, pixelValue);
             }
+            writer.writeRow(row);
         }
+        writer.end();
+        image.flushStream();
 
         return image;
     }
@@ -243,8 +237,8 @@ public class ElevationTiles extends ElevationTilesCommon {
      */
     public byte[] drawTileData(short[] pixelValues, int tileWidth,
                                int tileHeight) {
-        Bitmap image = drawTile(pixelValues, tileWidth, tileHeight);
-        byte[] bytes = getImageBytes(image);
+        ElevationImage image = drawTile(pixelValues, tileWidth, tileHeight);
+        byte[] bytes = image.getImageBytes();
         return bytes;
     }
 
@@ -255,18 +249,24 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param pixelValues "unsigned short" pixel values as [row][width]
      * @return elevation image tile
      */
-    public Bitmap drawTile(short[][] pixelValues) {
+    public ElevationImage drawTile(short[][] pixelValues) {
 
         int tileWidth = pixelValues[0].length;
         int tileHeight = pixelValues.length;
 
-        Bitmap image = createImage(tileWidth, tileHeight);
-        for (int x = 0; x < tileWidth; x++) {
-            for (int y = 0; y < tileHeight; y++) {
+        ElevationImage image = createImage(tileWidth, tileHeight);
+        PngWriter writer = image.getWriter();
+        for (int y = 0; y < tileHeight; y++) {
+            ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
+            int[] rowLine = row.getScanline();
+            for (int x = 0; x < tileWidth; x++) {
                 short pixelValue = pixelValues[y][x];
-                setPixelValue(image, x, y, pixelValue);
+                setPixelValue(rowLine, x, pixelValue);
             }
+            writer.writeRow(row);
         }
+        writer.end();
+        image.flushStream();
 
         return image;
     }
@@ -279,8 +279,8 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @return elevation image tile bytes
      */
     public byte[] drawTileData(short[][] pixelValues) {
-        Bitmap image = drawTile(pixelValues);
-        byte[] bytes = getImageBytes(image);
+        ElevationImage image = drawTile(pixelValues);
+        byte[] bytes = image.getImageBytes();
         return bytes;
     }
 
@@ -295,17 +295,23 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param tileHeight          tile height
      * @return elevation image tile
      */
-    public Bitmap drawTile(int[] unsignedPixelValues, int tileWidth,
-                           int tileHeight) {
+    public ElevationImage drawTile(int[] unsignedPixelValues, int tileWidth,
+                                   int tileHeight) {
 
-        Bitmap image = createImage(tileWidth, tileHeight);
-        for (int x = 0; x < tileWidth; x++) {
-            for (int y = 0; y < tileHeight; y++) {
+        ElevationImage image = createImage(tileWidth, tileHeight);
+        PngWriter writer = image.getWriter();
+        for (int y = 0; y < tileHeight; y++) {
+            ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
+            int[] rowLine = row.getScanline();
+            for (int x = 0; x < tileWidth; x++) {
                 int unsignedPixelValue = unsignedPixelValues[(y * tileWidth)
                         + x];
-                setPixelValue(image, x, y, unsignedPixelValue);
+                setPixelValue(rowLine, x, unsignedPixelValue);
             }
+            writer.writeRow(row);
         }
+        writer.end();
+        image.flushStream();
 
         return image;
     }
@@ -323,9 +329,9 @@ public class ElevationTiles extends ElevationTilesCommon {
      */
     public byte[] drawTileData(int[] unsignedPixelValues, int tileWidth,
                                int tileHeight) {
-        Bitmap image = drawTile(unsignedPixelValues, tileWidth,
+        ElevationImage image = drawTile(unsignedPixelValues, tileWidth,
                 tileHeight);
-        byte[] bytes = getImageBytes(image);
+        byte[] bytes = image.getImageBytes();
         return bytes;
     }
 
@@ -336,18 +342,24 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param unsignedPixelValues unsigned 16 bit integer pixel values as [row][width]
      * @return elevation image tile
      */
-    public Bitmap drawTile(int[][] unsignedPixelValues) {
+    public ElevationImage drawTile(int[][] unsignedPixelValues) {
 
         int tileWidth = unsignedPixelValues[0].length;
         int tileHeight = unsignedPixelValues.length;
 
-        Bitmap image = createImage(tileWidth, tileHeight);
-        for (int x = 0; x < tileWidth; x++) {
-            for (int y = 0; y < tileHeight; y++) {
+        ElevationImage image = createImage(tileWidth, tileHeight);
+        PngWriter writer = image.getWriter();
+        for (int y = 0; y < tileHeight; y++) {
+            ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
+            int[] rowLine = row.getScanline();
+            for (int x = 0; x < tileWidth; x++) {
                 int unsignedPixelValue = unsignedPixelValues[y][x];
-                setPixelValue(image, x, y, unsignedPixelValue);
+                setPixelValue(rowLine, x, unsignedPixelValue);
             }
+            writer.writeRow(row);
         }
+        writer.end();
+        image.flushStream();
 
         return image;
     }
@@ -361,8 +373,8 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @return elevation image tile bytes
      */
     public byte[] drawTileData(int[][] unsignedPixelValues) {
-        Bitmap image = drawTile(unsignedPixelValues);
-        byte[] bytes = getImageBytes(image);
+        ElevationImage image = drawTile(unsignedPixelValues);
+        byte[] bytes = image.getImageBytes();
         return bytes;
     }
 
@@ -376,17 +388,23 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param tileHeight  tile height
      * @return elevation image tile
      */
-    public Bitmap drawTile(GriddedTile griddedTile, Double[] elevations,
-                           int tileWidth, int tileHeight) {
+    public ElevationImage drawTile(GriddedTile griddedTile, Double[] elevations,
+                                   int tileWidth, int tileHeight) {
 
-        Bitmap image = createImage(tileWidth, tileHeight);
-        for (int x = 0; x < tileWidth; x++) {
-            for (int y = 0; y < tileHeight; y++) {
+        ElevationImage image = createImage(tileWidth, tileHeight);
+        PngWriter writer = image.getWriter();
+        for (int y = 0; y < tileHeight; y++) {
+            ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
+            int[] rowLine = row.getScanline();
+            for (int x = 0; x < tileWidth; x++) {
                 Double elevation = elevations[(y * tileWidth) + x];
                 short pixelValue = getPixelValue(griddedTile, elevation);
-                setPixelValue(image, x, y, pixelValue);
+                setPixelValue(rowLine, x, pixelValue);
             }
+            writer.writeRow(row);
         }
+        writer.end();
+        image.flushStream();
 
         return image;
     }
@@ -404,9 +422,9 @@ public class ElevationTiles extends ElevationTilesCommon {
      */
     public byte[] drawTileData(GriddedTile griddedTile, Double[] elevations,
                                int tileWidth, int tileHeight) {
-        Bitmap image = drawTile(griddedTile, elevations, tileWidth,
+        ElevationImage image = drawTile(griddedTile, elevations, tileWidth,
                 tileHeight);
-        byte[] bytes = getImageBytes(image);
+        byte[] bytes = image.getImageBytes();
         return bytes;
     }
 
@@ -418,19 +436,25 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param elevations  elevations as [row][width]
      * @return elevation image tile
      */
-    public Bitmap drawTile(GriddedTile griddedTile, Double[][] elevations) {
+    public ElevationImage drawTile(GriddedTile griddedTile, Double[][] elevations) {
 
         int tileWidth = elevations[0].length;
         int tileHeight = elevations.length;
 
-        Bitmap image = createImage(tileWidth, tileHeight);
-        for (int x = 0; x < tileWidth; x++) {
-            for (int y = 0; y < tileHeight; y++) {
+        ElevationImage image = createImage(tileWidth, tileHeight);
+        PngWriter writer = image.getWriter();
+        for (int y = 0; y < tileHeight; y++) {
+            ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
+            int[] rowLine = row.getScanline();
+            for (int x = 0; x < tileWidth; x++) {
                 Double elevation = elevations[y][x];
                 short pixelValue = getPixelValue(griddedTile, elevation);
-                setPixelValue(image, x, y, pixelValue);
+                setPixelValue(rowLine, x, pixelValue);
             }
+            writer.writeRow(row);
         }
+        writer.end();
+        image.flushStream();
 
         return image;
     }
@@ -444,71 +468,44 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @return elevation image tile bytes
      */
     public byte[] drawTileData(GriddedTile griddedTile, Double[][] elevations) {
-        Bitmap image = drawTile(griddedTile, elevations);
-        byte[] bytes = getImageBytes(image);
+        ElevationImage image = drawTile(griddedTile, elevations);
+        byte[] bytes = image.getImageBytes();
         return bytes;
     }
 
     /**
-     * Create a new unsigned 16 bit short grayscale image
+     * Create a new 16 bit single channel image
      *
      * @param tileWidth  tile width
      * @param tileHeight tile height
      * @return image
      */
-    public Bitmap createImage(int tileWidth, int tileHeight) {
-        //return new Bitmap(tileWidth, tileHeight,
-        //        BufferedImage.TYPE_USHORT_GRAY);
-        return null; // TODO
+    public ElevationImage createImage(int tileWidth, int tileHeight) {
+        ImageInfo imageInfo = new ImageInfo(tileWidth, tileHeight, 16, false, true, false);
+        ElevationImage image = new ElevationImage(imageInfo);
+        return image;
     }
 
-    /**
-     * Get the image as PNG bytes
-     *
-     * @param image image
-     * @return image bytes
-     */
-    public byte[] getImageBytes(Bitmap image) {
-        byte[] bytes = null;
-        /*
-        try {
-            bytes = ImageUtils.writeImageToBytes(image,
-                    ImageUtils.IMAGE_FORMAT_PNG);
-        } catch (IOException e) {
-            throw new GeoPackageException("Failed to write image to "
-                    + ImageUtils.IMAGE_FORMAT_PNG + " bytes", e);
-        }
-        */ // TODO
-        return bytes;
-    }
-
-    /**
-     * Set the "unsigned short" pixel value into the image
-     *
-     * @param image      image
-     * @param x          x coordinate
-     * @param y          y coordinate
-     * @param pixelValue "unsigned short" pixel value
-     */
-    public void setPixelValue(Bitmap image, int x, int y,
+    public void setPixelValue(ImageLineInt row, int x,
                               short pixelValue) {
-        //short data[] = new short[] { pixelValue };
-        //image.setDataElements(x, y, data);
-        // TODO
+        setPixelValue(row.getScanline(), x, pixelValue);
     }
 
-    /**
-     * Set the unsigned 16 bit integer pixel value into the image
-     *
-     * @param image              image
-     * @param x                  x coordinate
-     * @param y                  y coordinate
-     * @param unsignedPixelValue unsigned 16 bit integer pixel value
-     */
-    public void setPixelValue(Bitmap image, int x, int y,
+    public void setPixelValue(int[] row, int x,
+                              short pixelValue) {
+        row[x] = pixelValue;
+    }
+
+    public void setPixelValue(ImageLineInt row, int x,
                               int unsignedPixelValue) {
         short pixelValue = getPixelValue(unsignedPixelValue);
-        setPixelValue(image, x, y, pixelValue);
+        setPixelValue(row, x, pixelValue);
+    }
+
+    public void setPixelValue(int[] row, int x,
+                              int unsignedPixelValue) {
+        short pixelValue = getPixelValue(unsignedPixelValue);
+        setPixelValue(row, x, pixelValue);
     }
 
     /**

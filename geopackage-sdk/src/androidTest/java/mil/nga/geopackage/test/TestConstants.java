@@ -56,6 +56,40 @@ public class TestConstants {
 			+ GEO_PACKAGE_EXTENSION;
 
 	/**
+	 * Create elevation tiles database name
+	 */
+	public static final String CREATE_ELEVATION_TILES_DB_NAME = "elevation_tiles";
+
+	/**
+	 * Create elevation tiles database file name
+	 */
+	public static final String CREATE_ELEVATION_TILES_DB_FILE_NAME = CREATE_ELEVATION_TILES_DB_NAME
+			+ "." + TestConstants.GEO_PACKAGE_EXTENSION;
+
+	/**
+	 * Import elevation tiles database name
+	 */
+	public static final String IMPORT_ELEVATION_TILES_DB_NAME = "elevation_tiles";
+
+	/**
+	 * Import elevation tiles tiff database name
+	 */
+	public static final String IMPORT_ELEVATION_TILES_TIFF_DB_NAME = "elevation_tiles_tiff";
+
+	/**
+	 * Import elevation tiles database file name, located in the test assets
+	 */
+	public static final String IMPORT_ELEVATION_TILES_DB_FILE_NAME = IMPORT_ELEVATION_TILES_DB_NAME
+			+ "." + TestConstants.GEO_PACKAGE_EXTENSION;
+
+	/**
+	 * Import elevation tiles tiff database file name, located in the test
+	 * assets
+	 */
+	public static final String IMPORT_ELEVATION_TILES_TIFF_DB_FILE_NAME = IMPORT_ELEVATION_TILES_TIFF_DB_NAME
+			+ "." + TestConstants.GEO_PACKAGE_EXTENSION;
+
+	/**
 	 * Tile file name extension
 	 */
 	public static final String TILE_FILE_NAME_EXTENSION = "png";
@@ -69,12 +103,17 @@ public class TestConstants {
 	/**
 	 * Tiles database table name
 	 */
-	public static final String TILES_DB_TABLE_NAME = "tiles";
+	public static final String TILES_DB_TABLE_NAME = "tiles.test";
 
 	/**
 	 * Tiles 2 database table name
 	 */
-	public static final String TILES2_DB_TABLE_NAME = "imagery";
+	public static final String TILES2_DB_TABLE_NAME = "imagery.test";
+
+	/**
+	 * Elevation Tiles table name
+	 */
+	public static final String CREATE_ELEVATION_TILES_DB_TABLE_NAME = "elevations.test";
 
 	/**
 	 * Tiles 2 database Web Mercator test image

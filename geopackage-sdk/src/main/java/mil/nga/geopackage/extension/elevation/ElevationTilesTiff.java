@@ -94,7 +94,8 @@ public class ElevationTilesTiff extends ElevationTilesCommon {
     @Override
     public Double getElevationValue(GriddedTile griddedTile,
                                     ElevationImage image, int x, int y) {
-        return getElevationValue(griddedTile, image.getImage(), x, y);
+        //return getElevationValue(griddedTile, image.getImageBytes(), x, y);
+        return null; //TODO
     }
 
     /**

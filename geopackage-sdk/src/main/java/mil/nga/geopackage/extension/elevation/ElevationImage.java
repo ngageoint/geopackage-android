@@ -1,7 +1,16 @@
 package mil.nga.geopackage.extension.elevation;
 
-import android.graphics.Bitmap;
+import android.util.Log;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import ar.com.hjg.pngj.ImageInfo;
+import ar.com.hjg.pngj.ImageLineInt;
+import ar.com.hjg.pngj.PngReaderInt;
+import ar.com.hjg.pngj.PngWriter;
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.tiles.user.TileRow;
 
 /**
@@ -12,29 +21,96 @@ import mil.nga.geopackage.tiles.user.TileRow;
  */
 public class ElevationImage {
 
-    // TODO may not be needed since there is no raster as in java
-
     /**
-     * Bitmap Image
+     * Image width / number of columns
      */
-    private final Bitmap image;
+    private final int width;
 
     /**
-     * Constructor
+     * Image height / number of rows
+     */
+    private final int height;
+
+    /**
+     * Image bytes
+     */
+    private byte[] imageBytes;
+
+    /**
+     * PNG reader
+     */
+    private PngReaderInt reader;
+
+    /**
+     * Byte array output stream
+     */
+    private ByteArrayOutputStream outputStream;
+
+    /**
+     * PNG writer
+     */
+    private PngWriter writer;
+
+    /**
+     * Pixel values
+     */
+    private int[][] pixels;
+
+    /**
+     * Constructor, used for reading a PNG
      *
      * @param tileRow tile row
      */
     public ElevationImage(TileRow tileRow) {
-        image = tileRow.getTileDataBitmap();
+        imageBytes = tileRow.getTileData();
+        reader = new PngReaderInt(new ByteArrayInputStream(imageBytes));
+        width = reader.imgInfo.cols;
+        height = reader.imgInfo.rows;
     }
 
     /**
-     * Get the bitmap image
+     * Constructor, used for writing a PNG
      *
-     * @return bitmap image
+     * @param imageInfo
      */
-    public Bitmap getImage() {
-        return image;
+    public ElevationImage(ImageInfo imageInfo) {
+        outputStream = new ByteArrayOutputStream();
+        writer = new PngWriter(outputStream, imageInfo);
+        width = imageInfo.cols;
+        height = imageInfo.rows;
+    }
+
+    /**
+     * Get the image bytes
+     *
+     * @return image bytes
+     */
+    public byte[] getImageBytes() {
+        byte[] bytes = null;
+        if (imageBytes != null) {
+            bytes = imageBytes;
+        } else if (outputStream != null) {
+            bytes = outputStream.toByteArray();
+        }
+        return bytes;
+    }
+
+    /**
+     * Get the PNG reader
+     *
+     * @return reader
+     */
+    public PngReaderInt getReader() {
+        return reader;
+    }
+
+    /**
+     * Get the PNG writer
+     *
+     * @return writer
+     */
+    public PngWriter getWriter() {
+        return writer;
     }
 
     /**
@@ -43,7 +119,7 @@ public class ElevationImage {
      * @return width
      */
     public int getWidth() {
-        return image.getWidth();
+        return width;
     }
 
     /**
@@ -52,7 +128,53 @@ public class ElevationImage {
      * @return height
      */
     public int getHeight() {
-        return image.getHeight();
+        return height;
+    }
+
+    /**
+     * Flush the output stream and set the image bytes, close the stream
+     */
+    public void flushStream() {
+        if (outputStream != null) {
+            if (imageBytes == null) {
+                imageBytes = outputStream.toByteArray();
+            }
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                Log.w(ElevationImage.class.getSimpleName(), "Failed to close output stream", e);
+            }
+        }
+    }
+
+    public int getPixel(int x, int y) {
+        int pixel = -1;
+        if (pixels == null) {
+            readPixels();
+        }
+        if (pixels != null) {
+            pixel = pixels[y][x];
+        } else {
+            throw new GeoPackageException("Could not retrieve pixel value");
+        }
+        return pixel;
+    }
+
+    /**
+     * Read all the pixels from the image
+     */
+    private void readPixels() {
+        if (reader != null) {
+            pixels = new int[reader.imgInfo.rows][reader.imgInfo.cols];
+            int rowCount = 0;
+            while (reader.hasMoreRows()) {
+                ImageLineInt row = reader.readRowInt();
+                int[] columnValues = new int[reader.imgInfo.cols];
+                System.arraycopy(row.getScanline(), 0, columnValues, 0, columnValues.length);
+                pixels[rowCount++] = columnValues;
+            }
+            reader.close();
+        }
     }
 
 }
