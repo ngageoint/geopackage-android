@@ -99,7 +99,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
         // TODO
         // GeoPackages created with SQLite version 4.2.0+ with GeoPackage support are not supported
-        // in Android (Lollipop uses SQLite version 3.8.4.3)
+        // in Android (Nougat uses SQLite version 3.9.2)
         dropSQLiteTriggers(geometryColumns);
 
         return dao;
