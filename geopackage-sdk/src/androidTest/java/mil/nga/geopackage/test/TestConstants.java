@@ -103,17 +103,17 @@ public class TestConstants {
 	/**
 	 * Tiles database table name
 	 */
-	public static final String TILES_DB_TABLE_NAME = "tiles.test";
+	public static final String TILES_DB_TABLE_NAME = "tiles";
 
 	/**
 	 * Tiles 2 database table name
 	 */
-	public static final String TILES2_DB_TABLE_NAME = "imagery.test";
+	public static final String TILES2_DB_TABLE_NAME = "imagery";
 
 	/**
 	 * Elevation Tiles table name
 	 */
-	public static final String CREATE_ELEVATION_TILES_DB_TABLE_NAME = "elevations.test";
+	public static final String CREATE_ELEVATION_TILES_DB_TABLE_NAME = "elevations";
 
 	/**
 	 * Tiles 2 database Web Mercator test image
