@@ -27,7 +27,7 @@ import mil.nga.geopackage.tiles.user.TileTable;
  * @author osbornb
  * @since 1.3.1
  */
-public abstract class ElevationTilesCommon extends ElevationTilesCore {
+public abstract class ElevationTilesCommon<TImage extends ElevationImage> extends ElevationTilesCore {
 
     /**
      * Tile DAO
@@ -54,6 +54,14 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
     }
 
     /**
+     * Create an elevation image
+     *
+     * @param tileRow tile row
+     * @return image
+     */
+    public abstract TImage createElevationImage(TileRow tileRow);
+
+    /**
      * Get the elevation value from the image at the coordinate
      *
      * @param griddedTile gridded tile
@@ -63,7 +71,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
      * @return
      */
     public abstract Double getElevationValue(GriddedTile griddedTile,
-                                             ElevationImage image, int x, int y);
+                                             TImage image, int x, int y);
 
     /**
      * Get the elevation value of the pixel in the tile row image
@@ -544,7 +552,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
             GriddedTile griddedTile = getGriddedTile(tileRow.getId());
 
             // Get the elevation tile image
-            ElevationImage image = new ElevationImage(tileRow);
+            TImage image = createElevationImage(tileRow);
 
             // If the tile overlaps with the requested box
             if (overlap != null) {
@@ -733,7 +741,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
      * @return bilinear elevation
      */
     private Double getBilinearInterpolationElevation(GriddedTile griddedTile,
-                                                     ElevationImage image, Double[][] leftLastColumns,
+                                                     TImage image, Double[][] leftLastColumns,
                                                      Double[][] topLeftRows, Double[][] topRows, int y, int x,
                                                      float widthRatio, float heightRatio, float destTop, float destLeft,
                                                      float srcTop, float srcLeft) {
@@ -778,7 +786,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
      * @return bicubic elevation
      */
     private Double getBicubicInterpolationElevation(GriddedTile griddedTile,
-                                                    ElevationImage image, Double[][] leftLastColumns,
+                                                    TImage image, Double[][] leftLastColumns,
                                                     Double[][] topLeftRows, Double[][] topRows, int y, int x,
                                                     float widthRatio, float heightRatio, float destTop, float destLeft,
                                                     float srcTop, float srcLeft) {
@@ -822,7 +830,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
      * @param values          values to populate
      */
     private void populateElevationValues(GriddedTile griddedTile,
-                                         ElevationImage image, Double[][] leftLastColumns,
+                                         TImage image, Double[][] leftLastColumns,
                                          Double[][] topLeftRows, Double[][] topRows,
                                          ElevationSourcePixel pixelX, ElevationSourcePixel pixelY,
                                          Double[][] values) {
@@ -847,7 +855,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
      * @param values          values to populate
      */
     private void populateElevationValues(GriddedTile griddedTile,
-                                         ElevationImage image, Double[][] leftLastColumns,
+                                         TImage image, Double[][] leftLastColumns,
                                          Double[][] topLeftRows, Double[][] topRows, int minX, int maxX,
                                          int minY, int maxY, Double[][] values) {
 
@@ -885,7 +893,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
      * @return nearest neighbor elevation
      */
     private Double getNearestNeighborElevation(GriddedTile griddedTile,
-                                               ElevationImage image, Double[][] leftLastColumns,
+                                               TImage image, Double[][] leftLastColumns,
                                                Double[][] topLeftRows, Double[][] topRows, int y, int x,
                                                float widthRatio, float heightRatio, float destTop, float destLeft,
                                                float srcTop, float srcLeft) {
@@ -927,7 +935,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
      * @return elevation value
      */
     private Double getElevationValueOverBorders(GriddedTile griddedTile,
-                                                ElevationImage image, Double[][] leftLastColumns,
+                                                TImage image, Double[][] leftLastColumns,
                                                 Double[][] topLeftRows, Double[][] topRows, int x, int y) {
         Double elevation = null;
 
@@ -1040,7 +1048,7 @@ public abstract class ElevationTilesCommon extends ElevationTilesCore {
                     GriddedTile griddedTile = getGriddedTile(tileRow.getId());
 
                     // Get the elevation tile image
-                    ElevationImage image = new ElevationImage(tileRow);
+                    TImage image = createElevationImage(tileRow);
 
                     // Create the elevation results for this tile
                     Double[][] elevations = new Double[srcBottom - srcTop + 1][srcRight

@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
@@ -17,7 +16,7 @@ import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
-import mil.nga.geopackage.extension.elevation.ElevationImage;
+import mil.nga.geopackage.extension.elevation.ElevationPngImage;
 import mil.nga.geopackage.extension.elevation.ElevationTileResults;
 import mil.nga.geopackage.extension.elevation.ElevationTiles;
 import mil.nga.geopackage.extension.elevation.ElevationTilesAlgorithm;
@@ -257,7 +256,7 @@ public class ElevationTilesTestUtils {
         TestCase.assertNotNull(tileRow);
         byte[] tileData = tileRow.getTileData();
         TestCase.assertTrue(tileData.length > 0);
-        ElevationImage image = new ElevationImage(tileRow);
+        ElevationPngImage image = new ElevationPngImage(tileRow);
 
         // Get all the pixel values of the image
         int[] pixelValues = elevationTiles.getPixelValues(tileData);

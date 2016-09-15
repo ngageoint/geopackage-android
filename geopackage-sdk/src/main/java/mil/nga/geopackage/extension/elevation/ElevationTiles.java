@@ -23,7 +23,7 @@ import mil.nga.geopackage.tiles.user.TileRow;
  * @author osbornb
  * @since 1.3.1
  */
-public class ElevationTiles extends ElevationTilesCommon {
+public class ElevationTiles extends ElevationTilesCommon<ElevationPngImage> {
 
     /**
      * Extension name without the author
@@ -84,6 +84,14 @@ public class ElevationTiles extends ElevationTilesCommon {
      * {@inheritDoc}
      */
     @Override
+    public ElevationPngImage createElevationImage(TileRow tileRow) {
+        return new ElevationPngImage(tileRow);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public double getElevationValue(GriddedTile griddedTile, TileRow tileRow,
                                     int x, int y) {
         byte[] imageBytes = tileRow.getTileData();
@@ -96,7 +104,7 @@ public class ElevationTiles extends ElevationTilesCommon {
      */
     @Override
     public Double getElevationValue(GriddedTile griddedTile,
-                                    ElevationImage image, int x, int y) {
+                                    ElevationPngImage image, int x, int y) {
         Double elevation = null;
         if (image.getReader() != null) {
             int pixelValue = image.getPixel(x, y);
@@ -205,10 +213,10 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param tileHeight  tile height
      * @return elevation image tile
      */
-    public ElevationImage drawTile(short[] pixelValues, int tileWidth,
-                                   int tileHeight) {
+    public ElevationPngImage drawTile(short[] pixelValues, int tileWidth,
+                                      int tileHeight) {
 
-        ElevationImage image = createImage(tileWidth, tileHeight);
+        ElevationPngImage image = createImage(tileWidth, tileHeight);
         PngWriter writer = image.getWriter();
         for (int y = 0; y < tileHeight; y++) {
             ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
@@ -237,7 +245,7 @@ public class ElevationTiles extends ElevationTilesCommon {
      */
     public byte[] drawTileData(short[] pixelValues, int tileWidth,
                                int tileHeight) {
-        ElevationImage image = drawTile(pixelValues, tileWidth, tileHeight);
+        ElevationPngImage image = drawTile(pixelValues, tileWidth, tileHeight);
         byte[] bytes = image.getImageBytes();
         return bytes;
     }
@@ -249,12 +257,12 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param pixelValues "unsigned short" pixel values as [row][width]
      * @return elevation image tile
      */
-    public ElevationImage drawTile(short[][] pixelValues) {
+    public ElevationPngImage drawTile(short[][] pixelValues) {
 
         int tileWidth = pixelValues[0].length;
         int tileHeight = pixelValues.length;
 
-        ElevationImage image = createImage(tileWidth, tileHeight);
+        ElevationPngImage image = createImage(tileWidth, tileHeight);
         PngWriter writer = image.getWriter();
         for (int y = 0; y < tileHeight; y++) {
             ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
@@ -279,7 +287,7 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @return elevation image tile bytes
      */
     public byte[] drawTileData(short[][] pixelValues) {
-        ElevationImage image = drawTile(pixelValues);
+        ElevationPngImage image = drawTile(pixelValues);
         byte[] bytes = image.getImageBytes();
         return bytes;
     }
@@ -295,10 +303,10 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param tileHeight          tile height
      * @return elevation image tile
      */
-    public ElevationImage drawTile(int[] unsignedPixelValues, int tileWidth,
-                                   int tileHeight) {
+    public ElevationPngImage drawTile(int[] unsignedPixelValues, int tileWidth,
+                                      int tileHeight) {
 
-        ElevationImage image = createImage(tileWidth, tileHeight);
+        ElevationPngImage image = createImage(tileWidth, tileHeight);
         PngWriter writer = image.getWriter();
         for (int y = 0; y < tileHeight; y++) {
             ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
@@ -329,7 +337,7 @@ public class ElevationTiles extends ElevationTilesCommon {
      */
     public byte[] drawTileData(int[] unsignedPixelValues, int tileWidth,
                                int tileHeight) {
-        ElevationImage image = drawTile(unsignedPixelValues, tileWidth,
+        ElevationPngImage image = drawTile(unsignedPixelValues, tileWidth,
                 tileHeight);
         byte[] bytes = image.getImageBytes();
         return bytes;
@@ -342,12 +350,12 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param unsignedPixelValues unsigned 16 bit integer pixel values as [row][width]
      * @return elevation image tile
      */
-    public ElevationImage drawTile(int[][] unsignedPixelValues) {
+    public ElevationPngImage drawTile(int[][] unsignedPixelValues) {
 
         int tileWidth = unsignedPixelValues[0].length;
         int tileHeight = unsignedPixelValues.length;
 
-        ElevationImage image = createImage(tileWidth, tileHeight);
+        ElevationPngImage image = createImage(tileWidth, tileHeight);
         PngWriter writer = image.getWriter();
         for (int y = 0; y < tileHeight; y++) {
             ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
@@ -373,7 +381,7 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @return elevation image tile bytes
      */
     public byte[] drawTileData(int[][] unsignedPixelValues) {
-        ElevationImage image = drawTile(unsignedPixelValues);
+        ElevationPngImage image = drawTile(unsignedPixelValues);
         byte[] bytes = image.getImageBytes();
         return bytes;
     }
@@ -388,10 +396,10 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param tileHeight  tile height
      * @return elevation image tile
      */
-    public ElevationImage drawTile(GriddedTile griddedTile, Double[] elevations,
-                                   int tileWidth, int tileHeight) {
+    public ElevationPngImage drawTile(GriddedTile griddedTile, Double[] elevations,
+                                      int tileWidth, int tileHeight) {
 
-        ElevationImage image = createImage(tileWidth, tileHeight);
+        ElevationPngImage image = createImage(tileWidth, tileHeight);
         PngWriter writer = image.getWriter();
         for (int y = 0; y < tileHeight; y++) {
             ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
@@ -422,7 +430,7 @@ public class ElevationTiles extends ElevationTilesCommon {
      */
     public byte[] drawTileData(GriddedTile griddedTile, Double[] elevations,
                                int tileWidth, int tileHeight) {
-        ElevationImage image = drawTile(griddedTile, elevations, tileWidth,
+        ElevationPngImage image = drawTile(griddedTile, elevations, tileWidth,
                 tileHeight);
         byte[] bytes = image.getImageBytes();
         return bytes;
@@ -436,12 +444,12 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param elevations  elevations as [row][width]
      * @return elevation image tile
      */
-    public ElevationImage drawTile(GriddedTile griddedTile, Double[][] elevations) {
+    public ElevationPngImage drawTile(GriddedTile griddedTile, Double[][] elevations) {
 
         int tileWidth = elevations[0].length;
         int tileHeight = elevations.length;
 
-        ElevationImage image = createImage(tileWidth, tileHeight);
+        ElevationPngImage image = createImage(tileWidth, tileHeight);
         PngWriter writer = image.getWriter();
         for (int y = 0; y < tileHeight; y++) {
             ImageLineInt row = new ImageLineInt(writer.imgInfo, new int[tileWidth]);
@@ -468,7 +476,7 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @return elevation image tile bytes
      */
     public byte[] drawTileData(GriddedTile griddedTile, Double[][] elevations) {
-        ElevationImage image = drawTile(griddedTile, elevations);
+        ElevationPngImage image = drawTile(griddedTile, elevations);
         byte[] bytes = image.getImageBytes();
         return bytes;
     }
@@ -480,9 +488,9 @@ public class ElevationTiles extends ElevationTilesCommon {
      * @param tileHeight tile height
      * @return image
      */
-    public ElevationImage createImage(int tileWidth, int tileHeight) {
+    public ElevationPngImage createImage(int tileWidth, int tileHeight) {
         ImageInfo imageInfo = new ImageInfo(tileWidth, tileHeight, 16, false, true, false);
-        ElevationImage image = new ElevationImage(imageInfo);
+        ElevationPngImage image = new ElevationPngImage(imageInfo);
         return image;
     }
 

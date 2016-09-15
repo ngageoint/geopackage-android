@@ -1,7 +1,5 @@
 package mil.nga.geopackage.test.extension.elevation;
 
-import android.graphics.Bitmap;
-
 import junit.framework.TestCase;
 
 import java.io.IOException;
@@ -18,6 +16,7 @@ import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
+import mil.nga.geopackage.extension.elevation.ElevationTiffImage;
 import mil.nga.geopackage.extension.elevation.ElevationTileResults;
 import mil.nga.geopackage.extension.elevation.ElevationTiles;
 import mil.nga.geopackage.extension.elevation.ElevationTilesAlgorithm;
@@ -258,10 +257,10 @@ public class ElevationTilesTiffTestUtils {
         TestCase.assertNotNull(tileRow);
         byte[] tileData = tileRow.getTileData();
         TestCase.assertTrue(tileData.length > 0);
-        Bitmap image = tileRow.getTileDataBitmap();
+        ElevationTiffImage image = new ElevationTiffImage(tileRow);
 
         // Get all the pixel values of the image
-        float[] pixelValues = elevationTiles.getPixelValues(image);
+        float[] pixelValues = elevationTiles.getPixelValues(tileData);
         if (elevationTileValues != null) {
             for (int i = 0; i < pixelValues.length; i++) {
                 TestCase.assertEquals(elevationTileValues.tilePixelsFlat[i],
@@ -276,7 +275,7 @@ public class ElevationTilesTiffTestUtils {
         List<Float> pixelValuesList = new ArrayList<>();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                float pixelValue = elevationTiles.getPixelValue(image, x, y);
+                float pixelValue = image.getPixel(x, y);
                 pixelValuesList.add(pixelValue);
 
                 // Test getting the pixel value from the pixel values
