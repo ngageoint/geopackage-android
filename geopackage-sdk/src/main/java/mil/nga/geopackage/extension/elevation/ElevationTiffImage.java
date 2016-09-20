@@ -1,12 +1,14 @@
 package mil.nga.geopackage.extension.elevation;
 
-import java.util.List;
+import java.io.IOException;
 
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.tiles.user.TileRow;
-import mil.nga.tiff.io.FileDirectories;
-import mil.nga.tiff.io.FileDirectory;
-import mil.nga.tiff.io.Rasters;
-import mil.nga.tiff.io.TiffReader;
+import mil.nga.tiff.FileDirectories;
+import mil.nga.tiff.FileDirectory;
+import mil.nga.tiff.Rasters;
+import mil.nga.tiff.TiffReader;
+import mil.nga.tiff.TiffWriter;
 
 /**
  * Elevation TIFF image
@@ -32,33 +34,38 @@ public class ElevationTiffImage implements ElevationImage {
     private byte[] imageBytes;
 
     /**
-     * File directories
+     * File directory
      */
-    private FileDirectories directories;
+    private FileDirectory directory;
 
     /**
-     * Constructor, used for reading a PNG
+     * Rasters
+     */
+    private Rasters rasters;
+
+    /**
+     * Constructor, used for reading a TIFF
      *
      * @param tileRow tile row
      */
     public ElevationTiffImage(TileRow tileRow) {
         imageBytes = tileRow.getTileData();
-
-        directories = TiffReader.readTiff(imageBytes);
-
-        FileDirectory directory = directories.getFileDirectory();
+        FileDirectories directories = TiffReader.readTiff(imageBytes);
+        directory = directories.getFileDirectory();
         width = directory.getImageWidth().intValue();
         height = directory.getImageHeight().intValue();
-
-        Rasters rasters = directory.readRasters(true, true);
-        rasters.hasInterleaveValues();
-        rasters.hasSampleValues();
     }
 
-    public ElevationTiffImage(int width, int height) {
-        // TODO
-        this.width = width;
-        this.height = height;
+    /**
+     * Constructor, used for writing a TIFF
+     *
+     * @param directory file directory
+     */
+    public ElevationTiffImage(FileDirectory directory) {
+        this.directory = directory;
+        this.rasters = directory.getWriteRasters();
+        width = directory.getImageWidth().intValue();
+        height = directory.getImageHeight().intValue();
     }
 
     /**
@@ -67,13 +74,31 @@ public class ElevationTiffImage implements ElevationImage {
      * @return image bytes
      */
     public byte[] getImageBytes() {
-        byte[] bytes = null;
-        if (imageBytes != null) {
-            bytes = imageBytes;
-        } else {
-            // TODO
+        if (imageBytes == null) {
+            writeTiff();
         }
         return imageBytes;
+    }
+
+    /**
+     * Get the file directory
+     *
+     * @return file directory
+     */
+    public FileDirectory getDirectory() {
+        return directory;
+    }
+
+    /**
+     * Get the rasters, read if needed
+     *
+     * @return rasters
+     */
+    public Rasters getRasters() {
+        if (rasters == null) {
+            readPixels();
+        }
+        return rasters;
     }
 
     /**
@@ -92,10 +117,48 @@ public class ElevationTiffImage implements ElevationImage {
         return height;
     }
 
+    /**
+     * Write the TIFF file to the image bytes
+     */
+    public void writeTiff() {
+        if (directory.getWriteRasters() != null) {
+            FileDirectories fileDirectories = new FileDirectories();
+            fileDirectories.add(directory);
+            try {
+                imageBytes = TiffWriter.writeTiffToBytes(fileDirectories);
+            } catch (IOException e) {
+                throw new GeoPackageException("Failed to write TIFF image", e);
+            }
+        }
+    }
 
+    /**
+     * Get the pixel at the coordinate
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return pixel value
+     */
     public float getPixel(int x, int y) {
+        float pixel = -1;
+        if (rasters == null) {
+            readPixels();
+        }
+        if (rasters != null) {
+            pixel = rasters.getFirstPixelSample(x, y).floatValue();
+        } else {
+            throw new GeoPackageException("Could not retrieve pixel value");
+        }
+        return pixel;
+    }
 
-        return 0.0f; // TODO
+    /**
+     * Read all the pixels from the image
+     */
+    private void readPixels() {
+        if (directory != null) {
+            rasters = directory.readRasters();
+        }
     }
 
 }

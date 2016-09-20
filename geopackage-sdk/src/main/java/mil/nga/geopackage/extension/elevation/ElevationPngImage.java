@@ -145,6 +145,13 @@ public class ElevationPngImage implements ElevationImage {
         }
     }
 
+    /**
+     * Get the pixel at the coordinate
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return pixel value
+     */
     public int getPixel(int x, int y) {
         int pixel = -1;
         if (pixels == null) {
