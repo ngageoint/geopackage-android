@@ -52,6 +52,7 @@ public class ElevationTiffImage implements ElevationImage {
         imageBytes = tileRow.getTileData();
         FileDirectories directories = TiffReader.readTiff(imageBytes);
         directory = directories.getFileDirectory();
+        ElevationTilesTiff.validateImageType(directory);
         width = directory.getImageWidth().intValue();
         height = directory.getImageHeight().intValue();
     }

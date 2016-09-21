@@ -158,7 +158,7 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      *
      * @param directory file directory
      */
-    public void validateImageType(FileDirectory directory) {
+    public static void validateImageType(FileDirectory directory) {
         if (directory == null) {
             throw new GeoPackageException("The image is null");
         }
@@ -389,9 +389,11 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
     public ElevationTiffImage createImage(int tileWidth, int tileHeight) {
 
         FileDirectory fileDirectory = new FileDirectory();
-        // TODO populate entries
-        fileDirectory.setImageHeight(tileHeight);
+
         fileDirectory.setImageWidth(tileWidth);
+        fileDirectory.setImageHeight(tileHeight);
+        // TODO populate entries
+
         Rasters rasters = new Rasters(tileWidth, tileHeight, 1);
         fileDirectory.setWriteRasters(rasters);
 

@@ -162,7 +162,7 @@ public class ElevationTiles extends ElevationTilesCommon<ElevationPngImage> {
      *
      * @param reader png reader
      */
-    public void validateImageType(PngReader reader) {
+    public static void validateImageType(PngReader reader) {
         if (reader == null) {
             throw new GeoPackageException("The image is null");
         }
@@ -494,22 +494,50 @@ public class ElevationTiles extends ElevationTilesCommon<ElevationPngImage> {
         return image;
     }
 
+    /**
+     * Set the pixel value
+     *
+     * @param row        image line row
+     * @param x          x coordinate
+     * @param pixelValue pixel value
+     */
     public void setPixelValue(ImageLineInt row, int x,
                               short pixelValue) {
         setPixelValue(row.getScanline(), x, pixelValue);
     }
 
+    /**
+     * Set the pixel value
+     *
+     * @param row        row array
+     * @param x          x coordinate
+     * @param pixelValue pixel value
+     */
     public void setPixelValue(int[] row, int x,
                               short pixelValue) {
         row[x] = pixelValue;
     }
 
+    /**
+     * Set the pixel value
+     *
+     * @param row        image line row
+     * @param x          x coordinate
+     * @param pixelValue unsigned pixel value
+     */
     public void setPixelValue(ImageLineInt row, int x,
                               int unsignedPixelValue) {
         short pixelValue = getPixelValue(unsignedPixelValue);
         setPixelValue(row, x, pixelValue);
     }
 
+    /**
+     * Set the pixel value
+     *
+     * @param row        row array
+     * @param x          x coordinate
+     * @param pixelValue unsigned pixel value
+     */
     public void setPixelValue(int[] row, int x,
                               int unsignedPixelValue) {
         short pixelValue = getPixelValue(unsignedPixelValue);
