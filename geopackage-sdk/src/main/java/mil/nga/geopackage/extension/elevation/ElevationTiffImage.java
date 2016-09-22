@@ -4,9 +4,9 @@ import java.io.IOException;
 
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.tiles.user.TileRow;
-import mil.nga.tiff.FileDirectories;
 import mil.nga.tiff.FileDirectory;
 import mil.nga.tiff.Rasters;
+import mil.nga.tiff.TIFFImage;
 import mil.nga.tiff.TiffReader;
 import mil.nga.tiff.TiffWriter;
 
@@ -50,8 +50,8 @@ public class ElevationTiffImage implements ElevationImage {
      */
     public ElevationTiffImage(TileRow tileRow) {
         imageBytes = tileRow.getTileData();
-        FileDirectories directories = TiffReader.readTiff(imageBytes);
-        directory = directories.getFileDirectory();
+        TIFFImage tiffImage = TiffReader.readTiff(imageBytes);
+        directory = tiffImage.getFileDirectory();
         ElevationTilesTiff.validateImageType(directory);
         width = directory.getImageWidth().intValue();
         height = directory.getImageHeight().intValue();
@@ -123,10 +123,10 @@ public class ElevationTiffImage implements ElevationImage {
      */
     public void writeTiff() {
         if (directory.getWriteRasters() != null) {
-            FileDirectories fileDirectories = new FileDirectories();
-            fileDirectories.add(directory);
+            TIFFImage tiffImage = new TIFFImage();
+            tiffImage.add(directory);
             try {
-                imageBytes = TiffWriter.writeTiffToBytes(fileDirectories);
+                imageBytes = TiffWriter.writeTiffToBytes(tiffImage);
             } catch (IOException e) {
                 throw new GeoPackageException("Failed to write TIFF image", e);
             }

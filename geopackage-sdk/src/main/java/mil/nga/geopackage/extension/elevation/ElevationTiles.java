@@ -521,9 +521,9 @@ public class ElevationTiles extends ElevationTilesCommon<ElevationPngImage> {
     /**
      * Set the pixel value
      *
-     * @param row        image line row
-     * @param x          x coordinate
-     * @param pixelValue unsigned pixel value
+     * @param row                image line row
+     * @param x                  x coordinate
+     * @param unsignedPixelValue unsigned pixel value
      */
     public void setPixelValue(ImageLineInt row, int x,
                               int unsignedPixelValue) {
@@ -534,9 +534,9 @@ public class ElevationTiles extends ElevationTilesCommon<ElevationPngImage> {
     /**
      * Set the pixel value
      *
-     * @param row        row array
-     * @param x          x coordinate
-     * @param pixelValue unsigned pixel value
+     * @param row                row array
+     * @param x                  x coordinate
+     * @param unsignedPixelValue unsigned pixel value
      */
     public void setPixelValue(int[] row, int x,
                               int unsignedPixelValue) {

@@ -1,5 +1,8 @@
 package mil.nga.geopackage.extension.elevation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
@@ -10,9 +13,9 @@ import mil.nga.geopackage.property.PropertyConstants;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
-import mil.nga.tiff.FileDirectories;
 import mil.nga.tiff.FileDirectory;
 import mil.nga.tiff.Rasters;
+import mil.nga.tiff.TIFFImage;
 import mil.nga.tiff.TiffReader;
 import mil.nga.tiff.util.TiffConstants;
 
@@ -40,6 +43,16 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      */
     public static final String EXTENSION_DEFINITION = GeoPackageProperties
             .getProperty(PropertyConstants.EXTENSIONS, EXTENSION_NAME_NO_AUTHOR);
+
+    /**
+     * Single sample elevation
+     */
+    public static final int SAMPLES_PER_PIXEL = 1;
+
+    /**
+     * Bits per value for floating point elevations
+     */
+    public static final int BITS_PER_SAMPLE = 32;
 
     /**
      * Constructor
@@ -125,8 +138,8 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      */
     public float getPixelValue(byte[] imageBytes, int x, int y) {
 
-        FileDirectories directories = TiffReader.readTiff(imageBytes);
-        FileDirectory directory = directories.getFileDirectory();
+        TIFFImage tiffImage = TiffReader.readTiff(imageBytes);
+        FileDirectory directory = tiffImage.getFileDirectory();
         validateImageType(directory);
         Rasters rasters = directory.readRasters();
         float pixelValue = rasters.getFirstPixelSample(x, y).floatValue();
@@ -141,8 +154,8 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      * @return float pixel values
      */
     public float[] getPixelValues(byte[] imageBytes) {
-        FileDirectories directories = TiffReader.readTiff(imageBytes);
-        FileDirectory directory = directories.getFileDirectory();
+        TIFFImage tiffImage = TiffReader.readTiff(imageBytes);
+        FileDirectory directory = tiffImage.getFileDirectory();
         validateImageType(directory);
         Rasters rasters = directory.readRasters();
         Number[] values = rasters.getSampleValues()[0];
@@ -173,8 +186,8 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
             sampleFormat = directory.getSampleFormat().get(0);
         }
 
-        if (samplesPerPixel == null || samplesPerPixel != 1
-                || bitsPerSample == null || bitsPerSample != 32
+        if (samplesPerPixel == null || samplesPerPixel != SAMPLES_PER_PIXEL
+                || bitsPerSample == null || bitsPerSample != BITS_PER_SAMPLE
                 || sampleFormat == null || sampleFormat != TiffConstants.SAMPLE_FORMAT_FLOAT) {
             throw new GeoPackageException(
                     "The elevation tile is expected to be a single sample 32 bit float. Samples Per Pixel: "
@@ -392,9 +405,23 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
 
         fileDirectory.setImageWidth(tileWidth);
         fileDirectory.setImageHeight(tileHeight);
+        List<Integer> bitsPerSample = new ArrayList<>();
+        bitsPerSample.add(BITS_PER_SAMPLE);
+        fileDirectory.setBitsPerSample(bitsPerSample);
+        fileDirectory.setCompression(TiffConstants.COMPRESSION_NO);
+        fileDirectory.setPhotometricInterpretation(TiffConstants.PHOTOMETRIC_INTERPRETATION_BLACK_IS_ZERO);
+        fileDirectory.setStripOffsets(null); // TODO
+        fileDirectory.setSamplesPerPixel(SAMPLES_PER_PIXEL);
+        fileDirectory.setRowsPerStrip(0); // TODO
+        fileDirectory.setStripByteCounts(null); // TODO
+        fileDirectory.setPlanarConfiguration(TiffConstants.PLANAR_CONFIGURATION_CHUNKY);
+        List<Integer> sampleFormat = new ArrayList<>();
+        bitsPerSample.add(TiffConstants.SAMPLE_FORMAT_FLOAT);
+        fileDirectory.setSampleFormat(sampleFormat);
+
         // TODO populate entries
 
-        Rasters rasters = new Rasters(tileWidth, tileHeight, 1);
+        Rasters rasters = new Rasters(tileWidth, tileHeight, 1, bitsPerSample);
         fileDirectory.setWriteRasters(rasters);
 
         ElevationTiffImage image = new ElevationTiffImage(fileDirectory);
