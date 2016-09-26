@@ -51,6 +51,7 @@ android {
         classpath += files("${android.sdkDirectory}/extras/android/support/v4/android-support-v4.jar")
         options.links("http://ngageoint.github.io/geopackage-core-java/docs/api/");
         options.links("http://ngageoint.github.io/geopackage-wkb-java/docs/api/");
+        options.links("http://ngageoint.github.io/geopackage-tiff-java/docs/api/");
         options.links("http://ormlite.com/javadoc/ormlite-core/");
         options.links("http://ormlite.com/javadoc/ormlite-android/");
         options.links("http://docs.oracle.com/javase/7/docs/api/");
@@ -152,7 +153,9 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'mil.nga.geopackage:geopackage-core:1.2.1'
     compile 'ar.com.hjg:pngj:2.1.0'
+    compile 'mil.nga:tiff:1.0.0'
     javadocDeps 'com.j256.ormlite:ormlite-android:4.48',
             'mil.nga.geopackage:geopackage-core:1.2.1' ,
-            'ar.com.hjg:pngj:2.1.0'
+            'ar.com.hjg:pngj:2.1.0' ,
+            'mil.nga:tiff:1.0.0'
 }
