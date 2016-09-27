@@ -1,8 +1,5 @@
 package mil.nga.geopackage.extension.elevation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
@@ -401,27 +398,20 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      */
     public ElevationTiffImage createImage(int tileWidth, int tileHeight) {
 
-        FileDirectory fileDirectory = new FileDirectory();
+        Rasters rasters = new Rasters(tileWidth, tileHeight, 1, BITS_PER_SAMPLE);
 
+        int rowsPerStrip = rasters.calculateRowsPerStrip(TiffConstants.PLANAR_CONFIGURATION_CHUNKY);
+
+        FileDirectory fileDirectory = new FileDirectory();
         fileDirectory.setImageWidth(tileWidth);
         fileDirectory.setImageHeight(tileHeight);
-        List<Integer> bitsPerSample = new ArrayList<>();
-        bitsPerSample.add(BITS_PER_SAMPLE);
-        fileDirectory.setBitsPerSample(bitsPerSample);
+        fileDirectory.setBitsPerSample(BITS_PER_SAMPLE);
         fileDirectory.setCompression(TiffConstants.COMPRESSION_NO);
         fileDirectory.setPhotometricInterpretation(TiffConstants.PHOTOMETRIC_INTERPRETATION_BLACK_IS_ZERO);
-        fileDirectory.setStripOffsets(null); // TODO
         fileDirectory.setSamplesPerPixel(SAMPLES_PER_PIXEL);
-        fileDirectory.setRowsPerStrip(0); // TODO
-        fileDirectory.setStripByteCounts(null); // TODO
+        fileDirectory.setRowsPerStrip(rowsPerStrip);
         fileDirectory.setPlanarConfiguration(TiffConstants.PLANAR_CONFIGURATION_CHUNKY);
-        List<Integer> sampleFormat = new ArrayList<>();
-        bitsPerSample.add(TiffConstants.SAMPLE_FORMAT_FLOAT);
-        fileDirectory.setSampleFormat(sampleFormat);
-
-        // TODO populate entries
-
-        Rasters rasters = new Rasters(tileWidth, tileHeight, 1, bitsPerSample);
+        fileDirectory.setSampleFormat(TiffConstants.SAMPLE_FORMAT_FLOAT);
         fileDirectory.setWriteRasters(rasters);
 
         ElevationTiffImage image = new ElevationTiffImage(fileDirectory);

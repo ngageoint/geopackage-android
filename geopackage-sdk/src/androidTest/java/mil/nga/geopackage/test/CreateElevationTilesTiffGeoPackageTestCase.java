@@ -198,10 +198,10 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
 
         int width = 1 + (int) Math.floor((Math.random() * 4.0));
         int height = 1 + (int) Math.floor((Math.random() * 4.0));
-        int tileWidth = 3 + (int) Math.floor((Math.random() * 254.0));
-        int tileHeight = 3 + (int) Math.floor((Math.random() * 254.0));
+        int tileWidth = 3 + (int) Math.floor((Math.random() * 62.0));
+        int tileHeight = 3 + (int) Math.floor((Math.random() * 62.0));
         int minZoomLevel = (int) Math.floor(Math.random() * 22.0);
-        int maxZoomLevel = minZoomLevel + (int) Math.floor(Math.random() * 4.0);
+        int maxZoomLevel = minZoomLevel + (int) Math.floor(Math.random() * 3.0);
 
         // Just draw one image and re-use
         elevationTiles = new ElevationTilesTiff(geoPackage, tileDao);
