@@ -1,5 +1,9 @@
 package mil.nga.geopackage.extension.elevation;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
@@ -398,20 +402,21 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      */
     public ElevationTiffImage createImage(int tileWidth, int tileHeight) {
 
-        Rasters rasters = new Rasters(tileWidth, tileHeight, 1, BITS_PER_SAMPLE);
+        List<Integer> bitsPerSample = new ArrayList<Integer>(Arrays.asList(BITS_PER_SAMPLE));
+        Rasters rasters = new Rasters(tileWidth, tileHeight, 1, bitsPerSample);
 
         int rowsPerStrip = rasters.calculateRowsPerStrip(TiffConstants.PLANAR_CONFIGURATION_CHUNKY);
 
         FileDirectory fileDirectory = new FileDirectory();
         fileDirectory.setImageWidth(tileWidth);
         fileDirectory.setImageHeight(tileHeight);
-        fileDirectory.setBitsPerSample(BITS_PER_SAMPLE);
+        fileDirectory.setBitsPerSample(bitsPerSample);
         fileDirectory.setCompression(TiffConstants.COMPRESSION_NO);
         fileDirectory.setPhotometricInterpretation(TiffConstants.PHOTOMETRIC_INTERPRETATION_BLACK_IS_ZERO);
         fileDirectory.setSamplesPerPixel(SAMPLES_PER_PIXEL);
         fileDirectory.setRowsPerStrip(rowsPerStrip);
         fileDirectory.setPlanarConfiguration(TiffConstants.PLANAR_CONFIGURATION_CHUNKY);
-        fileDirectory.setSampleFormat(TiffConstants.SAMPLE_FORMAT_FLOAT);
+        fileDirectory.setSingleSampleFormat(TiffConstants.SAMPLE_FORMAT_FLOAT);
         fileDirectory.setWriteRasters(rasters);
 
         ElevationTiffImage image = new ElevationTiffImage(fileDirectory);
