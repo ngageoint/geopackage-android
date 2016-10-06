@@ -122,7 +122,6 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
             defaultPrecision = false;
         }
         griddedCoverage.setDataNull((double) Float.MAX_VALUE);
-        griddedCoverage.setDataMissing((double) (Float.MAX_VALUE - 1.0));
         TestCase.assertEquals(1, griddedCoverageDao.create(griddedCoverage));
 
         long gcId = griddedCoverage.getId();

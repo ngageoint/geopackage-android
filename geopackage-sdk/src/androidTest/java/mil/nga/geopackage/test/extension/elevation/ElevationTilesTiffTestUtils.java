@@ -18,7 +18,6 @@ import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
 import mil.nga.geopackage.extension.elevation.ElevationTiffImage;
 import mil.nga.geopackage.extension.elevation.ElevationTileResults;
-import mil.nga.geopackage.extension.elevation.ElevationTiles;
 import mil.nga.geopackage.extension.elevation.ElevationTilesAlgorithm;
 import mil.nga.geopackage.extension.elevation.ElevationTilesTiff;
 import mil.nga.geopackage.extension.elevation.GriddedCoverage;
@@ -125,29 +124,29 @@ public class ElevationTilesTiffTestUtils {
             ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
 
             Extensions griddedCoverageExtension = extensionsDao
-                    .queryByExtension(ElevationTiles.EXTENSION_NAME,
+                    .queryByExtension(ElevationTilesTiff.EXTENSION_NAME,
                             GriddedCoverage.TABLE_NAME, null);
             TestCase.assertNotNull(griddedCoverageExtension);
             TestCase.assertEquals(GriddedCoverage.TABLE_NAME,
                     griddedCoverageExtension.getTableName());
             TestCase.assertNull(griddedCoverageExtension.getColumnName());
-            TestCase.assertEquals(ElevationTiles.EXTENSION_NAME,
+            TestCase.assertEquals(ElevationTilesTiff.EXTENSION_NAME,
                     griddedCoverageExtension.getExtensionName());
-            TestCase.assertEquals(ElevationTiles.EXTENSION_DEFINITION,
+            TestCase.assertEquals(ElevationTilesTiff.EXTENSION_DEFINITION,
                     griddedCoverageExtension.getDefinition());
             TestCase.assertEquals(ExtensionScopeType.READ_WRITE,
                     griddedCoverageExtension.getScope());
 
             Extensions griddedTileExtension = extensionsDao
-                    .queryByExtension(ElevationTiles.EXTENSION_NAME,
+                    .queryByExtension(ElevationTilesTiff.EXTENSION_NAME,
                             GriddedTile.TABLE_NAME, null);
             TestCase.assertNotNull(griddedTileExtension);
             TestCase.assertEquals(GriddedTile.TABLE_NAME,
                     griddedTileExtension.getTableName());
             TestCase.assertNull(griddedTileExtension.getColumnName());
-            TestCase.assertEquals(ElevationTiles.EXTENSION_NAME,
+            TestCase.assertEquals(ElevationTilesTiff.EXTENSION_NAME,
                     griddedTileExtension.getExtensionName());
-            TestCase.assertEquals(ElevationTiles.EXTENSION_DEFINITION,
+            TestCase.assertEquals(ElevationTilesTiff.EXTENSION_DEFINITION,
                     griddedTileExtension.getDefinition());
             TestCase.assertEquals(ExtensionScopeType.READ_WRITE,
                     griddedTileExtension.getScope());
@@ -168,23 +167,19 @@ public class ElevationTilesTiffTestUtils {
                     tileTableExtension.getScope());
 
             // Test the Gridded Coverage
-            List<GriddedCoverage> griddedCoverages = elevationTiles
+            GriddedCoverage griddedCoverage = elevationTiles
                     .getGriddedCoverage();
-            TestCase.assertNotNull(griddedCoverages);
-            TestCase.assertFalse(griddedCoverages.isEmpty());
-            for (GriddedCoverage griddedCoverage : griddedCoverages) {
-                TestCase.assertTrue(griddedCoverage.getId() >= 0);
-                TestCase.assertNotNull(griddedCoverage.getTileMatrixSet());
-                TestCase.assertEquals(tileMatrixSet.getTableName(),
-                        griddedCoverage.getTileMatrixSetName());
-                TestCase.assertEquals(GriddedCoverageDataType.FLOAT,
-                        griddedCoverage.getDataType());
-                TestCase.assertTrue(griddedCoverage.getScale() >= 0);
-                TestCase.assertTrue(griddedCoverage.getOffset() >= 0);
-                TestCase.assertTrue(griddedCoverage.getPrecision() >= 0);
-                griddedCoverage.getDataNull();
-                griddedCoverage.getDataMissing();
-            }
+            TestCase.assertNotNull(griddedCoverage);
+            TestCase.assertTrue(griddedCoverage.getId() >= 0);
+            TestCase.assertNotNull(griddedCoverage.getTileMatrixSet());
+            TestCase.assertEquals(tileMatrixSet.getTableName(),
+                    griddedCoverage.getTileMatrixSetName());
+            TestCase.assertEquals(GriddedCoverageDataType.FLOAT,
+                    griddedCoverage.getDataType());
+            TestCase.assertTrue(griddedCoverage.getScale() >= 0);
+            TestCase.assertTrue(griddedCoverage.getOffset() >= 0);
+            TestCase.assertTrue(griddedCoverage.getPrecision() >= 0);
+            griddedCoverage.getDataNull();
 
             // Test the Gridded Tile
             List<GriddedTile> griddedTiles = elevationTiles.getGriddedTile();
@@ -288,7 +283,7 @@ public class ElevationTilesTiffTestUtils {
                 Double elevationValue = elevationTiles.getElevationValue(
                         griddedTile, pixelValue);
                 GriddedCoverage griddedCoverage = elevationTiles
-                        .getGriddedCoverage().get(0);
+                        .getGriddedCoverage();
                 if (elevationTileValues != null) {
                     TestCase.assertEquals(elevationTileValues.tilePixels[y][x],
                             pixelValue);
@@ -296,10 +291,8 @@ public class ElevationTilesTiffTestUtils {
                             elevationTileValues.tilePixelsFlat[(y * width) + x],
                             pixelValue);
                 }
-                if ((griddedCoverage.getDataNull() != null && pixelValue == griddedCoverage
-                        .getDataNull())
-                        || (griddedCoverage.getDataMissing() != null && pixelValue == griddedCoverage
-                        .getDataMissing())) {
+                if (griddedCoverage.getDataNull() != null && pixelValue == griddedCoverage
+                        .getDataNull()) {
                     TestCase.assertNull(elevationValue);
                 } else {
                     TestCase.assertEquals(

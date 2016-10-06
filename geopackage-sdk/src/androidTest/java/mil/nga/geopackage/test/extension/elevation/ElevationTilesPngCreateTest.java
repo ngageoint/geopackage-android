@@ -8,13 +8,13 @@ import mil.nga.geopackage.test.CreateElevationTilesGeoPackageTestCase;
  *
  * @author osbornb
  */
-public class ElevationTilesCreateTest extends
+public class ElevationTilesPngCreateTest extends
         CreateElevationTilesGeoPackageTestCase {
 
     /**
      * Constructor
      */
-    public ElevationTilesCreateTest() {
+    public ElevationTilesPngCreateTest() {
         super(true);
     }
 
@@ -24,7 +24,7 @@ public class ElevationTilesCreateTest extends
      */
     public void testElevationsNearestNeighbor() throws Exception {
 
-        ElevationTilesTestUtils.testElevations(geoPackage, elevationTileValues,
+        ElevationTilesPngTestUtils.testElevations(geoPackage, elevationTileValues,
                 ElevationTilesAlgorithm.NEAREST_NEIGHBOR, allowNulls);
 
     }
@@ -35,7 +35,7 @@ public class ElevationTilesCreateTest extends
      */
     public void testElevationsBilinear() throws Exception {
 
-        ElevationTilesTestUtils.testElevations(geoPackage, elevationTileValues,
+        ElevationTilesPngTestUtils.testElevations(geoPackage, elevationTileValues,
                 ElevationTilesAlgorithm.BILINEAR, allowNulls);
 
     }
@@ -46,7 +46,7 @@ public class ElevationTilesCreateTest extends
      */
     public void testElevationsBicubic() throws Exception {
 
-        ElevationTilesTestUtils.testElevations(geoPackage, elevationTileValues,
+        ElevationTilesPngTestUtils.testElevations(geoPackage, elevationTileValues,
                 ElevationTilesAlgorithm.BICUBIC, allowNulls);
 
     }
@@ -56,7 +56,7 @@ public class ElevationTilesCreateTest extends
      */
     public void testRandomBoundingBoxNearestNeighbor() throws Exception {
 
-        ElevationTilesTestUtils.testRandomBoundingBox(geoPackage,
+        ElevationTilesPngTestUtils.testRandomBoundingBox(geoPackage,
                 elevationTileValues, ElevationTilesAlgorithm.NEAREST_NEIGHBOR,
                 allowNulls);
 
@@ -67,7 +67,7 @@ public class ElevationTilesCreateTest extends
      */
     public void testRandomBoundingBoxBilinear() throws Exception {
 
-        ElevationTilesTestUtils.testRandomBoundingBox(geoPackage,
+        ElevationTilesPngTestUtils.testRandomBoundingBox(geoPackage,
                 elevationTileValues, ElevationTilesAlgorithm.BILINEAR,
                 allowNulls);
 
@@ -78,7 +78,7 @@ public class ElevationTilesCreateTest extends
      */
     public void testRandomBoundingBoxBicubic() throws Exception {
 
-        ElevationTilesTestUtils.testRandomBoundingBox(geoPackage,
+        ElevationTilesPngTestUtils.testRandomBoundingBox(geoPackage,
                 elevationTileValues, ElevationTilesAlgorithm.BICUBIC,
                 allowNulls);
 

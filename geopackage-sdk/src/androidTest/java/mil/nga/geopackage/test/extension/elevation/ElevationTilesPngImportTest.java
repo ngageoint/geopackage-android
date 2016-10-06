@@ -8,8 +8,8 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.extension.elevation.ElevationTileResults;
-import mil.nga.geopackage.extension.elevation.ElevationTiles;
 import mil.nga.geopackage.extension.elevation.ElevationTilesAlgorithm;
+import mil.nga.geopackage.extension.elevation.ElevationTilesPng;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
@@ -25,7 +25,7 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
  *
  * @author osbornb
  */
-public class ElevationTilesImportTest extends
+public class ElevationTilesPngImportTest extends
         ImportElevationTilesGeoPackageTestCase {
 
     private static final boolean PRINT = false;
@@ -36,7 +36,7 @@ public class ElevationTilesImportTest extends
      */
     public void testElevationsNearestNeighbor() throws Exception {
 
-        ElevationTilesTestUtils.testElevations(geoPackage, null,
+        ElevationTilesPngTestUtils.testElevations(geoPackage, null,
                 ElevationTilesAlgorithm.NEAREST_NEIGHBOR, false);
 
     }
@@ -47,7 +47,7 @@ public class ElevationTilesImportTest extends
      */
     public void testElevationsBilinear() throws Exception {
 
-        ElevationTilesTestUtils.testElevations(geoPackage, null,
+        ElevationTilesPngTestUtils.testElevations(geoPackage, null,
                 ElevationTilesAlgorithm.BILINEAR, false);
 
     }
@@ -58,7 +58,7 @@ public class ElevationTilesImportTest extends
      */
     public void testElevationsBicubic() throws Exception {
 
-        ElevationTilesTestUtils.testElevations(geoPackage, null,
+        ElevationTilesPngTestUtils.testElevations(geoPackage, null,
                 ElevationTilesAlgorithm.BICUBIC, false);
 
     }
@@ -68,7 +68,7 @@ public class ElevationTilesImportTest extends
      */
     public void testRandomBoundingBoxNearestNeighbor() throws Exception {
 
-        ElevationTilesTestUtils.testRandomBoundingBox(geoPackage, null,
+        ElevationTilesPngTestUtils.testRandomBoundingBox(geoPackage, null,
                 ElevationTilesAlgorithm.NEAREST_NEIGHBOR, true);
 
     }
@@ -78,7 +78,7 @@ public class ElevationTilesImportTest extends
      */
     public void testRandomBoundingBoxBilinear() throws Exception {
 
-        ElevationTilesTestUtils.testRandomBoundingBox(geoPackage, null,
+        ElevationTilesPngTestUtils.testRandomBoundingBox(geoPackage, null,
                 ElevationTilesAlgorithm.BILINEAR, true);
 
     }
@@ -88,7 +88,7 @@ public class ElevationTilesImportTest extends
      */
     public void testRandomBoundingBoxBicubic() throws Exception {
 
-        ElevationTilesTestUtils.testRandomBoundingBox(geoPackage, null,
+        ElevationTilesPngTestUtils.testRandomBoundingBox(geoPackage, null,
                 ElevationTilesAlgorithm.BICUBIC, true);
 
     }
@@ -115,7 +115,7 @@ public class ElevationTilesImportTest extends
 
         BoundingBox projectedBoundingBox = null;
 
-        List<String> elevationTables = ElevationTiles.getTables(geoPackage);
+        List<String> elevationTables = ElevationTilesPng.getTables(geoPackage);
         TileMatrixSetDao dao = geoPackage.getTileMatrixSetDao();
 
         for (String elevationTable : elevationTables) {
@@ -262,7 +262,7 @@ public class ElevationTilesImportTest extends
                     System.out.println();
                 }
                 for (double lon = minLongitude + (widthPixelDistance * .5); lon <= maxLongitude; lon += widthPixelDistance) {
-                    Double elevation = ElevationTilesTestUtils.getElevation(
+                    Double elevation = ElevationTilesPngTestUtils.getElevation(
                             geoPackage, algorithm, lat, lon, geoPackageEpsg);
                     if (PRINT) {
                         System.out.print("   " + elevation);
@@ -271,7 +271,7 @@ public class ElevationTilesImportTest extends
                 }
             }
 
-            ElevationTileResults results = ElevationTilesTestUtils
+            ElevationTileResults results = ElevationTilesPngTestUtils
                     .getElevations(geoPackage, algorithm, boundingBox, width,
                             height, geoPackageEpsg);
             TestCase.assertNotNull(results);
@@ -318,7 +318,7 @@ public class ElevationTilesImportTest extends
         ProjectionTransform wgs84Transform = projection
                 .getTransformation(printProjection);
 
-        List<String> elevationTables = ElevationTiles.getTables(geoPackage);
+        List<String> elevationTables = ElevationTilesPng.getTables(geoPackage);
         TileMatrixSetDao dao = geoPackage.getTileMatrixSetDao();
 
         for (String elevationTable : elevationTables) {
@@ -406,7 +406,7 @@ public class ElevationTilesImportTest extends
                         System.out.println();
                     }
                     for (double lon = minLongitude; lon <= maxLongitude; lon += widthPixelDistance) {
-                        Double elevation = ElevationTilesTestUtils
+                        Double elevation = ElevationTilesPngTestUtils
                                 .getElevation(geoPackage, algorithm, lat, lon,
                                         geoPackageEpsg);
                         if (PRINT) {
@@ -418,7 +418,7 @@ public class ElevationTilesImportTest extends
                             TestCase.assertNotNull(elevation);
                         }
                     }
-                    Double elevation = ElevationTilesTestUtils.getElevation(
+                    Double elevation = ElevationTilesPngTestUtils.getElevation(
                             geoPackage, algorithm, lat, maxLongitude,
                             geoPackageEpsg);
                     if (PRINT) {
@@ -432,7 +432,7 @@ public class ElevationTilesImportTest extends
                     System.out.println();
                 }
                 for (double lon = minLongitude; lon <= maxLongitude; lon += widthPixelDistance) {
-                    Double elevation = ElevationTilesTestUtils.getElevation(
+                    Double elevation = ElevationTilesPngTestUtils.getElevation(
                             geoPackage, algorithm, minLatitude, lon,
                             geoPackageEpsg);
                     if (PRINT) {
@@ -442,7 +442,7 @@ public class ElevationTilesImportTest extends
                         TestCase.assertNotNull(elevation);
                     }
                 }
-                Double elevation = ElevationTilesTestUtils.getElevation(
+                Double elevation = ElevationTilesPngTestUtils.getElevation(
                         geoPackage, algorithm, minLatitude, maxLongitude,
                         geoPackageEpsg);
                 if (PRINT) {
@@ -452,7 +452,7 @@ public class ElevationTilesImportTest extends
                     TestCase.assertNotNull(elevation);
                 }
 
-                ElevationTileResults results = ElevationTilesTestUtils
+                ElevationTileResults results = ElevationTilesPngTestUtils
                         .getElevations(geoPackage, algorithm, boundingBox,
                                 width, height, geoPackageEpsg);
                 if (PRINT) {
@@ -495,7 +495,7 @@ public class ElevationTilesImportTest extends
                                     + ", column = " + column);
                         }
 
-                        elevation = ElevationTilesTestUtils.getElevation(
+                        elevation = ElevationTilesPngTestUtils.getElevation(
                                 geoPackage, algorithm, maxLatitude2,
                                 minLongitude2, geoPackageEpsg);
                         double[] point = wgs84Transform.transform(
@@ -511,7 +511,7 @@ public class ElevationTilesImportTest extends
                             TestCase.assertNotNull(elevation);
                         }
 
-                        elevation = ElevationTilesTestUtils.getElevation(
+                        elevation = ElevationTilesPngTestUtils.getElevation(
                                 geoPackage, algorithm, maxLatitude2,
                                 maxLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(maxLongitude2,
@@ -528,7 +528,7 @@ public class ElevationTilesImportTest extends
                             TestCase.assertNotNull(elevation);
                         }
 
-                        elevation = ElevationTilesTestUtils.getElevation(
+                        elevation = ElevationTilesPngTestUtils.getElevation(
                                 geoPackage, algorithm, minLatitude2,
                                 minLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(minLongitude2,
@@ -544,7 +544,7 @@ public class ElevationTilesImportTest extends
                             TestCase.assertNotNull(elevation);
                         }
 
-                        elevation = ElevationTilesTestUtils.getElevation(
+                        elevation = ElevationTilesPngTestUtils.getElevation(
                                 geoPackage, algorithm, minLatitude2,
                                 maxLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(maxLongitude2,
@@ -561,7 +561,7 @@ public class ElevationTilesImportTest extends
                             TestCase.assertNotNull(elevation);
                         }
 
-                        results = ElevationTilesTestUtils.getElevations(
+                        results = ElevationTilesPngTestUtils.getElevations(
                                 geoPackage, algorithm, boundingBox2, width,
                                 height, geoPackageEpsg);
                         if (PRINT) {
@@ -617,7 +617,7 @@ public class ElevationTilesImportTest extends
 
         for (ElevationTilesAlgorithm algorithm : ElevationTilesAlgorithm
                 .values()) {
-            Double elevation = ElevationTilesTestUtils.getElevation(geoPackage,
+            Double elevation = ElevationTilesPngTestUtils.getElevation(geoPackage,
                     algorithm, latitude, longitude,
                     ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
             if (PRINT) {

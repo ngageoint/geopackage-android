@@ -64,7 +64,7 @@ public class ElevationPngImage implements ElevationImage {
     public ElevationPngImage(TileRow tileRow) {
         imageBytes = tileRow.getTileData();
         reader = new PngReaderInt(new ByteArrayInputStream(imageBytes));
-        ElevationTiles.validateImageType(reader);
+        ElevationTilesPng.validateImageType(reader);
         width = reader.imgInfo.cols;
         height = reader.imgInfo.rows;
     }
