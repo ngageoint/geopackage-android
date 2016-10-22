@@ -259,13 +259,13 @@ public abstract class CreateElevationTilesGeoPackageTestCase extends
                     griddedTile = griddedTileDao.queryForId(gtId);
                     TestCase.assertNotNull(griddedTile);
                     if (defaultGTScale) {
-                        TestCase.assertEquals(1.0, griddedTile.getScale());
+                        TestCase.assertEquals(1.0, griddedTile.getScaleOrDefault());
                     } else {
                         TestCase.assertTrue(griddedTile.getScale() >= 0.0
                                 && griddedTile.getScale() <= 100.0);
                     }
                     if (defaultGTOffset) {
-                        TestCase.assertEquals(0.0, griddedTile.getOffset());
+                        TestCase.assertEquals(0.0, griddedTile.getOffsetOrDefault());
                     } else {
                         TestCase.assertTrue(griddedTile.getOffset() >= 0.0
                                 && griddedTile.getOffset() <= 100.0);

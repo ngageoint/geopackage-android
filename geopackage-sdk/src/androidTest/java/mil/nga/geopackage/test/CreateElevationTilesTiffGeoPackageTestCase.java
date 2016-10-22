@@ -106,16 +106,8 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
         GriddedCoverage griddedCoverage = new GriddedCoverage();
         griddedCoverage.setTileMatrixSet(tileMatrixSet);
         griddedCoverage.setDataType(GriddedCoverageDataType.FLOAT);
-        boolean defaultScale = true;
-        if (Math.random() < .5) {
-            griddedCoverage.setScale(100.0 * Math.random());
-            defaultScale = false;
-        }
-        boolean defaultOffset = true;
-        if (Math.random() < .5) {
-            griddedCoverage.setOffset(100.0 * Math.random());
-            defaultOffset = false;
-        }
+        griddedCoverage.setScale(null);
+        griddedCoverage.setOffset(null);
         boolean defaultPrecision = true;
         if (Math.random() < .5) {
             griddedCoverage.setPrecision(10.0 * Math.random());
@@ -127,18 +119,9 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
         long gcId = griddedCoverage.getId();
         griddedCoverage = griddedCoverageDao.queryForId(gcId);
         TestCase.assertNotNull(griddedCoverage);
-        if (defaultScale) {
-            TestCase.assertEquals(1.0, griddedCoverage.getScale());
-        } else {
-            TestCase.assertTrue(griddedCoverage.getScale() >= 0.0
-                    && griddedCoverage.getScale() <= 100.0);
-        }
-        if (defaultOffset) {
-            TestCase.assertEquals(0.0, griddedCoverage.getOffset());
-        } else {
-            TestCase.assertTrue(griddedCoverage.getOffset() >= 0.0
-                    && griddedCoverage.getOffset() <= 100.0);
-        }
+        TestCase.assertNull(griddedCoverage.getScale());
+        TestCase.assertNull(griddedCoverage.getOffset());
+
         if (defaultPrecision) {
             TestCase.assertEquals(1.0, griddedCoverage.getPrecision());
         } else {
@@ -148,16 +131,9 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
 
         GriddedTile commonGriddedTile = new GriddedTile();
         commonGriddedTile.setContents(tileMatrixSet.getContents());
-        boolean defaultGTScale = true;
-        if (Math.random() < .5) {
-            commonGriddedTile.setScale(100.0 * Math.random());
-            defaultGTScale = false;
-        }
-        boolean defaultGTOffset = true;
-        if (Math.random() < .5) {
-            commonGriddedTile.setOffset(100.0 * Math.random());
-            defaultGTOffset = false;
-        }
+        commonGriddedTile.setScale(null);
+        commonGriddedTile.setOffset(null);
+
         // The min, max, mean, and sd are just for testing and have
         // no association on the test tile created
         boolean defaultGTMin = true;
@@ -253,18 +229,8 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
 
                     griddedTile = griddedTileDao.queryForId(gtId);
                     TestCase.assertNotNull(griddedTile);
-                    if (defaultGTScale) {
-                        TestCase.assertEquals(1.0, griddedTile.getScale());
-                    } else {
-                        TestCase.assertTrue(griddedTile.getScale() >= 0.0
-                                && griddedTile.getScale() <= 100.0);
-                    }
-                    if (defaultGTOffset) {
-                        TestCase.assertEquals(0.0, griddedTile.getOffset());
-                    } else {
-                        TestCase.assertTrue(griddedTile.getOffset() >= 0.0
-                                && griddedTile.getOffset() <= 100.0);
-                    }
+                    TestCase.assertNull(griddedTile.getScale());
+                    TestCase.assertNull(griddedTile.getOffset());
                     if (defaultGTMin) {
                         TestCase.assertNull(griddedTile.getMin());
                     } else {

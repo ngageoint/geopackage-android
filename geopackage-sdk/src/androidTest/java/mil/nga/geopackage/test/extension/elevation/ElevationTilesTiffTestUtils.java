@@ -176,8 +176,8 @@ public class ElevationTilesTiffTestUtils {
                     griddedCoverage.getTileMatrixSetName());
             TestCase.assertEquals(GriddedCoverageDataType.FLOAT,
                     griddedCoverage.getDataType());
-            TestCase.assertTrue(griddedCoverage.getScale() >= 0);
-            TestCase.assertTrue(griddedCoverage.getOffset() >= 0);
+            TestCase.assertNull(griddedCoverage.getScale());
+            TestCase.assertNull(griddedCoverage.getOffset());
             TestCase.assertTrue(griddedCoverage.getPrecision() >= 0);
             griddedCoverage.getDataNull();
 
@@ -241,8 +241,8 @@ public class ElevationTilesTiffTestUtils {
                 griddedTile.getTableName());
         long tableId = griddedTile.getTableId();
         TestCase.assertTrue(tableId >= 0);
-        TestCase.assertTrue(griddedTile.getScale() >= 0);
-        TestCase.assertTrue(griddedTile.getOffset() >= 0);
+        TestCase.assertNull(griddedTile.getScale());
+        TestCase.assertNull(griddedTile.getOffset());
         griddedTile.getMin();
         griddedTile.getMax();
         griddedTile.getMean();
@@ -295,12 +295,7 @@ public class ElevationTilesTiffTestUtils {
                         .getDataNull()) {
                     TestCase.assertNull(elevationValue);
                 } else {
-                    TestCase.assertEquals(
-                            (pixelValue * griddedTile.getScale() + griddedTile
-                                    .getOffset())
-                                    * griddedCoverage.getScale()
-                                    + griddedCoverage.getOffset(),
-                            elevationValue);
+                    TestCase.assertEquals(pixelValue, elevationValue.floatValue());
                 }
             }
         }

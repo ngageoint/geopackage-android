@@ -37,18 +37,15 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     /**
      * Constructor
      *
-     * @param geoPackage          GeoPackage
-     * @param extensionName       extension name
-     * @param extensionDefinition extension definition
-     * @param tileDao             tile dao
-     * @param width               elevation response width
-     * @param height              elevation response height
-     * @param requestProjection   request projection
+     * @param geoPackage        GeoPackage
+     * @param tileDao           tile dao
+     * @param width             elevation response width
+     * @param height            elevation response height
+     * @param requestProjection request projection
      */
-    public ElevationTilesCommon(GeoPackage geoPackage, String extensionName,
-                                String extensionDefinition, TileDao tileDao, Integer width,
+    public ElevationTilesCommon(GeoPackage geoPackage, TileDao tileDao, Integer width,
                                 Integer height, Projection requestProjection) {
-        super(geoPackage, extensionName, extensionDefinition, tileDao
+        super(geoPackage, tileDao
                 .getTileMatrixSet(), width, height, requestProjection);
         this.tileDao = tileDao;
     }

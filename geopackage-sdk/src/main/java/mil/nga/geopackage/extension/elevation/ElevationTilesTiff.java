@@ -3,10 +3,7 @@ package mil.nga.geopackage.extension.elevation;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.property.GeoPackageProperties;
-import mil.nga.geopackage.property.PropertyConstants;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
@@ -23,23 +20,6 @@ import mil.nga.tiff.util.TiffConstants;
  * @since 1.3.1
  */
 public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage> {
-
-    /**
-     * Extension name without the author
-     */
-    public static final String EXTENSION_NAME_NO_AUTHOR = TIFF_EXTENSION_NAME_NO_AUTHOR;
-
-    /**
-     * Extension, with author and name
-     */
-    public static final String EXTENSION_NAME = Extensions.buildExtensionName(
-            EXTENSION_AUTHOR, EXTENSION_NAME_NO_AUTHOR);
-
-    /**
-     * Extension definition URL
-     */
-    public static final String EXTENSION_DEFINITION = GeoPackageProperties
-            .getProperty(PropertyConstants.EXTENSIONS, EXTENSION_NAME_NO_AUTHOR);
 
     /**
      * Single sample elevation
@@ -62,7 +42,7 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      */
     public ElevationTilesTiff(GeoPackage geoPackage, TileDao tileDao,
                               Integer width, Integer height, Projection requestProjection) {
-        super(geoPackage, EXTENSION_NAME, EXTENSION_DEFINITION, tileDao, width,
+        super(geoPackage, tileDao, width,
                 height, requestProjection);
     }
 
