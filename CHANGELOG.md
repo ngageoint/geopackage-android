@@ -6,7 +6,14 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.3.1 (TBD)
 
-* TBD
+* Elevation Extension support (PNG & TIFF)
+* geopackage-core version updated to 1.2.1
+* User Attributes table support
+* geopackage-tiff-java dependency for TIFF support
+* Elevation query algorithms including Nearest Neighbor, Bilinear, and Bicubic
+* Elevation unbounded results elevation queries
+* Table and column name SQL quotations to allow uncommon but valid names
+* Zoom level determination using width and height
 
 ## [1.3.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.0) (06-23-2016)
 
