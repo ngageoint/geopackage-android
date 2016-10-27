@@ -1,19 +1,34 @@
 package mil.nga.geopackage.test;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 
 import junit.framework.TestCase;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageManager;
+import mil.nga.geopackage.attributes.AttributesColumn;
+import mil.nga.geopackage.attributes.AttributesDao;
+import mil.nga.geopackage.attributes.AttributesRow;
+import mil.nga.geopackage.attributes.AttributesTable;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
@@ -35,11 +50,6 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.wkb.geom.GeometryType;
 
-import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-
 /**
  * Test setup and teardown methods for preparing and cleaning the database with
  * data
@@ -50,7 +60,7 @@ public class TestSetupTeardown {
 
 	public static final int CREATE_SRS_COUNT = 3;
 
-	public static final int CREATE_CONTENTS_COUNT = 5;
+	public static final int CREATE_CONTENTS_COUNT = 6;
 
 	public static final int CREATE_GEOMETRY_COLUMNS_COUNT = 4;
 
@@ -62,9 +72,9 @@ public class TestSetupTeardown {
 
 	public static final int CREATE_DATA_COLUMN_CONSTRAINTS_COUNT = 7;
 
-	public static final int CREATE_METADATA_COUNT = 3;
+	public static final int CREATE_METADATA_COUNT = 4;
 
-	public static final int CREATE_METADATA_REFERENCE_COUNT = 3;
+	public static final int CREATE_METADATA_REFERENCE_COUNT = 13;
 
 	public static final int CREATE_EXTENSIONS_COUNT = 5;
 
@@ -217,6 +227,120 @@ public class TestSetupTeardown {
 		extensions3.setDefinition("TEST DEFINITION 3");
 		extensions3.setScope(ExtensionScopeType.READ_WRITE);
 		extensionsDao.create(extensions3);
+
+		// Attributes
+
+		List<AttributesColumn> columns = new ArrayList<AttributesColumn>();
+
+		columns.add(AttributesColumn.createColumn(6, "test_text_limited",
+				GeoPackageDataType.TEXT, 5L, false, null));
+		columns.add(AttributesColumn.createColumn(7, "test_blob_limited",
+				GeoPackageDataType.BLOB, 7L, false, null));
+		columns.add(AttributesColumn.createColumn(1, "test_text",
+				GeoPackageDataType.TEXT, false, ""));
+		columns.add(AttributesColumn.createColumn(2, "test_real",
+				GeoPackageDataType.REAL, false, null));
+		columns.add(AttributesColumn.createColumn(3, "test_boolean",
+				GeoPackageDataType.BOOLEAN, false, null));
+		columns.add(AttributesColumn.createColumn(4, "test_blob",
+				GeoPackageDataType.BLOB, false, null));
+		columns.add(AttributesColumn.createColumn(5, "test_integer",
+				GeoPackageDataType.INTEGER, false, null));
+
+		AttributesTable attributesTable = geoPackage
+				.createAttributesTableWithId("test_attributes", columns);
+		TestCase.assertNotNull(attributesTable);
+		Contents attributesContents = attributesTable.getContents();
+		TestCase.assertNotNull(attributesContents);
+		TestCase.assertEquals(ContentsDataType.ATTRIBUTES,
+				attributesContents.getDataType());
+		TestCase.assertEquals("test_attributes",
+				attributesContents.getTableName());
+		TestCase.assertEquals(attributesContents.getTableName(),
+				attributesTable.getTableName());
+
+		Metadata attributesMetadata = new Metadata();
+		attributesMetadata.setId(4);
+		attributesMetadata.setMetadataScope(MetadataScopeType.ATTRIBUTE_TYPE);
+		attributesMetadata.setStandardUri("ATTRIBUTES_TEST_URI");
+		attributesMetadata.setMimeType("text/plain");
+		attributesMetadata.setMetadata("ATTRIBUTES METADATA");
+		metadataDao.create(attributesMetadata);
+
+		AttributesDao attributesDao = geoPackage
+				.getAttributesDao(attributesTable.getTableName());
+
+		for (int i = 0; i < 10; i++) {
+
+			AttributesRow newRow = attributesDao.newRow();
+
+			for (AttributesColumn column : attributesTable.getColumns()) {
+				if (!column.isPrimaryKey()) {
+
+					// Leave nullable columns null 20% of the time
+					if (!column.isNotNull()) {
+						if (Math.random() < 0.2) {
+							continue;
+						}
+					}
+
+					Object value = null;
+
+					switch (column.getDataType()) {
+
+						case TEXT:
+							String text = UUID.randomUUID().toString();
+							if (column.getMax() != null
+									&& text.length() > column.getMax()) {
+								text = text
+										.substring(0, column.getMax().intValue());
+							}
+							value = text;
+							break;
+						case REAL:
+						case DOUBLE:
+							value = Math.random() * 5000.0;
+							break;
+						case BOOLEAN:
+							value = Math.random() < .5 ? false : true;
+							break;
+						case INTEGER:
+						case INT:
+							value = (int) (Math.random() * 500);
+							break;
+						case BLOB:
+							byte[] blob = UUID.randomUUID().toString().getBytes();
+							if (column.getMax() != null
+									&& blob.length > column.getMax()) {
+								byte[] blobLimited = new byte[column.getMax()
+										.intValue()];
+								ByteBuffer
+										.wrap(blob, 0, column.getMax().intValue())
+										.get(blobLimited);
+								blob = blobLimited;
+							}
+							value = blob;
+							break;
+						default:
+							throw new UnsupportedOperationException(
+									"Not implemented for data type: "
+											+ column.getDataType());
+					}
+
+					newRow.setValue(column.getName(), value);
+
+				}
+			}
+			long rowId = attributesDao.create(newRow);
+
+			MetadataReference attributesReference = new MetadataReference();
+			attributesReference.setReferenceScope(ReferenceScopeType.ROW);
+			attributesReference.setTableName(attributesTable.getTableName());
+			attributesReference.setRowIdValue(rowId);
+			attributesReference.setTimestamp(new Date());
+			attributesReference.setMetadata(attributesMetadata);
+			metadataReferenceDao.create(attributesReference);
+		}
 	}
 
 	/**

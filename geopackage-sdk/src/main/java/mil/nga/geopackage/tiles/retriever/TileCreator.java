@@ -452,11 +452,16 @@ public class TileCreator {
                 tileSetBoundingBox) != null) {
 
             // Get the tile distance
-            double distance = projectedRequestBoundingBox.getMaxLongitude()
+            double distanceWidth = projectedRequestBoundingBox
+                    .getMaxLongitude()
                     - projectedRequestBoundingBox.getMinLongitude();
+            double distanceHeight = projectedRequestBoundingBox
+                    .getMaxLatitude()
+                    - projectedRequestBoundingBox.getMinLatitude();
 
             // Get the zoom level to request based upon the tile size
-            Long zoomLevel = tileDao.getZoomLevel(distance);
+            Long zoomLevel = tileDao
+                    .getZoomLevel(distanceWidth, distanceHeight);
 
             // If there is a matching zoom level
             if (zoomLevel != null) {

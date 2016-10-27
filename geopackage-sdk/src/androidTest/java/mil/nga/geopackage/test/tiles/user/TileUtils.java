@@ -116,7 +116,7 @@ public class TileUtils {
 				cursor.close();
 
 				// Manually query for all and compare
-				cursor = (TileCursor) dao.getSQLiteDatabase().query(dao.getTableName(),
+				cursor = (TileCursor) dao.getDatabaseConnection().query(dao.getTableName(),
 						null, null, null, null, null, null);
 				count = cursor.getCount();
 				manualCount = 0;

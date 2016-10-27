@@ -1,9 +1,9 @@
 package mil.nga.geopackage.user;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 
 /**
  * Abstract User DAO for reading user tables
@@ -20,7 +20,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     /**
      * Database connection
      */
-    private final SQLiteDatabase db;
+    private final GeoPackageDatabase db;
 
     /**
      * Constructor
@@ -40,9 +40,10 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     /**
      * Get the database connection
      *
-     * @return
+     * @return database
+     * @since 1.3.1
      */
-    public SQLiteDatabase getSQLiteDatabase() {
+    public GeoPackageDatabase getDatabaseConnection() {
         return db;
     }
 

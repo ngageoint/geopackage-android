@@ -1,7 +1,6 @@
 package mil.nga.geopackage.db;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.j256.ormlite.android.AndroidConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
@@ -21,7 +20,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     /**
      * Database connection
      */
-    private final SQLiteDatabase db;
+    private final GeoPackageDatabase db;
 
     /**
      * Connection source
@@ -33,9 +32,9 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      *
      * @param db
      */
-    public GeoPackageConnection(SQLiteDatabase db) {
+    public GeoPackageConnection(GeoPackageDatabase db) {
         this.db = db;
-        this.connectionSource = new AndroidConnectionSource(db);
+        this.connectionSource = new AndroidConnectionSource(db.getDb());
     }
 
     /**
@@ -43,7 +42,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      *
      * @return
      */
-    public SQLiteDatabase getDb() {
+    public GeoPackageDatabase getDb() {
         return db;
     }
 
@@ -78,7 +77,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     public int count(String table, String where, String[] args) {
 
         StringBuilder countQuery = new StringBuilder();
-        countQuery.append("select count(*) from " + table);
+        countQuery.append("select count(*) from ").append(CoreSQLUtils.quoteWrap(table));
         if (where != null) {
             countQuery.append(" where ").append(where);
         }
@@ -98,8 +97,8 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
         Integer min = null;
         if (count(table, where, args) > 0) {
             StringBuilder minQuery = new StringBuilder();
-            minQuery.append("select min(").append(column).append(") from ")
-                    .append(table);
+            minQuery.append("select min(").append(CoreSQLUtils.quoteWrap(column)).append(") from ")
+                    .append(CoreSQLUtils.quoteWrap(table));
             if (where != null) {
                 minQuery.append(" where ").append(where);
             }
@@ -120,8 +119,8 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
         Integer max = null;
         if (count(table, where, args) > 0) {
             StringBuilder maxQuery = new StringBuilder();
-            maxQuery.append("select max(").append(column).append(") from ")
-                    .append(table);
+            maxQuery.append("select max(").append(CoreSQLUtils.quoteWrap(column)).append(") from ")
+                    .append(CoreSQLUtils.quoteWrap(table));
             if (where != null) {
                 maxQuery.append(" where ").append(where);
             }
@@ -173,7 +172,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
 
         boolean exists = false;
 
-        Cursor cursor = rawQuery("PRAGMA table_info(" + tableName + ")", null);
+        Cursor cursor = rawQuery("PRAGMA table_info(" + CoreSQLUtils.quoteWrap(tableName) + ")", null);
         try {
             int nameIndex = cursor.getColumnIndex(NAME_COLUMN);
             while (cursor.moveToNext()) {

@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 
 /**
  * GeoPackage Metadata database
@@ -26,7 +27,7 @@ public class GeoPackageMetadataDb extends SQLiteOpenHelper {
     /**
      * Open db
      */
-    private SQLiteDatabase db;
+    private GeoPackageDatabase db;
 
     /**
      * Constructor
@@ -62,7 +63,7 @@ public class GeoPackageMetadataDb extends SQLiteOpenHelper {
      * Open database
      */
     public void open() {
-        db = getWritableDatabase();
+        db = new GeoPackageDatabase(getWritableDatabase());
     }
 
     /**
@@ -70,7 +71,7 @@ public class GeoPackageMetadataDb extends SQLiteOpenHelper {
      *
      * @return
      */
-    SQLiteDatabase getDb() {
+    GeoPackageDatabase getDb() {
         if (db == null) {
             throw new GeoPackageException("Database connection is not open");
         }

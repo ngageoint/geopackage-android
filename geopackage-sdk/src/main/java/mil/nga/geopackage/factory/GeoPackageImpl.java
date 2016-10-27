@@ -10,7 +10,15 @@ import java.util.List;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.attributes.AttributesConnection;
+import mil.nga.geopackage.attributes.AttributesCursor;
+import mil.nga.geopackage.attributes.AttributesDao;
+import mil.nga.geopackage.attributes.AttributesTable;
+import mil.nga.geopackage.attributes.AttributesTableReader;
+import mil.nga.geopackage.attributes.AttributesWrapperConnection;
 import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.core.contents.ContentsDao;
+import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageTableCreator;
 import mil.nga.geopackage.features.columns.GeometryColumns;
@@ -86,7 +94,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         FeatureConnection userDb = new FeatureConnection(database);
         FeatureDao dao = new FeatureDao(getName(), database, userDb, geometryColumns, featureTable);
 
-        // Register the table to wrap cursors with the feature cursor
+        // Register the table name (with and without quotes) to wrap cursors with the feature cursor
         cursorFactory.registerTable(geometryColumns.getTableName(),
                 new GeoPackageCursorWrapper() {
 
@@ -98,7 +106,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
         // TODO
         // GeoPackages created with SQLite version 4.2.0+ with GeoPackage support are not supported
-        // in Android (Lollipop uses SQLite version 3.8.4.3)
+        // in Android (Nougat uses SQLite version 3.9.2)
         dropSQLiteTriggers(geometryColumns);
 
         return dao;
@@ -198,7 +206,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         TileDao dao = new TileDao(getName(), database, userDb, tileMatrixSet, tileMatrices,
                 tileTable);
 
-        // Register the table to wrap cursors with the tile cursor
+        // Register the table name (with and without quotes) to wrap cursors with the tile cursor
         cursorFactory.registerTable(tileMatrixSet.getTableName(),
                 new GeoPackageCursorWrapper() {
 
@@ -262,6 +270,70 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                     + tileMatrixSetList.size());
         }
         return getTileDao(tileMatrixSetList.get(0));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AttributesDao getAttributesDao(Contents contents) {
+
+        if (contents == null) {
+            throw new GeoPackageException("Non null "
+                    + Contents.class.getSimpleName()
+                    + " is required to create "
+                    + AttributesDao.class.getSimpleName());
+        }
+        if (contents.getDataType() != ContentsDataType.ATTRIBUTES) {
+            throw new GeoPackageException(Contents.class.getSimpleName()
+                    + " is required to be of type "
+                    + ContentsDataType.ATTRIBUTES + ". Actual: "
+                    + contents.getDataTypeString());
+        }
+
+        // Read the existing table and create the dao
+        AttributesTableReader tableReader = new AttributesTableReader(
+                contents.getTableName());
+        final AttributesTable attributesTable = tableReader.readTable(new AttributesWrapperConnection(database));
+        attributesTable.setContents(contents);
+        AttributesConnection userDb = new AttributesConnection(database);
+        AttributesDao dao = new AttributesDao(getName(), database, userDb,
+                attributesTable);
+
+        // Register the table name (with and without quotes) to wrap cursors with the attributes cursor
+        cursorFactory.registerTable(attributesTable.getTableName(),
+                new GeoPackageCursorWrapper() {
+
+                    @Override
+                    public Cursor wrapCursor(Cursor cursor) {
+                        return new AttributesCursor(attributesTable, cursor);
+                    }
+                });
+
+
+        return dao;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AttributesDao getAttributesDao(String tableName) {
+
+        ContentsDao dao = getContentsDao();
+        Contents contents = null;
+        try {
+            contents = dao.queryForId(tableName);
+        } catch (SQLException e) {
+            throw new GeoPackageException("Failed to retrieve "
+                    + Contents.class.getSimpleName() + " for table name: "
+                    + tableName, e);
+        }
+        if (contents == null) {
+            throw new GeoPackageException(
+                    "No Contents Table exists for table name: " + tableName);
+        }
+        return getAttributesDao(contents);
     }
 
     /**
