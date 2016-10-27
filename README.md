@@ -189,5 +189,6 @@ From your project directory, link the cloned SDK directory:
 ### Remote Dependencies ###
 
 * [GeoPackage Core Java](https://github.com/ngageoint/geopackage-core-java) (The MIT License (MIT)) - GeoPackage Library
+* [TIFF](https://github.com/ngageoint/geopackage-tiff-java) (The MIT License (MIT)) - GeoPackage Tagged Image File Format Lib
 * [OrmLite](http://ormlite.com/) (Open Source License) - Object Relational Mapping (ORM) Library
 * [PNGJ](http://github.com/leonbloy/pngj) (Apache License, Version 2.0) - PNGJ: Java library for PNG encoding
