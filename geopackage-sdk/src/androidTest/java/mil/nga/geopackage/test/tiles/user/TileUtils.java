@@ -354,7 +354,7 @@ public class TileUtils {
 											.toString();
 								}
 								if (tileColumn.getMax() != null) {
-									if (updatedLimitedString != null) {
+									if (updatedLimitedString == null) {
 										if (updatedString.length() > tileColumn
 												.getMax()) {
 											updatedLimitedString = updatedString
@@ -459,7 +459,7 @@ public class TileUtils {
 									updatedBitmapHeight = bitmap.getHeight();
 								}
 								if (tileColumn.getMax() != null) {
-									if (updatedLimitedBytes != null) {
+									if (updatedLimitedBytes == null) {
 										if (updatedBytes.length > tileColumn
 												.getMax()) {
 											updatedLimitedBytes = new byte[tileColumn
@@ -567,7 +567,7 @@ public class TileUtils {
 													.getIndex()));
 									break;
 								default:
-									TestCase.fail("Unexpected integer type: "
+									TestCase.fail("Unexpected float type: "
 											+ readTileColumn.getDataType());
 								}
 								break;

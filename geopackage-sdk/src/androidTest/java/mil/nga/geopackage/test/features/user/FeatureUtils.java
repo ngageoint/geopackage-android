@@ -612,7 +612,7 @@ public class FeatureUtils {
 													.toString();
 										}
 										if (featureColumn.getMax() != null) {
-											if (updatedLimitedString != null) {
+											if (updatedLimitedString == null) {
 												if (updatedString.length() > featureColumn
 														.getMax()) {
 													updatedLimitedString = updatedString
@@ -727,7 +727,7 @@ public class FeatureUtils {
 													.toString().getBytes();
 										}
 										if (featureColumn.getMax() != null) {
-											if (updatedLimitedBytes != null) {
+											if (updatedLimitedBytes == null) {
 												if (updatedBytes.length > featureColumn
 														.getMax()) {
 													updatedLimitedBytes = new byte[featureColumn
@@ -856,7 +856,7 @@ public class FeatureUtils {
 														.getIndex()));
 										break;
 									default:
-										TestCase.fail("Unexpected integer type: "
+										TestCase.fail("Unexpected float type: "
 												+ readFeatureColumn
 														.getDataType());
 									}
