@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageConstants;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.attributes.AttributesColumn;
@@ -124,6 +125,16 @@ public class TestSetupTeardown {
 		if (geoPackage == null) {
 			throw new GeoPackageException("Failed to open database");
 		}
+
+		TestCase.assertEquals("Application Id", geoPackage.getApplicationId(), GeoPackageConstants.APPLICATION_ID);
+		TestCase.assertEquals("User Version", geoPackage.getUserVersion(), GeoPackageConstants.USER_VERSION);
+		String userVersionString = String.valueOf(geoPackage.getUserVersion());
+		String majorVersion = userVersionString.substring(0, userVersionString.length() - 4);
+		String minorVersion = userVersionString.substring(userVersionString.length() - 4, userVersionString.length() - 2);
+		String patchVersion = userVersionString.substring(userVersionString.length() - 2);
+		TestCase.assertEquals("Major User Version", geoPackage.getUserVersionMajor(), Integer.valueOf(majorVersion).intValue());
+		TestCase.assertEquals("Minor User Version", geoPackage.getUserVersionMinor(), Integer.valueOf(minorVersion).intValue());
+		TestCase.assertEquals("Patch User Version", geoPackage.getUserVersionPatch(), Integer.valueOf(patchVersion).intValue());
 
 		if (features) {
 			setUpCreateFeatures(geoPackage, allowEmptyFeatures);

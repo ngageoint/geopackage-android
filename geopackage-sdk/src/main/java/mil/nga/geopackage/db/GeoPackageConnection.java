@@ -210,6 +210,26 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Integer querySingleIntResult(String sql, String[] args) {
+
+        Cursor cursor = db.rawQuery(sql, args);
+
+        Integer result = null;
+        try {
+            if (cursor.moveToFirst()) {
+                result = cursor.getInt(0);
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return result;
+    }
+
+    /**
      * Perform a raw database query
      *
      * @param sql
