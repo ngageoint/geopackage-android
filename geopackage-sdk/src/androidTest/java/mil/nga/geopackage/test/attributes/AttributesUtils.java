@@ -331,7 +331,7 @@ public class AttributesUtils {
 											.toString();
 								}
 								if (attributesColumn.getMax() != null) {
-									if (updatedLimitedString != null) {
+									if (updatedLimitedString == null) {
 										if (updatedString.length() > attributesColumn
 												.getMax()) {
 											updatedLimitedString = updatedString
@@ -442,7 +442,7 @@ public class AttributesUtils {
 											.getBytes();
 								}
 								if (attributesColumn.getMax() != null) {
-									if (updatedLimitedBytes != null) {
+									if (updatedLimitedBytes == null) {
 										if (updatedBytes.length > attributesColumn
 												.getMax()) {
 											updatedLimitedBytes = new byte[attributesColumn
@@ -551,7 +551,7 @@ public class AttributesUtils {
 													.getIndex()));
 									break;
 								default:
-									TestCase.fail("Unexpected integer type: "
+									TestCase.fail("Unexpected float type: "
 											+ readAttributesColumn
 													.getDataType());
 								}

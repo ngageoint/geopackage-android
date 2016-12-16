@@ -481,8 +481,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
         GeoPackageConnection connection = new GeoPackageConnection(db);
 
-        // Set the application id as a GeoPackage
+        // Set the GeoPackage application id and user version
         connection.setApplicationId();
+        connection.setUserVersion();
 
         // Create the minimum required tables
         GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
