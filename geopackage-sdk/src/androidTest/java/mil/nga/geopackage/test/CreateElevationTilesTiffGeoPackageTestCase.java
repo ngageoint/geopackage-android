@@ -308,8 +308,8 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
         griddedTile.setStandardDeviation(commonGriddedTile
                 .getStandardDeviation());
 
-        float maxElevation = 8850.0f;
-        float minElevation = 10994.0f;
+        float minElevation = 8850.0f;
+        float maxElevation = 10994.0f;
 
         // Create the image and graphics
         for (int x = 0; x < tileWidth; x++) {
@@ -318,7 +318,7 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
                 if (allowNulls && Math.random() < .05) {
                     value = griddedCoverage.getDataNull().floatValue();
                 } else {
-                    value = (float) ((Math.random() * (maxElevation + minElevation)) - minElevation);
+                    value = (float) ((Math.random() * (maxElevation - minElevation)) + minElevation);
                 }
 
                 elevationTileValues.tilePixels[y][x] = value;
