@@ -1,10 +1,4 @@
-package mil.nga.geopackage.test.tiles.features;
-
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Paint;
+package mil.nga.geopackage.test.db;
 
 import java.sql.SQLException;
 import java.util.Date;
@@ -19,9 +13,6 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.schema.TableColumnKey;
-import mil.nga.geopackage.tiles.features.FeatureTilePointIcon;
-import mil.nga.geopackage.tiles.features.FeatureTiles;
-import mil.nga.geopackage.tiles.features.MapFeatureTiles;
 import mil.nga.wkb.geom.GeometryType;
 import mil.nga.wkb.geom.LineString;
 import mil.nga.wkb.geom.Point;
@@ -30,7 +21,7 @@ import mil.nga.wkb.geom.Polygon;
 /**
  * Feature Tile Utils
  */
-public class FeatureTileUtils {
+public class FeatureIndexerUtils {
 
     /**
      * Create feature dao
@@ -87,38 +78,6 @@ public class FeatureTileUtils {
         updateLastChange(geoPackage, featureDao);
 
         return count;
-    }
-
-    /**
-     * Create a new feature tiles
-     *
-     * @return
-     */
-    public static FeatureTiles createFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
-
-        FeatureTiles featureTiles = new MapFeatureTiles(context, featureDao);
-
-        Paint pointPaint = featureTiles.getPointPaint();
-        //pointPaint.setColor(Color.BLUE);
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), mil.nga.geopackage.test.R.drawable.ic_launcher);
-        bitmap = Bitmap.createScaledBitmap(bitmap, 25, 25, false);
-        FeatureTilePointIcon icon = new FeatureTilePointIcon(bitmap);
-        featureTiles.setPointIcon(icon);
-
-        Paint linePaint = featureTiles.getLinePaint();
-        linePaint.setColor(Color.GREEN);
-
-        Paint polygonPaint = featureTiles.getPolygonPaint();
-        polygonPaint.setColor(Color.RED);
-
-        featureTiles.setFillPolygon(true);
-        Paint polygonFillPaint = featureTiles.getPolygonFillPaint();
-        polygonFillPaint.setColor(Color.RED);
-        polygonFillPaint.setAlpha(50);
-
-        featureTiles.calculateDrawOverlap();
-
-        return featureTiles;
     }
 
     public static void insertFourPoints(FeatureDao featureDao, double x, double y) {

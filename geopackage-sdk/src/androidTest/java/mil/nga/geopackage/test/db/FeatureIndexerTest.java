@@ -16,7 +16,6 @@ import mil.nga.geopackage.db.metadata.TableMetadataDataSource;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
-import mil.nga.geopackage.test.tiles.features.FeatureTileUtils;
 import mil.nga.wkb.geom.GeometryEnvelope;
 import mil.nga.wkb.geom.GeometryType;
 
@@ -41,9 +40,9 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
      */
     public void testIndexer() throws SQLException {
 
-        FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
+        FeatureDao featureDao = FeatureIndexerUtils.createFeatureDao(geoPackage);
 
-        int initialFeatures = FeatureTileUtils.insertFeatures(geoPackage, featureDao);
+        int initialFeatures = FeatureIndexerUtils.insertFeatures(geoPackage, featureDao);
 
         FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
 
@@ -121,9 +120,9 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
         double maxX = 8.38495;
         double minY = 6.82645;
         double maxY = 9.134445;
-        long id1 = FeatureTileUtils.insertPoint(featureDao, minX, maxY);
-        long id2 = FeatureTileUtils.insertLine(featureDao, new double[][]{{minX, minY}, {maxX, maxY}});
-        FeatureTileUtils.updateLastChange(geoPackage, featureDao);
+        long id1 = FeatureIndexerUtils.insertPoint(featureDao, minX, maxY);
+        long id2 = FeatureIndexerUtils.insertLine(featureDao, new double[][]{{minX, minY}, {maxX, maxY}});
+        FeatureIndexerUtils.updateLastChange(geoPackage, featureDao);
 
         // Verify no longer indexed
         assertFalse(indexer.isIndexed());
@@ -133,8 +132,8 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
         assertTrue(indexer.isIndexed());
 
         // Insert a polygon and index manually
-        long id3 = FeatureTileUtils.insertPolygon(featureDao, new double[][]{{minX, minY}, {maxX, minY}, {maxX, maxY}});
-        FeatureTileUtils.updateLastChange(geoPackage, featureDao);
+        long id3 = FeatureIndexerUtils.insertPolygon(featureDao, new double[][]{{minX, minY}, {maxX, minY}, {maxX, maxY}});
+        FeatureIndexerUtils.updateLastChange(geoPackage, featureDao);
         FeatureRow polygonRow = featureDao.queryForIdRow(id3);
         assertNotNull(polygonRow);
         TestCase.assertTrue(indexer.index(polygonRow));
@@ -143,9 +142,9 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
         // Update the point coordinates
         FeatureRow pointRow = featureDao.queryForIdRow(id1);
         assertNotNull(pointRow);
-        FeatureTileUtils.setPoint(pointRow, maxX, minY);
+        FeatureIndexerUtils.setPoint(pointRow, maxX, minY);
         assertTrue(featureDao.update(pointRow) > 0);
-        FeatureTileUtils.updateLastChange(geoPackage, featureDao);
+        FeatureIndexerUtils.updateLastChange(geoPackage, featureDao);
         TestCase.assertTrue(indexer.index(pointRow));
         assertTrue(indexer.isIndexed());
 
