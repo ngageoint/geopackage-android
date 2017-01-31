@@ -21,9 +21,13 @@ View the latest [Javadoc](http://ngageoint.github.io/geopackage-android/docs/api
 
 #### Implementations ####
 
+##### GeoPackage Android Map #####
+
+The [GeoPackage Android Map](https://github.com/ngageoint/geopackage-android-map) SDK includes this library and adds Android Map implementations.
+
 ##### GeoPackage MapCache #####
 
-The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-android) app provides an extensive standalone example on how to use the SDK.
+The [GeoPackage MapCache](https://github.com/ngageoint/geopackage-mapcache-android) app provides an extensive standalone example on how to use both this and the [GeoPackage Android Map](https://github.com/ngageoint/geopackage-android-map) SDKs.
 
 ##### MAGE #####
 
@@ -39,7 +43,6 @@ The [Disconnected Interactive Content Explorer (DICE)](https://github.com/ngageo
 
 // Context context = ...;
 // File geoPackageFile = ...;
-// GoogleMap map = ...;
 
 // Get a manager
 GeoPackageManager manager = GeoPackageFactory.getManager(context);
@@ -72,17 +75,12 @@ List<String> tiles = geoPackage.getTileTables();
 // Query Features
 String featureTable = features.get(0);
 FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
-GoogleMapShapeConverter converter = new GoogleMapShapeConverter(
-        featureDao.getProjection());
 FeatureCursor featureCursor = featureDao.queryForAll();
 try{
     while(featureCursor.moveToNext()){
         FeatureRow featureRow = featureCursor.getRow();
         GeoPackageGeometryData geometryData = featureRow.getGeometry();
         Geometry geometry = geometryData.getGeometry();
-        GoogleMapShape shape = converter.toShape(geometry);
-        GoogleMapShape mapShape = GoogleMapShapeConverter
-                .addShapeToMap(map, shape);
         // ...
     }
 }finally{
@@ -104,40 +102,30 @@ try{
     tileCursor.close();
 }
 
-// Tile Provider (GeoPackage or Google API)
-TileProvider overlay = GeoPackageOverlayFactory
-        .getTileProvider(tileDao);
-TileOverlayOptions overlayOptions = new TileOverlayOptions();
-overlayOptions.tileProvider(overlay);
-overlayOptions.zIndex(-1);
-map.addTileOverlay(overlayOptions);
-
 // Index Features
 FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
 indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
 int indexedCount = indexer.index();
 
-// Feature Tile Provider (dynamically draw tiles from features)
-FeatureTiles featureTiles = new MapFeatureTiles(context, featureDao);
+// Draw tiles from features
+FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao);
 featureTiles.setMaxFeaturesPerTile(1000); // Set max features to draw per tile
 NumberFeaturesTile numberFeaturesTile = new NumberFeaturesTile(context); // Custom feature tile implementation
 featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
 featureTiles.setIndexManager(indexer); // Set index manager to query feature indices
-FeatureOverlay featureOverlay = new FeatureOverlay(featureTiles);
-featureOverlay.setMinZoom(featureDao.getZoomLevel()); // Set zoom level to start showing tiles
-TileOverlayOptions featureOverlayOptions = new TileOverlayOptions();
-featureOverlayOptions.tileProvider(featureOverlay);
-featureOverlayOptions.zIndex(-1); // Draw the feature tiles behind map markers
-map.addTileOverlay(featureOverlayOptions);
+Bitmap tile = featureTiles.drawTile(2, 2, 2);
+
+BoundingBox boundingBox = new BoundingBox();
+Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
 // URL Tile Generator (generate tiles from a URL)
 TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,
-                "url_tile_table", "http://url/{z}/{x}/{y}.png", 2, 7);
+                "url_tile_table", "http://url/{z}/{x}/{y}.png", 2, 7, boundingBox, projection);
 int urlTileCount = urlTileGenerator.generateTiles();
 
 // Feature Tile Generator (generate tiles from features)
 TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
-                featureTable + "_tiles", featureTiles, 10, 15);
+                featureTable + "_tiles", featureTiles, 10, 15, boundingBox, projection);
 int featureTileCount = featureTileGenerator.generateTiles();
 
 // Close database when done
