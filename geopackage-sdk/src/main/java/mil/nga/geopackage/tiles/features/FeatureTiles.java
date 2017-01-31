@@ -722,6 +722,16 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Create a projection transformation from provided projection to Web Mercator
+     *
+     * @param projection projection from
+     * @return transform
+     */
+    protected ProjectionTransform getProjectionToWebMercatorTransform(Projection projection) {
+        return projection.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+    }
+
+    /**
      * Draw a tile bitmap from feature index results
      *
      * @param webMercatorBoundingBox

@@ -8,6 +8,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 * Elevation Extension support (PNG & TIFF)
 * geopackage-core version updated to 1.2.1
+* Moved Play Services and Android Map Utility dependencies to [geopackage-android-map](http://github.com/ngageoint/geopackage-android-map)
+* MapFeatureTiles replaced by DefaultFeatureTiles, removes Map library dependency & fixes geometries drawn over the International Date Line
 * User Attributes table support
 * geopackage-tiff-java dependency for TIFF support
 * Elevation query algorithms including Nearest Neighbor, Bilinear, and Bicubic
@@ -15,6 +17,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Table and column name SQL quotations to allow uncommon but valid names
 * Zoom level determination using width and height
 * GeoPackage application id and user version
+* Updated Android, Gradle, & Maven build & SDK libraries
+* OrmLite Android version updated to 5.0
 
 ## [1.3.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.0) (06-23-2016)
 

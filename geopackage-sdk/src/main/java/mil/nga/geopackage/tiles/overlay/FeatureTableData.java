@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *Represents a collection of rows from a feature table
+ * Represents a collection of rows from a feature table
  *
  * @author osbornb
  * @since 1.2.7
  */
-public class FeatureTableData{
+public class FeatureTableData {
 
     /**
      * Table name
@@ -29,21 +29,21 @@ public class FeatureTableData{
     /**
      * Constructor
      *
-     * @param name table name
+     * @param name  table name
      * @param count row count
      */
-    public FeatureTableData(String name, long count){
+    public FeatureTableData(String name, long count) {
         this(name, count, null);
     }
 
     /**
      * Constructor
      *
-     * @param name table name
+     * @param name  table name
      * @param count row count
-     * @param rows feature rows
+     * @param rows  feature rows
      */
-    public FeatureTableData(String name, long count, List<FeatureRowData> rows){
+    public FeatureTableData(String name, long count, List<FeatureRowData> rows) {
         this.name = name;
         this.count = count;
         this.rows = rows;
@@ -51,6 +51,7 @@ public class FeatureTableData{
 
     /**
      * Get the table name
+     *
      * @return table name
      */
     public String getName() {
@@ -59,6 +60,7 @@ public class FeatureTableData{
 
     /**
      * Get the row count
+     *
      * @return row count
      */
     public long getCount() {
@@ -67,6 +69,7 @@ public class FeatureTableData{
 
     /**
      * Get the feature rows
+     *
      * @return feature rows
      */
     public List<FeatureRowData> getRows() {
@@ -74,51 +77,48 @@ public class FeatureTableData{
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @return JSON compatiable object
+     * @return JSON compatiable object
      */
-    public Object jsonCompatible(){
+    public Object jsonCompatible() {
         return jsonCompatible(true, true);
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @param includePoints true to include point geometries, but no other geometry types
-     *
-     *  @return JSON compatiable object
+     * @param includePoints true to include point geometries, but no other geometry types
+     * @return JSON compatiable object
      */
-    public Object jsonCompatibleWithPoints(boolean includePoints){
+    public Object jsonCompatibleWithPoints(boolean includePoints) {
         return jsonCompatible(includePoints, false);
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @param includeGeometries true to include all geometries, false for no geometries
-     *
-     *  @return JSON compatiable object
+     * @param includeGeometries true to include all geometries, false for no geometries
+     * @return JSON compatiable object
      */
-    public Object jsonCompatibleWithGeometries(boolean includeGeometries){
+    public Object jsonCompatibleWithGeometries(boolean includeGeometries) {
         return jsonCompatible(includeGeometries, includeGeometries);
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @param includePoints     true to include point geometries, ignored if includeGeometries is true
-     *  @param includeGeometries true to include all geometry types
-     *
-     *  @return JSON compatiable object
+     * @param includePoints     true to include point geometries, ignored if includeGeometries is true
+     * @param includeGeometries true to include all geometry types
+     * @return JSON compatiable object
      */
-    public Object jsonCompatible(boolean includePoints, boolean includeGeometries){
+    public Object jsonCompatible(boolean includePoints, boolean includeGeometries) {
         Object jsonObject = null;
-        if(rows == null || rows.isEmpty()){
+        if (rows == null || rows.isEmpty()) {
             jsonObject = count;
-        }else{
+        } else {
             List<Object> jsonRows = new ArrayList<>();
-            for(FeatureRowData row: rows){
+            for (FeatureRowData row : rows) {
                 jsonRows.add(row.jsonCompatible(includePoints, includeGeometries));
             }
             jsonObject = jsonRows;

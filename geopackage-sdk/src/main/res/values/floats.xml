@@ -5,6 +5,4 @@
     <item name="number_features_tile_circle_padding_percentage" type="dimen" format="float">.1</item>
     <item name="number_features_tile_border_stroke_width" type="dimen" format="float">2.0</item>
 
-    <item name="map_feature_overlay_click_screen_percentage" type="dimen" format="float">.03</item>
-
 </resources>

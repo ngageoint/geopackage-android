@@ -14,7 +14,7 @@ import mil.nga.wkb.util.GeometryJSONCompatible;
  * @author osbornb
  * @since 1.2.7
  */
-public class FeatureRowData{
+public class FeatureRowData {
 
     /**
      * Column names and values
@@ -28,16 +28,18 @@ public class FeatureRowData{
 
     /**
      * Constructor
-     * @param values column names and values
+     *
+     * @param values         column names and values
      * @param geometryColumn geometry column name
      */
-    public FeatureRowData(Map<String, Object> values, String geometryColumn){
+    public FeatureRowData(Map<String, Object> values, String geometryColumn) {
         this.values = values;
         this.geometryColumn = geometryColumn;
     }
 
     /**
      * Get the values
+     *
      * @return column names and values
      */
     public Map<String, Object> getValues() {
@@ -46,6 +48,7 @@ public class FeatureRowData{
 
     /**
      * Get the geometry column name
+     *
      * @return geometry column
      */
     public String getGeometryColumn() {
@@ -53,79 +56,76 @@ public class FeatureRowData{
     }
 
     /**
-     *  Get the geometry data
+     * Get the geometry data
      *
-     *  @return geometry data
+     * @return geometry data
      */
-    public GeoPackageGeometryData getGeometryData(){
+    public GeoPackageGeometryData getGeometryData() {
         return (GeoPackageGeometryData) values.get(geometryColumn);
     }
 
     /**
-     *  Get the geometry
+     * Get the geometry
      *
-     *  @return geometry
+     * @return geometry
      */
-    public Geometry getGeometry(){
+    public Geometry getGeometry() {
         return getGeometryData().getGeometry();
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @return JSON compatiable object
+     * @return JSON compatiable object
      */
-    public Object jsonCompatible(){
+    public Object jsonCompatible() {
         return jsonCompatible(true, true);
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @param includePoints true to include point geometries, but no other geometry types
-     *
-     *  @return JSON compatiable object
+     * @param includePoints true to include point geometries, but no other geometry types
+     * @return JSON compatiable object
      */
-    public Object jsonCompatibleWithPoints(boolean includePoints){
+    public Object jsonCompatibleWithPoints(boolean includePoints) {
         return jsonCompatible(includePoints, false);
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @param includeGeometries true to include all geometries, false for no geometries
-     *
-     *  @return JSON compatiable object
+     * @param includeGeometries true to include all geometries, false for no geometries
+     * @return JSON compatiable object
      */
-    public Object jsonCompatibleWithGeometries(boolean includeGeometries){
+    public Object jsonCompatibleWithGeometries(boolean includeGeometries) {
         return jsonCompatible(includeGeometries, includeGeometries);
     }
 
     /**
-     *  Build a JSON compatible object
+     * Build a JSON compatible object
      *
-     *  @param includePoints     true to include point geometries, ignored if includeGeometries is true
-     *  @param includeGeometries true to include all geometry types
-     *
-     *  @return JSON compatiable object
+     * @param includePoints     true to include point geometries, ignored if includeGeometries is true
+     * @param includeGeometries true to include all geometry types
+     * @return JSON compatiable object
      */
-    public Object jsonCompatible(boolean includePoints, boolean includeGeometries){
+    public Object jsonCompatible(boolean includePoints, boolean includeGeometries) {
 
         Map<String, Object> jsonValues = new HashMap<>();
 
-        for(String key: values.keySet()){
+        for (String key : values.keySet()) {
             Object jsonValue = null;
             Object value = values.get(key);
-            if(key.equals(geometryColumn)){
+            if (key.equals(geometryColumn)) {
                 GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
-                if(geometryData.getGeometry() != null){
-                    if(includeGeometries || (includePoints && geometryData.getGeometry().getGeometryType() == GeometryType.POINT)){
+                if (geometryData.getGeometry() != null) {
+                    if (includeGeometries || (includePoints && geometryData.getGeometry().getGeometryType() == GeometryType.POINT)) {
                         jsonValue = GeometryJSONCompatible.getJSONCompatibleGeometry(geometryData.getGeometry());
                     }
-                }else{
+                } else {
                     jsonValue = value;
                 }
-                if(jsonValue != null){
+                if (jsonValue != null) {
                     jsonValues.put(key, jsonValue);
                 }
             }
