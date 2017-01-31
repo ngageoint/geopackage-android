@@ -9,6 +9,7 @@ import android.graphics.Path;
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -16,6 +17,7 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.wkb.geom.CompoundCurve;
 import mil.nga.wkb.geom.Geometry;
 import mil.nga.wkb.geom.GeometryCollection;
 import mil.nga.wkb.geom.LineString;
@@ -24,6 +26,7 @@ import mil.nga.wkb.geom.MultiPoint;
 import mil.nga.wkb.geom.MultiPolygon;
 import mil.nga.wkb.geom.Point;
 import mil.nga.wkb.geom.Polygon;
+import mil.nga.wkb.geom.PolyhedralSurface;
 
 /**
  * Default Feature Tiles implementation using Android Graphics to draw tiles
@@ -144,12 +147,14 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 drawPoint(boundingBox, transform, canvas, pointPaint, point);
                 break;
             case LINESTRING:
+            case CIRCULARSTRING:
                 LineString lineString = (LineString) geometry;
                 Path linePath = new Path();
                 addLineString(boundingBox, transform, linePath, lineString);
                 drawLinePath(canvas, linePath);
                 break;
             case POLYGON:
+            case TRIANGLE:
                 Polygon polygon = (Polygon) geometry;
                 Path polygonPath = new Path();
                 addPolygon(boundingBox, transform, polygonPath, polygon);
@@ -177,7 +182,23 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 }
                 drawPolygonPath(canvas, multiPolygonPath);
                 break;
-            // TODO other WKB shapes????
+            case COMPOUNDCURVE:
+                CompoundCurve compoundCurve = (CompoundCurve) geometry;
+                Path compoundCurvePath = new Path();
+                for (LineString lineStringFromCompoundCurve : compoundCurve.getLineStrings()) {
+                    addLineString(boundingBox, transform, compoundCurvePath, lineStringFromCompoundCurve);
+                }
+                drawLinePath(canvas, compoundCurvePath);
+                break;
+            case POLYHEDRALSURFACE:
+            case TIN:
+                PolyhedralSurface polyhedralSurface = (PolyhedralSurface) geometry;
+                Path polyhedralSurfacePath = new Path();
+                for (Polygon polygonFromPolyhedralSurface : polyhedralSurface.getPolygons()) {
+                    addPolygon(boundingBox, transform, polyhedralSurfacePath, polygonFromPolyhedralSurface);
+                }
+                drawPolygonPath(canvas, polyhedralSurfacePath);
+                break;
             case GEOMETRYCOLLECTION:
                 GeometryCollection<Geometry> geometryCollection = (GeometryCollection) geometry;
                 List<Geometry> geometries = geometryCollection.getGeometries();
@@ -185,6 +206,9 @@ public class DefaultFeatureTiles extends FeatureTiles {
                     drawShape(boundingBox, transform, canvas, geometryFromCollection);
                 }
                 break;
+            default:
+                throw new GeoPackageException("Unsupported Geometry Type: "
+                        + geometry.getGeometryType().getName());
         }
 
     }
