@@ -4,7 +4,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -27,7 +26,7 @@ import mil.nga.geopackage.tiles.user.TileTable;
  * @author osbornb
  * @since 1.3.1
  */
-public abstract class ElevationTilesCommon<TImage extends ElevationImage> extends ElevationTilesCore {
+public abstract class ElevationTilesCommon<TImage extends ElevationImage> extends ElevationTilesCore<TImage> {
 
     /**
      * Tile DAO
@@ -59,18 +58,6 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     public abstract TImage createElevationImage(TileRow tileRow);
 
     /**
-     * Get the elevation value from the image at the coordinate
-     *
-     * @param griddedTile gridded tile
-     * @param image       elevation image
-     * @param x           x coordinate
-     * @param y           y coordinate
-     * @return
-     */
-    public abstract Double getElevationValue(GriddedTile griddedTile,
-                                             TImage image, int x, int y);
-
-    /**
      * Get the elevation value of the pixel in the tile row image
      *
      * @param griddedTile gridded tile
@@ -92,69 +79,9 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the elevation at the coordinate
-     *
-     * @param latitude  latitude
-     * @param longitude longitude
-     * @return elevation value
+     * {@inheritDoc}
      */
-    public Double getElevation(double latitude, double longitude) {
-        ElevationRequest request = new ElevationRequest(latitude, longitude);
-        ElevationTileResults elevations = getElevations(request, 1, 1);
-        Double elevation = null;
-        if (elevations != null) {
-            elevation = elevations.getElevations()[0][0];
-        }
-        return elevation;
-    }
-
-    /**
-     * Get the elevation values within the bounding box
-     *
-     * @param requestBoundingBox request bounding box
-     * @return elevation results
-     */
-    public ElevationTileResults getElevations(BoundingBox requestBoundingBox) {
-        ElevationRequest request = new ElevationRequest(requestBoundingBox);
-        ElevationTileResults elevations = getElevations(request);
-        return elevations;
-    }
-
-    /**
-     * Get the elevation values within the bounding box with the requested width
-     * and height result size
-     *
-     * @param requestBoundingBox request bounding box
-     * @param width              elevation request width
-     * @param height             elevation request height
-     * @return elevation results
-     */
-    public ElevationTileResults getElevations(BoundingBox requestBoundingBox,
-                                              Integer width, Integer height) {
-        ElevationRequest request = new ElevationRequest(requestBoundingBox);
-        ElevationTileResults elevations = getElevations(request, width, height);
-        return elevations;
-    }
-
-    /**
-     * Get the requested elevation values
-     *
-     * @param request elevation request
-     * @return elevation results
-     */
-    public ElevationTileResults getElevations(ElevationRequest request) {
-        ElevationTileResults elevations = getElevations(request, width, height);
-        return elevations;
-    }
-
-    /**
-     * Get the requested elevation values with the requested width and height
-     *
-     * @param request elevation request
-     * @param width   elevation request width
-     * @param height  elevation request height
-     * @return elevation results
-     */
+    @Override
     public ElevationTileResults getElevations(ElevationRequest request,
                                               Integer width, Integer height) {
 
@@ -250,27 +177,9 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the unbounded elevation values within the bounding box. Unbounded
-     * results retrieves and returns each elevation pixel. The results size
-     * equals the width and height of all matching pixels.
-     *
-     * @param requestBoundingBox request bounding box
-     * @return elevation results
+     * {@inheritDoc}
      */
-    public ElevationTileResults getElevationsUnbounded(
-            BoundingBox requestBoundingBox) {
-        ElevationRequest request = new ElevationRequest(requestBoundingBox);
-        return getElevationsUnbounded(request);
-    }
-
-    /**
-     * Get the requested unbounded elevation values. Unbounded results retrieves
-     * and returns each elevation pixel. The results size equals the width and
-     * height of all matching pixels.
-     *
-     * @param request elevation request
-     * @return elevation results
-     */
+    @Override
     public ElevationTileResults getElevationsUnbounded(ElevationRequest request) {
 
         ElevationTileResults elevationResults = null;
@@ -717,271 +626,6 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
         }
 
         return elevations;
-    }
-
-    /**
-     * Get the bilinear interpolation elevation
-     *
-     * @param griddedTile     gridded tile
-     * @param image           image
-     * @param leftLastColumns last columns in the tile to the left
-     * @param topLeftRows     last rows of the tile to the top left
-     * @param topRows         last rows of the tile to the top
-     * @param y               y coordinate
-     * @param x               x coordinate
-     * @param widthRatio      width source over destination ratio
-     * @param heightRatio     height source over destination ratio
-     * @param destTop         destination top most pixel
-     * @param destLeft        destination left most pixel
-     * @param srcTop          source top most pixel
-     * @param srcLeft         source left most pixel
-     * @return bilinear elevation
-     */
-    private Double getBilinearInterpolationElevation(GriddedTile griddedTile,
-                                                     TImage image, Double[][] leftLastColumns,
-                                                     Double[][] topLeftRows, Double[][] topRows, int y, int x,
-                                                     float widthRatio, float heightRatio, float destTop, float destLeft,
-                                                     float srcTop, float srcLeft) {
-
-        // Determine which source pixel to use
-        float xSource = getXSource(x, destLeft, srcLeft, widthRatio);
-        float ySource = getYSource(y, destTop, srcTop, heightRatio);
-
-        ElevationSourcePixel sourcePixelX = getSourceMinAndMax(xSource);
-        ElevationSourcePixel sourcePixelY = getSourceMinAndMax(ySource);
-
-        Double[][] values = new Double[2][2];
-        populateElevationValues(griddedTile, image, leftLastColumns,
-                topLeftRows, topRows, sourcePixelX, sourcePixelY, values);
-
-        Double elevation = null;
-
-        if (values != null) {
-            elevation = getBilinearInterpolationElevation(sourcePixelX,
-                    sourcePixelY, values);
-        }
-
-        return elevation;
-    }
-
-    /**
-     * Get the bicubic interpolation elevation
-     *
-     * @param griddedTile     gridded tile
-     * @param image           image
-     * @param leftLastColumns last columns in the tile to the left
-     * @param topLeftRows     last rows of the tile to the top left
-     * @param topRows         last rows of the tile to the top
-     * @param y               y coordinate
-     * @param x               x coordinate
-     * @param widthRatio      width source over destination ratio
-     * @param heightRatio     height source over destination ratio
-     * @param destTop         destination top most pixel
-     * @param destLeft        destination left most pixel
-     * @param srcTop          source top most pixel
-     * @param srcLeft         source left most pixel
-     * @return bicubic elevation
-     */
-    private Double getBicubicInterpolationElevation(GriddedTile griddedTile,
-                                                    TImage image, Double[][] leftLastColumns,
-                                                    Double[][] topLeftRows, Double[][] topRows, int y, int x,
-                                                    float widthRatio, float heightRatio, float destTop, float destLeft,
-                                                    float srcTop, float srcLeft) {
-
-        // Determine which source pixel to use
-        float xSource = getXSource(x, destLeft, srcLeft, widthRatio);
-        float ySource = getYSource(y, destTop, srcTop, heightRatio);
-
-        ElevationSourcePixel sourcePixelX = getSourceMinAndMax(xSource);
-        sourcePixelX.setMin(sourcePixelX.getMin() - 1);
-        sourcePixelX.setMax(sourcePixelX.getMax() + 1);
-
-        ElevationSourcePixel sourcePixelY = getSourceMinAndMax(ySource);
-        sourcePixelY.setMin(sourcePixelY.getMin() - 1);
-        sourcePixelY.setMax(sourcePixelY.getMax() + 1);
-
-        Double[][] values = new Double[4][4];
-        populateElevationValues(griddedTile, image, leftLastColumns,
-                topLeftRows, topRows, sourcePixelX, sourcePixelY, values);
-
-        Double elevation = null;
-
-        if (values != null) {
-            elevation = getBicubicInterpolationElevation(values, sourcePixelX,
-                    sourcePixelY);
-        }
-
-        return elevation;
-    }
-
-    /**
-     * Populate the elevation values
-     *
-     * @param griddedTile     gridded tile
-     * @param image           image
-     * @param leftLastColumns last columns in the tile to the left
-     * @param topLeftRows     last rows of the tile to the top left
-     * @param topRows         last rows of the tile to the top
-     * @param pixelX          source x pixel
-     * @param pixelY          source y pixel
-     * @param values          values to populate
-     */
-    private void populateElevationValues(GriddedTile griddedTile,
-                                         TImage image, Double[][] leftLastColumns,
-                                         Double[][] topLeftRows, Double[][] topRows,
-                                         ElevationSourcePixel pixelX, ElevationSourcePixel pixelY,
-                                         Double[][] values) {
-
-        populateElevationValues(griddedTile, image, leftLastColumns,
-                topLeftRows, topRows, pixelX.getMin(), pixelX.getMax(),
-                pixelY.getMin(), pixelY.getMax(), values);
-    }
-
-    /**
-     * Populate the elevation values
-     *
-     * @param griddedTile     gridded tile
-     * @param image           image
-     * @param leftLastColumns last columns in the tile to the left
-     * @param topLeftRows     last rows of the tile to the top left
-     * @param topRows         last rows of the tile to the top
-     * @param minX            min x coordinate
-     * @param maxX            max x coordinate
-     * @param minY            min y coordinate
-     * @param maxY            max y coordinate
-     * @param values          values to populate
-     */
-    private void populateElevationValues(GriddedTile griddedTile,
-                                         TImage image, Double[][] leftLastColumns,
-                                         Double[][] topLeftRows, Double[][] topRows, int minX, int maxX,
-                                         int minY, int maxY, Double[][] values) {
-
-        for (int yLocation = maxY; values != null && yLocation >= minY; yLocation--) {
-            for (int xLocation = maxX; xLocation >= minX; xLocation--) {
-                Double value = getElevationValueOverBorders(griddedTile, image,
-                        leftLastColumns, topLeftRows, topRows, xLocation,
-                        yLocation);
-                if (value == null) {
-                    values = null;
-                    break;
-                } else {
-                    values[yLocation - minY][xLocation - minX] = value;
-                }
-            }
-        }
-    }
-
-    /**
-     * Get the nearest neighbor elevation
-     *
-     * @param griddedTile     gridded tile
-     * @param image           image
-     * @param leftLastColumns last columns in the tile to the left
-     * @param topLeftRows     last rows of the tile to the top left
-     * @param topRows         last rows of the tile to the top
-     * @param y               y coordinate
-     * @param x               x coordinate
-     * @param widthRatio      width source over destination ratio
-     * @param heightRatio     height source over destination ratio
-     * @param destTop         destination top most pixel
-     * @param destLeft        destination left most pixel
-     * @param srcTop          source top most pixel
-     * @param srcLeft         source left most pixel
-     * @return nearest neighbor elevation
-     */
-    private Double getNearestNeighborElevation(GriddedTile griddedTile,
-                                               TImage image, Double[][] leftLastColumns,
-                                               Double[][] topLeftRows, Double[][] topRows, int y, int x,
-                                               float widthRatio, float heightRatio, float destTop, float destLeft,
-                                               float srcTop, float srcLeft) {
-
-        // Determine which source pixel to use
-        float xSource = getXSource(x, destLeft, srcLeft, widthRatio);
-        float ySource = getYSource(y, destTop, srcTop, heightRatio);
-
-        // Get the closest nearest neighbors
-        List<int[]> nearestNeighbors = getNearestNeighbors(xSource, ySource);
-
-        // Get the elevation value from the source pixel nearest neighbors until
-        // one is found
-        Double elevation = null;
-        for (int[] nearestNeighbor : nearestNeighbors) {
-            elevation = getElevationValueOverBorders(griddedTile, image,
-                    leftLastColumns, topLeftRows, topRows, nearestNeighbor[0],
-                    nearestNeighbor[1]);
-            if (elevation != null) {
-                break;
-            }
-        }
-
-        return elevation;
-    }
-
-    /**
-     * Get the elevation value from the coordinate location. If the coordinate
-     * crosses the left, top, or top left tile, attempts to get the elevation
-     * from previously processed border elevations.
-     *
-     * @param griddedTile     gridded tile
-     * @param image           image
-     * @param leftLastColumns last columns in the tile to the left
-     * @param topLeftRows     last rows of the tile to the top left
-     * @param topRows         last rows of the tile to the top
-     * @param y               x coordinate
-     * @param y               y coordinate
-     * @return elevation value
-     */
-    private Double getElevationValueOverBorders(GriddedTile griddedTile,
-                                                TImage image, Double[][] leftLastColumns,
-                                                Double[][] topLeftRows, Double[][] topRows, int x, int y) {
-        Double elevation = null;
-
-        // Only handle locations in the current tile, to the left, top left, or
-        // top tiles. Tiles are processed sorted by rows and columns, so values
-        // to the top right, right, or any below tiles will be handled later if
-        // those tiles exist
-        if (x < image.getWidth() && y < image.getHeight()) {
-
-            if (x >= 0 && y >= 0) {
-                elevation = getElevationValue(griddedTile, image, x, y);
-            } else if (x < 0 && y < 0) {
-                // Try to get the elevation from the top left tile values
-                if (topLeftRows != null) {
-                    int row = (-1 * y) - 1;
-                    if (row < topLeftRows.length) {
-                        int column = x + topLeftRows[row].length;
-                        if (column >= 0) {
-                            elevation = topLeftRows[row][column];
-                        }
-                    }
-                }
-            } else if (x < 0) {
-                // Try to get the elevation from the left tile values
-                if (leftLastColumns != null) {
-                    int column = (-1 * x) - 1;
-                    if (column < leftLastColumns.length) {
-                        int row = y;
-                        if (row < leftLastColumns[column].length) {
-                            elevation = leftLastColumns[column][row];
-                        }
-                    }
-                }
-            } else {
-                // Try to get the elevation from the top tile values
-                if (topRows != null) {
-                    int row = (-1 * y) - 1;
-                    if (row < topRows.length) {
-                        int column = x;
-                        if (column < topRows[row].length) {
-                            elevation = topRows[row][column];
-                        }
-                    }
-                }
-            }
-
-        }
-
-        return elevation;
     }
 
     /**
