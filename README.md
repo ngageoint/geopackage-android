@@ -13,7 +13,7 @@ Software source code previously released under an open source license and then m
 
 [GeoPackage Android](http://ngageoint.github.io/geopackage-android/) is a [GeoPackage Library](http://ngageoint.github.io/GeoPackage/) SDK implementation of the Open Geospatial Consortium [GeoPackage](http://www.geopackage.org/) [spec](http://www.geopackage.org/spec/).  It is listed as an [OGC GeoPackage Implementation](http://www.geopackage.org/#implementations_nga) by the National Geospatial-Intelligence Agency.
 
-The GeoPackage SDK provides the ability to manage GeoPackage files providing read, write, import, export, share, and open support. Open GeoPackage files provide read and write access to features and tiles. Feature support includes Well-Known Binary and Google Map shape translations. Tile generation supports creation by URL or features. Tile providers supporting GeoPackage format, Google tile API, and feature tile generation.
+The GeoPackage SDK provides the ability to manage GeoPackage files providing read, write, import, export, share, and open support. Open GeoPackage files provide read and write access to features and tiles. Feature support includes Well-Known Binary translations. Tile generation supports creation by URL or features. Tile providers supporting GeoPackage format, Google tile API, and feature tile generation.
 
 ### Usage ###
 
@@ -23,7 +23,7 @@ View the latest [Javadoc](http://ngageoint.github.io/geopackage-android/docs/api
 
 ##### GeoPackage Android Map #####
 
-The [GeoPackage Android Map](https://github.com/ngageoint/geopackage-android-map) SDK includes this library and adds Android Map implementations.
+The [GeoPackage Android Map](https://github.com/ngageoint/geopackage-android-map) SDK adds Android Map implementations to this base library.
 
 ##### GeoPackage MapCache #####
 
