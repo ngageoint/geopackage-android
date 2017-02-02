@@ -135,9 +135,9 @@ geoPackage.close();
 
 ### Installation ###
 
-Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|1.3.0|aar) (AAR, POM, Source, Javadoc)
+Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|1.3.1|aar) (AAR, POM, Source, Javadoc)
 
-    compile "mil.nga.geopackage:geopackage-android:1.3.0"
+    compile "mil.nga.geopackage:geopackage-android:1.3.1"
 
 ### Build ###
 
