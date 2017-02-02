@@ -4,6 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## 1.3.2 (TBD)
+
+* TBD
+
 ## [1.3.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.1) (02-02-2017)
 
 * Elevation Extension support (PNG & TIFF)
