@@ -7,7 +7,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 1.3.2 (TBD)
 
 * geopackage-core version updated to 1.2.2
-* AndroidManifest cleanup
+* Android support library updated to 25.1.1
+* min SDK lowered from 14 to 13
+* Android Manifest cleanup
 
 ## [1.3.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.1) (02-02-2017)
 
