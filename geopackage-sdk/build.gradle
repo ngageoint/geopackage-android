@@ -12,7 +12,7 @@ android {
     buildToolsVersion "25.0.1"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 13
         targetSdkVersion 25
 
         testApplicationId 'mil.nga.geopackage.test'
@@ -147,7 +147,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v13:25.1.0'
+    compile 'com.android.support:support-v13:25.1.1'
     compile 'com.j256.ormlite:ormlite-android:5.0'
     compile 'mil.nga.geopackage:geopackage-core:1.2.2'
     compile 'ar.com.hjg:pngj:2.1.0'
