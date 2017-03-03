@@ -569,10 +569,6 @@ public class TestSetupTeardown {
 		// Create new Tile Matrix rows
 		TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
 
-		int matrixWidthAndHeight = 2;
-		double pixelXSize = 69237.2;
-		double pixelYSize = 68412.1;
-
 		// Read the asset tile to bytes and convert to bitmap
 		byte[] assetTileData = TestUtils.getAssetFileBytes(testContext,
 				TestConstants.TILE_FILE_NAME);
@@ -581,6 +577,10 @@ public class TestSetupTeardown {
 		// Get the width and height of the bitmap
 		final int tileWidth = bitmap.getWidth();
 		final int tileHeight = bitmap.getHeight();
+
+		int matrixWidthAndHeight = 2;
+		double pixelXSize = (tileMatrixSet.getMaxX() - tileMatrixSet.getMinX()) / (matrixWidthAndHeight * tileWidth);
+		double pixelYSize = (tileMatrixSet.getMaxY() - tileMatrixSet.getMinY()) / (matrixWidthAndHeight * tileHeight);
 
 		// Compress the bitmap back to bytes and use those for the test
 		byte[] tileData = BitmapConverter.toBytes(bitmap, CompressFormat
