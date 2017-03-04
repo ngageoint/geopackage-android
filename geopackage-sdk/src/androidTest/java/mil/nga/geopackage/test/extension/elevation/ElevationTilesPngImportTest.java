@@ -298,7 +298,9 @@ public class ElevationTilesPngImportTest extends
                         if (PRINT) {
                             System.out.print("   " + elevation);
                         }
-                        TestCase.assertNotNull(elevation);
+                        if (!allowNulls) {
+                            TestCase.assertNotNull(elevation);
+                        }
                     }
                 }
             }
