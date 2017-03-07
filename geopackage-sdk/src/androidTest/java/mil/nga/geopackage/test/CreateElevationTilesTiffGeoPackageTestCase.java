@@ -129,8 +129,6 @@ public abstract class CreateElevationTilesTiffGeoPackageTestCase extends
 
         GriddedTile commonGriddedTile = new GriddedTile();
         commonGriddedTile.setContents(tileMatrixSet.getContents());
-        commonGriddedTile.setScale(1.0);
-        commonGriddedTile.setOffset(0.0);
 
         // The min, max, mean, and sd are just for testing and have
         // no association on the test tile created
