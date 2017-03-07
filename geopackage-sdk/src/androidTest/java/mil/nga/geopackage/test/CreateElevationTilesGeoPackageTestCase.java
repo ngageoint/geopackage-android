@@ -157,11 +157,15 @@ public abstract class CreateElevationTilesGeoPackageTestCase extends
         if (Math.random() < .5) {
             commonGriddedTile.setScale(100.0 * Math.random());
             defaultGTScale = false;
+        } else {
+            commonGriddedTile.setScale(1.0);
         }
         boolean defaultGTOffset = true;
         if (Math.random() < .5) {
             commonGriddedTile.setOffset(100.0 * Math.random());
             defaultGTOffset = false;
+        } else {
+            commonGriddedTile.setOffset(0.0);
         }
         // The min, max, mean, and sd are just for testing and have
         // no association on the test tile created
@@ -259,13 +263,13 @@ public abstract class CreateElevationTilesGeoPackageTestCase extends
                     griddedTile = griddedTileDao.queryForId(gtId);
                     TestCase.assertNotNull(griddedTile);
                     if (defaultGTScale) {
-                        TestCase.assertEquals(1.0, griddedTile.getScaleOrDefault());
+                        TestCase.assertEquals(1.0, griddedTile.getScale());
                     } else {
                         TestCase.assertTrue(griddedTile.getScale() >= 0.0
                                 && griddedTile.getScale() <= 100.0);
                     }
                     if (defaultGTOffset) {
-                        TestCase.assertEquals(0.0, griddedTile.getOffsetOrDefault());
+                        TestCase.assertEquals(0.0, griddedTile.getOffset());
                     } else {
                         TestCase.assertTrue(griddedTile.getOffset() >= 0.0
                                 && griddedTile.getOffset() <= 100.0);
