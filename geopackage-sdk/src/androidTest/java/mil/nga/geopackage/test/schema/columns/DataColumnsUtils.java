@@ -1,19 +1,25 @@
 package mil.nga.geopackage.test.schema.columns;
 
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.PreparedUpdate;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.UpdateBuilder;
+
+import junit.framework.TestCase;
+
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
-import mil.nga.wkb.geom.GeometryType;
 import mil.nga.geopackage.schema.TableColumnKey;
 import mil.nga.geopackage.schema.columns.DataColumns;
 import mil.nga.geopackage.schema.columns.DataColumnsDao;
@@ -23,13 +29,7 @@ import mil.nga.geopackage.schema.constraints.DataColumnConstraintsDao;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.tiles.user.TileTable;
-
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.stmt.PreparedDelete;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.PreparedUpdate;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.UpdateBuilder;
+import mil.nga.wkb.geom.GeometryType;
 
 /**
  * Tile Data Columns Utility test methods
@@ -257,7 +257,7 @@ public class DataColumnsUtils {
 			tileContents.setDataType(ContentsDataType.TILES);
 			tileContents.setIdentifier("tile_contents");
 			tileContents.setDescription("");
-			tileContents.setLastChange(new Date());
+			// tileContents.setLastChange(new Date());
 			tileContents.setMinX(-180.0);
 			tileContents.setMinY(-90.0);
 			tileContents.setMaxX(180.0);
@@ -312,7 +312,7 @@ public class DataColumnsUtils {
 			featureContents.setDataType(ContentsDataType.FEATURES);
 			featureContents.setIdentifier("feature_contents");
 			featureContents.setDescription("");
-			featureContents.setLastChange(new Date());
+			// featureContents.setLastChange(new Date());
 			featureContents.setMinX(-180.0);
 			featureContents.setMinY(-90.0);
 			featureContents.setMaxX(180.0);
