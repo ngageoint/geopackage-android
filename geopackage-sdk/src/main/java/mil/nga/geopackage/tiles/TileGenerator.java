@@ -454,7 +454,8 @@ public abstract class TileGenerator {
      */
     private void adjustGoogleBounds() {
         // Set the tile matrix set bounding box to be the world
-        BoundingBox standardWgs84Box = new BoundingBox(-180.0, 180.0,
+        BoundingBox standardWgs84Box = new BoundingBox(-ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH,
+                ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH,
                 ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE,
                 ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE);
         ProjectionTransform wgs84ToWebMercatorTransform = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)

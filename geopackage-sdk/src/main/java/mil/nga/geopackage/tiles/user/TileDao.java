@@ -550,8 +550,8 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         // Verify the bounds are the entire world
         if (wgs84BoundingBox.getMinLatitude() <= ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE
                 && wgs84BoundingBox.getMaxLatitude() >= ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE
-                && wgs84BoundingBox.getMinLongitude() <= -180.0
-                && wgs84BoundingBox.getMaxLongitude() >= 180.0) {
+                && wgs84BoundingBox.getMinLongitude() <= -ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH
+                && wgs84BoundingBox.getMaxLongitude() >= ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) {
 
             googleTiles = true;
 
