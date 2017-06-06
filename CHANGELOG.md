@@ -12,6 +12,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Android support library updated to 25.2.0
 * min SDK lowered from 14 to 13
 * build tools version updated to 25.0.3
+* gradle plugin updated to 2.3.2
 * Android Manifest cleanup
 
 ## [1.3.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.1) (02-02-2017)
