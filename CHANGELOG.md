@@ -9,8 +9,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * geopackage-core version updated to 1.2.2
 * tiff version updated to 1.0.1
 * Elevation Extension scale and offset columns changed to be non nullable
-* Android support library updated to 25.1.1
+* Android support library updated to 25.2.0
 * min SDK lowered from 14 to 13
+* build tools version updated to 25.0.3
 * Android Manifest cleanup
 
 ## [1.3.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.1) (02-02-2017)
