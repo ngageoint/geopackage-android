@@ -14,6 +14,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * build tools version updated to 25.0.3
 * gradle plugin updated to 2.3.2
 * Android Manifest cleanup
+* URL Tile Generator handle URL redirects
 
 ## [1.3.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.1) (02-02-2017)
 
