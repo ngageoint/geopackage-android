@@ -149,9 +149,9 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-android:5.0'
     compile 'mil.nga.geopackage:geopackage-core:1.2.2'
     compile 'ar.com.hjg:pngj:2.1.0'
-    compile 'mil.nga:tiff:1.0.1'
+    compile 'mil.nga:tiff:1.0.2'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.0',
             'mil.nga.geopackage:geopackage-core:1.2.2' ,
             'ar.com.hjg:pngj:2.1.0' ,
-            'mil.nga:tiff:1.0.1'
+            'mil.nga:tiff:1.0.2'
 }
