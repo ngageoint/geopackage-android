@@ -176,8 +176,8 @@ public class ElevationTilesTiffTestUtils {
                     griddedCoverage.getTileMatrixSetName());
             TestCase.assertEquals(GriddedCoverageDataType.FLOAT,
                     griddedCoverage.getDataType());
-            TestCase.assertNull(griddedCoverage.getScale());
-            TestCase.assertNull(griddedCoverage.getOffset());
+            TestCase.assertEquals(1.0, griddedCoverage.getScale());
+            TestCase.assertEquals(0.0, griddedCoverage.getOffset());
             TestCase.assertTrue(griddedCoverage.getPrecision() >= 0);
             griddedCoverage.getDataNull();
 
@@ -241,8 +241,8 @@ public class ElevationTilesTiffTestUtils {
                 griddedTile.getTableName());
         long tableId = griddedTile.getTableId();
         TestCase.assertTrue(tableId >= 0);
-        TestCase.assertNull(griddedTile.getScale());
-        TestCase.assertNull(griddedTile.getOffset());
+        TestCase.assertEquals(1.0, griddedTile.getScale());
+        TestCase.assertEquals(0.0, griddedTile.getOffset());
         griddedTile.getMin();
         griddedTile.getMax();
         griddedTile.getMean();
@@ -309,6 +309,14 @@ public class ElevationTilesTiffTestUtils {
 
         TileMatrix tileMatrix = elevationTiles.getTileDao().getTileMatrix(
                 tileRow.getZoomLevel());
+        double xDistance = tileMatrixSet.getMaxX() - tileMatrixSet.getMinX();
+        double xDistance2 = tileMatrix.getMatrixWidth()
+                * tileMatrix.getTileWidth() * tileMatrix.getPixelXSize();
+        TestCase.assertEquals(xDistance, xDistance2, .001);
+        double yDistance = tileMatrixSet.getMaxY() - tileMatrixSet.getMinY();
+        double yDistance2 = tileMatrix.getMatrixHeight()
+                * tileMatrix.getTileHeight() * tileMatrix.getPixelYSize();
+        TestCase.assertEquals(yDistance, yDistance2, .001);
         BoundingBox boundingBox = TileBoundingBoxUtils.getBoundingBox(
                 tileMatrixSet.getBoundingBox(), tileMatrix,
                 tileRow.getTileColumn(), tileRow.getTileRow());

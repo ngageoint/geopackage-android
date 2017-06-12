@@ -177,7 +177,9 @@ public class ElevationTilesPngTestUtils {
             TestCase.assertEquals(GriddedCoverageDataType.INTEGER,
                     griddedCoverage.getDataType());
             TestCase.assertTrue(griddedCoverage.getScale() >= 0);
-            TestCase.assertTrue(griddedCoverage.getOffset() >= 0);
+            if (elevationTileValues != null) {
+                TestCase.assertTrue(griddedCoverage.getOffset() >= 0);
+            }
             TestCase.assertTrue(griddedCoverage.getPrecision() >= 0);
             griddedCoverage.getDataNull();
 
@@ -241,8 +243,10 @@ public class ElevationTilesPngTestUtils {
                 griddedTile.getTableName());
         long tableId = griddedTile.getTableId();
         TestCase.assertTrue(tableId >= 0);
-        TestCase.assertTrue(griddedTile.getScaleOrDefault() >= 0);
-        TestCase.assertTrue(griddedTile.getOffsetOrDefault() >= 0);
+        TestCase.assertTrue(griddedTile.getScale() >= 0);
+        if (elevationTileValues != null) {
+            TestCase.assertTrue(griddedTile.getOffset() >= 0);
+        }
         griddedTile.getMin();
         griddedTile.getMax();
         griddedTile.getMean();
@@ -305,10 +309,10 @@ public class ElevationTilesPngTestUtils {
                     TestCase.assertNull(elevationValue);
                 } else {
                     TestCase.assertEquals(
-                            (pixelValue * griddedTile.getScaleOrDefault() + griddedTile
-                                    .getOffsetOrDefault())
-                                    * griddedCoverage.getScaleOrDefault()
-                                    + griddedCoverage.getOffsetOrDefault(),
+                            (pixelValue * griddedTile.getScale() + griddedTile
+                                    .getOffset())
+                                    * griddedCoverage.getScale()
+                                    + griddedCoverage.getOffset(),
                             elevationValue);
                 }
             }
@@ -324,6 +328,14 @@ public class ElevationTilesPngTestUtils {
 
         TileMatrix tileMatrix = elevationTiles.getTileDao().getTileMatrix(
                 tileRow.getZoomLevel());
+        double xDistance = tileMatrixSet.getMaxX() - tileMatrixSet.getMinX();
+        double xDistance2 = tileMatrix.getMatrixWidth()
+                * tileMatrix.getTileWidth() * tileMatrix.getPixelXSize();
+        TestCase.assertEquals(xDistance, xDistance2, .0000000001);
+        double yDistance = tileMatrixSet.getMaxY() - tileMatrixSet.getMinY();
+        double yDistance2 = tileMatrix.getMatrixHeight()
+                * tileMatrix.getTileHeight() * tileMatrix.getPixelYSize();
+        TestCase.assertEquals(yDistance, yDistance2, .0000000001);
         BoundingBox boundingBox = TileBoundingBoxUtils.getBoundingBox(
                 tileMatrixSet.getBoundingBox(), tileMatrix,
                 tileRow.getTileColumn(), tileRow.getTileRow());

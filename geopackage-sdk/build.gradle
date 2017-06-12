@@ -9,10 +9,10 @@ def remotePublish = false
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 13
         targetSdkVersion 25
 
         testApplicationId 'mil.nga.geopackage.test'
@@ -47,8 +47,7 @@ android {
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         classpath += configurations.javadocDeps
-        classpath += files("${android.sdkDirectory}/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar")
-        classpath += files("${android.sdkDirectory}/extras/android/support/v4/android-support-v4.jar")
+        classpath += files("${android.sdkDirectory}/extras/android/support/v13/android-support-v13.jar")
         options.links("http://ngageoint.github.io/geopackage-core-java/docs/api/");
         options.links("http://ngageoint.github.io/geopackage-wkb-java/docs/api/");
         options.links("http://ngageoint.github.io/geopackage-tiff-java/docs/api/");
@@ -57,7 +56,6 @@ android {
         options.links("http://docs.oracle.com/javase/7/docs/api/");
         options.links("http://hjg.com.ar/pngj/apidocs/");
         options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/docs/reference");
-        options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/extras/google/google_play_services/docs/reference");
         destinationDir = file("../javadoc/")
         failOnError false
     }
@@ -147,13 +145,13 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v13:25.1.0'
+    compile 'com.android.support:support-v13:25.2.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
-    compile 'mil.nga.geopackage:geopackage-core:1.2.1'
+    compile 'mil.nga.geopackage:geopackage-core:1.2.2'
     compile 'ar.com.hjg:pngj:2.1.0'
-    compile 'mil.nga:tiff:1.0.0'
+    compile 'mil.nga:tiff:1.0.2'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.0',
-            'mil.nga.geopackage:geopackage-core:1.2.1' ,
+            'mil.nga.geopackage:geopackage-core:1.2.2' ,
             'ar.com.hjg:pngj:2.1.0' ,
-            'mil.nga:tiff:1.0.0'
+            'mil.nga:tiff:1.0.2'
 }

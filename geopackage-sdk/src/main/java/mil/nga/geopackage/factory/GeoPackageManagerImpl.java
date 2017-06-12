@@ -705,6 +705,17 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             connection = (HttpURLConnection) url.openConnection();
             connection.connect();
 
+            int responseCode = connection.getResponseCode();
+            if(responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                    || responseCode == HttpURLConnection.HTTP_MOVED_TEMP
+                    || responseCode == HttpURLConnection.HTTP_SEE_OTHER){
+                String redirect = connection.getHeaderField("Location");
+                connection.disconnect();
+                url = new URL(redirect);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+            }
+
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new GeoPackageException("Failed to import GeoPackage "
                         + name + " from URL: '" + url.toString() + "'. HTTP "

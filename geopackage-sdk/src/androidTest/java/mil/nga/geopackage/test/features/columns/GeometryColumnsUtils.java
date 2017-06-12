@@ -1,12 +1,19 @@
 package mil.nga.geopackage.test.features.columns;
 
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.PreparedUpdate;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.UpdateBuilder;
+
+import junit.framework.TestCase;
+
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
@@ -19,16 +26,9 @@ import mil.nga.geopackage.features.columns.GeometryColumnsSfSql;
 import mil.nga.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.geopackage.features.columns.GeometryColumnsSqlMm;
 import mil.nga.geopackage.features.columns.GeometryColumnsSqlMmDao;
-import mil.nga.wkb.geom.GeometryType;
 import mil.nga.geopackage.schema.TableColumnKey;
 import mil.nga.geopackage.test.TestUtils;
-
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.stmt.PreparedDelete;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.PreparedUpdate;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.UpdateBuilder;
+import mil.nga.wkb.geom.GeometryType;
 
 /**
  * Geometry Columns Utility test methods
@@ -527,7 +527,7 @@ public class GeometryColumnsUtils {
 			contents.setDataType(ContentsDataType.FEATURES);
 			contents.setIdentifier("test_contents");
 			contents.setDescription("");
-			contents.setLastChange(new Date());
+			// contents.setLastChange(new Date());
 			contents.setMinX(-180.0);
 			contents.setMinY(-90.0);
 			contents.setMaxX(180.0);
