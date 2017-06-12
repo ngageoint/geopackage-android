@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.3.2 (TBD)
+## [1.3.2](https://github.com/ngageoint/geopackage-android/releases/tag/1.3.2) (06-12-2017)
 
 * geopackage-core version updated to 1.2.2
 * tiff version updated to 1.0.2
