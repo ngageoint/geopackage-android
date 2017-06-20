@@ -147,11 +147,11 @@ android {
 dependencies {
     compile 'com.android.support:support-v13:25.2.0'
     compile 'com.j256.ormlite:ormlite-android:5.0'
-    compile 'mil.nga.geopackage:geopackage-core:1.2.2'
+    compile 'mil.nga.geopackage:geopackage-core:1.2.3'
     compile 'ar.com.hjg:pngj:2.1.0'
     compile 'mil.nga:tiff:1.0.2'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.0',
-            'mil.nga.geopackage:geopackage-core:1.2.2' ,
+            'mil.nga.geopackage:geopackage-core:1.2.3' ,
             'ar.com.hjg:pngj:2.1.0' ,
             'mil.nga:tiff:1.0.2'
 }
