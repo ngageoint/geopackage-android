@@ -1,5 +1,10 @@
 package mil.nga.geopackage.test.features.user;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
+
+import junit.framework.TestCase;
+
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -7,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureColumn;
@@ -17,6 +22,10 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.geopackage.test.TestUtils;
+import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
+import mil.nga.geopackage.user.ColumnValue;
 import mil.nga.wkb.geom.Geometry;
 import mil.nga.wkb.geom.GeometryCollection;
 import mil.nga.wkb.geom.GeometryType;
@@ -26,14 +35,8 @@ import mil.nga.wkb.geom.MultiPoint;
 import mil.nga.wkb.geom.MultiPolygon;
 import mil.nga.wkb.geom.Point;
 import mil.nga.wkb.geom.Polygon;
-import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.wkb.io.ByteReader;
 import mil.nga.wkb.io.WkbGeometryReader;
-import mil.nga.geopackage.test.TestUtils;
-import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
-import mil.nga.geopackage.user.ColumnValue;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
 
 /**
  * Features Utility test methods
@@ -1048,6 +1051,62 @@ public class FeatureUtils {
 					cursor = dao.queryForAll();
 					TestCase.assertEquals(count + 2, cursor.getCount());
 					cursor.close();
+
+					// Test copied row
+					FeatureRow copyRow = new FeatureRow(queryFeatureRow2);
+					for (int i = 0; i < dao.getTable().getColumns().size(); i++) {
+						TestCase.assertEquals(queryFeatureRow2.getValue(i),
+								copyRow.getValue(i));
+					}
+
+					copyRow.resetId();
+
+					long newRowId3 = dao.create(copyRow);
+
+					TestCase.assertEquals(newRowId3, copyRow.getId());
+
+					// Verify new was created
+					FeatureRow queryFeatureRow3 = dao.queryForIdRow(newRowId3);
+					TestCase.assertNotNull(queryFeatureRow3);
+					cursor = dao.queryForAll();
+					TestCase.assertEquals(count + 3, cursor.getCount());
+					cursor.close();
+
+					for (FeatureColumn column : dao.getTable().getColumns()) {
+						if (column.isPrimaryKey()) {
+							TestCase.assertNotSame(
+									queryFeatureRow2.getValue(column.getName()),
+									queryFeatureRow3.getValue(column.getName()));
+						} else if (column.getIndex() == queryFeatureRow2
+								.getGeometryColumnIndex()) {
+							GeoPackageGeometryData geometry1 = queryFeatureRow2
+									.getGeometry();
+							GeoPackageGeometryData geometry2 = queryFeatureRow3
+									.getGeometry();
+							if (geometry1 == null) {
+								TestCase.assertNull(geometry2);
+							} else {
+								GeoPackageGeometryDataUtils
+										.compareGeometryData(geometry1,
+												geometry2);
+							}
+						} else if (column.getDataType() == GeoPackageDataType.BLOB) {
+							byte[] blob1 = (byte[]) queryFeatureRow2
+									.getValue(column.getName());
+							byte[] blob2 = (byte[]) queryFeatureRow3
+									.getValue(column.getName());
+							if (blob1 == null) {
+								TestCase.assertNull(blob2);
+							} else {
+								GeoPackageGeometryDataUtils.compareByteArrays(
+										blob1, blob2);
+							}
+						} else {
+							TestCase.assertEquals(
+									queryFeatureRow2.getValue(column.getName()),
+									queryFeatureRow3.getValue(column.getName()));
+						}
+					}
 				}
 				cursor.close();
 			}

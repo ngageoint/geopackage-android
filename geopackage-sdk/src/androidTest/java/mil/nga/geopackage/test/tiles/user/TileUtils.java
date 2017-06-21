@@ -712,6 +712,48 @@ public class TileUtils {
                     cursor = dao.queryForAll();
                     TestCase.assertEquals(count + 2, cursor.getCount());
                     cursor.close();
+
+                    // Test copied row
+                    TileRow copyRow = new TileRow(queryTileRow2);
+                    for (int i = 0; i < dao.getTable().getColumns().size(); i++) {
+                        TestCase.assertEquals(queryTileRow2.getValue(i),
+                                copyRow.getValue(i));
+                    }
+
+                    copyRow.resetId();
+                    copyRow.setZoomLevel(queryTileRow2.getZoomLevel() + 1);
+
+                    long newRowId3 = dao.create(copyRow);
+
+                    TestCase.assertEquals(newRowId3, copyRow.getId());
+
+                    // Verify new was created
+                    TileRow queryTileRow3 = dao.queryForIdRow(newRowId3);
+                    TestCase.assertNotNull(queryTileRow3);
+                    cursor = dao.queryForAll();
+                    TestCase.assertEquals(count + 3, cursor.getCount());
+                    cursor.close();
+
+                    for (TileColumn column : dao.getTable().getColumns()) {
+                        if (column.isPrimaryKey()) {
+                            TestCase.assertNotSame(queryTileRow2.getId(),
+                                    queryTileRow3.getId());
+                        } else if (column.getIndex() == queryTileRow3
+                                .getZoomLevelColumnIndex()) {
+                            TestCase.assertEquals(queryTileRow2.getZoomLevel(),
+                                    queryTileRow3.getZoomLevel() - 1);
+                        } else if (column.getIndex() == queryTileRow3
+                                .getTileDataColumnIndex()) {
+                            byte[] tileData1 = queryTileRow2.getTileData();
+                            byte[] tileData2 = queryTileRow3.getTileData();
+                            GeoPackageGeometryDataUtils.compareByteArrays(
+                                    tileData1, tileData2);
+                        } else {
+                            TestCase.assertEquals(
+                                    queryTileRow2.getValue(column.getName()),
+                                    queryTileRow3.getValue(column.getName()));
+                        }
+                    }
                 }
                 cursor.close();
             }

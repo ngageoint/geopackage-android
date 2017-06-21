@@ -1,12 +1,20 @@
 package mil.nga.geopackage.test.core.srs;
 
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.PreparedUpdate;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.UpdateBuilder;
+
+import junit.framework.TestCase;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
@@ -19,13 +27,6 @@ import mil.nga.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.schema.TableColumnKey;
-
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.stmt.PreparedDelete;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.PreparedUpdate;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.UpdateBuilder;
 
 /**
  * Spatial Reference System Utility test methods
@@ -350,6 +351,44 @@ public class SpatialReferenceSystemUtils {
 				querySrs.getOrganizationCoordsysId());
 		TestCase.assertEquals(definition, querySrs.getDefinition());
 		TestCase.assertEquals(description, querySrs.getDescription());
+
+		// Test copied srs
+		SpatialReferenceSystem copySrs = new SpatialReferenceSystem(querySrs);
+		TestCase.assertEquals(querySrs.getSrsName(), copySrs.getSrsName());
+		TestCase.assertEquals(querySrs.getId(), copySrs.getId());
+		TestCase.assertEquals(querySrs.getOrganization(),
+				copySrs.getOrganization());
+		TestCase.assertEquals(querySrs.getOrganizationCoordsysId(),
+				copySrs.getOrganizationCoordsysId());
+		TestCase.assertEquals(querySrs.getDefinition(), copySrs.getDefinition());
+		TestCase.assertEquals(querySrs.getDescription(),
+				copySrs.getDescription());
+		TestCase.assertEquals(querySrs.getDefinition_12_063(),
+				copySrs.getDefinition_12_063());
+
+		// Change pk
+		long copySrsId = 654321l;
+		copySrs.setSrsId(copySrsId);
+
+		dao.create(copySrs);
+
+		// Verify count
+		long newCount2 = dao.countOf();
+		TestCase.assertEquals(count + 2, newCount2);
+
+		// Verify saved contents
+		SpatialReferenceSystem queryCopiedSrs = dao.queryForId(copySrsId);
+		TestCase.assertEquals(querySrs.getSrsName(),
+				queryCopiedSrs.getSrsName());
+		TestCase.assertEquals(copySrsId, queryCopiedSrs.getSrsId());
+		TestCase.assertEquals(querySrs.getOrganization(),
+				queryCopiedSrs.getOrganization());
+		TestCase.assertEquals(querySrs.getOrganizationCoordsysId(),
+				queryCopiedSrs.getOrganizationCoordsysId());
+		TestCase.assertEquals(querySrs.getDefinition(),
+				queryCopiedSrs.getDefinition());
+		TestCase.assertEquals(querySrs.getDescription(),
+				queryCopiedSrs.getDescription());
 
 	}
 
