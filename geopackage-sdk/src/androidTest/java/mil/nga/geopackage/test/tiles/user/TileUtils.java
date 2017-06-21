@@ -715,9 +715,19 @@ public class TileUtils {
 
                     // Test copied row
                     TileRow copyRow = new TileRow(queryTileRow2);
-                    for (int i = 0; i < dao.getTable().getColumns().size(); i++) {
-                        TestCase.assertEquals(queryTileRow2.getValue(i),
-                                copyRow.getValue(i));
+                    for (TileColumn column : dao.getTable().getColumns()) {
+                        if (column.getIndex() == queryTileRow2
+                                .getTileDataColumnIndex()) {
+                            byte[] tileData1 = queryTileRow2.getTileData();
+                            byte[] tileData2 = copyRow.getTileData();
+                            TestCase.assertNotSame(tileData1, tileData2);
+                            GeoPackageGeometryDataUtils.compareByteArrays(
+                                    tileData1, tileData2);
+                        } else {
+                            TestCase.assertEquals(
+                                    queryTileRow2.getValue(column.getName()),
+                                    copyRow.getValue(column.getName()));
+                        }
                     }
 
                     copyRow.resetId();

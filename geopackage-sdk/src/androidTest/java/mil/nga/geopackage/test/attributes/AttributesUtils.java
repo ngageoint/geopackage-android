@@ -664,9 +664,23 @@ public class AttributesUtils {
 					// Test copied row
 					AttributesRow copyRow = new AttributesRow(
 							queryAttributesRow2);
-					for (int i = 0; i < dao.getTable().getColumns().size(); i++) {
-						TestCase.assertEquals(queryAttributesRow2.getValue(i),
-								copyRow.getValue(i));
+					for (AttributesColumn column : dao.getTable().getColumns()) {
+						if (column.getDataType() == GeoPackageDataType.BLOB) {
+							byte[] blob1 = (byte[]) queryAttributesRow2
+									.getValue(column.getName());
+							byte[] blob2 = (byte[]) copyRow.getValue(column
+									.getName());
+							if (blob1 == null) {
+								TestCase.assertNull(blob2);
+							} else {
+								GeoPackageGeometryDataUtils.compareByteArrays(
+										blob1, blob2);
+							}
+						} else {
+							TestCase.assertEquals(queryAttributesRow2
+									.getValue(column.getName()), copyRow
+									.getValue(column.getName()));
+						}
 					}
 
 					copyRow.resetId();

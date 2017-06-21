@@ -1054,9 +1054,38 @@ public class FeatureUtils {
 
 					// Test copied row
 					FeatureRow copyRow = new FeatureRow(queryFeatureRow2);
-					for (int i = 0; i < dao.getTable().getColumns().size(); i++) {
-						TestCase.assertEquals(queryFeatureRow2.getValue(i),
-								copyRow.getValue(i));
+					for (FeatureColumn column : dao.getTable().getColumns()) {
+						if (column.getIndex() == queryFeatureRow2
+								.getGeometryColumnIndex()) {
+							GeoPackageGeometryData geometry1 = queryFeatureRow2
+									.getGeometry();
+							GeoPackageGeometryData geometry2 = copyRow
+									.getGeometry();
+							if (geometry1 == null) {
+								TestCase.assertNull(geometry2);
+							} else {
+								TestCase.assertNotSame(geometry1, geometry2);
+								GeoPackageGeometryDataUtils
+										.compareGeometryData(geometry1,
+												geometry2);
+							}
+						} else if (column.getDataType() == GeoPackageDataType.BLOB) {
+							byte[] blob1 = (byte[]) queryFeatureRow2
+									.getValue(column.getName());
+							byte[] blob2 = (byte[]) copyRow.getValue(column
+									.getName());
+							if (blob1 == null) {
+								TestCase.assertNull(blob2);
+							} else {
+								TestCase.assertNotSame(blob1, blob2);
+								GeoPackageGeometryDataUtils.compareByteArrays(
+										blob1, blob2);
+							}
+						} else {
+							TestCase.assertEquals(
+									queryFeatureRow2.getValue(column.getName()),
+									copyRow.getValue(column.getName()));
+						}
 					}
 
 					copyRow.resetId();
