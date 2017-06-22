@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.UUID;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -274,6 +276,7 @@ public class FeatureUtils {
 
 		for (int i = 0; i < featureRow.columnCount(); i++) {
 			FeatureColumn column = featureRow.getTable().getColumns().get(i);
+			GeoPackageDataType dataType = column.getDataType();
 			TestCase.assertEquals(i, column.getIndex());
 			TestCase.assertEquals(columns[i], featureRow.getColumnName(i));
 			TestCase.assertEquals(i, featureRow.getColumnIndex(columns[i]));
@@ -291,7 +294,15 @@ public class FeatureUtils {
 				break;
 
 			case Cursor.FIELD_TYPE_STRING:
-				TestCase.assertTrue(value instanceof String);
+				if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+					TestCase.assertTrue(value instanceof Date);
+					Date date = (Date) value;
+					DateConverter converter = DateConverter.converter(dataType);
+					String dateString = converter.stringValue(date);
+					TestCase.assertEquals(date.getTime(), converter.dateValue(dateString).getTime());
+				}else{
+					TestCase.assertTrue(value instanceof String);
+				}
 				break;
 
 			case Cursor.FIELD_TYPE_BLOB:
@@ -548,6 +559,7 @@ public class FeatureUtils {
 					if (geometryData != null) {
 						String updatedString = null;
 						String updatedLimitedString = null;
+						Date updatedDate = null;
 						Boolean updatedBoolean = null;
 						Byte updatedByte = null;
 						Short updatedShort = null;
@@ -573,6 +585,8 @@ public class FeatureUtils {
 						for (FeatureColumn featureColumn : dao.getTable()
 								.getColumns()) {
 							if (!featureColumn.isPrimaryKey()) {
+
+								GeoPackageDataType dataType = featureColumn.getDataType();
 
 								if (featureColumn.isGeometry()) {
 
@@ -610,31 +624,47 @@ public class FeatureUtils {
 													.getIndex())) {
 
 									case Cursor.FIELD_TYPE_STRING:
-										if (updatedString == null) {
-											updatedString = UUID.randomUUID()
-													.toString();
-										}
-										if (featureColumn.getMax() != null) {
-											if (updatedLimitedString == null) {
-												if (updatedString.length() > featureColumn
-														.getMax()) {
-													updatedLimitedString = updatedString
-															.substring(
-																	0,
-																	featureColumn
-																			.getMax()
-																			.intValue());
-												} else {
-													updatedLimitedString = updatedString;
-												}
+										if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+											if (updatedDate == null) {
+												updatedDate = new Date();
 											}
-											featureRow.setValue(
-													featureColumn.getIndex(),
-													updatedLimitedString);
-										} else {
-											featureRow.setValue(
-													featureColumn.getIndex(),
-													updatedString);
+											DateConverter converter = DateConverter.converter(dataType);
+											if(Math.random() < .5){
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														updatedDate);
+											}else{
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														converter.stringValue(updatedDate));
+											}
+										}else {
+											if (updatedString == null) {
+												updatedString = UUID.randomUUID()
+														.toString();
+											}
+											if (featureColumn.getMax() != null) {
+												if (updatedLimitedString == null) {
+													if (updatedString.length() > featureColumn
+															.getMax()) {
+														updatedLimitedString = updatedString
+																.substring(
+																		0,
+																		featureColumn
+																				.getMax()
+																				.intValue());
+													} else {
+														updatedLimitedString = updatedString;
+													}
+												}
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														updatedLimitedString);
+											} else {
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														updatedString);
+											}
 										}
 										break;
 									case Cursor.FIELD_TYPE_INTEGER:
@@ -789,19 +819,41 @@ public class FeatureUtils {
 									.getColumn(readColumnName);
 							if (!readFeatureColumn.isPrimaryKey()
 									&& !readFeatureColumn.isGeometry()) {
+
+								GeoPackageDataType dataType = readFeatureColumn.getDataType();
+
 								switch (readRow
 										.getRowColumnType(readColumnName)) {
 								case Cursor.FIELD_TYPE_STRING:
-									if (readFeatureColumn.getMax() != null) {
+									if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+										DateConverter converter = DateConverter.converter(dataType);
+										Object value = readRow.getValue(readFeatureColumn
+												.getIndex());
+										Date date = null;
+										if(value instanceof Date){
+											date = (Date) value;
+										}else{
+											date = converter.dateValue((String)value);
+										}
+										Date compareDate = updatedDate;
+										if(dataType == GeoPackageDataType.DATE){
+											compareDate = converter.dateValue(converter.stringValue(compareDate));
+										}
 										TestCase.assertEquals(
-												updatedLimitedString,
-												readRow.getValue(readFeatureColumn
-														.getIndex()));
-									} else {
-										TestCase.assertEquals(
-												updatedString,
-												readRow.getValue(readFeatureColumn
-														.getIndex()));
+												compareDate.getTime(),
+												date.getTime());
+									}else {
+										if (readFeatureColumn.getMax() != null) {
+											TestCase.assertEquals(
+													updatedLimitedString,
+													readRow.getValue(readFeatureColumn
+															.getIndex()));
+										} else {
+											TestCase.assertEquals(
+													updatedString,
+													readRow.getValue(readFeatureColumn
+															.getIndex()));
+										}
 									}
 									break;
 								case Cursor.FIELD_TYPE_INTEGER:

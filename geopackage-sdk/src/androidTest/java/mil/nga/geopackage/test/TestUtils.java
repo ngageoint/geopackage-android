@@ -1,5 +1,12 @@
 package mil.nga.geopackage.test;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.sqlite.SQLiteException;
+
+import junit.framework.TestCase;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,13 +16,14 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureColumn;
@@ -39,11 +47,6 @@ import mil.nga.wkb.geom.GeometryType;
 import mil.nga.wkb.geom.LineString;
 import mil.nga.wkb.geom.Point;
 import mil.nga.wkb.geom.Polygon;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.sqlite.SQLiteException;
 
 /**
  * Test utility methods
@@ -246,6 +249,10 @@ public class TestUtils {
 				GeoPackageDataType.TEXT, 5L, false, null));
 		columns.add(FeatureColumn.createColumn(8, "test_blob_limited",
 				GeoPackageDataType.BLOB, 7L, false, null));
+		columns.add(FeatureColumn.createColumn(9, "test_date",
+				GeoPackageDataType.DATE, false, null));
+		columns.add(FeatureColumn.createColumn(10, "test_datetime",
+				GeoPackageDataType.DATETIME, false, null));
 		columns.add(FeatureColumn.createGeometryColumn(1, geometryColumn,
 				geometryType, false, null));
 		columns.add(FeatureColumn.createColumn(2, "test_text",
@@ -376,6 +383,16 @@ public class TestUtils {
 								blob = blobLimited;
 							}
 							value = blob;
+							break;
+						case DATE:
+						case DATETIME:
+							DateConverter converter = DateConverter.converter(column.getDataType());
+							Date date = new Date();
+							if(Math.random() < .5){
+								value = date;
+							}else{
+								value = converter.stringValue(date);
+							}
 							break;
 						default:
 							throw new UnsupportedOperationException(

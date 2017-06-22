@@ -2,7 +2,10 @@ package mil.nga.geopackage.user;
 
 import android.content.ContentValues;
 
+import java.util.Date;
+
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.DateConverter;
 
 /**
  * User Row containing the values from a single cursor row
@@ -135,6 +138,13 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
             Boolean booleanValue = (Boolean) value;
             short shortBoolean = booleanValue ? (short) 1 : (short) 0;
             contentValues.put(columnName, shortBoolean);
+        } else if (value instanceof Date) {
+            validateValue(column, value, Date.class, String.class);
+            Date dateValue = (Date) value;
+            DateConverter converter = DateConverter.converter(column
+                    .getDataType());
+            String dateString = converter.stringValue(dateValue);
+            contentValues.put(columnName, dateString);
         } else {
             throw new GeoPackageException(
                     "Unsupported update column value. column: " + columnName
