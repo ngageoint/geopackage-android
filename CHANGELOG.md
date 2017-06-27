@@ -4,9 +4,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.3.3 (TBD)
+## [1.4.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.4.0) (06-27-2017)
 
-* geopackage-core version updated to 1.2.3
+* geopackage-core version updated to 1.3.0
 * tiff version updated to 1.0.3
 * Copy constructors for user table (features, tiles, attributes) row objects
 * Improved date column support for user tables (features, tiles, attributes)
