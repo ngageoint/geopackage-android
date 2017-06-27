@@ -69,7 +69,7 @@ public class FeatureDao extends
                 .getProjection(contents.getSrs());
 
         BoundingBox boundingBox = contents.getBoundingBox();
-        if (projection.getEpsg() != contentsProjection.getEpsg()) {
+        if (!projection.equals(contentsProjection)) {
             ProjectionTransform transform = contentsProjection
                     .getTransformation(projection);
             boundingBox = transform.transform(boundingBox);

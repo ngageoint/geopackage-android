@@ -176,7 +176,7 @@ public class GeoPackageGeometryDataUtils {
 									.getSpatialReferenceSystemDao();
 							long srsId = geometryData.getSrsId();
 							SpatialReferenceSystem srs = srsDao
-									.getOrCreate(srsId);
+									.queryForId(srsId);
 
 							long epsg = srs.getOrganizationCoordsysId();
 							Projection projection = ProjectionFactory
