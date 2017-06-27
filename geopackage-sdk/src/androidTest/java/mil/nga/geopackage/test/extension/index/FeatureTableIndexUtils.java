@@ -160,7 +160,7 @@ public class FeatureTableIndexUtils {
                     envelope.getMaxX() + 1, envelope.getMinY() - 1,
                     envelope.getMaxY() + 1);
             Projection projection = null;
-            if (featureDao.getProjection().getEpsg() != ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM) {
+            if (!featureDao.getProjection().equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)) {
                 projection = ProjectionFactory
                         .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
             } else {

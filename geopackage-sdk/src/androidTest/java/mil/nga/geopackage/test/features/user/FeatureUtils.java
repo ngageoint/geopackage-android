@@ -1,15 +1,22 @@
 package mil.nga.geopackage.test.features.user;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
+
+import junit.framework.TestCase;
+
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.DateConverter;
+import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureColumn;
@@ -17,6 +24,10 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.geopackage.test.TestUtils;
+import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
+import mil.nga.geopackage.user.ColumnValue;
 import mil.nga.wkb.geom.Geometry;
 import mil.nga.wkb.geom.GeometryCollection;
 import mil.nga.wkb.geom.GeometryType;
@@ -26,14 +37,8 @@ import mil.nga.wkb.geom.MultiPoint;
 import mil.nga.wkb.geom.MultiPolygon;
 import mil.nga.wkb.geom.Point;
 import mil.nga.wkb.geom.Polygon;
-import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.wkb.io.ByteReader;
 import mil.nga.wkb.io.WkbGeometryReader;
-import mil.nga.geopackage.test.TestUtils;
-import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
-import mil.nga.geopackage.user.ColumnValue;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
 
 /**
  * Features Utility test methods
@@ -271,6 +276,7 @@ public class FeatureUtils {
 
 		for (int i = 0; i < featureRow.columnCount(); i++) {
 			FeatureColumn column = featureRow.getTable().getColumns().get(i);
+			GeoPackageDataType dataType = column.getDataType();
 			TestCase.assertEquals(i, column.getIndex());
 			TestCase.assertEquals(columns[i], featureRow.getColumnName(i));
 			TestCase.assertEquals(i, featureRow.getColumnIndex(columns[i]));
@@ -288,7 +294,15 @@ public class FeatureUtils {
 				break;
 
 			case Cursor.FIELD_TYPE_STRING:
-				TestCase.assertTrue(value instanceof String);
+				if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+					TestCase.assertTrue(value instanceof Date);
+					Date date = (Date) value;
+					DateConverter converter = DateConverter.converter(dataType);
+					String dateString = converter.stringValue(date);
+					TestCase.assertEquals(date.getTime(), converter.dateValue(dateString).getTime());
+				}else{
+					TestCase.assertTrue(value instanceof String);
+				}
 				break;
 
 			case Cursor.FIELD_TYPE_BLOB:
@@ -545,6 +559,7 @@ public class FeatureUtils {
 					if (geometryData != null) {
 						String updatedString = null;
 						String updatedLimitedString = null;
+						Date updatedDate = null;
 						Boolean updatedBoolean = null;
 						Byte updatedByte = null;
 						Short updatedShort = null;
@@ -570,6 +585,8 @@ public class FeatureUtils {
 						for (FeatureColumn featureColumn : dao.getTable()
 								.getColumns()) {
 							if (!featureColumn.isPrimaryKey()) {
+
+								GeoPackageDataType dataType = featureColumn.getDataType();
 
 								if (featureColumn.isGeometry()) {
 
@@ -607,31 +624,47 @@ public class FeatureUtils {
 													.getIndex())) {
 
 									case Cursor.FIELD_TYPE_STRING:
-										if (updatedString == null) {
-											updatedString = UUID.randomUUID()
-													.toString();
-										}
-										if (featureColumn.getMax() != null) {
-											if (updatedLimitedString == null) {
-												if (updatedString.length() > featureColumn
-														.getMax()) {
-													updatedLimitedString = updatedString
-															.substring(
-																	0,
-																	featureColumn
-																			.getMax()
-																			.intValue());
-												} else {
-													updatedLimitedString = updatedString;
-												}
+										if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+											if (updatedDate == null) {
+												updatedDate = new Date();
 											}
-											featureRow.setValue(
-													featureColumn.getIndex(),
-													updatedLimitedString);
-										} else {
-											featureRow.setValue(
-													featureColumn.getIndex(),
-													updatedString);
+											DateConverter converter = DateConverter.converter(dataType);
+											if(Math.random() < .5){
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														updatedDate);
+											}else{
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														converter.stringValue(updatedDate));
+											}
+										}else {
+											if (updatedString == null) {
+												updatedString = UUID.randomUUID()
+														.toString();
+											}
+											if (featureColumn.getMax() != null) {
+												if (updatedLimitedString == null) {
+													if (updatedString.length() > featureColumn
+															.getMax()) {
+														updatedLimitedString = updatedString
+																.substring(
+																		0,
+																		featureColumn
+																				.getMax()
+																				.intValue());
+													} else {
+														updatedLimitedString = updatedString;
+													}
+												}
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														updatedLimitedString);
+											} else {
+												featureRow.setValue(
+														featureColumn.getIndex(),
+														updatedString);
+											}
 										}
 										break;
 									case Cursor.FIELD_TYPE_INTEGER:
@@ -786,19 +819,41 @@ public class FeatureUtils {
 									.getColumn(readColumnName);
 							if (!readFeatureColumn.isPrimaryKey()
 									&& !readFeatureColumn.isGeometry()) {
+
+								GeoPackageDataType dataType = readFeatureColumn.getDataType();
+
 								switch (readRow
 										.getRowColumnType(readColumnName)) {
 								case Cursor.FIELD_TYPE_STRING:
-									if (readFeatureColumn.getMax() != null) {
+									if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+										DateConverter converter = DateConverter.converter(dataType);
+										Object value = readRow.getValue(readFeatureColumn
+												.getIndex());
+										Date date = null;
+										if(value instanceof Date){
+											date = (Date) value;
+										}else{
+											date = converter.dateValue((String)value);
+										}
+										Date compareDate = updatedDate;
+										if(dataType == GeoPackageDataType.DATE){
+											compareDate = converter.dateValue(converter.stringValue(compareDate));
+										}
 										TestCase.assertEquals(
-												updatedLimitedString,
-												readRow.getValue(readFeatureColumn
-														.getIndex()));
-									} else {
-										TestCase.assertEquals(
-												updatedString,
-												readRow.getValue(readFeatureColumn
-														.getIndex()));
+												compareDate.getTime(),
+												date.getTime());
+									}else {
+										if (readFeatureColumn.getMax() != null) {
+											TestCase.assertEquals(
+													updatedLimitedString,
+													readRow.getValue(readFeatureColumn
+															.getIndex()));
+										} else {
+											TestCase.assertEquals(
+													updatedString,
+													readRow.getValue(readFeatureColumn
+															.getIndex()));
+										}
 									}
 									break;
 								case Cursor.FIELD_TYPE_INTEGER:
@@ -1048,6 +1103,91 @@ public class FeatureUtils {
 					cursor = dao.queryForAll();
 					TestCase.assertEquals(count + 2, cursor.getCount());
 					cursor.close();
+
+					// Test copied row
+					FeatureRow copyRow = new FeatureRow(queryFeatureRow2);
+					for (FeatureColumn column : dao.getTable().getColumns()) {
+						if (column.getIndex() == queryFeatureRow2
+								.getGeometryColumnIndex()) {
+							GeoPackageGeometryData geometry1 = queryFeatureRow2
+									.getGeometry();
+							GeoPackageGeometryData geometry2 = copyRow
+									.getGeometry();
+							if (geometry1 == null) {
+								TestCase.assertNull(geometry2);
+							} else {
+								TestCase.assertNotSame(geometry1, geometry2);
+								GeoPackageGeometryDataUtils
+										.compareGeometryData(geometry1,
+												geometry2);
+							}
+						} else if (column.getDataType() == GeoPackageDataType.BLOB) {
+							byte[] blob1 = (byte[]) queryFeatureRow2
+									.getValue(column.getName());
+							byte[] blob2 = (byte[]) copyRow.getValue(column
+									.getName());
+							if (blob1 == null) {
+								TestCase.assertNull(blob2);
+							} else {
+								TestCase.assertNotSame(blob1, blob2);
+								GeoPackageGeometryDataUtils.compareByteArrays(
+										blob1, blob2);
+							}
+						} else {
+							TestCase.assertEquals(
+									queryFeatureRow2.getValue(column.getName()),
+									copyRow.getValue(column.getName()));
+						}
+					}
+
+					copyRow.resetId();
+
+					long newRowId3 = dao.create(copyRow);
+
+					TestCase.assertEquals(newRowId3, copyRow.getId());
+
+					// Verify new was created
+					FeatureRow queryFeatureRow3 = dao.queryForIdRow(newRowId3);
+					TestCase.assertNotNull(queryFeatureRow3);
+					cursor = dao.queryForAll();
+					TestCase.assertEquals(count + 3, cursor.getCount());
+					cursor.close();
+
+					for (FeatureColumn column : dao.getTable().getColumns()) {
+						if (column.isPrimaryKey()) {
+							TestCase.assertNotSame(
+									queryFeatureRow2.getValue(column.getName()),
+									queryFeatureRow3.getValue(column.getName()));
+						} else if (column.getIndex() == queryFeatureRow2
+								.getGeometryColumnIndex()) {
+							GeoPackageGeometryData geometry1 = queryFeatureRow2
+									.getGeometry();
+							GeoPackageGeometryData geometry2 = queryFeatureRow3
+									.getGeometry();
+							if (geometry1 == null) {
+								TestCase.assertNull(geometry2);
+							} else {
+								GeoPackageGeometryDataUtils
+										.compareGeometryData(geometry1,
+												geometry2);
+							}
+						} else if (column.getDataType() == GeoPackageDataType.BLOB) {
+							byte[] blob1 = (byte[]) queryFeatureRow2
+									.getValue(column.getName());
+							byte[] blob2 = (byte[]) queryFeatureRow3
+									.getValue(column.getName());
+							if (blob1 == null) {
+								TestCase.assertNull(blob2);
+							} else {
+								GeoPackageGeometryDataUtils.compareByteArrays(
+										blob1, blob2);
+							}
+						} else {
+							TestCase.assertEquals(
+									queryFeatureRow2.getValue(column.getName()),
+									queryFeatureRow3.getValue(column.getName()));
+						}
+					}
 				}
 				cursor.close();
 			}

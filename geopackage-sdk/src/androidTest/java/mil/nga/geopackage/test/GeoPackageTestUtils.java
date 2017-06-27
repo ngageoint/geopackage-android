@@ -149,6 +149,10 @@ public class GeoPackageTestUtils {
 				GeoPackageDataType.TEXT, 5L, false, null));
 		columns.add(FeatureColumn.createColumn(8, "test_blob_limited",
 				GeoPackageDataType.BLOB, 7L, false, null));
+		columns.add(FeatureColumn.createColumn(9, "test_date",
+				GeoPackageDataType.DATE, false, null));
+		columns.add(FeatureColumn.createColumn(10, "test_datetime",
+				GeoPackageDataType.DATETIME, false, null));
 		columns.add(FeatureColumn.createColumn(2, "test_text",
 				GeoPackageDataType.TEXT, false, ""));
 		columns.add(FeatureColumn.createColumn(3, "test_real",

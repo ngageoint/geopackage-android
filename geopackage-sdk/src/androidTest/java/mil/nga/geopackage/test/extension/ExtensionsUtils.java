@@ -1,22 +1,23 @@
 package mil.nga.geopackage.test.extension;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.TestCase;
-import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.extension.ExtensionScopeType;
-import mil.nga.geopackage.extension.Extensions;
-import mil.nga.geopackage.extension.ExtensionsDao;
-
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.PreparedUpdate;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
+
+import junit.framework.TestCase;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.extension.ExtensionScopeType;
+import mil.nga.geopackage.extension.Extensions;
+import mil.nga.geopackage.extension.ExtensionsDao;
 
 /**
  * Extensions Utility test methods

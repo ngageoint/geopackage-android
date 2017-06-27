@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import mil.nga.geopackage.attributes.AttributesRow;
 import mil.nga.geopackage.attributes.AttributesTable;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
+import mil.nga.geopackage.db.DateConverter;
+import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.metadata.Metadata;
 import mil.nga.geopackage.metadata.MetadataScopeType;
 import mil.nga.geopackage.metadata.reference.MetadataReference;
@@ -233,6 +236,7 @@ public class AttributesUtils {
 		for (int i = 0; i < attributesRow.columnCount(); i++) {
 			AttributesColumn column = attributesRow.getTable().getColumns()
 					.get(i);
+            GeoPackageDataType dataType = column.getDataType();
 			TestCase.assertEquals(i, column.getIndex());
 			TestCase.assertEquals(columns[i], attributesRow.getColumnName(i));
 			TestCase.assertEquals(i, attributesRow.getColumnIndex(columns[i]));
@@ -250,7 +254,15 @@ public class AttributesUtils {
 				break;
 
 			case UserCoreResultUtils.FIELD_TYPE_STRING:
-				TestCase.assertTrue(value instanceof String);
+                if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+                    TestCase.assertTrue(value instanceof Date);
+                    Date date = (Date) value;
+                    DateConverter converter = DateConverter.converter(dataType);
+                    String dateString = converter.stringValue(date);
+                    TestCase.assertEquals(date.getTime(), converter.dateValue(dateString).getTime());
+                }else{
+                    TestCase.assertTrue(value instanceof String);
+                }
 				break;
 
 			case UserCoreResultUtils.FIELD_TYPE_BLOB:
@@ -296,6 +308,7 @@ public class AttributesUtils {
 
 					String updatedString = null;
 					String updatedLimitedString = null;
+                    Date updatedDate = null;
 					Boolean updatedBoolean = null;
 					Byte updatedByte = null;
 					Short updatedShort = null;
@@ -321,36 +334,54 @@ public class AttributesUtils {
 							.getColumns()) {
 						if (!attributesColumn.isPrimaryKey()) {
 
+                            GeoPackageDataType dataType = attributesColumn.getDataType();
+
 							switch (attributesRow
 									.getRowColumnType(attributesColumn
 											.getIndex())) {
 
 							case UserCoreResultUtils.FIELD_TYPE_STRING:
-								if (updatedString == null) {
-									updatedString = UUID.randomUUID()
-											.toString();
-								}
-								if (attributesColumn.getMax() != null) {
-									if (updatedLimitedString == null) {
-										if (updatedString.length() > attributesColumn
-												.getMax()) {
-											updatedLimitedString = updatedString
-													.substring(0,
-															attributesColumn
-																	.getMax()
-																	.intValue());
-										} else {
-											updatedLimitedString = updatedString;
-										}
-									}
-									attributesRow.setValue(
-											attributesColumn.getIndex(),
-											updatedLimitedString);
-								} else {
-									attributesRow.setValue(
-											attributesColumn.getIndex(),
-											updatedString);
-								}
+                                if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+                                    if (updatedDate == null) {
+                                        updatedDate = new Date();
+                                    }
+                                    DateConverter converter = DateConverter.converter(dataType);
+                                    if(Math.random() < .5){
+                                        attributesRow.setValue(
+                                                attributesColumn.getIndex(),
+                                                updatedDate);
+                                    }else{
+                                        attributesRow.setValue(
+                                                attributesColumn.getIndex(),
+                                                converter.stringValue(updatedDate));
+                                    }
+                                }else {
+                                    if (updatedString == null) {
+                                        updatedString = UUID.randomUUID()
+                                                .toString();
+                                    }
+                                    if (attributesColumn.getMax() != null) {
+                                        if (updatedLimitedString == null) {
+                                            if (updatedString.length() > attributesColumn
+                                                    .getMax()) {
+                                                updatedLimitedString = updatedString
+                                                        .substring(0,
+                                                                attributesColumn
+                                                                        .getMax()
+                                                                        .intValue());
+                                            } else {
+                                                updatedLimitedString = updatedString;
+                                            }
+                                        }
+                                        attributesRow.setValue(
+                                                attributesColumn.getIndex(),
+                                                updatedLimitedString);
+                                    } else {
+                                        attributesRow.setValue(
+                                                attributesColumn.getIndex(),
+                                                updatedString);
+                                    }
+                                }
 								break;
 							case UserCoreResultUtils.FIELD_TYPE_INTEGER:
 								switch (attributesColumn.getDataType()) {
@@ -486,19 +517,41 @@ public class AttributesUtils {
 						AttributesColumn readAttributesColumn = readRow
 								.getColumn(readColumnName);
 						if (!readAttributesColumn.isPrimaryKey()) {
+
+                            GeoPackageDataType dataType = readAttributesColumn.getDataType();
+
 							switch (readRow.getRowColumnType(readColumnName)) {
 							case UserCoreResultUtils.FIELD_TYPE_STRING:
-								if (readAttributesColumn.getMax() != null) {
-									TestCase.assertEquals(
-											updatedLimitedString,
-											readRow.getValue(readAttributesColumn
-													.getIndex()));
-								} else {
-									TestCase.assertEquals(
-											updatedString,
-											readRow.getValue(readAttributesColumn
-													.getIndex()));
-								}
+                                if(dataType == GeoPackageDataType.DATE || dataType == GeoPackageDataType.DATETIME){
+                                    DateConverter converter = DateConverter.converter(dataType);
+                                    Object value = readRow.getValue(readAttributesColumn
+                                            .getIndex());
+                                    Date date = null;
+                                    if(value instanceof Date){
+                                        date = (Date) value;
+                                    }else{
+                                        date = converter.dateValue((String)value);
+                                    }
+                                    Date compareDate = updatedDate;
+                                    if(dataType == GeoPackageDataType.DATE){
+                                        compareDate = converter.dateValue(converter.stringValue(compareDate));
+                                    }
+                                    TestCase.assertEquals(
+                                            compareDate.getTime(),
+                                            date.getTime());
+                                }else {
+                                    if (readAttributesColumn.getMax() != null) {
+                                        TestCase.assertEquals(
+                                                updatedLimitedString,
+                                                readRow.getValue(readAttributesColumn
+                                                        .getIndex()));
+                                    } else {
+                                        TestCase.assertEquals(
+                                                updatedString,
+                                                readRow.getValue(readAttributesColumn
+                                                        .getIndex()));
+                                    }
+                                }
 								break;
 							case UserCoreResultUtils.FIELD_TYPE_INTEGER:
 								switch (readAttributesColumn.getDataType()) {
@@ -659,6 +712,67 @@ public class AttributesUtils {
 					cursor = dao.queryForAll();
 					TestCase.assertEquals(count + 2, cursor.getCount());
 					cursor.close();
+
+					// Test copied row
+					AttributesRow copyRow = new AttributesRow(
+							queryAttributesRow2);
+					for (AttributesColumn column : dao.getTable().getColumns()) {
+						if (column.getDataType() == GeoPackageDataType.BLOB) {
+							byte[] blob1 = (byte[]) queryAttributesRow2
+									.getValue(column.getName());
+							byte[] blob2 = (byte[]) copyRow.getValue(column
+									.getName());
+							if (blob1 == null) {
+								TestCase.assertNull(blob2);
+							} else {
+								GeoPackageGeometryDataUtils.compareByteArrays(
+										blob1, blob2);
+							}
+						} else {
+							TestCase.assertEquals(queryAttributesRow2
+									.getValue(column.getName()), copyRow
+									.getValue(column.getName()));
+						}
+					}
+
+					copyRow.resetId();
+
+					long newRowId3 = dao.create(copyRow);
+
+					TestCase.assertEquals(newRowId3, copyRow.getId());
+
+					// Verify new was created
+					AttributesRow queryAttributesRow3 = dao
+							.queryForIdRow(newRowId3);
+					TestCase.assertNotNull(queryAttributesRow3);
+					cursor = dao.queryForAll();
+					TestCase.assertEquals(count + 3, cursor.getCount());
+					cursor.close();
+
+					for (AttributesColumn column : dao.getTable().getColumns()) {
+						if (column.isPrimaryKey()) {
+							TestCase.assertNotSame(queryAttributesRow2
+											.getValue(column.getName()),
+									queryAttributesRow3.getValue(column
+											.getName()));
+						} else if (column.getDataType() == GeoPackageDataType.BLOB) {
+							byte[] blob1 = (byte[]) queryAttributesRow2
+									.getValue(column.getName());
+							byte[] blob2 = (byte[]) queryAttributesRow3
+									.getValue(column.getName());
+							if (blob1 == null) {
+								TestCase.assertNull(blob2);
+							} else {
+								GeoPackageGeometryDataUtils.compareByteArrays(
+										blob1, blob2);
+							}
+						} else {
+							TestCase.assertEquals(queryAttributesRow2
+											.getValue(column.getName()),
+									queryAttributesRow3.getValue(column
+											.getName()));
+						}
+					}
 				}
 				cursor.close();
 			}

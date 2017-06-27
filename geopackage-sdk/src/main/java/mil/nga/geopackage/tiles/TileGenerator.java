@@ -349,7 +349,8 @@ public abstract class TileGenerator {
                 || !tileMatrixSetDao.idExists(tableName)) {
             // Create the srs if needed
             SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
-            SpatialReferenceSystem srs = srsDao.getOrCreateFromEpsg(projection.getEpsg());
+            SpatialReferenceSystem srs = srsDao.getOrCreateCode(projection.getAuthority(),
+                    Long.parseLong(projection.getCode()));
             // Create the tile table
             tileMatrixSet = geoPackage.createTileTableWithMetadata(
                     tableName,
@@ -523,9 +524,9 @@ public abstract class TileGenerator {
         }
 
         Projection tileMatrixProjection = ProjectionFactory.getProjection(tileMatrixSet.getSrs());
-        if (tileMatrixProjection.getEpsg() != projection.getEpsg()) {
+        if (!tileMatrixProjection.equals(projection)) {
             throw new GeoPackageException("Can not update tiles projected at "
-                    + tileMatrixProjection.getEpsg() + " with tiles projected at " + projection.getEpsg());
+                    + tileMatrixProjection.getCode() + " with tiles projected at " + projection.getCode());
         }
 
         Contents contents = tileMatrixSet.getContents();

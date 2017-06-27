@@ -138,7 +138,7 @@ public class ElevationTilesPngImportTest extends
             SpatialReferenceSystemDao srsDao = geoPackage
                     .getSpatialReferenceSystemDao();
             long srsId = tileMatrixSet.getSrsId();
-            SpatialReferenceSystem srs = srsDao.getOrCreate(srsId);
+            SpatialReferenceSystem srs = srsDao.queryForId(srsId);
             Projection projection = ProjectionFactory.getProjection(srs);
             Projection requestProjection = ProjectionFactory
                     .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);

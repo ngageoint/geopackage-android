@@ -1,5 +1,14 @@
 package mil.nga.geopackage.test.core.contents;
 
+import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.PreparedUpdate;
+import com.j256.ormlite.stmt.QueryBuilder;
+import com.j256.ormlite.stmt.UpdateBuilder;
+
+import junit.framework.TestCase;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
@@ -19,13 +27,6 @@ import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.schema.TableColumnKey;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.wkb.geom.GeometryType;
-
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.stmt.PreparedDelete;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.PreparedUpdate;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.UpdateBuilder;
 
 /**
  * Contents Utility test methods
@@ -275,6 +276,93 @@ public class ContentsUtils {
 
 		// Verify saved contents
 		Contents queryContents = dao.queryForId(tableName);
+		String queryContentsId = queryContents.getId();
+		TestCase.assertEquals(tableName, queryContents.getTableName());
+		TestCase.assertEquals(dataType, queryContents.getDataType());
+		TestCase.assertEquals(identifier, queryContents.getIdentifier());
+		TestCase.assertEquals(description, queryContents.getDescription());
+		TestCase.assertEquals(lastChange, queryContents.getLastChange());
+		TestCase.assertEquals(minX, queryContents.getMinX());
+		TestCase.assertEquals(minY, queryContents.getMinY());
+		TestCase.assertEquals(maxX, queryContents.getMaxX());
+		TestCase.assertEquals(maxY, queryContents.getMaxY());
+		if (srs != null) {
+			TestCase.assertEquals(srs.getId(), queryContents.getSrs().getId());
+		} else {
+			TestCase.assertNull(queryContents.getSrs());
+		}
+
+		// Test copied contents
+		Contents copyContents = new Contents(queryContents);
+		TestCase.assertEquals(queryContents.getId(), copyContents.getId());
+		TestCase.assertEquals(queryContents.getTableName(),
+				copyContents.getTableName());
+		TestCase.assertEquals(queryContents.getDataType(),
+				copyContents.getDataType());
+		TestCase.assertEquals(queryContents.getIdentifier(),
+				copyContents.getIdentifier());
+		TestCase.assertEquals(queryContents.getDescription(),
+				copyContents.getDescription());
+		TestCase.assertEquals(queryContents.getLastChange(),
+				copyContents.getLastChange());
+		TestCase.assertEquals(queryContents.getMinX(), copyContents.getMinX());
+		TestCase.assertEquals(queryContents.getMinY(), copyContents.getMinY());
+		TestCase.assertEquals(queryContents.getMaxX(), copyContents.getMaxX());
+		TestCase.assertEquals(queryContents.getMaxY(), copyContents.getMaxY());
+		TestCase.assertEquals(queryContents.getSrs(), copyContents.getSrs());
+		TestCase.assertEquals(queryContents.getSrsId(), copyContents.getSrsId());
+
+		// Change pk and unique
+		String copyTableName = "CopyContents";
+		String copyIdentifier = "CopyIdentifier";
+		copyContents.setId(copyTableName);
+		copyContents.setIdentifier(copyIdentifier);
+
+		TestCase.assertEquals(queryContentsId, queryContents.getId());
+		TestCase.assertEquals(identifier, queryContents.getIdentifier());
+		TestCase.assertEquals(copyTableName, copyContents.getId());
+		TestCase.assertEquals(copyIdentifier, copyContents.getIdentifier());
+		TestCase.assertNotSame(queryContents.getId(), copyContents.getId());
+		TestCase.assertNotSame(queryContents.getIdentifier(), copyContents.getIdentifier());
+
+		geoPackage.createFeatureTable(TestUtils.buildFeatureTable(
+				copyContents.getTableName(), "geom", GeometryType.GEOMETRY));
+
+		dao.create(copyContents);
+
+		// Verify count
+		long newCount2 = dao.countOf();
+		TestCase.assertEquals(count + 2, newCount2);
+
+		// Verify saved contents
+		Contents queryCopiedContents = dao.queryForId(copyTableName);
+		TestCase.assertEquals(copyTableName, queryCopiedContents.getTableName());
+		TestCase.assertEquals(queryContents.getDataType(),
+				queryCopiedContents.getDataType());
+		TestCase.assertEquals(copyIdentifier,
+				queryCopiedContents.getIdentifier());
+		TestCase.assertEquals(queryContents.getDescription(),
+				queryCopiedContents.getDescription());
+		TestCase.assertEquals(queryContents.getLastChange(),
+				queryCopiedContents.getLastChange());
+		TestCase.assertEquals(queryContents.getMinX(),
+				queryCopiedContents.getMinX());
+		TestCase.assertEquals(queryContents.getMinY(),
+				queryCopiedContents.getMinY());
+		TestCase.assertEquals(queryContents.getMaxX(),
+				queryCopiedContents.getMaxX());
+		TestCase.assertEquals(queryContents.getMaxY(),
+				queryCopiedContents.getMaxY());
+		if (srs != null) {
+			TestCase.assertEquals(srs.getId(), queryCopiedContents.getSrs()
+					.getId());
+		} else {
+			TestCase.assertNull(queryCopiedContents.getSrs());
+		}
+
+		// Verify initial saved contents again
+		queryContents = dao.queryForId(tableName);
+		TestCase.assertEquals(queryContentsId, queryContents.getId());
 		TestCase.assertEquals(tableName, queryContents.getTableName());
 		TestCase.assertEquals(dataType, queryContents.getDataType());
 		TestCase.assertEquals(identifier, queryContents.getIdentifier());

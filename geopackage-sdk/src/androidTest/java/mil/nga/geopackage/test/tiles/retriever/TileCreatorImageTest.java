@@ -45,7 +45,10 @@ public class TileCreatorImageTest extends TilesGeoPackageTestCase {
     public void testTileImage() throws SQLException {
 
         TileDao tileDao = geoPackage.getTileDao(TestConstants.TILES2_DB_TABLE_NAME);
-        TestCase.assertEquals(tileDao.getProjection().getEpsg(), ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+        TestCase.assertEquals(tileDao.getProjection().getAuthority(),
+                ProjectionConstants.AUTHORITY_EPSG);
+        TestCase.assertEquals(Long.parseLong(tileDao.getProjection().getCode()),
+                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
         Projection webMercator = ProjectionFactory
                 .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
