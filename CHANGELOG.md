@@ -7,6 +7,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 1.3.3 (TBD)
 
 * geopackage-core version updated to 1.2.3
+* tiff version updated to 1.0.3
 * Copy constructors for user table (features, tiles, attributes) row objects
 * Improved date column support for user tables (features, tiles, attributes)
 
