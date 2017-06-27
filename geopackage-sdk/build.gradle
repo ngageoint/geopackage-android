@@ -5,7 +5,7 @@ apply plugin: 'signing'
 group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
 version = "1.4.0"
-def remotePublish = false
+def remotePublish = true
 
 android {
     compileSdkVersion 25
