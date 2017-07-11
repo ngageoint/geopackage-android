@@ -6,7 +6,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.4.1 (TBD)
 
-* TBD
+* Feature Tile max feature number drawn tiles default padding and text size
+* Minor color deprecation and Javadoc updates
 
 ## [1.4.0](https://github.com/ngageoint/geopackage-android/releases/tag/1.4.0) (06-27-2017)
 

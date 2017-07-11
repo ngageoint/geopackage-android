@@ -43,7 +43,7 @@ public class AttributesDao
 
     /**
      * {@inheritDoc}
-     * <p/>
+     *
      * Not supported for Attributes
      */
     @Override

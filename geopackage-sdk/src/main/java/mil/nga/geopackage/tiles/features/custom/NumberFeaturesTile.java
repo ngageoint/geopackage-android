@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 
 import mil.nga.geopackage.GeoPackageException;
@@ -71,17 +72,14 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
         Resources resources = context.getResources();
 
         // Set the default text paint values
-        textPaint.setColor(resources.getColor(R.color.number_features_tile_text_color));
-        TypedValue textSize = new TypedValue();
-        resources.getValue(R.dimen.number_features_tile_text_size,
-                textSize, true);
-        textPaint.setTextSize(textSize.getFloat() * resources.getDisplayMetrics().density);
+        textPaint.setColor(ContextCompat.getColor(context, R.color.number_features_tile_text_color));
+        textPaint.setTextSize(resources.getDimensionPixelSize(R.dimen.number_features_tile_text_size));
 
         // Set the default circle paint values
         if (resources.getBoolean(R.bool.number_features_tile_circle_draw)) {
             circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             circlePaint.setStyle(Paint.Style.STROKE);
-            circlePaint.setColor(resources.getColor(R.color.number_features_tile_circle_color));
+            circlePaint.setColor(ContextCompat.getColor(context, R.color.number_features_tile_circle_color));
             TypedValue circleStrokeWidth = new TypedValue();
             resources.getValue(R.dimen.number_features_tile_circle_stroke_width,
                     circleStrokeWidth, true);
@@ -92,14 +90,14 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
         if (resources.getBoolean(R.bool.number_features_tile_circle_fill_draw)) {
             circleFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             circleFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-            circleFillPaint.setColor(resources.getColor(R.color.number_features_tile_circle_fill_color));
+            circleFillPaint.setColor(ContextCompat.getColor(context, R.color.number_features_tile_circle_fill_color));
         }
 
         // Set the default tile border paint values
         if (resources.getBoolean(R.bool.number_features_tile_border_draw)) {
             tileBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             tileBorderPaint.setStyle(Paint.Style.STROKE);
-            tileBorderPaint.setColor(resources.getColor(R.color.number_features_tile_border_color));
+            tileBorderPaint.setColor(ContextCompat.getColor(context, R.color.number_features_tile_border_color));
             TypedValue tileBorderStrokeWidth = new TypedValue();
             resources.getValue(R.dimen.number_features_tile_border_stroke_width,
                     tileBorderStrokeWidth, true);
@@ -110,7 +108,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
         if (resources.getBoolean(R.bool.number_features_tile_fill_draw)) {
             tileFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             tileFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-            tileFillPaint.setColor(resources.getColor(R.color.number_features_tile_fill_color));
+            tileFillPaint.setColor(ContextCompat.getColor(context, R.color.number_features_tile_fill_color));
         }
 
         // Set the default circle padding percentage

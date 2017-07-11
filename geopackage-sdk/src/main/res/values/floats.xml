@@ -1,8 +1,7 @@
 <resources>
 
-    <item name="number_features_tile_text_size" type="dimen" format="float">7.0</item>
     <item name="number_features_tile_circle_stroke_width" type="dimen" format="float">5.0</item>
-    <item name="number_features_tile_circle_padding_percentage" type="dimen" format="float">.1</item>
+    <item name="number_features_tile_circle_padding_percentage" type="dimen" format="float">.4</item>
     <item name="number_features_tile_border_stroke_width" type="dimen" format="float">2.0</item>
 
 </resources>
