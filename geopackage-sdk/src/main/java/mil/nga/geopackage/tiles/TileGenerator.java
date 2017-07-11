@@ -533,15 +533,17 @@ public abstract class TileGenerator {
 
         // Combine the existing content and request bounding boxes
         BoundingBox previousContentsBoundingBox = contents.getBoundingBox();
-        ProjectionTransform transformProjectionToContents = projection.getTransformation(ProjectionFactory.getProjection(contents.getSrs()));
-        BoundingBox contentsBoundingBox = transformProjectionToContents.transform(boundingBox);
-        contentsBoundingBox = TileBoundingBoxUtils.union(contentsBoundingBox, previousContentsBoundingBox);
+        if (previousContentsBoundingBox != null) {
+            ProjectionTransform transformProjectionToContents = projection.getTransformation(ProjectionFactory.getProjection(contents.getSrs()));
+            BoundingBox contentsBoundingBox = transformProjectionToContents.transform(boundingBox);
+            contentsBoundingBox = TileBoundingBoxUtils.union(contentsBoundingBox, previousContentsBoundingBox);
 
-        // Update the contents if modified
-        if (!contentsBoundingBox.equals(previousContentsBoundingBox)) {
-            contents.setBoundingBox(contentsBoundingBox);
-            ContentsDao contentsDao = geoPackage.getContentsDao();
-            contentsDao.update(contents);
+            // Update the contents if modified
+            if (!contentsBoundingBox.equals(previousContentsBoundingBox)) {
+                contents.setBoundingBox(contentsBoundingBox);
+                ContentsDao contentsDao = geoPackage.getContentsDao();
+                contentsDao.update(contents);
+            }
         }
 
         // If updating GeoPackage format tiles, all existing metadata and tile

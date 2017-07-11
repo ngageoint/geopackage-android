@@ -6,6 +6,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.4.1 (TBD)
 
+* geopackage-core version updated to 1.3.1
+* Improved handling of unknown Contents bounding boxes
 * Feature Tile max feature number drawn tiles default padding and text size
 * Minor color deprecation and Javadoc updates
 
