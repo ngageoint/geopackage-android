@@ -65,14 +65,16 @@ public class FeatureDao extends
     @Override
     public BoundingBox getBoundingBox() {
         Contents contents = geometryColumns.getContents();
-        Projection contentsProjection = ProjectionFactory
-                .getProjection(contents.getSrs());
 
         BoundingBox boundingBox = contents.getBoundingBox();
-        if (!projection.equals(contentsProjection)) {
-            ProjectionTransform transform = contentsProjection
-                    .getTransformation(projection);
-            boundingBox = transform.transform(boundingBox);
+        if (boundingBox != null) {
+            Projection contentsProjection = ProjectionFactory
+                    .getProjection(contents.getSrs());
+            if (!projection.equals(contentsProjection)) {
+                ProjectionTransform transform = contentsProjection
+                        .getTransformation(projection);
+                boundingBox = transform.transform(boundingBox);
+            }
         }
 
         return boundingBox;

@@ -80,7 +80,6 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
      * @param contentValues
      * @param column
      * @param value
-     * @return
      */
     protected void columnToContentValue(ContentValues contentValues,
                                         TColumn column, Object value) {

@@ -15,7 +15,7 @@ public class FeatureCursor extends
 	/**
 	 * Constructor
 	 * 
-	 * @param dao
+	 * @param table
 	 * @param cursor
 	 */
 	public FeatureCursor(FeatureTable table, Cursor cursor) {
