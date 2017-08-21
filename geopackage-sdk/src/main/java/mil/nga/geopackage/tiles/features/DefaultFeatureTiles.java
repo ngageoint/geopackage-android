@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.Log;
 
 import java.util.List;
 
@@ -87,8 +88,13 @@ public class DefaultFeatureTiles extends FeatureTiles {
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
 
         while (cursor.moveToNext()) {
-            FeatureRow row = cursor.getRow();
-            drawFeature(boundingBox, transform, canvas, row);
+            try {
+                FeatureRow row = cursor.getRow();
+                drawFeature(boundingBox, transform, canvas, row);
+            } catch (Exception e) {
+                Log.e(DefaultFeatureTiles.class.getSimpleName(), "Failed to draw feature in tile. Table: "
+                        + featureDao.getTableName() + ", Position: " + cursor.getPosition(), e);
+            }
         }
 
         cursor.close();

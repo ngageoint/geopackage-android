@@ -1,5 +1,7 @@
 package mil.nga.geopackage.extension.index;
 
+import android.util.Log;
+
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.support.ConnectionSource;
@@ -96,14 +98,19 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
                             try {
                                 while ((progress == null || progress.isActive())
                                         && cursor.moveToNext()) {
-                                    FeatureRow row = cursor.getRow();
-                                    boolean indexed = index(tableIndex,
-                                            row.getId(), row.getGeometry());
-                                    if (indexed) {
-                                        count++;
-                                    }
-                                    if (progress != null) {
-                                        progress.addProgress(1);
+                                    try {
+                                        FeatureRow row = cursor.getRow();
+                                        boolean indexed = index(tableIndex,
+                                                row.getId(), row.getGeometry());
+                                        if (indexed) {
+                                            count++;
+                                        }
+                                        if (progress != null) {
+                                            progress.addProgress(1);
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e(FeatureTableIndex.class.getSimpleName(), "Failed to index feature. Table: "
+                                                + tableIndex.getTableName() + ", Position: " + cursor.getPosition(), e);
                                     }
                                 }
                             } finally {

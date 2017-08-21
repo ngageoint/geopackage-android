@@ -2,6 +2,7 @@ package mil.nga.geopackage.db;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.Date;
 
@@ -147,13 +148,18 @@ public class FeatureIndexer {
         FeatureCursor cursor = featureDao.queryForAll();
         try {
             while ((progress == null || progress.isActive()) && cursor.moveToNext()) {
-                FeatureRow row = cursor.getRow();
-                boolean indexed = index(metadata.getGeoPackageId(), row, false);
-                if (indexed) {
-                    count++;
-                }
-                if (progress != null) {
-                    progress.addProgress(1);
+                try {
+                    FeatureRow row = cursor.getRow();
+                    boolean indexed = index(metadata.getGeoPackageId(), row, false);
+                    if (indexed) {
+                        count++;
+                    }
+                    if (progress != null) {
+                        progress.addProgress(1);
+                    }
+                } catch (Exception e) {
+                    Log.e(FeatureIndexer.class.getSimpleName(), "Failed to index feature. Table: "
+                            + featureDao.getTableName() + ", Position: " + cursor.getPosition(), e);
                 }
             }
         } finally {
