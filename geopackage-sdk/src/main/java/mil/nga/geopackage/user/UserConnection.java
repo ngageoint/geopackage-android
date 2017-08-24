@@ -52,10 +52,30 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      * {@inheritDoc}
      */
     @Override
+    public TResult query(String table, String[] columns, String[] columnsAs, String selection,
+                         String[] selectionArgs, String groupBy, String having,
+                         String orderBy) {
+        return (TResult) database.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TResult query(String table, String[] columns, String selection,
                          String[] selectionArgs, String groupBy, String having,
                          String orderBy, String limit) {
         return (TResult) database.query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TResult query(String table, String[] columns, String[] columnsAs, String selection,
+                         String[] selectionArgs, String groupBy, String having,
+                         String orderBy, String limit) {
+        return (TResult) database.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
 }

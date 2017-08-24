@@ -64,10 +64,32 @@ public abstract class UserWrapperConnection<TColumn extends UserColumn, TTable e
      * {@inheritDoc}
      */
     @Override
+    public TResult query(String table, String[] columns, String[] columnsAs, String selection,
+                         String[] selectionArgs, String groupBy, String having,
+                         String orderBy) {
+        Cursor cursor = database.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
+        return wrapCursor(cursor);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TResult query(String table, String[] columns, String selection,
                          String[] selectionArgs, String groupBy, String having,
                          String orderBy, String limit) {
         Cursor cursor = database.query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+        return wrapCursor(cursor);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TResult query(String table, String[] columns, String[] columnsAs, String selection,
+                         String[] selectionArgs, String groupBy, String having,
+                         String orderBy, String limit) {
+        Cursor cursor = database.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
         return wrapCursor(cursor);
     }
 

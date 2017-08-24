@@ -1,12 +1,13 @@
 package mil.nga.geopackage.features.user;
 
+import android.database.Cursor;
+
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.user.UserCursor;
-import android.database.Cursor;
 
 /**
  * Feature Cursor to wrap a database cursor for feature queries
- * 
+ *
  * @author osbornb
  */
 public class FeatureCursor extends
@@ -14,7 +15,7 @@ public class FeatureCursor extends
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param table
 	 * @param cursor
 	 */
@@ -33,7 +34,7 @@ public class FeatureCursor extends
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * Handles geometries
 	 */
 	@Override
@@ -49,16 +50,22 @@ public class FeatureCursor extends
 
 	/**
 	 * Get the geometry
-	 * 
+	 *
 	 * @return
 	 */
 	public GeoPackageGeometryData getGeometry() {
 
-		byte[] geometryBytes = getBlob(getTable().getGeometryColumnIndex());
-
 		GeoPackageGeometryData geometry = null;
-		if (geometryBytes != null) {
-			geometry = new GeoPackageGeometryData(geometryBytes);
+
+		int columnIndex = getTable().getGeometryColumnIndex();
+		int type = getType(columnIndex);
+
+		if(type != FIELD_TYPE_NULL) {
+			byte[] geometryBytes = getBlob(columnIndex);
+
+			if (geometryBytes != null) {
+				geometry = new GeoPackageGeometryData(geometryBytes);
+			}
 		}
 
 		return geometry;

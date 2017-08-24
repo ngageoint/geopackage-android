@@ -3,6 +3,11 @@ package mil.nga.geopackage.user;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import mil.nga.geopackage.db.GeoPackageDataType;
 
 /**
@@ -20,6 +25,11 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Table
      */
     private final TTable table;
+
+    /**
+     * Invalid cursor positions due to large sized blobs
+     */
+    private Set<Integer> invalidPositions = new LinkedHashSet<>();
 
     /**
      * Constructor
@@ -50,6 +60,26 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     }
 
     /**
+     * Get the invalid positions found when retrieving rows
+     *
+     * @return invalid positions
+     * @since 1.4.2
+     */
+    public List<Integer> getInvalidPositions() {
+        return new ArrayList<>(invalidPositions);
+    }
+
+    /**
+     * Determine if invalid positions were found when retrieving rows
+     *
+     * @return true if invalid positions
+     * @since 1.4.2
+     */
+    public boolean hasInvalidPositions() {
+        return !invalidPositions.isEmpty();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -62,14 +92,24 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
             int[] columnTypes = new int[table.columnCount()];
             Object[] values = new Object[table.columnCount()];
 
+            boolean valid = true;
+
             for (TColumn column : table.getColumns()) {
 
                 int index = column.getIndex();
+                int columnType = getType(index);
 
-                columnTypes[index] = getType(index);
+                if (column.isPrimaryKey() && columnType == FIELD_TYPE_NULL) {
+                    valid = false;
+                }
 
+                columnTypes[index] = columnType;
                 values[index] = getValue(column);
 
+            }
+
+            if (!valid) {
+                invalidPositions.add(getPosition());
             }
 
             row = getRow(columnTypes, values);
