@@ -23,6 +23,8 @@ import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.user.UserCoreResult;
+import mil.nga.geopackage.user.UserQuery;
+import mil.nga.geopackage.user.UserQueryParamType;
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to
@@ -105,13 +107,16 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
 
                             if (cursor.hasInvalidPositions()) {
 
+                                UserQuery query = cursor.getQuery();
+
                                 List<FeatureColumn> blobColumns = featureDao.getTable().columnsOfType(GeoPackageDataType.BLOB);
                                 String[] columnsAs = featureDao.buildColumnsAsNull(blobColumns);
-                                FeatureCursor columnsAsCursor = featureDao.queryForAll(columnsAs);
+                                query.set(UserQueryParamType.COLUMNS_AS, columnsAs);
+
+                                FeatureCursor columnsAsCursor = featureDao.query(query);
                                 FeatureInvalidCursor invalidCursor = new FeatureInvalidCursor(featureDao, columnsAsCursor, cursor.getInvalidPositions(), blobColumns);
 
                                 count += indexRows(tableIndex, invalidCursor);
-
                             }
 
                             // Update the last indexed time
@@ -146,7 +151,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
                     && cursor.moveToNext()) {
                 try {
                     FeatureRow row = cursor.getRow();
-                    if (row.hasId()) {
+                    if (row.isValid()) {
                         boolean indexed = index(tableIndex,
                                 row.getId(), row.getGeometry());
                         if (indexed) {

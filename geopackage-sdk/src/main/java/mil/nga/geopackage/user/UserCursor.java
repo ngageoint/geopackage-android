@@ -32,6 +32,11 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     private Set<Integer> invalidPositions = new LinkedHashSet<>();
 
     /**
+     * User query arguments
+     */
+    private UserQuery query;
+
+    /**
      * Constructor
      *
      * @param table
@@ -108,11 +113,12 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
 
             }
 
+            row = getRow(columnTypes, values);
+
             if (!valid) {
                 invalidPositions.add(getPosition());
+                row.setValid(false);
             }
-
-            row = getRow(columnTypes, values);
         }
 
         return row;
@@ -134,6 +140,26 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     @Override
     public boolean wasNull() {
         return false;
+    }
+
+    /**
+     * Set the user query
+     *
+     * @param query user query
+     * @since 1.4.2
+     */
+    public void setQuery(UserQuery query) {
+        this.query = query;
+    }
+
+    /**
+     * Get the user query
+     *
+     * @return user query
+     * @since 1.4.2
+     */
+    public UserQuery getQuery() {
+        return query;
     }
 
 }

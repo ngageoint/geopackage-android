@@ -18,6 +18,11 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
         extends UserCoreRow<TColumn, TTable> {
 
     /**
+     * When false, the row read is not valid possibly due to size
+     */
+    private boolean valid = true;
+
+    /**
      * Constructor
      *
      * @param table
@@ -149,6 +154,26 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
                     "Unsupported update column value. column: " + columnName
                             + ", value: " + value);
         }
+    }
+
+    /**
+     * Set the row valid state
+     *
+     * @param valid true if valid
+     * @since 1.4.2
+     */
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    /**
+     * Check if the row is valid
+     *
+     * @return true if valid
+     * @since 1.4.2
+     */
+    public boolean isValid() {
+        return valid;
     }
 
 }

@@ -23,6 +23,11 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     private final GeoPackageDatabase db;
 
     /**
+     * User database
+     */
+    private UserConnection userDb;
+
+    /**
      * Constructor
      *
      * @param database
@@ -35,6 +40,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
                       TTable table) {
         super(database, db, userDb, table);
         this.db = db.getDb();
+        this.userDb = userDb;
     }
 
     /**
@@ -45,6 +51,28 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      */
     public GeoPackageDatabase getDatabaseConnection() {
         return db;
+    }
+
+    /**
+     * Query using the previous result query arguments
+     *
+     * @param previousResult previous result
+     * @return result
+     * @since 1.4.2
+     */
+    public TResult query(TResult previousResult) {
+        return (TResult) userDb.query(previousResult);
+    }
+
+    /**
+     * Query using the user query arguments
+     *
+     * @param query user query
+     * @return result
+     * @since 1.4.2
+     */
+    public TResult query(UserQuery query) {
+        return (TResult) userDb.query(query);
     }
 
     /**
