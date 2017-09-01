@@ -63,7 +63,7 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      * @param invalidPositions invalid first cursor positions
      * @param blobColumns      blob columns
      */
-    public UserInvalidCursor(TUserDao dao, TCursor cursor, List<Integer> invalidPositions, List<TColumn> blobColumns) {
+    protected UserInvalidCursor(TUserDao dao, TCursor cursor, List<Integer> invalidPositions, List<TColumn> blobColumns) {
         this.dao = dao;
         this.cursor = cursor;
         this.invalidPositions = invalidPositions;

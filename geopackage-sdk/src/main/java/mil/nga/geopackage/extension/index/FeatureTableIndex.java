@@ -7,24 +7,19 @@ import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
-import mil.nga.geopackage.features.user.FeatureInvalidCursor;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.user.UserCoreResult;
-import mil.nga.geopackage.user.UserQuery;
-import mil.nga.geopackage.user.UserQueryParamType;
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to
@@ -102,22 +97,9 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
                         public Integer call() throws Exception {
 
                             FeatureCursor cursor = featureDao.queryForAll();
+                            cursor.enableInvalidRequery(featureDao);
 
                             int count = indexRows(tableIndex, cursor);
-
-                            if (cursor.hasInvalidPositions()) {
-
-                                UserQuery query = cursor.getQuery();
-
-                                List<FeatureColumn> blobColumns = featureDao.getTable().columnsOfType(GeoPackageDataType.BLOB);
-                                String[] columnsAs = featureDao.buildColumnsAsNull(blobColumns);
-                                query.set(UserQueryParamType.COLUMNS_AS, columnsAs);
-
-                                FeatureCursor columnsAsCursor = featureDao.query(query);
-                                FeatureInvalidCursor invalidCursor = new FeatureInvalidCursor(featureDao, columnsAsCursor, cursor.getInvalidPositions(), blobColumns);
-
-                                count += indexRows(tableIndex, invalidCursor);
-                            }
 
                             // Update the last indexed time
                             if (progress == null || progress.isActive()) {
