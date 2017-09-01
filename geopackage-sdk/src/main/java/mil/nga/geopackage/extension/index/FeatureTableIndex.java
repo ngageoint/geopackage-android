@@ -97,7 +97,6 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
                         public Integer call() throws Exception {
 
                             FeatureCursor cursor = featureDao.queryForAll();
-                            cursor.enableInvalidRequery(featureDao);
 
                             int count = indexRows(tableIndex, cursor);
 

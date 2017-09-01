@@ -28,6 +28,11 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     private UserConnection userDb;
 
     /**
+     * Invalid requery flag to requery to handle invalid large user rows
+     */
+    private boolean invalidRequery = true;
+
+    /**
      * Constructor
      *
      * @param database
@@ -51,6 +56,39 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      */
     public GeoPackageDatabase getDatabaseConnection() {
         return db;
+    }
+
+    /**
+     * Is the invalid requery flag enabled?
+     * When enabled (default is true) large invalid user rows are requeried and handled.
+     *
+     * @return invalid requery flag
+     * @since 1.4.2
+     */
+    public boolean isInvalidRequery() {
+        return invalidRequery;
+    }
+
+    /**
+     * Set the invalid requery flag.
+     * When enabled (default is true) large invalid user rows are requeried and handled.
+     *
+     * @param invalidRequery invalid requery flag
+     * @since 1.4.2
+     */
+    public void setInvalidRequery(boolean invalidRequery) {
+        this.invalidRequery = invalidRequery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TResult prepareResult(TResult result) {
+        if (invalidRequery) {
+            result.enableInvalidRequery(this);
+        }
+        return result;
     }
 
     /**
