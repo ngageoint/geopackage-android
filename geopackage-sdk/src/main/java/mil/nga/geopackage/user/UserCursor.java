@@ -233,6 +233,9 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
         // If requery has not been performed, a requery dao has been set, and there are invalid positions
         if (invalidCursor == null && dao != null && hasInvalidPositions()) {
 
+            // Close the original cursor when performing an invalid cursor query
+            super.close();
+
             // Set the blob columns to return as null
             List<TColumn> blobColumns = dao.getTable().columnsOfType(GeoPackageDataType.BLOB);
             String[] columnsAs = dao.buildColumnsAsNull(blobColumns);
