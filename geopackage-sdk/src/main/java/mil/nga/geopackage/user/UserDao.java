@@ -92,6 +92,24 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     }
 
     /**
+     * {@inheritDoc}
+     * Handles requery of invalid id row
+     */
+    @Override
+    public TRow queryForIdRow(long id) {
+        TRow row = null;
+        TResult readCursor = queryForId(id);
+        if (readCursor.moveToNext()) {
+            row = readCursor.getRow();
+            if (!row.isValid() && readCursor.moveToNext()) {
+                row = readCursor.getRow();
+            }
+        }
+        readCursor.close();
+        return row;
+    }
+
+    /**
      * Query using the previous result query arguments
      *
      * @param previousResult previous result
