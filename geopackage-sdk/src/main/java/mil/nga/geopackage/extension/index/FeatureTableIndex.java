@@ -16,6 +16,7 @@ import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
+import mil.nga.geopackage.features.user.FeatureRowSync;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionTransform;
@@ -37,6 +38,11 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * Feature DAO
      */
     private final FeatureDao featureDao;
+
+    /**
+     * Feature Row Sync for simultaneous same row queries
+     */
+    private final FeatureRowSync featureRowSync = new FeatureRowSync();
 
     /**
      * Constructor
@@ -225,7 +231,21 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @return feature row
      */
     public FeatureRow getFeatureRow(GeometryIndex geometryIndex) {
-        return featureDao.queryForIdRow(geometryIndex.getGeomId());
+
+        long geomId = geometryIndex.getGeomId();
+
+        // Get the row or lock for reading
+        FeatureRow row = featureRowSync.getRowOrLock(geomId);
+        if (row == null) {
+            // Query for the row and set in the sync
+            try {
+                row = featureDao.queryForIdRow(geomId);
+            } finally {
+                featureRowSync.setRow(geomId, row);
+            }
+        }
+
+        return row;
     }
 
 }
