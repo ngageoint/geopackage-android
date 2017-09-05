@@ -213,7 +213,7 @@ public class TestUtils {
 		DataColumns dataColumns = new DataColumns();
 		dataColumns.setContents(contents);
 		dataColumns.setColumnName(TEST_INTEGER_COLUMN);
-		dataColumns.setName("TEST_NAME");
+		dataColumns.setName(contents.getTableName());
 		dataColumns.setTitle("TEST_TITLE");
 		dataColumns.setDescription("TEST_DESCRIPTION");
 		dataColumns.setMimeType("TEST_MIME_TYPE");
