@@ -12,15 +12,12 @@ import java.util.concurrent.Callable;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureRowSync;
-import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionTransform;
-import mil.nga.geopackage.user.UserCoreResult;
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to
@@ -126,10 +123,10 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * Index the feature rows in the cursor
      *
      * @param tableIndex table index
-     * @param cursor     feature result
-     * @return
+     * @param cursor     feature cursor
+     * @return count
      */
-    private int indexRows(TableIndex tableIndex, UserCoreResult<FeatureColumn, FeatureTable, FeatureRow> cursor) {
+    private int indexRows(TableIndex tableIndex, FeatureCursor cursor) {
 
         int count = 0;
 
