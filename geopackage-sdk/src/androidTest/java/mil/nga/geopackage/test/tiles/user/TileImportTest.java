@@ -97,4 +97,15 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test testThreadedTileDao
+	 *
+	 * @throws SQLException
+	 */
+	public void testThreadedTileDao() throws SQLException {
+
+		TileUtils.testThreadedTileDao(geoPackage);
+
+	}
+
 }

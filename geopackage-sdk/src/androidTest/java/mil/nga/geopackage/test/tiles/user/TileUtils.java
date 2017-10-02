@@ -17,10 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
@@ -1094,6 +1099,81 @@ public class TileUtils {
             }
         }
 
+    }
+
+    static boolean threadedTileDaoError = false;
+
+    public static void testThreadedTileDao(final GeoPackage geoPackage)
+            throws SQLException {
+
+        final int threads = 30;
+        final int attemptsPerThread = 50;
+
+        TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+
+        if (tileMatrixSetDao.isTableExists()) {
+
+            List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            for (TileMatrixSet tileMatrixSet : results) {
+
+                threadedTileDaoError = false;
+
+                final String tableName = tileMatrixSet.getTableName();
+
+                Runnable task = new Runnable() {
+
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < attemptsPerThread; i++) {
+
+                            try {
+                                ContentsDao contentsDao = geoPackage
+                                        .getContentsDao();
+                                Contents contents = contentsDao
+                                        .queryForId(tableName);
+                                if (contents == null) {
+                                    throw new Exception(
+                                            "Contents was null, table name: "
+                                                    + tableName);
+                                }
+
+                                TileDao dao = geoPackage.getTileDao(tableName);
+                                if (dao == null) {
+                                    throw new Exception(
+                                            "Tile DAO was null, table name: "
+                                                    + tableName);
+                                }
+                            } catch (Exception e) {
+                                threadedTileDaoError = true;
+                                e.printStackTrace();
+                                break;
+                            }
+                        }
+                    }
+                };
+
+                ExecutorService executor = Executors
+                        .newFixedThreadPool(threads);
+                for (int i = 0; i < threads; i++) {
+                    executor.submit(task);
+                }
+
+                executor.shutdown();
+                try {
+                    executor.awaitTermination(60, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    TestCase.fail("Waiting for threads terminated: "
+                            + e.getMessage());
+                }
+
+                if (threadedTileDaoError) {
+                    TestCase.fail("Error occurred during threading");
+                }
+
+            }
+
+        }
     }
 
 }
