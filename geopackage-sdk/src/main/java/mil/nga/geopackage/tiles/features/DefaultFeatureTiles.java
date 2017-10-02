@@ -88,13 +88,8 @@ public class DefaultFeatureTiles extends FeatureTiles {
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
 
         while (cursor.moveToNext()) {
-            try {
-                FeatureRow row = cursor.getRow();
-                drawFeature(boundingBox, transform, canvas, row);
-            } catch (Exception e) {
-                Log.e(DefaultFeatureTiles.class.getSimpleName(), "Failed to draw feature in tile. Table: "
-                        + featureDao.getTableName() + ", Position: " + cursor.getPosition(), e);
-            }
+            FeatureRow row = cursor.getRow();
+            drawFeature(boundingBox, transform, canvas, row);
         }
 
         cursor.close();
@@ -129,10 +124,15 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param row
      */
     private void drawFeature(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
-        GeoPackageGeometryData geomData = row.getGeometry();
-        if (geomData != null) {
-            Geometry geometry = geomData.getGeometry();
-            drawShape(boundingBox, transform, canvas, geometry);
+        try {
+            GeoPackageGeometryData geomData = row.getGeometry();
+            if (geomData != null) {
+                Geometry geometry = geomData.getGeometry();
+                drawShape(boundingBox, transform, canvas, geometry);
+            }
+        } catch (Exception e) {
+            Log.e(DefaultFeatureTiles.class.getSimpleName(), "Failed to draw feature in tile. Table: "
+                    + featureDao.getTableName(), e);
         }
     }
 
