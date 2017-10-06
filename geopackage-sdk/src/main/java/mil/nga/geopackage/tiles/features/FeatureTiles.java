@@ -154,9 +154,9 @@ public abstract class FeatureTiles {
     protected CustomFeaturesTile maxFeaturesTileDraw;
 
     /**
-     * When true, geometries are simplified before being drawn
+     * When true, geometries are simplified before being drawn.  Default is true
      */
-    protected boolean simplifyGeometries = false;
+    protected boolean simplifyGeometries = true;
 
     /**
      * Constructor
@@ -545,7 +545,7 @@ public abstract class FeatureTiles {
     }
 
     /**
-     * Is the simplify geometries flag set?
+     * Is the simplify geometries flag set?  Default is true
      *
      * @return simplify geometries flag
      * @since 1.4.2
@@ -557,8 +557,7 @@ public abstract class FeatureTiles {
     /**
      * Set the simplify geometries flag
      *
-     * @param simplifyGeometries
-     *            simplify geometries flag
+     * @param simplifyGeometries simplify geometries flag
      * @since 1.4.2
      */
     public void setSimplifyGeometries(boolean simplifyGeometries) {
@@ -787,10 +786,8 @@ public abstract class FeatureTiles {
      * When the simplify tolerance is set, simplify the points to a similar
      * curve with fewer points.
      *
-     * @param simplifyTolerance
-     *            simplify tolerance in meters
-     * @param points
-     *            ordered points
+     * @param simplifyTolerance simplify tolerance in meters
+     * @param points            ordered points
      * @return simplified points
      * @since 1.4.2
      */
@@ -823,7 +820,7 @@ public abstract class FeatureTiles {
     /**
      * Draw a tile bitmap from feature index results
      *
-     * @param zoom zoom level
+     * @param zoom                   zoom level
      * @param webMercatorBoundingBox
      * @param results
      * @return tile
@@ -834,7 +831,7 @@ public abstract class FeatureTiles {
     /**
      * Draw a tile bitmap from feature geometries in the provided cursor
      *
-     * @param zoom zoom level
+     * @param zoom                   zoom level
      * @param webMercatorBoundingBox
      * @param cursor
      * @return tile
@@ -845,7 +842,7 @@ public abstract class FeatureTiles {
     /**
      * Draw a tile bitmap from the feature rows
      *
-     * @param zoom zoom level
+     * @param zoom                   zoom level
      * @param webMercatorBoundingBox
      * @param featureRow
      * @return tile
