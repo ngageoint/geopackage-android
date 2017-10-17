@@ -5,8 +5,10 @@ import android.database.Cursor;
 
 import com.j256.ormlite.dao.CloseableIterator;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import mil.nga.geopackage.BoundingBox;
@@ -61,9 +63,9 @@ public class FeatureIndexManager {
     /**
      * Constructor
      *
-     * @param context
-     * @param geoPackage
-     * @param featureDao
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature DAO
      */
     public FeatureIndexManager(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
         this.featureDao = featureDao;
@@ -96,7 +98,7 @@ public class FeatureIndexManager {
     /**
      * Get the feature table index, used to index inside the GeoPackage as an extension
      *
-     * @return
+     * @return feature table index
      */
     public FeatureTableIndex getFeatureTableIndex() {
         return featureTableIndex;
@@ -105,7 +107,7 @@ public class FeatureIndexManager {
     /**
      * Get the feature indexer, used to index in metadata tables
      *
-     * @return
+     * @return feature indexer
      */
     public FeatureIndexer getFeatureIndexer() {
         return featureIndexer;
@@ -124,7 +126,7 @@ public class FeatureIndexManager {
      * Prioritize the query location order.  All types are placed at the front of the query order
      * in the order they are given. Omitting a location leaves it at it's current priority location.
      *
-     * @param types
+     * @param types feature index types
      */
     public void prioritizeQueryLocation(FeatureIndexType... types) {
         // Create a new query order set
@@ -141,7 +143,7 @@ public class FeatureIndexManager {
     /**
      * Set the index location
      *
-     * @param indexLocation
+     * @param indexLocation feature index type
      */
     public void setIndexLocation(FeatureIndexType indexLocation) {
         this.indexLocation = indexLocation;
@@ -150,7 +152,7 @@ public class FeatureIndexManager {
     /**
      * Set the GeoPackage Progress
      *
-     * @param progress
+     * @param progress GeoPackage progress
      */
     public void setProgress(GeoPackageProgress progress) {
         featureTableIndex.setProgress(progress);
@@ -164,6 +166,22 @@ public class FeatureIndexManager {
      */
     public int index() {
         return index(verifyIndexLocation(), false);
+    }
+
+    /**
+     * Index the feature tables if needed for the index types
+     *
+     * @param types feature index types
+     * @return largest count of indexed features
+     * @since 1.4.2
+     */
+    public int index(List<FeatureIndexType> types) {
+        int count = 0;
+        for (FeatureIndexType type : types) {
+            int typeCount = index(type, false);
+            count = Math.max(count, typeCount);
+        }
+        return count;
     }
 
     /**
@@ -184,6 +202,23 @@ public class FeatureIndexManager {
      */
     public int index(boolean force) {
         return index(verifyIndexLocation(), force);
+    }
+
+    /**
+     * Index the feature tables for the index types
+     *
+     * @param force true to force re-indexing
+     * @param types feature index types
+     * @return largest count of indexed features
+     * @since 1.4.2
+     */
+    public int index(boolean force, List<FeatureIndexType> types) {
+        int count = 0;
+        for (FeatureIndexType type : types) {
+            int typeCount = index(type, force);
+            count = Math.max(count, typeCount);
+        }
+        return count;
     }
 
     /**
@@ -224,6 +259,26 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Index the feature row for the index types.
+     * This method assumes that indexing has been completed and
+     * maintained as the last indexed time is updated.
+     *
+     * @param row   feature row to index
+     * @param types feature index types
+     * @return true if indexed from any type
+     * @since 1.4.2
+     */
+    public boolean index(FeatureRow row, List<FeatureIndexType> types) {
+        boolean indexed = false;
+        for (FeatureIndexType type : types) {
+            if (index(type, row)) {
+                indexed = true;
+            }
+        }
+        return indexed;
+    }
+
+    /**
      * Index the feature row. This method assumes that indexing has been completed and
      * maintained as the last indexed time is updated.
      *
@@ -259,9 +314,26 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Delete the feature index from the index types
+     *
+     * @param types feature index types
+     * @return true if deleted from any type
+     * @since 1.4.2
+     */
+    public boolean deleteIndex(List<FeatureIndexType> types) {
+        boolean deleted = false;
+        for (FeatureIndexType type : types) {
+            if (deleteIndex(type)) {
+                deleted = true;
+            }
+        }
+        return deleted;
+    }
+
+    /**
      * Delete the feature index
      *
-     * @param type
+     * @param type feature index type
      * @return true if deleted
      */
     public boolean deleteIndex(FeatureIndexType type) {
@@ -285,7 +357,7 @@ public class FeatureIndexManager {
     /**
      * Delete the feature index for the feature row
      *
-     * @param row
+     * @param row feature row
      * @return true if deleted
      */
     public boolean deleteIndex(FeatureRow row) {
@@ -293,10 +365,28 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Delete the feature index for the feature row from the index types
+     *
+     * @param row   feature row
+     * @param types feature index types
+     * @return true if deleted from any type
+     * @since 1.4.2
+     */
+    public boolean deleteIndex(FeatureRow row, List<FeatureIndexType> types) {
+        boolean deleted = false;
+        for (FeatureIndexType type : types) {
+            if (deleteIndex(type, row)) {
+                deleted = true;
+            }
+        }
+        return deleted;
+    }
+
+    /**
      * Delete the feature index for the feature row
      *
-     * @param type
-     * @param row
+     * @param type feature index type
+     * @param row  feature row
      * @return true if deleted
      */
     public boolean deleteIndex(FeatureIndexType type, FeatureRow row) {
@@ -306,7 +396,7 @@ public class FeatureIndexManager {
     /**
      * Delete the feature index for the geometry id
      *
-     * @param geomId
+     * @param geomId geometry id
      * @return true if deleted
      */
     public boolean deleteIndex(long geomId) {
@@ -314,10 +404,28 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Delete the feature index for the geometry id from the index types
+     *
+     * @param geomId geometry id
+     * @param types  feature index types
+     * @return true if deleted from any type
+     * @since 1.4.2
+     */
+    public boolean deleteIndex(long geomId, List<FeatureIndexType> types) {
+        boolean deleted = false;
+        for (FeatureIndexType type : types) {
+            if (deleteIndex(type, geomId)) {
+                deleted = true;
+            }
+        }
+        return deleted;
+    }
+
+    /**
      * Delete the feature index for the geometry id
      *
-     * @param type
-     * @param geomId
+     * @param type   feature index type
+     * @param geomId geometry id
      * @return true if deleted
      */
     public boolean deleteIndex(FeatureIndexType type, long geomId) {
@@ -380,6 +488,22 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Get the indexed types that are currently indexed
+     *
+     * @return indexed types
+     * @since 1.4.2
+     */
+    public List<FeatureIndexType> getIndexedTypes() {
+        List<FeatureIndexType> indexed = new ArrayList<>();
+        for (FeatureIndexType type : indexLocationQueryOrder) {
+            if (isIndexed(type)) {
+                indexed.add(type);
+            }
+        }
+        return indexed;
+    }
+
+    /**
      * Get the date last indexed
      *
      * @return last indexed date or null
@@ -398,7 +522,7 @@ public class FeatureIndexManager {
     /**
      * Get the date last indexed
      *
-     * @param type
+     * @param type feature index type
      * @return last indexed date or null
      */
     public Date getLastIndexed(FeatureIndexType type) {
@@ -463,7 +587,7 @@ public class FeatureIndexManager {
      * Query for feature index results within the bounding box, projected
      * correctly
      *
-     * @param boundingBox
+     * @param boundingBox bounding box
      * @return feature index results, close when done
      */
     public FeatureIndexResults query(BoundingBox boundingBox) {
@@ -486,7 +610,7 @@ public class FeatureIndexManager {
      * Query for feature index count within the bounding box, projected
      * correctly
      *
-     * @param boundingBox
+     * @param boundingBox bounding box
      * @return count
      */
     public long count(BoundingBox boundingBox) {
@@ -505,7 +629,7 @@ public class FeatureIndexManager {
     /**
      * Query for feature index results within the Geometry Envelope
      *
-     * @param envelope
+     * @param envelope geometry envelope
      * @return feature index results, close when done
      */
     public FeatureIndexResults query(GeometryEnvelope envelope) {
@@ -527,7 +651,7 @@ public class FeatureIndexManager {
     /**
      * Query for feature index count within the Geometry Envelope
      *
-     * @param envelope
+     * @param envelope geometry envelope
      * @return count
      */
     public long count(GeometryEnvelope envelope) {
@@ -547,8 +671,8 @@ public class FeatureIndexManager {
      * Query for feature index results within the bounding box in
      * the provided projection
      *
-     * @param boundingBox
-     * @param projection
+     * @param boundingBox bounding box
+     * @param projection  projection
      * @return feature index results, close when done
      */
     public FeatureIndexResults query(BoundingBox boundingBox, Projection projection) {
@@ -571,8 +695,8 @@ public class FeatureIndexManager {
      * Query for feature index count within the bounding box in
      * the provided projection
      *
-     * @param boundingBox
-     * @param projection
+     * @param boundingBox bounding box
+     * @param projection  projection
      * @return count
      */
     public long count(BoundingBox boundingBox, Projection projection) {
