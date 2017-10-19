@@ -135,10 +135,12 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
         FileDirectory directory = tiffImage.getFileDirectory();
         validateImageType(directory);
         Rasters rasters = directory.readRasters();
-        Number[] values = rasters.getSampleValues()[0];
-        float[] pixels = new float[values.length];
-        for (int i = 0; i < values.length; i++) {
-            pixels[i] = values[i].floatValue();
+        float[] pixels = new float[rasters.getWidth() * rasters.getHeight()];
+        for (int y = 0; y < rasters.getHeight(); y++) {
+            for (int x = 0; x < rasters.getWidth(); x++) {
+                int index = rasters.getSampleIndex(x, y);
+                pixels[index] = rasters.getPixelSample(0, x, y).floatValue();
+            }
         }
         return pixels;
     }
@@ -378,7 +380,8 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
      */
     public ElevationTiffImage createImage(int tileWidth, int tileHeight) {
 
-        Rasters rasters = new Rasters(tileWidth, tileHeight, 1, BITS_PER_SAMPLE);
+        Rasters rasters = new Rasters(tileWidth, tileHeight, 1,
+                BITS_PER_SAMPLE, TiffConstants.SAMPLE_FORMAT_FLOAT);
 
         int rowsPerStrip = rasters.calculateRowsPerStrip(TiffConstants.PLANAR_CONFIGURATION_CHUNKY);
 
