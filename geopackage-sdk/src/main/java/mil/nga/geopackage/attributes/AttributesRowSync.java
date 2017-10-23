@@ -7,7 +7,7 @@ import mil.nga.geopackage.user.UserRowSync;
  * near simultaneous asynchronous requests are made
  *
  * @author osbornb
- * @since 1.4.2
+ * @since 1.5.0
  */
 public class AttributesRowSync extends UserRowSync<AttributesColumn, AttributesTable, AttributesRow> {
 

@@ -4,7 +4,7 @@ package mil.nga.geopackage.user;
  * User Query parameter types
  *
  * @author osbornb
- * @since 1.4.2
+ * @since 1.5.0
  */
 public enum UserQueryParamType {
 

@@ -38,7 +38,7 @@ public class TileCursor extends UserCursor<TileColumn, TileTable, TileRow> {
      * Only supported for {@link #moveToNext()} and {@link #getRow()} usage.
      *
      * @param dao data access object used to perform requery
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public void enableInvalidRequery(TileDao dao) {
         super.enableInvalidRequery(dao);

@@ -8,7 +8,7 @@ import mil.nga.geopackage.user.UserInvalidCursor;
  * Feature Invalid Cursor wrapper for feature requery to handle failed rows due to large blobs
  *
  * @author osbornb
- * @since 1.4.2
+ * @since 1.5.0
  */
 public class FeatureInvalidCursor extends UserInvalidCursor<FeatureColumn, FeatureTable, FeatureRow, FeatureCursor, FeatureDao> {
 

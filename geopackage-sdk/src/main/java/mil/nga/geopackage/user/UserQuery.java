@@ -7,7 +7,7 @@ import java.util.Map;
  * User Query parameter types
  *
  * @author osbornb
- * @since 1.4.2
+ * @since 1.5.0
  */
 public class UserQuery {
 

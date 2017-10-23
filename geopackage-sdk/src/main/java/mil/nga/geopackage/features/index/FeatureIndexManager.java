@@ -173,7 +173,7 @@ public class FeatureIndexManager {
      *
      * @param types feature index types
      * @return largest count of indexed features
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public int index(List<FeatureIndexType> types) {
         int count = 0;
@@ -210,7 +210,7 @@ public class FeatureIndexManager {
      * @param force true to force re-indexing
      * @param types feature index types
      * @return largest count of indexed features
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public int index(boolean force, List<FeatureIndexType> types) {
         int count = 0;
@@ -266,7 +266,7 @@ public class FeatureIndexManager {
      * @param row   feature row to index
      * @param types feature index types
      * @return true if indexed from any type
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public boolean index(FeatureRow row, List<FeatureIndexType> types) {
         boolean indexed = false;
@@ -318,7 +318,7 @@ public class FeatureIndexManager {
      *
      * @param types feature index types
      * @return true if deleted from any type
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public boolean deleteIndex(List<FeatureIndexType> types) {
         boolean deleted = false;
@@ -370,7 +370,7 @@ public class FeatureIndexManager {
      * @param row   feature row
      * @param types feature index types
      * @return true if deleted from any type
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public boolean deleteIndex(FeatureRow row, List<FeatureIndexType> types) {
         boolean deleted = false;
@@ -409,7 +409,7 @@ public class FeatureIndexManager {
      * @param geomId geometry id
      * @param types  feature index types
      * @return true if deleted from any type
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public boolean deleteIndex(long geomId, List<FeatureIndexType> types) {
         boolean deleted = false;
@@ -491,7 +491,7 @@ public class FeatureIndexManager {
      * Get the indexed types that are currently indexed
      *
      * @return indexed types
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public List<FeatureIndexType> getIndexedTypes() {
         List<FeatureIndexType> indexed = new ArrayList<>();

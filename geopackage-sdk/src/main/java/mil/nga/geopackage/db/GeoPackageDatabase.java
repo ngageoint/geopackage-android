@@ -75,7 +75,7 @@ public class GeoPackageDatabase {
 
     /**
      * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String)
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
                         String[] selectionArgs, String groupBy, String having,
@@ -96,7 +96,7 @@ public class GeoPackageDatabase {
 
     /**
      * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String, String)
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
                         String[] selectionArgs, String groupBy, String having,

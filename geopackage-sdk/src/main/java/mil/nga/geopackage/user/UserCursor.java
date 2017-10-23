@@ -77,7 +77,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Get the invalid positions found when retrieving rows
      *
      * @return invalid positions
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public List<Integer> getInvalidPositions() {
         return new ArrayList<>(invalidPositions);
@@ -87,7 +87,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Determine if invalid positions were found when retrieving rows
      *
      * @return true if invalid positions
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public boolean hasInvalidPositions() {
         return !invalidPositions.isEmpty();
@@ -194,7 +194,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Set the user query
      *
      * @param query user query
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public void setQuery(UserQuery query) {
         this.query = query;
@@ -204,7 +204,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Get the user query
      *
      * @return user query
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public UserQuery getQuery() {
         return query;
@@ -215,7 +215,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Only supported for {@link #moveToNext()} and {@link #getRow()} usage.
      *
      * @param dao data access object used to perform requery
-     * @since 1.4.2
+     * @since 1.5.0
      */
     protected void enableInvalidRequery(UserDao<TColumn, TTable, TRow, ? extends UserCursor<TColumn, TTable, TRow>> dao) {
         this.dao = dao;

@@ -20,7 +20,7 @@ import mil.nga.geopackage.db.GeoPackageDataType;
  * @param <TRow>
  * @param <TCursor>
  * @param <TUserDao>
- * @since 1.4.2
+ * @since 1.5.0
  */
 public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TCursor extends UserCursor<TColumn, TTable, TRow>, TUserDao extends UserDao<TColumn, TTable, TRow, TCursor>>
         implements UserCoreResult<TColumn, TTable, TRow> {

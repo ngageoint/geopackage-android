@@ -534,7 +534,7 @@ public abstract class FeatureTiles {
      * Is the simplify geometries flag set?  Default is true
      *
      * @return simplify geometries flag
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public boolean isSimplifyGeometries() {
         return simplifyGeometries;
@@ -544,7 +544,7 @@ public abstract class FeatureTiles {
      * Set the simplify geometries flag
      *
      * @param simplifyGeometries simplify geometries flag
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public void setSimplifyGeometries(boolean simplifyGeometries) {
         this.simplifyGeometries = simplifyGeometries;
@@ -775,7 +775,7 @@ public abstract class FeatureTiles {
      * @param simplifyTolerance simplify tolerance in meters
      * @param points            ordered points
      * @return simplified points
-     * @since 1.4.2
+     * @since 1.5.0
      */
     protected List<Point> simplifyPoints(double simplifyTolerance,
                                          List<Point> points) {
@@ -814,7 +814,7 @@ public abstract class FeatureTiles {
      * @param webMercatorBoundingBox
      * @param results
      * @return tile
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public abstract Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, FeatureIndexResults results);
 
@@ -825,7 +825,7 @@ public abstract class FeatureTiles {
      * @param webMercatorBoundingBox
      * @param cursor
      * @return tile
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public abstract Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, FeatureCursor cursor);
 
@@ -836,7 +836,7 @@ public abstract class FeatureTiles {
      * @param webMercatorBoundingBox
      * @param featureRow
      * @return tile
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public abstract Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, List<FeatureRow> featureRow);
 

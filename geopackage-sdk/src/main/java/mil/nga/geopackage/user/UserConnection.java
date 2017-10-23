@@ -95,7 +95,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      *
      * @param previousResult previous result
      * @return result
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public TResult query(TResult previousResult) {
         UserQuery query = previousResult.getQuery();
@@ -108,7 +108,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      *
      * @param query user query
      * @return result
-     * @since 1.4.2
+     * @since 1.5.0
      */
     public TResult query(UserQuery query) {
         Cursor cursor = null;
@@ -165,7 +165,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      *
      * @param cursor cursor
      * @return result cursor
-     * @since 1.4.2
+     * @since 1.5.0
      */
     protected TResult convertCursor(Cursor cursor) {
         return (TResult) cursor;
