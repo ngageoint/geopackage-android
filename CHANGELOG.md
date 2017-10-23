@@ -6,7 +6,26 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 1.5.0 (TBD)
 
-* TBD
+* geopackage-core version updated to 1.4.0
+* User Invalid Cursor support for reading large blobs
+* Attribute, Feature, and Tile Invalid Cursor implementations
+* Attribute, Feature, and Tile User Row Sync implementations
+* Query support for "columns as"
+* Feature Indexer and Feature Table Index row syncing
+* Improved feature row geometry blob handling
+* Feature Tiles geometry simplifications
+* Multiple Results and List Results implementations of Feature Index results
+* Feature Index Manager index type specific improvements
+* User Query object representation and support
+* tiff version updated to 2.0.0
+* gradle plugin updated to 2.3.3
+* android maven gradle plugin updated to 2.0
+* maven google dependency
+* compile SDK version 26
+* build tools version updated to 26.0.1
+* min SDK version updated to 14
+* target SDK version updated to 26
+* Android support library updated to 26.0.2
 
 ## [1.4.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.4.1) (07-13-2017)
 
