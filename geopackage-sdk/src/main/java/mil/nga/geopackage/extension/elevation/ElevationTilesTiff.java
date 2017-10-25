@@ -155,7 +155,7 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
             throw new GeoPackageException("The image is null");
         }
 
-        Integer samplesPerPixel = directory.getSamplesPerPixel();
+        int samplesPerPixel = directory.getSamplesPerPixel();
         Integer bitsPerSample = null;
         if (directory.getBitsPerSample() != null && !directory.getBitsPerSample().isEmpty()) {
             bitsPerSample = directory.getBitsPerSample().get(0);
@@ -165,7 +165,7 @@ public class ElevationTilesTiff extends ElevationTilesCommon<ElevationTiffImage>
             sampleFormat = directory.getSampleFormat().get(0);
         }
 
-        if (samplesPerPixel == null || samplesPerPixel != SAMPLES_PER_PIXEL
+        if (samplesPerPixel != SAMPLES_PER_PIXEL
                 || bitsPerSample == null || bitsPerSample != BITS_PER_SAMPLE
                 || sampleFormat == null || sampleFormat != TiffConstants.SAMPLE_FORMAT_FLOAT) {
             throw new GeoPackageException(
