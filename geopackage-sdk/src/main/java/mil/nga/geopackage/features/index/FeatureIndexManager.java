@@ -178,7 +178,7 @@ public class FeatureIndexManager {
     public int index(List<FeatureIndexType> types) {
         int count = 0;
         for (FeatureIndexType type : types) {
-            int typeCount = index(type, false);
+            int typeCount = index(type);
             count = Math.max(count, typeCount);
         }
         return count;
