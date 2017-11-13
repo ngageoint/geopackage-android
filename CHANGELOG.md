@@ -6,8 +6,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.0.0 (TBD)
 
-* WARNING - BoundingBox.java coordinate constructor arguments order changed to (min lon, min lat, max lon, max lat)
+* WARNING - BoundingBox.java (geopackage-core) coordinate constructor arguments order changed to (min lon, min lat, max lon, max lat)
   Pre-existing calls to BoundingBox coordinate constructor should swap the min lat and max lon values
+* WARNING - TileGrid.java (geopackage-core) constructor arguments order changed to (minX, minY, maxX, maxY)
+  Pre-existing calls to TileGrid constructor should swap the minY and maxX values
 * geopackage-core version updated to 2.0.0
 * User Invalid Cursor support for reading large blobs
 * Attribute, Feature, and Tile Invalid Cursor implementations
