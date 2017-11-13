@@ -87,8 +87,8 @@ public abstract class CreateElevationTilesGeoPackageTestCase extends
                 + ((ProjectionConstants.WEB_MERCATOR_MAX_LAT_RANGE - minLatitude) * Math
                 .random());
 
-        BoundingBox bbox = new BoundingBox(minLongitude, maxLongitude,
-                minLatitude, maxLatitude);
+        BoundingBox bbox = new BoundingBox(minLongitude,
+                minLatitude, maxLongitude, maxLatitude);
 
         SpatialReferenceSystemDao srsDao = geoPackage
                 .getSpatialReferenceSystemDao();

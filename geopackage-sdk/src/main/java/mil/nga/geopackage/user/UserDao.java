@@ -63,7 +63,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      * When enabled (default is true) large invalid user rows are requeried and handled.
      *
      * @return invalid requery flag
-     * @since 1.5.0
+     * @since 2.0.0
      */
     public boolean isInvalidRequery() {
         return invalidRequery;
@@ -74,7 +74,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      * When enabled (default is true) large invalid user rows are requeried and handled.
      *
      * @param invalidRequery invalid requery flag
-     * @since 1.5.0
+     * @since 2.0.0
      */
     public void setInvalidRequery(boolean invalidRequery) {
         this.invalidRequery = invalidRequery;
@@ -114,7 +114,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      *
      * @param previousResult previous result
      * @return result
-     * @since 1.5.0
+     * @since 2.0.0
      */
     public TResult query(TResult previousResult) {
         return (TResult) userDb.query(previousResult);
@@ -125,7 +125,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      *
      * @param query user query
      * @return result
-     * @since 1.5.0
+     * @since 2.0.0
      */
     public TResult query(UserQuery query) {
         return (TResult) userDb.query(query);

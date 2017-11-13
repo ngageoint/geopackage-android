@@ -10,7 +10,7 @@ import mil.nga.geopackage.features.user.FeatureRow;
  * Feature Index Results Feature Row list implementation
  *
  * @author osbornb
- * @since 1.5.0
+ * @since 2.0.0
  */
 public class FeatureIndexListResults implements FeatureIndexResults {
 

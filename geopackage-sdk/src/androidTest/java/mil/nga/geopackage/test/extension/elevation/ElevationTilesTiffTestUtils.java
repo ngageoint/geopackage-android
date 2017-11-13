@@ -519,7 +519,7 @@ public class ElevationTilesTiffTestUtils {
                 * Math.random() + minLongitude;
 
         BoundingBox requestBoundingBox = new BoundingBox(minLongitude,
-                maxLongitude, minLatitude, maxLatitude);
+                minLatitude, maxLongitude, maxLatitude);
         ElevationTileResults elevations = elevationTiles2
                 .getElevations(requestBoundingBox);
         TestCase.assertNotNull(elevations);
@@ -643,7 +643,7 @@ public class ElevationTilesTiffTestUtils {
                     * Math.random() + minLongitude;
 
             BoundingBox requestBoundingBox = new BoundingBox(minLongitude,
-                    maxLongitude, minLatitude, maxLatitude);
+                    minLatitude, maxLongitude, maxLatitude);
 
             ElevationTileResults elevations = elevationTiles
                     .getElevations(requestBoundingBox);

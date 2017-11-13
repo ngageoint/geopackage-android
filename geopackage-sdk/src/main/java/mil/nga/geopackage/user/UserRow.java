@@ -160,7 +160,7 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
      * Set the row valid state
      *
      * @param valid true if valid
-     * @since 1.5.0
+     * @since 2.0.0
      */
     public void setValid(boolean valid) {
         this.valid = valid;
@@ -170,7 +170,7 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
      * Check if the row is valid
      *
      * @return true if valid
-     * @since 1.5.0
+     * @since 2.0.0
      */
     public boolean isValid() {
         return valid;

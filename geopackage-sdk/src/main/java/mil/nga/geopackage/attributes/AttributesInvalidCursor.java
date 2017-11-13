@@ -8,7 +8,7 @@ import mil.nga.geopackage.user.UserInvalidCursor;
  * Attributes Invalid Cursor wrapper for attributes requery to handle failed rows due to large blobs
  *
  * @author osbornb
- * @since 1.5.0
+ * @since 2.0.0
  */
 public class AttributesInvalidCursor extends UserInvalidCursor<AttributesColumn, AttributesTable, AttributesRow, AttributesCursor, AttributesDao> {
 

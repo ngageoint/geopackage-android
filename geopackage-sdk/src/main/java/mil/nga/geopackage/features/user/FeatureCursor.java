@@ -78,7 +78,7 @@ public class FeatureCursor extends
      * Only supported for {@link #moveToNext()} and {@link #getRow()} usage.
      *
      * @param dao data access object used to perform requery
-     * @since 1.5.0
+     * @since 2.0.0
      */
     public void enableInvalidRequery(FeatureDao dao) {
         super.enableInvalidRequery(dao);

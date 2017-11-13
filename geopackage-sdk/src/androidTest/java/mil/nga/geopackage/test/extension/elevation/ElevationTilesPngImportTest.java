@@ -199,8 +199,8 @@ public class ElevationTilesPngImportTest extends
         double minLatitude = 8760000;
         double maxLatitude = minLatitude + (height * heightPixelDistance);
 
-        BoundingBox boundingBox = new BoundingBox(minLongitude, maxLongitude,
-                minLatitude, maxLatitude);
+        BoundingBox boundingBox = new BoundingBox(minLongitude, minLatitude,
+                maxLongitude, maxLatitude);
 
         Projection projection = ProjectionFactory.getProjection(requestEpsg);
         Projection printProjection = ProjectionFactory

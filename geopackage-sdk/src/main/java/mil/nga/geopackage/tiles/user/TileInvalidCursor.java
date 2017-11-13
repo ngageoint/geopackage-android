@@ -8,7 +8,7 @@ import mil.nga.geopackage.user.UserInvalidCursor;
  * Tile Invalid Cursor wrapper for tile requery to handle failed rows due to large blobs
  *
  * @author osbornb
- * @since 1.5.0
+ * @since 2.0.0
  */
 public class TileInvalidCursor extends UserInvalidCursor<TileColumn, TileTable, TileRow, TileCursor, TileDao> {
 

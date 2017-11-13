@@ -4,9 +4,11 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.5.0 (TBD)
+## 2.0.0 (TBD)
 
-* geopackage-core version updated to 1.4.0
+* WARNING - BoundingBox.java coordinate constructor arguments order changed to (min lon, min lat, max lon, max lat)
+  Pre-existing calls to BoundingBox coordinate constructor should swap the min lat and max lon values
+* geopackage-core version updated to 2.0.0
 * User Invalid Cursor support for reading large blobs
 * Attribute, Feature, and Tile Invalid Cursor implementations
 * Attribute, Feature, and Tile User Row Sync implementations
