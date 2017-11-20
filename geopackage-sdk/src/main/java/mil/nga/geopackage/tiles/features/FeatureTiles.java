@@ -7,6 +7,8 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Paint;
 import android.util.Log;
 
+import org.osgeo.proj4j.units.Units;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -23,6 +25,8 @@ import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.wkb.geom.Point;
+import mil.nga.wkb.util.GeometryUtils;
 
 /**
  * Tiles drawn from or linked to features. Used to query features and optionally draw tiles
@@ -53,6 +57,11 @@ public abstract class FeatureTiles {
      * Tile data access object
      */
     protected final FeatureDao featureDao;
+
+    /**
+     * Feature DAO Projection
+     */
+    protected Projection projection;
 
     /**
      * When not null, features are retrieved using a feature index
@@ -135,6 +144,11 @@ public abstract class FeatureTiles {
     protected CustomFeaturesTile maxFeaturesTileDraw;
 
     /**
+     * When true, geometries are simplified before being drawn.  Default is true
+     */
+    protected boolean simplifyGeometries = true;
+
+    /**
      * Constructor
      *
      * @param context
@@ -143,6 +157,9 @@ public abstract class FeatureTiles {
     public FeatureTiles(Context context, FeatureDao featureDao) {
         this.context = context;
         this.featureDao = featureDao;
+        if (featureDao != null) {
+            this.projection = featureDao.getProjection();
+        }
 
         Resources resources = context.getResources();
         tileWidth = resources.getInteger(R.integer.feature_tiles_width);
@@ -514,6 +531,26 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Is the simplify geometries flag set?  Default is true
+     *
+     * @return simplify geometries flag
+     * @since 2.0.0
+     */
+    public boolean isSimplifyGeometries() {
+        return simplifyGeometries;
+    }
+
+    /**
+     * Set the simplify geometries flag
+     *
+     * @param simplifyGeometries simplify geometries flag
+     * @since 2.0.0
+     */
+    public void setSimplifyGeometries(boolean simplifyGeometries) {
+        this.simplifyGeometries = simplifyGeometries;
+    }
+
+    /**
      * Draw the tile and get the bytes from the x, y, and zoom level
      *
      * @param x
@@ -590,7 +627,7 @@ public abstract class FeatureTiles {
             if (maxFeaturesPerTile == null || tileCount <= maxFeaturesPerTile.longValue()) {
 
                 // Draw the tile bitmap
-                bitmap = drawTile(webMercatorBoundingBox, results);
+                bitmap = drawTile(zoom, webMercatorBoundingBox, results);
 
             } else if (maxFeaturesTileDraw != null) {
 
@@ -649,8 +686,8 @@ public abstract class FeatureTiles {
         double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
         BoundingBox expandedQueryBoundingBox = new BoundingBox(
                 minLongitude,
-                maxLongitude,
                 minLatitude,
+                maxLongitude,
                 maxLatitude);
 
         // Query for geometries matching the bounds in the index
@@ -688,7 +725,7 @@ public abstract class FeatureTiles {
             if (maxFeaturesPerTile == null || totalCount <= maxFeaturesPerTile) {
 
                 // Draw the tile bitmap
-                bitmap = drawTile(boundingBox, cursor);
+                bitmap = drawTile(zoom, boundingBox, cursor);
 
             } else if (maxFeaturesTileDraw != null) {
 
@@ -732,30 +769,75 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * When the simplify tolerance is set, simplify the points to a similar
+     * curve with fewer points.
+     *
+     * @param simplifyTolerance simplify tolerance in meters
+     * @param points            ordered points
+     * @return simplified points
+     * @since 2.0.0
+     */
+    protected List<Point> simplifyPoints(double simplifyTolerance,
+                                         List<Point> points) {
+
+        List<Point> simplifiedPoints = null;
+        if (simplifyGeometries) {
+
+            // Reproject to web mercator if not in meters
+            if (projection != null && projection.getUnit() != Units.METRES) {
+                ProjectionTransform toWebMercator = projection
+                        .getTransformation(WEB_MERCATOR_PROJECTION);
+                points = toWebMercator.transform(points);
+            }
+
+            // Simplify the points
+            simplifiedPoints = GeometryUtils.simplifyPoints(points,
+                    simplifyTolerance);
+
+            // Reproject back to the original projection
+            if (projection != null && projection.getUnit() != Units.METRES) {
+                ProjectionTransform fromWebMercator = WEB_MERCATOR_PROJECTION
+                        .getTransformation(projection);
+                simplifiedPoints = fromWebMercator.transform(simplifiedPoints);
+            }
+        } else {
+            simplifiedPoints = points;
+        }
+
+        return simplifiedPoints;
+    }
+
+    /**
      * Draw a tile bitmap from feature index results
      *
+     * @param zoom                   zoom level
      * @param webMercatorBoundingBox
      * @param results
-     * @return
+     * @return tile
+     * @since 2.0.0
      */
-    public abstract Bitmap drawTile(BoundingBox webMercatorBoundingBox, FeatureIndexResults results);
+    public abstract Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, FeatureIndexResults results);
 
     /**
      * Draw a tile bitmap from feature geometries in the provided cursor
      *
+     * @param zoom                   zoom level
      * @param webMercatorBoundingBox
      * @param cursor
-     * @return
+     * @return tile
+     * @since 2.0.0
      */
-    public abstract Bitmap drawTile(BoundingBox webMercatorBoundingBox, FeatureCursor cursor);
+    public abstract Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, FeatureCursor cursor);
 
     /**
      * Draw a tile bitmap from the feature rows
      *
+     * @param zoom                   zoom level
      * @param webMercatorBoundingBox
      * @param featureRow
-     * @return
+     * @return tile
+     * @since 2.0.0
      */
-    public abstract Bitmap drawTile(BoundingBox webMercatorBoundingBox, List<FeatureRow> featureRow);
+    public abstract Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, List<FeatureRow> featureRow);
 
 }

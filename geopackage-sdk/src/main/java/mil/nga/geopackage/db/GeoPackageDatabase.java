@@ -74,12 +74,36 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String)
+     * @since 2.0.0
+     */
+    public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
+                        String[] selectionArgs, String groupBy, String having,
+                        String orderBy) {
+        String[] wrappedColumns = CoreSQLUtils.quoteWrap(columns);
+        String[] wrappedColumnsAs = CoreSQLUtils.buildColumnsAs(wrappedColumns, columnsAs);
+        return db.query(CoreSQLUtils.quoteWrap(table), wrappedColumnsAs, selection, selectionArgs, groupBy, having, orderBy);
+    }
+
+    /**
      * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String, String)
      */
     public Cursor query(String table, String[] columns, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy, String limit) {
         return db.query(CoreSQLUtils.quoteWrap(table), CoreSQLUtils.quoteWrap(columns), selection, selectionArgs, groupBy, having, orderBy, limit);
+    }
+
+    /**
+     * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String, String)
+     * @since 2.0.0
+     */
+    public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
+                        String[] selectionArgs, String groupBy, String having,
+                        String orderBy, String limit) {
+        String[] wrappedColumns = CoreSQLUtils.quoteWrap(columns);
+        String[] wrappedColumnsAs = CoreSQLUtils.buildColumnsAs(wrappedColumns, columnsAs);
+        return db.query(CoreSQLUtils.quoteWrap(table), wrappedColumnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
     /**

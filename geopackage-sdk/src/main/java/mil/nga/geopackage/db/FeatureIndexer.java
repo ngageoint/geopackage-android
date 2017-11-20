@@ -2,6 +2,7 @@ package mil.nga.geopackage.db;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.Date;
 
@@ -16,6 +17,7 @@ import mil.nga.geopackage.db.metadata.TableMetadataDataSource;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
+import mil.nga.geopackage.features.user.FeatureRowSync;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.projection.Projection;
@@ -38,6 +40,11 @@ public class FeatureIndexer {
      * Feature DAO
      */
     private final FeatureDao featureDao;
+
+    /**
+     * Feature Row Sync for simultaneous same row queries
+     */
+    private final FeatureRowSync featureRowSync = new FeatureRowSync();
 
     /**
      * Database connection to the metadata
@@ -147,13 +154,18 @@ public class FeatureIndexer {
         FeatureCursor cursor = featureDao.queryForAll();
         try {
             while ((progress == null || progress.isActive()) && cursor.moveToNext()) {
-                FeatureRow row = cursor.getRow();
-                boolean indexed = index(metadata.getGeoPackageId(), row, false);
-                if (indexed) {
-                    count++;
-                }
-                if (progress != null) {
-                    progress.addProgress(1);
+                try {
+                    FeatureRow row = cursor.getRow();
+                    boolean indexed = index(metadata.getGeoPackageId(), row, false);
+                    if (indexed) {
+                        count++;
+                    }
+                    if (progress != null) {
+                        progress.addProgress(1);
+                    }
+                } catch (Exception e) {
+                    Log.e(FeatureIndexer.class.getSimpleName(), "Failed to index feature. Table: "
+                            + featureDao.getTableName() + ", Position: " + cursor.getPosition(), e);
                 }
             }
         } finally {
@@ -461,8 +473,21 @@ public class FeatureIndexer {
      * @since 1.1.0
      */
     public FeatureRow getFeatureRow(GeometryMetadata geometryMetadata) {
-        FeatureRow featureRow = featureDao.queryForIdRow(geometryMetadata.getId());
-        return featureRow;
+
+        long geomId = geometryMetadata.getId();
+
+        // Get the row or lock for reading
+        FeatureRow row = featureRowSync.getRowOrLock(geomId);
+        if (row == null) {
+            // Query for the row and set in the sync
+            try {
+                row = featureDao.queryForIdRow(geomId);
+            } finally {
+                featureRowSync.setRow(geomId, row);
+            }
+        }
+
+        return row;
     }
 
 }

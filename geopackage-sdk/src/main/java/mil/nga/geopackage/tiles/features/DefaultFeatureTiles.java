@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.util.Log;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * {@inheritDoc}
      */
     @Override
-    public Bitmap drawTile(BoundingBox webMercatorBoundingBox, FeatureIndexResults results) {
+    public Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, FeatureIndexResults results) {
 
         // Create bitmap and canvas
         Bitmap bitmap = createNewBitmap();
@@ -69,7 +70,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
 
         for (FeatureRow featureRow : results) {
-            drawFeature(webMercatorBoundingBox, transform, canvas, featureRow);
+            drawFeature(zoom, webMercatorBoundingBox, transform, canvas, featureRow);
         }
 
         return bitmap;
@@ -79,7 +80,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * {@inheritDoc}
      */
     @Override
-    public Bitmap drawTile(BoundingBox boundingBox, FeatureCursor cursor) {
+    public Bitmap drawTile(int zoom, BoundingBox boundingBox, FeatureCursor cursor) {
 
         Bitmap bitmap = createNewBitmap();
         Canvas canvas = new Canvas(bitmap);
@@ -88,7 +89,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         while (cursor.moveToNext()) {
             FeatureRow row = cursor.getRow();
-            drawFeature(boundingBox, transform, canvas, row);
+            drawFeature(zoom, boundingBox, transform, canvas, row);
         }
 
         cursor.close();
@@ -100,7 +101,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * {@inheritDoc}
      */
     @Override
-    public Bitmap drawTile(BoundingBox boundingBox, List<FeatureRow> featureRow) {
+    public Bitmap drawTile(int zoom, BoundingBox boundingBox, List<FeatureRow> featureRow) {
 
         Bitmap bitmap = createNewBitmap();
         Canvas canvas = new Canvas(bitmap);
@@ -108,7 +109,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
 
         for (FeatureRow row : featureRow) {
-            drawFeature(boundingBox, transform, canvas, row);
+            drawFeature(zoom, boundingBox, transform, canvas, row);
         }
 
         return bitmap;
@@ -117,28 +118,36 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Draw the feature on the canvas
      *
+     * @param zoom        zoom level
      * @param boundingBox
      * @param transform
      * @param canvas
      * @param row
      */
-    private void drawFeature(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
-        GeoPackageGeometryData geomData = row.getGeometry();
-        if (geomData != null) {
-            Geometry geometry = geomData.getGeometry();
-            drawShape(boundingBox, transform, canvas, geometry);
+    private void drawFeature(int zoom, BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
+        try {
+            GeoPackageGeometryData geomData = row.getGeometry();
+            if (geomData != null) {
+                Geometry geometry = geomData.getGeometry();
+                double simplifyTolerance = TileBoundingBoxUtils.toleranceDistance(zoom, tileWidth, tileHeight);
+                drawShape(simplifyTolerance, boundingBox, transform, canvas, geometry);
+            }
+        } catch (Exception e) {
+            Log.e(DefaultFeatureTiles.class.getSimpleName(), "Failed to draw feature in tile. Table: "
+                    + featureDao.getTableName(), e);
         }
     }
 
     /**
      * Draw the geometry on the canvas
      *
+     * @param simplifyTolerance simplify tolerance in meters
      * @param boundingBox
      * @param transform
      * @param canvas
      * @param geometry
      */
-    private void drawShape(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Geometry geometry) {
+    private void drawShape(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Geometry geometry) {
 
         switch (geometry.getGeometryType()) {
 
@@ -150,14 +159,14 @@ public class DefaultFeatureTiles extends FeatureTiles {
             case CIRCULARSTRING:
                 LineString lineString = (LineString) geometry;
                 Path linePath = new Path();
-                addLineString(boundingBox, transform, linePath, lineString);
+                addLineString(simplifyTolerance, boundingBox, transform, linePath, lineString);
                 drawLinePath(canvas, linePath);
                 break;
             case POLYGON:
             case TRIANGLE:
                 Polygon polygon = (Polygon) geometry;
                 Path polygonPath = new Path();
-                addPolygon(boundingBox, transform, polygonPath, polygon);
+                addPolygon(simplifyTolerance, boundingBox, transform, polygonPath, polygon);
                 drawPolygonPath(canvas, polygonPath);
                 break;
             case MULTIPOINT:
@@ -170,7 +179,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 MultiLineString multiLineString = (MultiLineString) geometry;
                 Path multiLinePath = new Path();
                 for (LineString lineStringFromMulti : multiLineString.getLineStrings()) {
-                    addLineString(boundingBox, transform, multiLinePath, lineStringFromMulti);
+                    addLineString(simplifyTolerance, boundingBox, transform, multiLinePath, lineStringFromMulti);
                 }
                 drawLinePath(canvas, multiLinePath);
                 break;
@@ -178,7 +187,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 MultiPolygon multiPolygon = (MultiPolygon) geometry;
                 Path multiPolygonPath = new Path();
                 for (Polygon polygonFromMulti : multiPolygon.getPolygons()) {
-                    addPolygon(boundingBox, transform, multiPolygonPath, polygonFromMulti);
+                    addPolygon(simplifyTolerance, boundingBox, transform, multiPolygonPath, polygonFromMulti);
                 }
                 drawPolygonPath(canvas, multiPolygonPath);
                 break;
@@ -186,7 +195,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 CompoundCurve compoundCurve = (CompoundCurve) geometry;
                 Path compoundCurvePath = new Path();
                 for (LineString lineStringFromCompoundCurve : compoundCurve.getLineStrings()) {
-                    addLineString(boundingBox, transform, compoundCurvePath, lineStringFromCompoundCurve);
+                    addLineString(simplifyTolerance, boundingBox, transform, compoundCurvePath, lineStringFromCompoundCurve);
                 }
                 drawLinePath(canvas, compoundCurvePath);
                 break;
@@ -195,7 +204,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 PolyhedralSurface polyhedralSurface = (PolyhedralSurface) geometry;
                 Path polyhedralSurfacePath = new Path();
                 for (Polygon polygonFromPolyhedralSurface : polyhedralSurface.getPolygons()) {
-                    addPolygon(boundingBox, transform, polyhedralSurfacePath, polygonFromPolyhedralSurface);
+                    addPolygon(simplifyTolerance, boundingBox, transform, polyhedralSurfacePath, polygonFromPolyhedralSurface);
                 }
                 drawPolygonPath(canvas, polyhedralSurfacePath);
                 break;
@@ -203,7 +212,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 GeometryCollection<Geometry> geometryCollection = (GeometryCollection) geometry;
                 List<Geometry> geometries = geometryCollection.getGeometries();
                 for (Geometry geometryFromCollection : geometries) {
-                    drawShape(boundingBox, transform, canvas, geometryFromCollection);
+                    drawShape(simplifyTolerance, boundingBox, transform, canvas, geometryFromCollection);
                 }
                 break;
             default:
@@ -240,14 +249,20 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Add the linestring to the path
      *
+     * @param simplifyTolerance simplify tolerance in meters
      * @param boundingBox
      * @param transform
      * @param path
      * @param lineString
      */
-    private void addLineString(BoundingBox boundingBox, ProjectionTransform transform, Path path, LineString lineString) {
+    private void addLineString(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Path path, LineString lineString) {
+
         List<Point> points = lineString.getPoints();
+
         if (points.size() >= 2) {
+
+            // Try to simplify the number of points in the LineString
+            points = simplifyPoints(simplifyTolerance, points);
 
             for (int i = 0; i < points.size(); i++) {
                 Point point = points.get(i);
@@ -268,12 +283,13 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Add the polygon on the canvas
      *
+     * @param simplifyTolerance simplify tolerance in meters
      * @param boundingBox
      * @param transform
      * @param path
      * @param polygon
      */
-    private void addPolygon(BoundingBox boundingBox, ProjectionTransform transform, Path path, Polygon polygon) {
+    private void addPolygon(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Path path, Polygon polygon) {
         List<LineString> rings = polygon.getRings();
         if (!rings.isEmpty()) {
 
@@ -281,14 +297,14 @@ public class DefaultFeatureTiles extends FeatureTiles {
             LineString polygonLineString = rings.get(0);
             List<Point> polygonPoints = polygonLineString.getPoints();
             if (polygonPoints.size() >= 2) {
-                addRing(boundingBox, transform, path, polygonPoints);
+                addRing(simplifyTolerance, boundingBox, transform, path, polygonPoints);
 
                 // Add the holes
                 for (int i = 1; i < rings.size(); i++) {
                     LineString holeLineString = rings.get(i);
                     List<Point> holePoints = holeLineString.getPoints();
                     if (holePoints.size() >= 2) {
-                        addRing(boundingBox, transform, path, holePoints);
+                        addRing(simplifyTolerance, boundingBox, transform, path, holePoints);
                     }
                 }
             }
@@ -298,12 +314,16 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Add a ring
      *
+     * @param simplifyTolerance simplify tolerance in meters
      * @param boundingBox
      * @param transform
      * @param path
      * @param points
      */
-    private void addRing(BoundingBox boundingBox, ProjectionTransform transform, Path path, List<Point> points) {
+    private void addRing(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Path path, List<Point> points) {
+
+        // Try to simplify the number of points in the LineString
+        points = simplifyPoints(simplifyTolerance, points);
 
         for (int i = 0; i < points.size(); i++) {
             Point point = points.get(i);

@@ -2,7 +2,11 @@ package mil.nga.geopackage.attributes;
 
 import android.database.Cursor;
 
+import java.util.List;
+
 import mil.nga.geopackage.user.UserCursor;
+import mil.nga.geopackage.user.UserDao;
+import mil.nga.geopackage.user.UserInvalidCursor;
 
 /**
  * Attributes Cursor to wrap a database cursor for attributes queries
@@ -28,8 +32,26 @@ public class AttributesCursor extends
      */
     @Override
     public AttributesRow getRow(int[] columnTypes, Object[] values) {
-        AttributesRow row = new AttributesRow(getTable(), columnTypes, values);
-        return row;
+        return new AttributesRow(getTable(), columnTypes, values);
+    }
+
+    /**
+     * Enable requery attempt of invalid rows after iterating through original query rows.
+     * Only supported for {@link #moveToNext()} and {@link #getRow()} usage.
+     *
+     * @param dao data access object used to perform requery
+     * @since 2.0.0
+     */
+    public void enableInvalidRequery(AttributesDao dao) {
+        super.enableInvalidRequery(dao);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected UserInvalidCursor<AttributesColumn, AttributesTable, AttributesRow, ? extends UserCursor<AttributesColumn, AttributesTable, AttributesRow>, ? extends UserDao<AttributesColumn, AttributesTable, AttributesRow, ? extends UserCursor<AttributesColumn, AttributesTable, AttributesRow>>> createInvalidCursor(UserDao dao, UserCursor cursor, List<Integer> invalidPositions, List<AttributesColumn> blobColumns) {
+        return new AttributesInvalidCursor((AttributesDao) dao, (AttributesCursor) cursor, invalidPositions, blobColumns);
     }
 
 }

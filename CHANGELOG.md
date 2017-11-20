@@ -4,9 +4,32 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 1.4.2 (TBD)
+## [2.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/2.0.0) (11-20-2017)
 
-* TBD
+* WARNING - BoundingBox.java (geopackage-core) coordinate constructor arguments order changed to (min lon, min lat, max lon, max lat)
+  Pre-existing calls to BoundingBox coordinate constructor should swap the min lat and max lon values
+* WARNING - TileGrid.java (geopackage-core) constructor arguments order changed to (minX, minY, maxX, maxY)
+  Pre-existing calls to TileGrid constructor should swap the minY and maxX values
+* geopackage-core version updated to 2.0.0
+* User Invalid Cursor support for reading large blobs
+* Attribute, Feature, and Tile Invalid Cursor implementations
+* Attribute, Feature, and Tile User Row Sync implementations
+* Query support for "columns as"
+* Feature Indexer and Feature Table Index row syncing
+* Improved feature row geometry blob handling
+* Feature Tiles geometry simplifications
+* Multiple Results and List Results implementations of Feature Index results
+* Feature Index Manager index type specific improvements
+* User Query object representation and support
+* tiff version updated to 2.0.0
+* gradle plugin updated to 2.3.3
+* android maven gradle plugin updated to 2.0
+* maven google dependency
+* compile SDK version 26
+* build tools version updated to 26.0.1
+* min SDK version updated to 14
+* target SDK version updated to 26
+* Android support library updated to 26.0.2
 
 ## [1.4.1](https://github.com/ngageoint/geopackage-android/releases/tag/1.4.1) (07-13-2017)
 

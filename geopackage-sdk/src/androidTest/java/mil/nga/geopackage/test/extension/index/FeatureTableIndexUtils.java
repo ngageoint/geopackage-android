@@ -157,7 +157,7 @@ public class FeatureTableIndexUtils {
             // Pick a projection different from the feature dao and project the
             // bounding box
             BoundingBox boundingBox = new BoundingBox(envelope.getMinX() - 1,
-                    envelope.getMaxX() + 1, envelope.getMinY() - 1,
+                    envelope.getMinY() - 1, envelope.getMaxX() + 1,
                     envelope.getMaxY() + 1);
             Projection projection = null;
             if (!featureDao.getProjection().equals(ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)) {

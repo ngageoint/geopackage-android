@@ -40,7 +40,7 @@ public class GeoPackageTestUtils {
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
 		SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
 				.createWebMercator();
@@ -66,7 +66,7 @@ public class GeoPackageTestUtils {
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
 		SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
 				.createWebMercator();
@@ -93,7 +93,7 @@ public class GeoPackageTestUtils {
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
 		List<FeatureColumn> additionalColumns = getFeatureColumns();
 
@@ -122,7 +122,7 @@ public class GeoPackageTestUtils {
 		geometryColumns.setZ((byte) 1);
 		geometryColumns.setM((byte) 0);
 
-		BoundingBox boundingBox = new BoundingBox(-90, 90, -45, 45);
+		BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
 		List<FeatureColumn> additionalColumns = getFeatureColumns();
 
