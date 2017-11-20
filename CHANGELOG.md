@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 2.0.0 (TBD)
+## [2.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/2.0.0) (11-20-2017)
 
 * WARNING - BoundingBox.java (geopackage-core) coordinate constructor arguments order changed to (min lon, min lat, max lon, max lat)
   Pre-existing calls to BoundingBox coordinate constructor should swap the min lat and max lon values
