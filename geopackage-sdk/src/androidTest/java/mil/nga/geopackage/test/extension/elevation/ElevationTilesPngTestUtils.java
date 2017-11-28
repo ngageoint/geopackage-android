@@ -98,9 +98,9 @@ public class ElevationTilesPngTestUtils {
             TestCase.assertNotNull(contents);
             TestCase.assertEquals(tileMatrixSet.getTableName(),
                     contents.getTableName());
-            TestCase.assertEquals(ContentsDataType.ELEVATION_TILES,
+            TestCase.assertEquals(ContentsDataType.GRIDDED_COVERAGE,
                     contents.getDataType());
-            TestCase.assertEquals(ContentsDataType.ELEVATION_TILES.getName(),
+            TestCase.assertEquals(ContentsDataType.GRIDDED_COVERAGE.getName(),
                     contents.getDataTypeString());
             TestCase.assertNotNull(contents.getLastChange());
 
