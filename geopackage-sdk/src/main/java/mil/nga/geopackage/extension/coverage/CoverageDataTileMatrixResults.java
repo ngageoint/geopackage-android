@@ -1,16 +1,16 @@
-package mil.nga.geopackage.extension.elevation;
+package mil.nga.geopackage.extension.coverage;
 
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.user.TileCursor;
 
 /**
- * Elevation Tile Matrix results including the elevation tile results and the
- * tile matrix where found
+ * Coverage Data Tile Matrix results including the coverage data tile results
+ * and the tile matrix where found
  *
  * @author osbornb
- * @since 1.3.1
+ * @since 2.0.1
  */
-public class ElevationTileMatrixResults {
+public class CoverageDataTileMatrixResults {
 
     /**
      * Tile matrix
@@ -18,7 +18,7 @@ public class ElevationTileMatrixResults {
     private TileMatrix tileMatrix;
 
     /**
-     * Elevation tile results
+     * Coverage data tile results
      */
     private TileCursor tileResults;
 
@@ -26,10 +26,10 @@ public class ElevationTileMatrixResults {
      * Constructor
      *
      * @param tileMatrix  tile matrix
-     * @param tileResults elevation tile results
+     * @param tileResults coverage data tile results
      */
-    public ElevationTileMatrixResults(TileMatrix tileMatrix,
-                                      TileCursor tileResults) {
+    public CoverageDataTileMatrixResults(TileMatrix tileMatrix,
+                                         TileCursor tileResults) {
         this.tileMatrix = tileMatrix;
         this.tileResults = tileResults;
     }

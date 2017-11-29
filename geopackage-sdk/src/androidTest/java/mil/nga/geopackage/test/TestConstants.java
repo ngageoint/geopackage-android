@@ -56,37 +56,37 @@ public class TestConstants {
 			+ GEO_PACKAGE_EXTENSION;
 
 	/**
-	 * Create elevation tiles database name
+	 * Create coverage data database name
 	 */
-	public static final String CREATE_ELEVATION_TILES_DB_NAME = "elevation_tiles";
+	public static final String CREATE_COVERAGE_DATA_DB_NAME = "coverage_data";
 
 	/**
-	 * Create elevation tiles database file name
+	 * Create coverage data database file name
 	 */
-	public static final String CREATE_ELEVATION_TILES_DB_FILE_NAME = CREATE_ELEVATION_TILES_DB_NAME
+	public static final String CREATE_COVERAGE_DATA_DB_FILE_NAME = CREATE_COVERAGE_DATA_DB_NAME
 			+ "." + TestConstants.GEO_PACKAGE_EXTENSION;
 
 	/**
-	 * Import elevation tiles database name
+	 * Import coverage data database name
 	 */
-	public static final String IMPORT_ELEVATION_TILES_DB_NAME = "elevation_tiles";
+	public static final String IMPORT_COVERAGE_DATA_DB_NAME = "coverage_data";
 
 	/**
-	 * Import elevation tiles tiff database name
+	 * Import coverage data tiff database name
 	 */
-	public static final String IMPORT_ELEVATION_TILES_TIFF_DB_NAME = "elevation_tiles_tiff";
+	public static final String IMPORT_COVERAGE_DATA_TIFF_DB_NAME = "coverage_data_tiff";
 
 	/**
-	 * Import elevation tiles database file name, located in the test assets
+	 * Import coverage data database file name, located in the test assets
 	 */
-	public static final String IMPORT_ELEVATION_TILES_DB_FILE_NAME = IMPORT_ELEVATION_TILES_DB_NAME
+	public static final String IMPORT_COVERAGE_DATA_DB_FILE_NAME = IMPORT_COVERAGE_DATA_DB_NAME
 			+ "." + TestConstants.GEO_PACKAGE_EXTENSION;
 
 	/**
-	 * Import elevation tiles tiff database file name, located in the test
+	 * Import coverage data tiff database file name, located in the test
 	 * assets
 	 */
-	public static final String IMPORT_ELEVATION_TILES_TIFF_DB_FILE_NAME = IMPORT_ELEVATION_TILES_TIFF_DB_NAME
+	public static final String IMPORT_COVERAGE_DATA_TIFF_DB_FILE_NAME = IMPORT_COVERAGE_DATA_TIFF_DB_NAME
 			+ "." + TestConstants.GEO_PACKAGE_EXTENSION;
 
 	/**
@@ -111,9 +111,9 @@ public class TestConstants {
 	public static final String TILES2_DB_TABLE_NAME = "imagery";
 
 	/**
-	 * Elevation Tiles table name
+	 * Coverage Data table name
 	 */
-	public static final String CREATE_ELEVATION_TILES_DB_TABLE_NAME = "elevations";
+	public static final String CREATE_COVERAGE_DATA_DB_TABLE_NAME = "coverages";
 
 	/**
 	 * Tiles 2 database Web Mercator test image

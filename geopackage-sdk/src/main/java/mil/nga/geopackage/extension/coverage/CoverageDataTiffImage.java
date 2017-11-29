@@ -1,4 +1,4 @@
-package mil.nga.geopackage.extension.elevation;
+package mil.nga.geopackage.extension.coverage;
 
 import java.io.IOException;
 
@@ -11,12 +11,12 @@ import mil.nga.tiff.TiffReader;
 import mil.nga.tiff.TiffWriter;
 
 /**
- * Elevation TIFF image
+ * Coverage Data TIFF image
  *
  * @author osbornb
- * @since 1.3.1
+ * @since 2.0.1
  */
-public class ElevationTiffImage implements ElevationImage {
+public class CoverageDataTiffImage implements CoverageDataImage {
 
     /**
      * Image width / number of columns
@@ -48,11 +48,11 @@ public class ElevationTiffImage implements ElevationImage {
      *
      * @param tileRow tile row
      */
-    public ElevationTiffImage(TileRow tileRow) {
+    public CoverageDataTiffImage(TileRow tileRow) {
         imageBytes = tileRow.getTileData();
         TIFFImage tiffImage = TiffReader.readTiff(imageBytes);
         directory = tiffImage.getFileDirectory();
-        ElevationTilesTiff.validateImageType(directory);
+        CoverageDataTiff.validateImageType(directory);
         width = directory.getImageWidth().intValue();
         height = directory.getImageHeight().intValue();
     }
@@ -62,7 +62,7 @@ public class ElevationTiffImage implements ElevationImage {
      *
      * @param directory file directory
      */
-    public ElevationTiffImage(FileDirectory directory) {
+    public CoverageDataTiffImage(FileDirectory directory) {
         this.directory = directory;
         this.rasters = directory.getWriteRasters();
         width = directory.getImageWidth().intValue();

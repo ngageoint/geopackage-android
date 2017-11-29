@@ -1,4 +1,4 @@
-package mil.nga.geopackage.extension.elevation;
+package mil.nga.geopackage.extension.coverage;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -21,12 +21,12 @@ import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
 
 /**
- * Tiled Gridded Elevation Common Data Extension
+ * Tiled Gridded Coverage Data, abstract Common Encoding, Extension
  *
  * @author osbornb
- * @since 1.3.1
+ * @since 2.0.1
  */
-public abstract class ElevationTilesCommon<TImage extends ElevationImage> extends ElevationTilesCore<TImage> {
+public abstract class CoverageDataCommon<TImage extends CoverageDataImage> extends CoverageDataCore<TImage> {
 
     /**
      * Tile DAO
@@ -38,35 +38,35 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
      *
      * @param geoPackage        GeoPackage
      * @param tileDao           tile dao
-     * @param width             elevation response width
-     * @param height            elevation response height
+     * @param width             coverage data response width
+     * @param height            coverage data response height
      * @param requestProjection request projection
      */
-    public ElevationTilesCommon(GeoPackage geoPackage, TileDao tileDao, Integer width,
-                                Integer height, Projection requestProjection) {
+    public CoverageDataCommon(GeoPackage geoPackage, TileDao tileDao, Integer width,
+                              Integer height, Projection requestProjection) {
         super(geoPackage, tileDao
                 .getTileMatrixSet(), width, height, requestProjection);
         this.tileDao = tileDao;
     }
 
     /**
-     * Create an elevation image
+     * Create a coverage data image
      *
      * @param tileRow tile row
      * @return image
      */
-    public abstract TImage createElevationImage(TileRow tileRow);
+    public abstract TImage createImage(TileRow tileRow);
 
     /**
-     * Get the elevation value of the pixel in the tile row image
+     * Get the coverage data value of the pixel in the tile row image
      *
      * @param griddedTile gridded tile
      * @param tileRow     tile row
      * @param x           x coordinate
      * @param y           y coordinate
-     * @return elevation value
+     * @return coverage data value
      */
-    public abstract double getElevationValue(GriddedTile griddedTile,
+    public abstract double getValue(GriddedTile griddedTile,
                                              TileRow tileRow, int x, int y);
 
     /**
@@ -82,18 +82,18 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
      * {@inheritDoc}
      */
     @Override
-    public ElevationTileResults getElevations(ElevationRequest request,
+    public CoverageDataResults getValues(CoverageDataRequest request,
                                               Integer width, Integer height) {
 
-        ElevationTileResults elevationResults = null;
+        CoverageDataResults coverageDataResults = null;
 
-        // Transform to the projection of the elevation tiles
-        ProjectionTransform transformRequestToElevation = null;
+        // Transform to the projection of the coverage data tiles
+        ProjectionTransform transformRequestToCoverage = null;
         BoundingBox requestProjectedBoundingBox = request.getBoundingBox();
         if (!sameProjection) {
-            transformRequestToElevation = requestProjection
-                    .getTransformation(elevationProjection);
-            requestProjectedBoundingBox = transformRequestToElevation
+            transformRequestToCoverage = requestProjection
+                    .getTransformation(coverageProjection);
+            requestProjectedBoundingBox = transformRequestToCoverage
                     .transform(requestProjectedBoundingBox);
         }
         request.setProjectedBoundingBox(requestProjectedBoundingBox);
@@ -110,7 +110,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
         }
 
         // Find the tile matrix and results
-        ElevationTileMatrixResults results = getResults(request,
+        CoverageDataTileMatrixResults results = getResults(request,
                 requestProjectedBoundingBox, overlappingPixels);
 
         if (results != null) {
@@ -120,16 +120,16 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
 
             try {
 
-                // Determine the requested elevation dimensions, or use the
-                // dimensions of a single tile matrix elevation tile
-                int requestedElevationsWidth = width != null ? width
+                // Determine the requested coverage data dimensions, or use the
+                // dimensions of a single tile matrix coverage data tile
+                int requestedCoverageDataWidth = width != null ? width
                         : (int) tileMatrix.getTileWidth();
-                int requestedElevationsHeight = height != null ? height
+                int requestedCoverageDataHeight = height != null ? height
                         : (int) tileMatrix.getTileHeight();
 
-                // Determine the size of the non projected elevation results
-                int tileWidth = requestedElevationsWidth;
-                int tileHeight = requestedElevationsHeight;
+                // Determine the size of the non projected coverage data results
+                int tileWidth = requestedCoverageDataWidth;
+                int tileHeight = requestedCoverageDataHeight;
                 if (!sameProjection) {
                     int projectedWidth = (int) Math
                             .round((requestProjectedBoundingBox
@@ -149,23 +149,23 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                     }
                 }
 
-                // Retrieve the elevations from the results
-                Double[][] elevations = getElevations(tileMatrix, tileResults,
+                // Retrieve the coverage data from the results
+                Double[][] values = getValues(tileMatrix, tileResults,
                         request, tileWidth, tileHeight, overlappingPixels);
 
-                // Project the elevations if needed
-                if (elevations != null && !sameProjection && !request.isPoint()) {
-                    elevations = reprojectElevations(elevations,
-                            requestedElevationsWidth,
-                            requestedElevationsHeight,
+                // Project the coverage data if needed
+                if (values != null && !sameProjection && !request.isPoint()) {
+                    values = reprojectCoverageData(values,
+                            requestedCoverageDataWidth,
+                            requestedCoverageDataHeight,
                             request.getBoundingBox(),
-                            transformRequestToElevation,
+                            transformRequestToCoverage,
                             requestProjectedBoundingBox);
                 }
 
                 // Create the results
-                if (elevations != null) {
-                    elevationResults = new ElevationTileResults(elevations,
+                if (values != null) {
+                    coverageDataResults = new CoverageDataResults(values,
                             tileMatrix);
                 }
             } finally {
@@ -173,30 +173,30 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
             }
         }
 
-        return elevationResults;
+        return coverageDataResults;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ElevationTileResults getElevationsUnbounded(ElevationRequest request) {
+    public CoverageDataResults getValuesUnbounded(CoverageDataRequest request) {
 
-        ElevationTileResults elevationResults = null;
+        CoverageDataResults coverageDataResults = null;
 
-        // Transform to the projection of the elevation tiles
-        ProjectionTransform transformRequestToElevation = null;
+        // Transform to the projection of the coverage data tiles
+        ProjectionTransform transformRequestToCoverage = null;
         BoundingBox requestProjectedBoundingBox = request.getBoundingBox();
         if (!sameProjection) {
-            transformRequestToElevation = requestProjection
-                    .getTransformation(elevationProjection);
-            requestProjectedBoundingBox = transformRequestToElevation
+            transformRequestToCoverage = requestProjection
+                    .getTransformation(coverageProjection);
+            requestProjectedBoundingBox = transformRequestToCoverage
                     .transform(requestProjectedBoundingBox);
         }
         request.setProjectedBoundingBox(requestProjectedBoundingBox);
 
         // Find the tile matrix and results
-        ElevationTileMatrixResults results = getResults(request,
+        CoverageDataTileMatrixResults results = getResults(request,
                 requestProjectedBoundingBox);
 
         if (results != null) {
@@ -206,22 +206,22 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
 
             try {
 
-                // Retrieve the elevations from the results
-                Double[][] elevations = getElevationsUnbounded(tileMatrix,
+                // Retrieve the coverage data values from the results
+                Double[][] values = getValuesUnbounded(tileMatrix,
                         tileResults, request);
 
-                // Project the elevations if needed
-                if (elevations != null && !sameProjection && !request.isPoint()) {
-                    elevations = reprojectElevations(elevations,
-                            elevations[0].length, elevations.length,
+                // Project the coverage data if needed
+                if (values != null && !sameProjection && !request.isPoint()) {
+                    values = reprojectCoverageData(values,
+                            values[0].length, values.length,
                             request.getBoundingBox(),
-                            transformRequestToElevation,
+                            transformRequestToCoverage,
                             requestProjectedBoundingBox);
                 }
 
                 // Create the results
-                if (elevations != null) {
-                    elevationResults = new ElevationTileResults(elevations,
+                if (values != null) {
+                    coverageDataResults = new CoverageDataResults(values,
                             tileMatrix);
                 }
 
@@ -230,39 +230,39 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
             }
         }
 
-        return elevationResults;
+        return coverageDataResults;
     }
 
     /**
-     * Get the elevation tile results by finding the tile matrix with values
+     * Get the coverage data tile results by finding the tile matrix with values
      *
-     * @param request                     elevation request
+     * @param request                     coverage data request
      * @param requestProjectedBoundingBox request projected bounding box
      * @return tile matrix results
      */
-    private ElevationTileMatrixResults getResults(ElevationRequest request,
-                                                  BoundingBox requestProjectedBoundingBox) {
+    private CoverageDataTileMatrixResults getResults(CoverageDataRequest request,
+                                                     BoundingBox requestProjectedBoundingBox) {
         return getResults(request, requestProjectedBoundingBox, 0);
     }
 
     /**
-     * Get the elevation tile results by finding the tile matrix with values
+     * Get the coverage data tile results by finding the tile matrix with values
      *
-     * @param request                     elevation request
+     * @param request                     coverage data request
      * @param requestProjectedBoundingBox request projected bounding box
      * @param overlappingPixels           overlapping request pixels
      * @return tile matrix results
      */
-    private ElevationTileMatrixResults getResults(ElevationRequest request,
-                                                  BoundingBox requestProjectedBoundingBox, int overlappingPixels) {
-        // Try to get the elevation from the current zoom level
+    private CoverageDataTileMatrixResults getResults(CoverageDataRequest request,
+                                                     BoundingBox requestProjectedBoundingBox, int overlappingPixels) {
+        // Try to get the coverage data from the current zoom level
         TileMatrix tileMatrix = getTileMatrix(request);
-        ElevationTileMatrixResults results = null;
+        CoverageDataTileMatrixResults results = null;
         if (tileMatrix != null) {
             results = getResults(requestProjectedBoundingBox, tileMatrix,
                     overlappingPixels);
 
-            // Try to zoom in or out to find a matching elevation
+            // Try to zoom in or out to find a matching coverage data
             if (results == null) {
                 results = getResultsZoom(requestProjectedBoundingBox,
                         tileMatrix, overlappingPixels);
@@ -272,24 +272,24 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the elevation tile results for a specified tile matrix
+     * Get the coverage data tile results for a specified tile matrix
      *
      * @param requestProjectedBoundingBox request projected bounding box
      * @param tileMatrix                  tile matrix
      * @param overlappingPixels           number of overlapping pixels used by the algorithm
      * @return tile matrix results
      */
-    private ElevationTileMatrixResults getResults(
+    private CoverageDataTileMatrixResults getResults(
             BoundingBox requestProjectedBoundingBox, TileMatrix tileMatrix,
             int overlappingPixels) {
-        ElevationTileMatrixResults results = null;
+        CoverageDataTileMatrixResults results = null;
         BoundingBox paddedBoundingBox = padBoundingBox(tileMatrix,
                 requestProjectedBoundingBox, overlappingPixels);
         TileCursor tileResults = retrieveSortedTileResults(
                 paddedBoundingBox, tileMatrix);
         if (tileResults != null) {
             if (tileResults.getCount() > 0) {
-                results = new ElevationTileMatrixResults(tileMatrix,
+                results = new CoverageDataTileMatrixResults(tileMatrix,
                         tileResults);
             } else {
                 tileResults.close();
@@ -299,7 +299,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the elevation tile results by zooming in or out as needed from the
+     * Get the coverage data tile results by zooming in or out as needed from the
      * provided tile matrix to find values
      *
      * @param requestProjectedBoundingBox request projected bounding box
@@ -307,11 +307,11 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
      * @param overlappingPixels           overlapping request pixels
      * @return tile matrix results
      */
-    private ElevationTileMatrixResults getResultsZoom(
+    private CoverageDataTileMatrixResults getResultsZoom(
             BoundingBox requestProjectedBoundingBox, TileMatrix tileMatrix,
             int overlappingPixels) {
 
-        ElevationTileMatrixResults results = null;
+        CoverageDataTileMatrixResults results = null;
 
         if (zoomIn && zoomInBeforeOut) {
             results = getResultsZoomIn(requestProjectedBoundingBox, tileMatrix,
@@ -330,7 +330,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the elevation tile results by zooming in from the provided tile
+     * Get the coverage data tile results by zooming in from the provided tile
      * matrix
      *
      * @param requestProjectedBoundingBox request projected bounding box
@@ -338,11 +338,11 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
      * @param overlappingPixels           overlapping request pixels
      * @return tile matrix results
      */
-    private ElevationTileMatrixResults getResultsZoomIn(
+    private CoverageDataTileMatrixResults getResultsZoomIn(
             BoundingBox requestProjectedBoundingBox, TileMatrix tileMatrix,
             int overlappingPixels) {
 
-        ElevationTileMatrixResults results = null;
+        CoverageDataTileMatrixResults results = null;
         for (long zoomLevel = tileMatrix.getZoomLevel() + 1; zoomLevel <= tileDao
                 .getMaxZoom(); zoomLevel++) {
             TileMatrix zoomTileMatrix = tileDao.getTileMatrix(zoomLevel);
@@ -358,7 +358,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the elevation tile results by zooming out from the provided tile
+     * Get the coverage data tile results by zooming out from the provided tile
      * matrix
      *
      * @param requestProjectedBoundingBox request projected bounding box
@@ -366,11 +366,11 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
      * @param overlappingPixels           overlapping request pixels
      * @return tile matrix results
      */
-    private ElevationTileMatrixResults getResultsZoomOut(
+    private CoverageDataTileMatrixResults getResultsZoomOut(
             BoundingBox requestProjectedBoundingBox, TileMatrix tileMatrix,
             int overlappingPixels) {
 
-        ElevationTileMatrixResults results = null;
+        CoverageDataTileMatrixResults results = null;
         for (long zoomLevel = tileMatrix.getZoomLevel() - 1; zoomLevel >= tileDao
                 .getMinZoom(); zoomLevel--) {
             TileMatrix zoomTileMatrix = tileDao.getTileMatrix(zoomLevel);
@@ -386,25 +386,25 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the elevation values from the tile results scaled to the provided
+     * Get the coverage data values from the tile results scaled to the provided
      * dimensions
      *
      * @param tileMatrix        tile matrix
      * @param tileResults       tile results
-     * @param request           elevation request
+     * @param request           coverage data request
      * @param tileWidth         tile width
      * @param tileHeight        tile height
      * @param overlappingPixels overlapping request pixels
-     * @return elevation values
+     * @return coverage data values
      */
-    private Double[][] getElevations(TileMatrix tileMatrix,
-                                     TileCursor tileResults, ElevationRequest request, int tileWidth,
-                                     int tileHeight, int overlappingPixels) {
+    private Double[][] getValues(TileMatrix tileMatrix,
+                                 TileCursor tileResults, CoverageDataRequest request, int tileWidth,
+                                 int tileHeight, int overlappingPixels) {
 
-        Double[][] elevations = null;
+        Double[][] values = null;
 
         // Tiles are ordered by rows and then columns. Track the last column
-        // elevations of the tile to the left and the last rows of the tiles in
+        // coverage data values of the tile to the left and the last rows of the tiles in
         // the row above
         Double[][] leftLastColumns = null;
         Map<Long, Double[][]> lastRowsByColumn = null;
@@ -413,10 +413,10 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
         long previousRow = -1;
         long previousColumn = Long.MAX_VALUE;
 
-        // Process each elevation tile
+        // Process each coverage data tile
         while (tileResults.moveToNext()) {
 
-            // Get the next elevation tile
+            // Get the next coverage data tile
             TileRow tileRow = tileResults.getRow();
 
             long currentRow = tileRow.getTileRow();
@@ -446,24 +446,24 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                 leftLastColumns = null;
             }
 
-            // Get the bounding box of the elevation
+            // Get the bounding box of the coverage data
             BoundingBox tileBoundingBox = TileBoundingBoxUtils
-                    .getBoundingBox(elevationBoundingBox, tileMatrix,
+                    .getBoundingBox(coverageBoundingBox, tileMatrix,
                             currentColumn, currentRow);
 
-            // Get the bounding box where the request and elevation tile overlap
+            // Get the bounding box where the request and coverage data tile overlap
             BoundingBox overlap = request.overlap(tileBoundingBox);
 
             // Get the gridded tile value for the tile
             GriddedTile griddedTile = getGriddedTile(tileRow.getId());
 
-            // Get the elevation tile image
-            TImage image = createElevationImage(tileRow);
+            // Get the coverage data tile image
+            TImage image = createImage(tileRow);
 
             // If the tile overlaps with the requested box
             if (overlap != null) {
 
-                // Get the rectangle of the tile elevation with matching values
+                // Get the rectangle of the tile coverage data with matching values
                 RectF src = TileBoundingBoxAndroidUtils
                         .getFloatRectangle(tileMatrix.getTileWidth(),
                                 tileMatrix.getTileHeight(), tileBoundingBox,
@@ -489,9 +489,9 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
 
                 if (TileBoundingBoxAndroidUtils.isValidAllowEmpty(src) && TileBoundingBoxAndroidUtils.isValidAllowEmpty(dest)) {
 
-                    // Create the elevations array first time through
-                    if (elevations == null) {
-                        elevations = new Double[tileHeight][tileWidth];
+                    // Create the coverage data array first time through
+                    if (values == null) {
+                        values = new Double[tileHeight][tileWidth];
                     }
 
                     // Get the destination widths
@@ -542,16 +542,16 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                     maxDestY = Math.min(maxDestY, tileHeight - 1);
                     maxDestX = Math.min(maxDestX, tileWidth - 1);
 
-                    // Read and set the elevation values
+                    // Read and set the coverage data values
                     for (int y = minDestY; y <= maxDestY; y++) {
                         for (int x = minDestX; x <= maxDestX; x++) {
 
-                            // Determine the elevation based upon the
+                            // Determine the coverage data based upon the
                             // selected algorithm
-                            Double elevation = null;
+                            Double value = null;
                             switch (algorithm) {
                                 case NEAREST_NEIGHBOR:
-                                    elevation = getNearestNeighborElevation(
+                                    value = getNearestNeighborValue(
                                             griddedTile, image, leftLastColumns,
                                             topLeftRows, topRows, y, x, widthRatio,
                                             heightRatio, dest.top,
@@ -559,7 +559,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                                             src.left);
                                     break;
                                 case BILINEAR:
-                                    elevation = getBilinearInterpolationElevation(
+                                    value = getBilinearInterpolationValue(
                                             griddedTile, image, leftLastColumns,
                                             topLeftRows, topRows, y, x, widthRatio,
                                             heightRatio, dest.top,
@@ -567,7 +567,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                                             src.left);
                                     break;
                                 case BICUBIC:
-                                    elevation = getBicubicInterpolationElevation(
+                                    value = getBicubicInterpolationValue(
                                             griddedTile, image, leftLastColumns,
                                             topLeftRows, topRows, y, x, widthRatio,
                                             heightRatio, dest.top,
@@ -580,8 +580,8 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                                                     + algorithm);
                             }
 
-                            if (elevation != null) {
-                                elevations[y][x] = elevation;
+                            if (value != null) {
+                                values[y][x] = value;
                             }
 
                         }
@@ -590,7 +590,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                 }
             }
 
-            // Determine and store the elevations of the last columns and rows
+            // Determine and store the coverage data values of the last columns and rows
             leftLastColumns = new Double[overlappingPixels][(int) tileMatrix
                     .getTileHeight()];
             Double[][] lastRows = new Double[overlappingPixels][(int) tileMatrix
@@ -600,22 +600,22 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
             // For each overlapping pixel
             for (int lastIndex = 0; lastIndex < overlappingPixels; lastIndex++) {
 
-                // Store the last column row elevation values
+                // Store the last column row coverage data values
                 int lastColumnIndex = (int) tileMatrix.getTileWidth()
                         - lastIndex - 1;
                 for (int row = 0; row < tileMatrix.getTileHeight(); row++) {
-                    Double elevation = getElevationValue(griddedTile, image,
+                    Double value = getValue(griddedTile, image,
                             lastColumnIndex, row);
-                    leftLastColumns[lastIndex][row] = elevation;
+                    leftLastColumns[lastIndex][row] = value;
                 }
 
-                // Store the last row column elevation values
+                // Store the last row column coverage data values
                 int lastRowIndex = (int) tileMatrix.getTileHeight() - lastIndex
                         - 1;
                 for (int column = 0; column < tileMatrix.getTileWidth(); column++) {
-                    Double elevation = getElevationValue(griddedTile, image,
+                    Double value = getValue(griddedTile, image,
                             column, lastRowIndex);
-                    lastRows[lastIndex][column] = elevation;
+                    lastRows[lastIndex][column] = value;
                 }
 
             }
@@ -625,19 +625,19 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
             previousColumn = currentColumn;
         }
 
-        return elevations;
+        return values;
     }
 
     /**
-     * Get the elevation values from the tile results unbounded in result size
+     * Get the coverage data values from the tile results unbounded in result size
      *
      * @param tileMatrix  tile matrix
      * @param tileResults tile results
-     * @param request     elevation request
-     * @return elevation values
+     * @param request     coverage data request
+     * @return coverage data values
      */
-    private Double[][] getElevationsUnbounded(TileMatrix tileMatrix,
-                                              TileCursor tileResults, ElevationRequest request) {
+    private Double[][] getValuesUnbounded(TileMatrix tileMatrix,
+                                          TileCursor tileResults, CoverageDataRequest request) {
 
         // Build a map of rows to maps of columns and values
         Map<Long, Map<Long, Double[][]>> rowsMap = new TreeMap<>();
@@ -651,24 +651,24 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
         // Track count of tiles involved in the results
         int tileCount = 0;
 
-        // Process each elevation tile row
+        // Process each coverage data tile row
         while (tileResults.moveToNext()) {
 
-            // Get the next elevation tile
+            // Get the next coverage data tile
             TileRow tileRow = tileResults.getRow();
 
-            // Get the bounding box of the elevation
+            // Get the bounding box of the coverage data
             BoundingBox tileBoundingBox = TileBoundingBoxUtils.getBoundingBox(
-                    elevationBoundingBox, tileMatrix, tileRow.getTileColumn(),
+                    coverageBoundingBox, tileMatrix, tileRow.getTileColumn(),
                     tileRow.getTileRow());
 
-            // Get the bounding box where the request and elevation tile overlap
+            // Get the bounding box where the request and coverage data tile overlap
             BoundingBox overlap = request.overlap(tileBoundingBox);
 
-            // If the elevation tile overlaps with the requested box
+            // If the coverage data tile overlaps with the requested box
             if (overlap != null) {
 
-                // Get the rectangle of the tile elevation with matching values
+                // Get the rectangle of the tile coverage data with matching values
                 Rect src = TileBoundingBoxAndroidUtils.getRectangle(
                         tileMatrix.getTileWidth(), tileMatrix.getTileHeight(),
                         tileBoundingBox, overlap);
@@ -688,11 +688,11 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                     // Get the gridded tile value for the tile
                     GriddedTile griddedTile = getGriddedTile(tileRow.getId());
 
-                    // Get the elevation tile image
-                    TImage image = createElevationImage(tileRow);
+                    // Get the coverage data tile image
+                    TImage image = createImage(tileRow);
 
-                    // Create the elevation results for this tile
-                    Double[][] elevations = new Double[srcBottom - srcTop + 1][srcRight
+                    // Create the coverage data results for this tile
+                    Double[][] values = new Double[srcBottom - srcTop + 1][srcRight
                             - srcLeft + 1];
 
                     // Get or add the columns map to the rows map
@@ -703,21 +703,21 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
                         rowsMap.put(tileRow.getTileRow(), columnsMap);
                     }
 
-                    // Read and set the elevation values
+                    // Read and set the coverage data values
                     for (int y = srcTop; y <= srcBottom; y++) {
 
                         for (int x = srcLeft; x <= srcRight; x++) {
 
-                            // Get the elevation value from the source pixel
-                            Double elevation = getElevationValue(griddedTile,
+                            // Get the coverage data value from the source pixel
+                            Double value = getValue(griddedTile,
                                     image, x, y);
 
-                            elevations[y - srcTop][x - srcLeft] = elevation;
+                            values[y - srcTop][x - srcLeft] = value;
                         }
                     }
 
-                    // Set the elevations in the results map
-                    columnsMap.put(tileRow.getTileColumn(), elevations);
+                    // Set the coverage data values in the results map
+                    columnsMap.put(tileRow.getTileColumn(), values);
 
                     // Increase the contributing tiles count
                     tileCount++;
@@ -736,25 +736,25 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
         }
 
         // Handle formatting the results
-        Double[][] elevations = formatUnboundedResults(tileMatrix, rowsMap,
+        Double[][] values = formatUnboundedResults(tileMatrix, rowsMap,
                 tileCount, minRow, maxRow, minColumn, maxColumn);
 
-        return elevations;
+        return values;
     }
 
     /**
      * Get the tile matrix for the zoom level as defined by the area of the
      * request
      *
-     * @param request elevation request
+     * @param request coverage data request
      * @return tile matrix or null
      */
-    private TileMatrix getTileMatrix(ElevationRequest request) {
+    private TileMatrix getTileMatrix(CoverageDataRequest request) {
 
         TileMatrix tileMatrix = null;
 
-        // Check if the request overlaps elevation bounding box
-        if (request.overlap(elevationBoundingBox) != null) {
+        // Check if the request overlaps coverage data bounding box
+        if (request.overlap(coverageBoundingBox) != null) {
 
             // Get the tile distance
             BoundingBox projectedBoundingBox = request
@@ -778,10 +778,10 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the tile row results of elevation tiles needed to create the
-     * requested bounding box elevations, sorted by row and then column
+     * Get the tile row results of coverage data tiles needed to create the
+     * requested bounding box coverage data, sorted by row and then column
      *
-     * @param projectedRequestBoundingBox bounding box projected to the elevations
+     * @param projectedRequestBoundingBox bounding box projected to the coverage data
      * @param tileMatrix                  tile matrix
      * @return tile results or null
      */
@@ -794,7 +794,7 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
 
             // Get the tile grid
             TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
-                    elevationBoundingBox, tileMatrix.getMatrixWidth(),
+                    coverageBoundingBox, tileMatrix.getMatrixWidth(),
                     tileMatrix.getMatrixHeight(), projectedRequestBoundingBox);
 
             // Query for matching tiles in the tile grid
@@ -808,17 +808,17 @@ public abstract class ElevationTilesCommon<TImage extends ElevationImage> extend
     }
 
     /**
-     * Get the elevation value of the pixel in the tile row image
+     * Get the coverage data value of the pixel in the tile row image
      *
      * @param tileRow tile row
      * @param x       x coordinate
      * @param y       y coordinate
-     * @return elevation value
+     * @return coverage data value
      */
-    public double getElevationValue(TileRow tileRow, int x, int y) {
+    public double getValue(TileRow tileRow, int x, int y) {
         GriddedTile griddedTile = getGriddedTile(tileRow.getId());
-        double elevation = getElevationValue(griddedTile, tileRow, x, y);
-        return elevation;
+        double value = getValue(griddedTile, tileRow, x, y);
+        return value;
     }
 
 }

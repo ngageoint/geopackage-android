@@ -1,4 +1,4 @@
-package mil.nga.geopackage.extension.elevation;
+package mil.nga.geopackage.extension.coverage;
 
 import android.util.Log;
 
@@ -14,12 +14,12 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.tiles.user.TileRow;
 
 /**
- * Elevation image, stores the tile row image
+ * Coverage Data PNG image, stores the tile row image and raster
  *
  * @author osbornb
- * @since 1.3.1
+ * @since 2.0.1
  */
-public class ElevationPngImage implements ElevationImage {
+public class CoverageDataPngImage implements CoverageDataImage {
 
     /**
      * Image width / number of columns
@@ -61,10 +61,10 @@ public class ElevationPngImage implements ElevationImage {
      *
      * @param tileRow tile row
      */
-    public ElevationPngImage(TileRow tileRow) {
+    public CoverageDataPngImage(TileRow tileRow) {
         imageBytes = tileRow.getTileData();
         reader = new PngReaderInt(new ByteArrayInputStream(imageBytes));
-        ElevationTilesPng.validateImageType(reader);
+        CoverageDataPng.validateImageType(reader);
         width = reader.imgInfo.cols;
         height = reader.imgInfo.rows;
     }
@@ -74,7 +74,7 @@ public class ElevationPngImage implements ElevationImage {
      *
      * @param imageInfo
      */
-    public ElevationPngImage(ImageInfo imageInfo) {
+    public CoverageDataPngImage(ImageInfo imageInfo) {
         outputStream = new ByteArrayOutputStream();
         writer = new PngWriter(outputStream, imageInfo);
         width = imageInfo.cols;
@@ -141,7 +141,7 @@ public class ElevationPngImage implements ElevationImage {
             try {
                 outputStream.close();
             } catch (IOException e) {
-                Log.w(ElevationPngImage.class.getSimpleName(), "Failed to close output stream", e);
+                Log.w(CoverageDataPngImage.class.getSimpleName(), "Failed to close output stream", e);
             }
         }
     }

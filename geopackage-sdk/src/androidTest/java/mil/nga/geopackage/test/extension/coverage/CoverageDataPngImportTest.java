@@ -1,4 +1,4 @@
-package mil.nga.geopackage.test.extension.elevation;
+package mil.nga.geopackage.test.extension.coverage;
 
 import junit.framework.TestCase;
 
@@ -7,60 +7,60 @@ import java.util.List;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
-import mil.nga.geopackage.extension.elevation.ElevationTileResults;
-import mil.nga.geopackage.extension.elevation.ElevationTilesAlgorithm;
-import mil.nga.geopackage.extension.elevation.ElevationTilesTiff;
+import mil.nga.geopackage.extension.coverage.CoverageDataAlgorithm;
+import mil.nga.geopackage.extension.coverage.CoverageDataPng;
+import mil.nga.geopackage.extension.coverage.CoverageDataResults;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.projection.ProjectionTransform;
-import mil.nga.geopackage.test.ImportElevationTilesTiffGeoPackageTestCase;
+import mil.nga.geopackage.test.ImportCoverageDataGeoPackageTestCase;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 
 /**
- * Elevation Tiles Tiff Extensions Tests from an imported GeoPackage
+ * Tiled Gridded Coverage Data Extension PNG Tests from an imported GeoPackage
  *
  * @author osbornb
  */
-public class ElevationTilesTiffImportTest extends
-        ImportElevationTilesTiffGeoPackageTestCase {
+public class CoverageDataPngImportTest extends
+        ImportCoverageDataGeoPackageTestCase {
 
     private static final boolean PRINT = false;
-    private static final boolean allowNulls = true;
+    private static final boolean allowNulls = false;
 
     /**
-     * Test the elevation extension with a newly created GeoPackage using the
+     * Test the coverage data extension with a newly created GeoPackage using the
      * Nearest Neighbor Algorithm
      */
-    public void testElevationsNearestNeighbor() throws Exception {
+    public void testNearestNeighbor() throws Exception {
 
-        ElevationTilesTiffTestUtils.testElevations(geoPackage, null,
-                ElevationTilesAlgorithm.NEAREST_NEIGHBOR, allowNulls);
+        CoverageDataPngTestUtils.testCoverageData(geoPackage, null,
+                CoverageDataAlgorithm.NEAREST_NEIGHBOR, allowNulls);
 
     }
 
     /**
-     * Test the elevation extension with a newly created GeoPackage using the
+     * Test the coverage data extension with a newly created GeoPackage using the
      * Bilinear Algorithm
      */
-    public void testElevationsBilinear() throws Exception {
+    public void testBilinear() throws Exception {
 
-        ElevationTilesTiffTestUtils.testElevations(geoPackage, null,
-                ElevationTilesAlgorithm.BILINEAR, allowNulls);
+        CoverageDataPngTestUtils.testCoverageData(geoPackage, null,
+                CoverageDataAlgorithm.BILINEAR, allowNulls);
 
     }
 
     /**
-     * Test the elevation extension with a newly created GeoPackage using the
+     * Test the coverage data extension with a newly created GeoPackage using the
      * Bicubic Algorithm
      */
-    public void testElevationsBicubic() throws Exception {
+    public void testBicubic() throws Exception {
 
-        ElevationTilesTiffTestUtils.testElevations(geoPackage, null,
-                ElevationTilesAlgorithm.BICUBIC, allowNulls);
+        CoverageDataPngTestUtils.testCoverageData(geoPackage, null,
+                CoverageDataAlgorithm.BICUBIC, allowNulls);
 
     }
 
@@ -69,8 +69,8 @@ public class ElevationTilesTiffImportTest extends
      */
     public void testRandomBoundingBoxNearestNeighbor() throws Exception {
 
-        ElevationTilesTiffTestUtils.testRandomBoundingBox(geoPackage, null,
-                ElevationTilesAlgorithm.NEAREST_NEIGHBOR, true);
+        CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage, null,
+                CoverageDataAlgorithm.NEAREST_NEIGHBOR, true);
 
     }
 
@@ -79,8 +79,8 @@ public class ElevationTilesTiffImportTest extends
      */
     public void testRandomBoundingBoxBilinear() throws Exception {
 
-        ElevationTilesTiffTestUtils.testRandomBoundingBox(geoPackage, null,
-                ElevationTilesAlgorithm.BILINEAR, true);
+        CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage, null,
+                CoverageDataAlgorithm.BILINEAR, true);
 
     }
 
@@ -89,8 +89,8 @@ public class ElevationTilesTiffImportTest extends
      */
     public void testRandomBoundingBoxBicubic() throws Exception {
 
-        ElevationTilesTiffTestUtils.testRandomBoundingBox(geoPackage, null,
-                ElevationTilesAlgorithm.BICUBIC, true);
+        CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage, null,
+                CoverageDataAlgorithm.BICUBIC, true);
 
     }
 
@@ -116,12 +116,12 @@ public class ElevationTilesTiffImportTest extends
 
         BoundingBox projectedBoundingBox = null;
 
-        List<String> elevationTables = ElevationTilesTiff.getTables(geoPackage);
+        List<String> coverageDataTables = CoverageDataPng.getTables(geoPackage);
         TileMatrixSetDao dao = geoPackage.getTileMatrixSetDao();
 
-        for (String elevationTable : elevationTables) {
+        for (String coverageTable : coverageDataTables) {
 
-            TileMatrixSet tileMatrixSet = dao.queryForId(elevationTable);
+            TileMatrixSet tileMatrixSet = dao.queryForId(coverageTable);
 
             BoundingBox boundingBox = tileMatrixSet.getBoundingBox();
             if (PRINT) {
@@ -142,9 +142,9 @@ public class ElevationTilesTiffImportTest extends
             Projection projection = ProjectionFactory.getProjection(srs);
             Projection requestProjection = ProjectionFactory
                     .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-            ProjectionTransform elevationToRequest = projection
+            ProjectionTransform coverageToRequest = projection
                     .getTransformation(requestProjection);
-            projectedBoundingBox = elevationToRequest.transform(boundingBox);
+            projectedBoundingBox = coverageToRequest.transform(boundingBox);
 
         }
         if (PRINT) {
@@ -181,14 +181,12 @@ public class ElevationTilesTiffImportTest extends
     }
 
     /**
-     * Test elevation requests within the bounds of the tiles and optionally
+     * Test coverage data requests within the bounds of the tiles and optionally
      * print
      *
      * @throws Exception
      */
     public void testBounds() throws Exception {
-
-        boolean allowNulls = false;
 
         long requestEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
 
@@ -252,33 +250,32 @@ public class ElevationTilesTiffImportTest extends
             }
         }
 
-        for (ElevationTilesAlgorithm algorithm : ElevationTilesAlgorithm
+        for (CoverageDataAlgorithm algorithm : CoverageDataAlgorithm
                 .values()) {
 
             if (PRINT) {
                 System.out.println();
                 System.out.println();
-                System.out.println(algorithm.name() + " SINGLE ELEVATIONS");
+                System.out.println(algorithm.name() + " SINGLE COVERAGE DATA VALUES");
             }
             for (double lat = maxLatitude - (heightPixelDistance * .5); lat >= minLatitude; lat -= heightPixelDistance) {
                 if (PRINT) {
                     System.out.println();
                 }
                 for (double lon = minLongitude + (widthPixelDistance * .5); lon <= maxLongitude; lon += widthPixelDistance) {
-                    Double elevation = ElevationTilesTiffTestUtils
-                            .getElevation(geoPackage, algorithm, lat, lon,
-                                    requestEpsg);
+                    Double value = CoverageDataPngTestUtils.getValue(
+                            geoPackage, algorithm, lat, lon, requestEpsg);
                     if (PRINT) {
-                        System.out.print("   " + elevation);
+                        System.out.print("   " + value);
                     }
                     if (!allowNulls) {
-                        TestCase.assertNotNull(elevation);
+                        TestCase.assertNotNull(value);
                     }
                 }
             }
 
-            ElevationTileResults results = ElevationTilesTiffTestUtils
-                    .getElevations(geoPackage, algorithm, boundingBox, width,
+            CoverageDataResults results = CoverageDataPngTestUtils
+                    .getValues(geoPackage, algorithm, boundingBox, width,
                             height, requestEpsg);
             if (!allowNulls) {
                 TestCase.assertNotNull(results);
@@ -287,23 +284,22 @@ public class ElevationTilesTiffImportTest extends
                 if (PRINT) {
                     System.out.println();
                     System.out.println();
-                    System.out.println(algorithm.name() + ", zoom: "
-                            + results.getZoomLevel());
+                    System.out.println(algorithm.name());
                 }
-                Double[][] elevations = results.getElevations();
-                TestCase.assertEquals(height, elevations.length);
-                TestCase.assertEquals(width, elevations[0].length);
-                for (int y = 0; y < elevations.length; y++) {
+                Double[][] values = results.getValues();
+                TestCase.assertEquals(height, values.length);
+                TestCase.assertEquals(width, values[0].length);
+                for (int y = 0; y < values.length; y++) {
                     if (PRINT) {
                         System.out.println();
                     }
-                    for (int x = 0; x < elevations[0].length; x++) {
-                        Double elevation = elevations[y][x];
+                    for (int x = 0; x < values[0].length; x++) {
+                        Double value = values[y][x];
                         if (PRINT) {
-                            System.out.print("   " + elevation);
+                            System.out.print("   " + value);
                         }
                         if (!allowNulls) {
-                            TestCase.assertNotNull(elevation);
+                            TestCase.assertNotNull(value);
                         }
                     }
                 }
@@ -323,12 +319,12 @@ public class ElevationTilesTiffImportTest extends
         int width = 10;
         int height = 6;
 
-        List<String> elevationTables = ElevationTilesTiff.getTables(geoPackage);
+        List<String> coverageDataTables = CoverageDataPng.getTables(geoPackage);
         TileMatrixSetDao dao = geoPackage.getTileMatrixSetDao();
 
-        for (String elevationTable : elevationTables) {
+        for (String coverageTable : coverageDataTables) {
 
-            TileMatrixSet tileMatrixSet = dao.queryForId(elevationTable);
+            TileMatrixSet tileMatrixSet = dao.queryForId(coverageTable);
 
             long geoPackageEpsg = tileMatrixSet.getSrs().getOrganizationCoordsysId();
 
@@ -405,43 +401,43 @@ public class ElevationTilesTiffImportTest extends
                 System.out.print("   (" + point[1] + "," + point[0] + ")");
             }
 
-            for (ElevationTilesAlgorithm algorithm : ElevationTilesAlgorithm
+            for (CoverageDataAlgorithm algorithm : CoverageDataAlgorithm
                     .values()) {
 
                 if (PRINT) {
                     System.out.println();
                     System.out.println();
                     System.out.println(algorithm.name()
-                            + " SINGLE ELEVATIONS Full Bounding Box");
+                            + " SINGLE COVERAGE DATA VALUES Full Bounding Box");
                 }
                 for (double lat = maxLatitude; lat >= minLatitude; lat -= heightPixelDistance) {
                     if (PRINT) {
                         System.out.println();
                     }
                     for (double lon = minLongitude; lon <= maxLongitude; lon += widthPixelDistance) {
-                        Double elevation = ElevationTilesTiffTestUtils
-                                .getElevation(geoPackage, algorithm, lat, lon,
+                        Double value = CoverageDataPngTestUtils
+                                .getValue(geoPackage, algorithm, lat, lon,
                                         geoPackageEpsg);
                         if (PRINT) {
-                            System.out.print("   " + elevation);
+                            System.out.print("   " + value);
                         }
-                        if (algorithm == ElevationTilesAlgorithm.NEAREST_NEIGHBOR
+                        if (algorithm == CoverageDataAlgorithm.NEAREST_NEIGHBOR
                                 || (lat < maxLatitude && lon > minLongitude
                                 && lat > minLatitude && lon < maxLongitude)) {
                             if (!allowNulls) {
-                                TestCase.assertNotNull(elevation);
+                                TestCase.assertNotNull(value);
                             }
                         }
                     }
-                    Double elevation = ElevationTilesTiffTestUtils
-                            .getElevation(geoPackage, algorithm, lat,
-                                    maxLongitude, geoPackageEpsg);
+                    Double value = CoverageDataPngTestUtils.getValue(
+                            geoPackage, algorithm, lat, maxLongitude,
+                            geoPackageEpsg);
                     if (PRINT) {
-                        System.out.print("   " + elevation);
+                        System.out.print("   " + value);
                     }
-                    if (algorithm == ElevationTilesAlgorithm.NEAREST_NEIGHBOR) {
+                    if (algorithm == CoverageDataAlgorithm.NEAREST_NEIGHBOR) {
                         if (!allowNulls) {
-                            TestCase.assertNotNull(elevation);
+                            TestCase.assertNotNull(value);
                         }
                     }
                 }
@@ -449,52 +445,50 @@ public class ElevationTilesTiffImportTest extends
                     System.out.println();
                 }
                 for (double lon = minLongitude; lon <= maxLongitude; lon += widthPixelDistance) {
-                    Double elevation = ElevationTilesTiffTestUtils
-                            .getElevation(geoPackage, algorithm, minLatitude,
-                                    lon, geoPackageEpsg);
+                    Double value = CoverageDataPngTestUtils.getValue(
+                            geoPackage, algorithm, minLatitude, lon,
+                            geoPackageEpsg);
                     if (PRINT) {
-                        System.out.print("   " + elevation);
+                        System.out.print("   " + value);
                     }
-                    if (algorithm == ElevationTilesAlgorithm.NEAREST_NEIGHBOR) {
+                    if (algorithm == CoverageDataAlgorithm.NEAREST_NEIGHBOR) {
                         if (!allowNulls) {
-                            TestCase.assertNotNull(elevation);
+                            TestCase.assertNotNull(value);
                         }
                     }
                 }
-                Double elevation = ElevationTilesTiffTestUtils.getElevation(
+                Double value = CoverageDataPngTestUtils.getValue(
                         geoPackage, algorithm, minLatitude, maxLongitude,
                         geoPackageEpsg);
                 if (PRINT) {
-                    System.out.print("   " + elevation);
+                    System.out.print("   " + value);
                 }
-                if (algorithm == ElevationTilesAlgorithm.NEAREST_NEIGHBOR) {
+                if (algorithm == CoverageDataAlgorithm.NEAREST_NEIGHBOR) {
                     if (!allowNulls) {
-                        TestCase.assertNotNull(elevation);
+                        TestCase.assertNotNull(value);
                     }
                 }
 
-                ElevationTileResults results = ElevationTilesTiffTestUtils
-                        .getElevations(geoPackage, algorithm, boundingBox,
+                CoverageDataResults results = CoverageDataPngTestUtils
+                        .getValues(geoPackage, algorithm, boundingBox,
                                 width, height, geoPackageEpsg);
                 if (PRINT) {
                     System.out.println();
                     System.out.println();
-                    System.out.println(algorithm.name()
-                            + " Full Bounding Box, zoom: "
-                            + results.getZoomLevel());
+                    System.out.println(algorithm.name() + " Full Bounding Box");
                 }
-                Double[][] elevations = results.getElevations();
-                for (int y = 0; y < elevations.length; y++) {
+                Double[][] values = results.getValues();
+                for (int y = 0; y < values.length; y++) {
                     if (PRINT) {
                         System.out.println();
                     }
-                    for (int x = 0; x < elevations[0].length; x++) {
-                        elevation = elevations[y][x];
+                    for (int x = 0; x < values[0].length; x++) {
+                        value = values[y][x];
                         if (PRINT) {
-                            System.out.print("   " + elevations[y][x]);
+                            System.out.print("   " + values[y][x]);
                         }
                         if (!allowNulls) {
-                            TestCase.assertNotNull(elevation);
+                            TestCase.assertNotNull(value);
                         }
                     }
                 }
@@ -516,85 +510,85 @@ public class ElevationTilesTiffImportTest extends
                             System.out.println();
                             System.out.println();
                             System.out.println(algorithm.name()
-                                    + " SINGLE ELEVATIONS Tile row = " + row
+                                    + " SINGLE COVERAGE DATA VALUES Tile row = " + row
                                     + ", column = " + column);
                         }
 
-                        elevation = ElevationTilesTiffTestUtils.getElevation(
+                        value = CoverageDataPngTestUtils.getValue(
                                 geoPackage, algorithm, maxLatitude2,
                                 minLongitude2, geoPackageEpsg);
                         double[] point = wgs84Transform.transform(
                                 minLongitude2, maxLatitude2);
                         if (PRINT) {
-                            System.out.print("   " + elevation + " ("
+                            System.out.print("   " + value + " ("
                                     + point[1] + "," + point[0] + ")");
                         }
-                        if (algorithm != ElevationTilesAlgorithm.NEAREST_NEIGHBOR
+                        if (algorithm != CoverageDataAlgorithm.NEAREST_NEIGHBOR
                                 && (row == 0 || column == 0)) {
-                            TestCase.assertNull(elevation);
+                            TestCase.assertNull(value);
                         } else {
                             if (!allowNulls) {
-                                TestCase.assertNotNull(elevation);
+                                TestCase.assertNotNull(value);
                             }
                         }
 
-                        elevation = ElevationTilesTiffTestUtils.getElevation(
+                        value = CoverageDataPngTestUtils.getValue(
                                 geoPackage, algorithm, maxLatitude2,
                                 maxLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(maxLongitude2,
                                 maxLatitude2);
                         if (PRINT) {
-                            System.out.println("   " + elevation + " ("
+                            System.out.println("   " + value + " ("
                                     + point[1] + "," + point[0] + ")");
                         }
-                        if (algorithm != ElevationTilesAlgorithm.NEAREST_NEIGHBOR
+                        if (algorithm != CoverageDataAlgorithm.NEAREST_NEIGHBOR
                                 && (row == 0 || column == tileMatrix
                                 .getMatrixWidth() - 1)) {
-                            TestCase.assertNull(elevation);
+                            TestCase.assertNull(value);
                         } else {
                             if (!allowNulls) {
-                                TestCase.assertNotNull(elevation);
+                                TestCase.assertNotNull(value);
                             }
                         }
 
-                        elevation = ElevationTilesTiffTestUtils.getElevation(
+                        value = CoverageDataPngTestUtils.getValue(
                                 geoPackage, algorithm, minLatitude2,
                                 minLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(minLongitude2,
                                 minLatitude2);
                         if (PRINT) {
-                            System.out.print("   " + elevation + " ("
+                            System.out.print("   " + value + " ("
                                     + point[1] + "," + point[0] + ")");
                         }
-                        if (algorithm != ElevationTilesAlgorithm.NEAREST_NEIGHBOR
+                        if (algorithm != CoverageDataAlgorithm.NEAREST_NEIGHBOR
                                 && (row == tileMatrix.getMatrixHeight() - 1 || column == 0)) {
-                            TestCase.assertNull(elevation);
+                            TestCase.assertNull(value);
                         } else {
                             if (!allowNulls) {
-                                TestCase.assertNotNull(elevation);
+                                TestCase.assertNotNull(value);
                             }
                         }
 
-                        elevation = ElevationTilesTiffTestUtils.getElevation(
+                        value = CoverageDataPngTestUtils.getValue(
                                 geoPackage, algorithm, minLatitude2,
                                 maxLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(maxLongitude2,
                                 minLatitude2);
                         if (PRINT) {
-                            System.out.println("   " + elevation + " ("
+                            System.out.println("   " + value + " ("
                                     + point[1] + "," + point[0] + ")");
                         }
-                        if (algorithm != ElevationTilesAlgorithm.NEAREST_NEIGHBOR
+                        if (algorithm != CoverageDataAlgorithm.NEAREST_NEIGHBOR
                                 && (row == tileMatrix.getMatrixHeight() - 1 || column == tileMatrix
                                 .getMatrixWidth() - 1)) {
-                            TestCase.assertNull(elevation);
+                            TestCase.assertNull(value);
                         } else {
                             if (!allowNulls) {
-                                TestCase.assertNotNull(elevation);
+                                TestCase.assertNotNull(value);
                             }
                         }
 
-                        results = ElevationTilesTiffTestUtils.getElevations(
+                        results = CoverageDataPngTestUtils.getValues(
                                 geoPackage, algorithm, boundingBox2, width,
                                 height, geoPackageEpsg);
                         if (PRINT) {
@@ -610,19 +604,19 @@ public class ElevationTilesTiffImportTest extends
                                 System.out.print("null results");
                             }
                         } else {
-                            elevations = results.getElevations();
-                            for (int y = 0; y < elevations.length; y++) {
+                            values = results.getValues();
+                            for (int y = 0; y < values.length; y++) {
                                 if (PRINT) {
                                     System.out.println();
                                 }
-                                for (int x = 0; x < elevations[0].length; x++) {
-                                    elevation = elevations[y][x];
+                                for (int x = 0; x < values[0].length; x++) {
+                                    value = values[y][x];
                                     if (PRINT) {
                                         System.out.print("   "
-                                                + elevations[y][x]);
+                                                + values[y][x]);
                                     }
                                     if (!allowNulls) {
-                                        TestCase.assertNotNull(elevation);
+                                        TestCase.assertNotNull(value);
                                     }
                                 }
                             }
@@ -650,13 +644,13 @@ public class ElevationTilesTiffImportTest extends
             System.out.println("Longitude: " + longitude);
         }
 
-        for (ElevationTilesAlgorithm algorithm : ElevationTilesAlgorithm
+        for (CoverageDataAlgorithm algorithm : CoverageDataAlgorithm
                 .values()) {
-            Double elevation = ElevationTilesTiffTestUtils.getElevation(
-                    geoPackage, algorithm, latitude, longitude,
+            Double value = CoverageDataPngTestUtils.getValue(geoPackage,
+                    algorithm, latitude, longitude,
                     ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
             if (PRINT) {
-                System.out.println(algorithm.name() + ": " + elevation);
+                System.out.println(algorithm.name() + ": " + value);
             }
         }
     }

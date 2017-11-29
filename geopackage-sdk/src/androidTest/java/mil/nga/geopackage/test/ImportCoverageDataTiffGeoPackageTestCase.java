@@ -8,17 +8,17 @@ import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 
 /**
- * Abstract Test Case for Imported Elevation Tiles Tiff GeoPackages
+ * Abstract Test Case for Imported TIFF Tiled Gridded Coverage Data GeoPackages
  *
  * @author osbornb
  */
-public abstract class ImportElevationTilesTiffGeoPackageTestCase extends
+public abstract class ImportCoverageDataTiffGeoPackageTestCase extends
         GeoPackageTestCase {
 
     /**
      * Constructor
      */
-    public ImportElevationTilesTiffGeoPackageTestCase() {
+    public ImportCoverageDataTiffGeoPackageTestCase() {
 
     }
 
@@ -28,19 +28,19 @@ public abstract class ImportElevationTilesTiffGeoPackageTestCase extends
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
 
         // Delete
-        manager.delete(TestConstants.IMPORT_ELEVATION_TILES_TIFF_DB_NAME);
+        manager.delete(TestConstants.IMPORT_COVERAGE_DATA_TIFF_DB_NAME);
 
         // Copy the test db file from assets to the internal storage
         TestUtils.copyAssetFileToInternalStorage(activity, testContext,
-                TestConstants.IMPORT_ELEVATION_TILES_TIFF_DB_FILE_NAME);
+                TestConstants.IMPORT_COVERAGE_DATA_TIFF_DB_FILE_NAME);
 
         // Import
         String importLocation = TestUtils.getAssetFileInternalStorageLocation(
-                activity, TestConstants.IMPORT_ELEVATION_TILES_TIFF_DB_FILE_NAME);
+                activity, TestConstants.IMPORT_COVERAGE_DATA_TIFF_DB_FILE_NAME);
         manager.importGeoPackage(new File(importLocation));
 
         // Open
-        GeoPackage geoPackage = manager.open(TestConstants.IMPORT_ELEVATION_TILES_TIFF_DB_NAME);
+        GeoPackage geoPackage = manager.open(TestConstants.IMPORT_COVERAGE_DATA_TIFF_DB_NAME);
         if (geoPackage == null) {
             throw new GeoPackageException("Failed to open database");
         }
