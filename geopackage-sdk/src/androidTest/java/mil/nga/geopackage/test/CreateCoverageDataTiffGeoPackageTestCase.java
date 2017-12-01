@@ -12,6 +12,7 @@ import mil.nga.geopackage.extension.coverage.CoverageDataTiff;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageDao;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
+import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
 import mil.nga.geopackage.factory.GeoPackageFactory;
@@ -112,6 +113,16 @@ public abstract class CreateCoverageDataTiffGeoPackageTestCase extends
             defaultPrecision = false;
         }
         griddedCoverage.setDataNull((double) Float.MAX_VALUE);
+        GriddedCoverageEncodingType encoding;
+        double randomEncoding = Math.random();
+        if (randomEncoding < 1.0 / 3.0) {
+            encoding = GriddedCoverageEncodingType.AREA;
+        } else if (randomEncoding < 2.0 / 3.0) {
+            encoding = GriddedCoverageEncodingType.CENTER;
+        } else {
+            encoding = GriddedCoverageEncodingType.CORNER;
+        }
+        griddedCoverage.setGridCellEncodingType(encoding);
         TestCase.assertEquals(1, griddedCoverageDao.create(griddedCoverage));
 
         long gcId = griddedCoverage.getId();
@@ -126,6 +137,12 @@ public abstract class CreateCoverageDataTiffGeoPackageTestCase extends
             TestCase.assertTrue(griddedCoverage.getPrecision() >= 0.0
                     && griddedCoverage.getPrecision() <= 10.0);
         }
+        TestCase.assertEquals(encoding,
+                griddedCoverage.getGridCellEncodingType());
+        TestCase.assertEquals(encoding.getName(),
+                griddedCoverage.getGridCellEncoding());
+        TestCase.assertEquals("Height", griddedCoverage.getFieldName());
+        TestCase.assertEquals("Height", griddedCoverage.getQuantityDefinition());
 
         GriddedTile commonGriddedTile = new GriddedTile();
         commonGriddedTile.setContents(tileMatrixSet.getContents());

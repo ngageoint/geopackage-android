@@ -22,6 +22,7 @@ import mil.nga.geopackage.extension.coverage.CoverageDataPngImage;
 import mil.nga.geopackage.extension.coverage.CoverageDataResults;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
+import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
@@ -119,6 +120,9 @@ public class CoverageDataPngTestUtils {
                     tileDao);
             TestCase.assertTrue(coverageData.has());
             coverageData.setAlgorithm(algorithm);
+            GriddedCoverageEncodingType encoding = coverageData
+                    .getGriddedCoverage().getGridCellEncodingType();
+            coverageData.setEncoding(encoding);
 
             // Test the 3 extension rows
             ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
@@ -182,6 +186,20 @@ public class CoverageDataPngTestUtils {
             }
             TestCase.assertTrue(griddedCoverage.getPrecision() >= 0);
             griddedCoverage.getDataNull();
+            griddedCoverage.getUom();
+            if (coverageDataValues != null) {
+                TestCase.assertEquals(encoding,
+                        griddedCoverage.getGridCellEncodingType());
+                TestCase.assertEquals(encoding.getName(),
+                        griddedCoverage.getGridCellEncoding());
+                TestCase.assertEquals("Height", griddedCoverage.getFieldName());
+                TestCase.assertEquals("Height",
+                        griddedCoverage.getQuantityDefinition());
+            } else {
+                TestCase.assertNotNull(griddedCoverage
+                        .getGridCellEncodingType());
+                griddedCoverage.getGridCellEncoding();
+            }
 
             // Test the Gridded Tile
             List<GriddedTile> griddedTiles = coverageData.getGriddedTile();
