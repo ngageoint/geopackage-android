@@ -6,83 +6,92 @@ import mil.nga.geopackage.test.CreateCoverageDataGeoPackageTestCase;
 /**
  * Tiled Gridded Coverage Data Extension PNG Tests from a created GeoPackage
  * with no null extension values
- * 
+ *
  * @author osbornb
  */
 public class CoverageDataPngNoNullsCreateTest extends
-		CreateCoverageDataGeoPackageTestCase {
+        CreateCoverageDataGeoPackageTestCase {
 
-	/**
-	 * Constructor
-	 */
-	public CoverageDataPngNoNullsCreateTest() {
-		super(false);
-	}
+    /**
+     * Constructor
+     */
+    public CoverageDataPngNoNullsCreateTest() {
+        super(false);
+    }
 
-	/**
-	 * Test the coverage data extension with a newly created GeoPackage using the
-	 * Nearest Neighbor Algorithm
-	 */
-	public void testNearestNeighbor() throws Exception {
+    /**
+     * Test the coverage data extension with a newly created GeoPackage using the
+     * Nearest Neighbor Algorithm
+     */
+    public void testNearestNeighbor() throws Exception {
 
-		CoverageDataPngTestUtils.testCoverageData(geoPackage, coverageDataValues,
-				CoverageDataAlgorithm.NEAREST_NEIGHBOR, allowNulls);
+        CoverageDataPngTestUtils.testCoverageData(geoPackage, coverageDataValues,
+                CoverageDataAlgorithm.NEAREST_NEIGHBOR, allowNulls);
 
-	}
+    }
 
-	/**
-	 * Test the coverage data extension with a newly created GeoPackage using the
-	 * Bilinear Algorithm
-	 */
-	public void testBilinear() throws Exception {
+    /**
+     * Test the coverage data extension with a newly created GeoPackage using the
+     * Bilinear Algorithm
+     */
+    public void testBilinear() throws Exception {
 
-		CoverageDataPngTestUtils.testCoverageData(geoPackage, coverageDataValues,
-				CoverageDataAlgorithm.BILINEAR, allowNulls);
+        CoverageDataPngTestUtils.testCoverageData(geoPackage, coverageDataValues,
+                CoverageDataAlgorithm.BILINEAR, allowNulls);
 
-	}
+    }
 
-	/**
-	 * Test the coverage data extension with a newly created GeoPackage using the
-	 * Bicubic Algorithm
-	 */
-	public void testBicubic() throws Exception {
+    /**
+     * Test the coverage data extension with a newly created GeoPackage using the
+     * Bicubic Algorithm
+     */
+    public void testBicubic() throws Exception {
 
-		CoverageDataPngTestUtils.testCoverageData(geoPackage, coverageDataValues,
-				CoverageDataAlgorithm.BICUBIC, allowNulls);
+        CoverageDataPngTestUtils.testCoverageData(geoPackage, coverageDataValues,
+                CoverageDataAlgorithm.BICUBIC, allowNulls);
 
-	}
+    }
 
-	/**
-	 * Test a random bounding box using the Nearest Neighbor Algorithm
-	 */
-	public void testRandomBoundingBoxNearestNeighbor() throws Exception {
+    /**
+     * Test a random bounding box using the Nearest Neighbor Algorithm
+     */
+    public void testRandomBoundingBoxNearestNeighbor() throws Exception {
 
-		CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage,
-				coverageDataValues, CoverageDataAlgorithm.NEAREST_NEIGHBOR,
-				allowNulls);
+        CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
+                CoverageDataAlgorithm.NEAREST_NEIGHBOR,
+                allowNulls);
 
-	}
+    }
 
-	/**
-	 * Test a random bounding box using the Bilinear Algorithm
-	 */
-	public void testRandomBoundingBoxBilinear() throws Exception {
+    /**
+     * Test a random bounding box using the Bilinear Algorithm
+     */
+    public void testRandomBoundingBoxBilinear() throws Exception {
 
-		CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage,
-				coverageDataValues, CoverageDataAlgorithm.BILINEAR,
-				allowNulls);
+        CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
+                CoverageDataAlgorithm.BILINEAR,
+                allowNulls);
 
-	}
+    }
 
-	/**
-	 * Test a random bounding box using the Bicubic Algorithm
-	 */
-	public void testRandomBoundingBoxBicubic() throws Exception {
+    /**
+     * Test a random bounding box using the Bicubic Algorithm
+     */
+    public void testRandomBoundingBoxBicubic() throws Exception {
 
-		CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage,
-				coverageDataValues, CoverageDataAlgorithm.BICUBIC,
-				allowNulls);
+        CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
+                CoverageDataAlgorithm.BICUBIC,
+                allowNulls);
 
-	}
+    }
+
+    /**
+     * Test the pixel encoding
+     */
+    public void testPixelEncoding() throws Exception {
+
+        CoverageDataTestUtils.testPixelEncoding(geoPackage, allowNulls);
+
+    }
 
 }

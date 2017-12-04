@@ -69,7 +69,7 @@ public class CoverageDataPngImportTest extends
      */
     public void testRandomBoundingBoxNearestNeighbor() throws Exception {
 
-        CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage, null,
+        CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
                 CoverageDataAlgorithm.NEAREST_NEIGHBOR, true);
 
     }
@@ -79,7 +79,7 @@ public class CoverageDataPngImportTest extends
      */
     public void testRandomBoundingBoxBilinear() throws Exception {
 
-        CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage, null,
+        CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
                 CoverageDataAlgorithm.BILINEAR, true);
 
     }
@@ -89,8 +89,17 @@ public class CoverageDataPngImportTest extends
      */
     public void testRandomBoundingBoxBicubic() throws Exception {
 
-        CoverageDataPngTestUtils.testRandomBoundingBox(geoPackage, null,
+        CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
                 CoverageDataAlgorithm.BICUBIC, true);
+
+    }
+
+    /**
+     * Test the pixel encoding
+     */
+    public void testPixelEncoding() throws Exception {
+
+        CoverageDataTestUtils.testPixelEncoding(geoPackage, allowNulls);
 
     }
 
@@ -263,7 +272,7 @@ public class CoverageDataPngImportTest extends
                     System.out.println();
                 }
                 for (double lon = minLongitude + (widthPixelDistance * .5); lon <= maxLongitude; lon += widthPixelDistance) {
-                    Double value = CoverageDataPngTestUtils.getValue(
+                    Double value = CoverageDataTestUtils.getValue(
                             geoPackage, algorithm, lat, lon, requestEpsg);
                     if (PRINT) {
                         System.out.print("   " + value);
@@ -274,7 +283,7 @@ public class CoverageDataPngImportTest extends
                 }
             }
 
-            CoverageDataResults results = CoverageDataPngTestUtils
+            CoverageDataResults results = CoverageDataTestUtils
                     .getValues(geoPackage, algorithm, boundingBox, width,
                             height, requestEpsg);
             if (!allowNulls) {
@@ -415,7 +424,7 @@ public class CoverageDataPngImportTest extends
                         System.out.println();
                     }
                     for (double lon = minLongitude; lon <= maxLongitude; lon += widthPixelDistance) {
-                        Double value = CoverageDataPngTestUtils
+                        Double value = CoverageDataTestUtils
                                 .getValue(geoPackage, algorithm, lat, lon,
                                         geoPackageEpsg);
                         if (PRINT) {
@@ -429,7 +438,7 @@ public class CoverageDataPngImportTest extends
                             }
                         }
                     }
-                    Double value = CoverageDataPngTestUtils.getValue(
+                    Double value = CoverageDataTestUtils.getValue(
                             geoPackage, algorithm, lat, maxLongitude,
                             geoPackageEpsg);
                     if (PRINT) {
@@ -445,7 +454,7 @@ public class CoverageDataPngImportTest extends
                     System.out.println();
                 }
                 for (double lon = minLongitude; lon <= maxLongitude; lon += widthPixelDistance) {
-                    Double value = CoverageDataPngTestUtils.getValue(
+                    Double value = CoverageDataTestUtils.getValue(
                             geoPackage, algorithm, minLatitude, lon,
                             geoPackageEpsg);
                     if (PRINT) {
@@ -457,7 +466,7 @@ public class CoverageDataPngImportTest extends
                         }
                     }
                 }
-                Double value = CoverageDataPngTestUtils.getValue(
+                Double value = CoverageDataTestUtils.getValue(
                         geoPackage, algorithm, minLatitude, maxLongitude,
                         geoPackageEpsg);
                 if (PRINT) {
@@ -469,7 +478,7 @@ public class CoverageDataPngImportTest extends
                     }
                 }
 
-                CoverageDataResults results = CoverageDataPngTestUtils
+                CoverageDataResults results = CoverageDataTestUtils
                         .getValues(geoPackage, algorithm, boundingBox,
                                 width, height, geoPackageEpsg);
                 if (PRINT) {
@@ -514,7 +523,7 @@ public class CoverageDataPngImportTest extends
                                     + ", column = " + column);
                         }
 
-                        value = CoverageDataPngTestUtils.getValue(
+                        value = CoverageDataTestUtils.getValue(
                                 geoPackage, algorithm, maxLatitude2,
                                 minLongitude2, geoPackageEpsg);
                         double[] point = wgs84Transform.transform(
@@ -532,7 +541,7 @@ public class CoverageDataPngImportTest extends
                             }
                         }
 
-                        value = CoverageDataPngTestUtils.getValue(
+                        value = CoverageDataTestUtils.getValue(
                                 geoPackage, algorithm, maxLatitude2,
                                 maxLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(maxLongitude2,
@@ -551,7 +560,7 @@ public class CoverageDataPngImportTest extends
                             }
                         }
 
-                        value = CoverageDataPngTestUtils.getValue(
+                        value = CoverageDataTestUtils.getValue(
                                 geoPackage, algorithm, minLatitude2,
                                 minLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(minLongitude2,
@@ -569,7 +578,7 @@ public class CoverageDataPngImportTest extends
                             }
                         }
 
-                        value = CoverageDataPngTestUtils.getValue(
+                        value = CoverageDataTestUtils.getValue(
                                 geoPackage, algorithm, minLatitude2,
                                 maxLongitude2, geoPackageEpsg);
                         point = wgs84Transform.transform(maxLongitude2,
@@ -588,7 +597,7 @@ public class CoverageDataPngImportTest extends
                             }
                         }
 
-                        results = CoverageDataPngTestUtils.getValues(
+                        results = CoverageDataTestUtils.getValues(
                                 geoPackage, algorithm, boundingBox2, width,
                                 height, geoPackageEpsg);
                         if (PRINT) {
@@ -646,7 +655,7 @@ public class CoverageDataPngImportTest extends
 
         for (CoverageDataAlgorithm algorithm : CoverageDataAlgorithm
                 .values()) {
-            Double value = CoverageDataPngTestUtils.getValue(geoPackage,
+            Double value = CoverageDataTestUtils.getValue(geoPackage,
                     algorithm, latitude, longitude,
                     ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
             if (PRINT) {

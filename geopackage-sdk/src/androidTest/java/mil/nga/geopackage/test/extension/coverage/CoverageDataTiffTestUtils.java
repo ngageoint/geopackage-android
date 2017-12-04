@@ -12,22 +12,17 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
+import mil.nga.geopackage.extension.coverage.CoverageDataAlgorithm;
+import mil.nga.geopackage.extension.coverage.CoverageDataResults;
 import mil.nga.geopackage.extension.coverage.CoverageDataTiff;
 import mil.nga.geopackage.extension.coverage.CoverageDataTiffImage;
-import mil.nga.geopackage.extension.coverage.CoverageDataResults;
-import mil.nga.geopackage.extension.coverage.CoverageDataAlgorithm;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
-import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.projection.ProjectionConstants;
-import mil.nga.geopackage.projection.ProjectionFactory;
-import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.test.CreateCoverageDataTiffGeoPackageTestCase.CoverageDataTiffValues;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
@@ -48,10 +43,10 @@ public class CoverageDataTiffTestUtils {
     /**
      * Test coverage data GeoPackage
      *
-     * @param geoPackage          GeoPackage
+     * @param geoPackage         GeoPackage
      * @param coverageDataValues coverage data values
-     * @param algorithm           algorithm
-     * @param allowNulls          true if nulls are allowed
+     * @param algorithm          algorithm
+     * @param allowNulls         true if nulls are allowed
      * @throws Exception
      */
     public static void testCoverageData(GeoPackage geoPackage,
@@ -225,7 +220,7 @@ public class CoverageDataTiffTestUtils {
             tileResultSet.close();
 
             // Perform coverage data query tests
-            testCoverageDataQueries(geoPackage, coverageData, tileMatrixSet,
+            CoverageDataTestUtils.testCoverageDataQueries(geoPackage, coverageData, tileMatrixSet,
                     algorithm, allowNulls);
         }
 
@@ -241,7 +236,7 @@ public class CoverageDataTiffTestUtils {
      * @param griddedTile
      * @param tileRow
      * @param algorithm
-     * @param allowNulls          allow nulls
+     * @param allowNulls         allow nulls
      * @throws IOException
      * @throws SQLException
      */
@@ -464,335 +459,6 @@ public class CoverageDataTiffTestUtils {
             }
         }
 
-    }
-
-    /**
-     * Test performing coverage data queries
-     *
-     * @param geoPackage
-     * @param coverageData
-     * @param tileMatrixSet
-     * @param algorithm
-     * @param allowNulls
-     * @throws SQLException
-     */
-    private static void testCoverageDataQueries(GeoPackage geoPackage,
-                                                CoverageDataTiff coverageData, TileMatrixSet tileMatrixSet,
-                                                CoverageDataAlgorithm algorithm, boolean allowNulls)
-            throws SQLException {
-
-        // Determine an alternate projection
-        BoundingBox boundingBox = tileMatrixSet.getBoundingBox();
-        SpatialReferenceSystemDao srsDao = geoPackage
-                .getSpatialReferenceSystemDao();
-        long srsId = tileMatrixSet.getSrsId();
-        SpatialReferenceSystem srs = srsDao.queryForId(srsId);
-
-        long epsg = srs.getOrganizationCoordsysId();
-        Projection projection = ProjectionFactory.getProjection(srs);
-        long requestEpsg = -1;
-        if (epsg == ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM) {
-            requestEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
-        } else {
-            requestEpsg = ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM;
-        }
-        Projection requestProjection = ProjectionFactory
-                .getProjection(requestEpsg);
-        ProjectionTransform coverageToRequest = projection
-                .getTransformation(requestProjection);
-        BoundingBox projectedBoundingBox = coverageToRequest
-                .transform(boundingBox);
-
-        // Get a random coordinate
-        double latDistance = projectedBoundingBox.getMaxLatitude()
-                - projectedBoundingBox.getMinLatitude();
-        double latitude = latDistance * .9 * Math.random()
-                + projectedBoundingBox.getMinLatitude() + (.05 * latDistance);
-        double lonDistance = projectedBoundingBox.getMaxLongitude()
-                - projectedBoundingBox.getMinLongitude();
-        double longitude = lonDistance * .9 * Math.random()
-                + projectedBoundingBox.getMinLongitude() + (.05 * lonDistance);
-
-        // Test getting the coverage data value of a single coordinate
-        CoverageDataTiff coverageData2 = new CoverageDataTiff(geoPackage,
-                coverageData.getTileDao(), requestProjection);
-        coverageData2.setAlgorithm(algorithm);
-        Double value = coverageData2.getValue(latitude, longitude);
-        if (!allowNulls) {
-            TestCase.assertNotNull(value);
-        }
-
-        // Build a random bounding box
-        double minLatitude = (projectedBoundingBox.getMaxLatitude() - projectedBoundingBox
-                .getMinLatitude())
-                * Math.random()
-                + projectedBoundingBox.getMinLatitude();
-        double minLongitude = (projectedBoundingBox.getMaxLongitude() - projectedBoundingBox
-                .getMinLongitude())
-                * Math.random()
-                + projectedBoundingBox.getMinLongitude();
-        double maxLatitude = (projectedBoundingBox.getMaxLatitude() - minLatitude)
-                * Math.random() + minLatitude;
-        double maxLongitude = (projectedBoundingBox.getMaxLongitude() - minLongitude)
-                * Math.random() + minLongitude;
-
-        BoundingBox requestBoundingBox = new BoundingBox(minLongitude,
-                minLatitude, maxLongitude, maxLatitude);
-        CoverageDataResults values = coverageData2
-                .getValues(requestBoundingBox);
-        TestCase.assertNotNull(values);
-        TestCase.assertNotNull(values.getValues());
-        TestCase.assertEquals(values.getValues()[0].length,
-                values.getWidth());
-        TestCase.assertEquals(values.getValues().length,
-                values.getHeight());
-        TestCase.assertNotNull(values.getTileMatrix());
-        TestCase.assertTrue(values.getZoomLevel() >= 0);
-        TestCase.assertTrue(values.getValues().length > 0);
-        TestCase.assertTrue(values.getValues()[0].length > 0);
-        for (int y = 0; y < values.getValues().length; y++) {
-            for (int x = 0; x < values.getValues()[y].length; x++) {
-                TestCase.assertEquals(values.getValues()[y][x],
-                        values.getValue(y, x));
-            }
-        }
-
-        int specifiedWidth = 50;
-        int specifiedHeight = 100;
-        coverageData2.setWidth(specifiedWidth);
-        coverageData2.setHeight(specifiedHeight);
-
-        values = coverageData2.getValues(requestBoundingBox);
-        TestCase.assertNotNull(values);
-        TestCase.assertNotNull(values.getValues());
-        TestCase.assertEquals(values.getValues()[0].length,
-                values.getWidth());
-        TestCase.assertEquals(values.getValues().length,
-                values.getHeight());
-        TestCase.assertNotNull(values.getTileMatrix());
-        TestCase.assertTrue(values.getZoomLevel() >= 0);
-        TestCase.assertTrue(values.getValues().length > 0);
-        TestCase.assertTrue(values.getValues()[0].length > 0);
-        TestCase.assertEquals(specifiedHeight, values.getHeight());
-        TestCase.assertEquals(specifiedWidth, values.getWidth());
-        for (int y = 0; y < specifiedHeight; y++) {
-            for (int x = 0; x < specifiedWidth; x++) {
-                TestCase.assertEquals(values.getValues()[y][x],
-                        values.getValue(y, x));
-            }
-        }
-
-        values = coverageData2.getValuesUnbounded(requestBoundingBox);
-        TestCase.assertNotNull(values);
-        TestCase.assertNotNull(values.getValues());
-        TestCase.assertEquals(values.getValues()[0].length,
-                values.getWidth());
-        TestCase.assertEquals(values.getValues().length,
-                values.getHeight());
-        TestCase.assertNotNull(values.getTileMatrix());
-        TestCase.assertTrue(values.getZoomLevel() >= 0);
-        TestCase.assertTrue(values.getValues().length > 0);
-        TestCase.assertTrue(values.getValues()[0].length > 0);
-        TestCase.assertEquals(
-                values.getValues()[0].length,
-                values.getValues()[values.getValues().length - 1].length);
-        for (int y = 0; y < values.getValues().length; y++) {
-            for (int x = 0; x < values.getValues()[y].length; x++) {
-                TestCase.assertEquals(values.getValues()[y][x],
-                        values.getValue(y, x));
-            }
-        }
-    }
-
-    /**
-     * Test a random bounding box query
-     *
-     * @param geoPackage          GeoPackage
-     * @param coverageDataValues coverage data values
-     * @param algorithm           algorithm
-     * @param allowNulls          allow null coverage data values
-     * @throws Exception
-     */
-    public static void testRandomBoundingBox(GeoPackage geoPackage,
-                                             CoverageDataTiffValues coverageDataValues,
-                                             CoverageDataAlgorithm algorithm, boolean allowNulls)
-            throws Exception {
-
-        // Verify the coverage data shows up as a coverage data table and not a tile
-        // table
-        List<String> tilesTables = geoPackage.getTileTables();
-        List<String> coverageDataTables = CoverageDataTiff.getTables(geoPackage);
-        TestCase.assertFalse(coverageDataTables.isEmpty());
-        for (String tilesTable : tilesTables) {
-            TestCase.assertFalse(coverageDataTables.contains(tilesTable));
-        }
-
-        TileMatrixSetDao dao = geoPackage.getTileMatrixSetDao();
-        TestCase.assertTrue(dao.isTableExists());
-
-        for (String coverageTable : coverageDataTables) {
-
-            TileMatrixSet tileMatrixSet = dao.queryForId(coverageTable);
-
-            TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
-            CoverageDataTiff coverageData = new CoverageDataTiff(
-                    geoPackage, tileDao);
-            coverageData.setAlgorithm(algorithm);
-
-            int specifiedWidth = (int) (Math.random() * 100.0) + 1;
-            int specifiedHeight = (int) (Math.random() * 100.0) + 1;
-            coverageData.setWidth(specifiedWidth);
-            coverageData.setHeight(specifiedHeight);
-
-            BoundingBox boundingBox = tileMatrixSet.getBoundingBox();
-
-            // Build a random bounding box
-            double minLatitude = (boundingBox.getMaxLatitude() - boundingBox
-                    .getMinLatitude())
-                    * Math.random()
-                    + boundingBox.getMinLatitude();
-            double minLongitude = (boundingBox.getMaxLongitude() - boundingBox
-                    .getMinLongitude())
-                    * Math.random()
-                    + boundingBox.getMinLongitude();
-            double maxLatitude = (boundingBox.getMaxLatitude() - minLatitude)
-                    * Math.random() + minLatitude;
-            double maxLongitude = (boundingBox.getMaxLongitude() - minLongitude)
-                    * Math.random() + minLongitude;
-
-            BoundingBox requestBoundingBox = new BoundingBox(minLongitude,
-                    minLatitude, maxLongitude, maxLatitude);
-
-            CoverageDataResults values = coverageData
-                    .getValues(requestBoundingBox);
-
-            TestCase.assertNotNull(values);
-            TestCase.assertNotNull(values.getValues());
-            TestCase.assertEquals(values.getValues()[0].length,
-                    values.getWidth());
-            TestCase.assertEquals(values.getValues().length,
-                    values.getHeight());
-            TestCase.assertNotNull(values.getTileMatrix());
-            TestCase.assertTrue(values.getZoomLevel() >= 0);
-            TestCase.assertTrue(values.getValues().length > 0);
-            TestCase.assertTrue(values.getValues()[0].length > 0);
-            TestCase.assertEquals(specifiedHeight, values.getHeight());
-            TestCase.assertEquals(specifiedWidth, values.getWidth());
-
-            for (int y = 0; y < specifiedHeight; y++) {
-                boolean nonNullFound = false;
-                boolean secondNullsFound = false;
-                for (int x = 0; x < specifiedWidth; x++) {
-                    TestCase.assertEquals(values.getValues()[y][x],
-                            values.getValue(y, x));
-                    if (!allowNulls) {
-                        if (values.getValues()[y][x] != null) {
-                            TestCase.assertFalse(secondNullsFound);
-                            nonNullFound = true;
-                        } else if (nonNullFound) {
-                            secondNullsFound = true;
-                        }
-                    }
-                }
-            }
-
-            for (int x = 0; x < specifiedWidth; x++) {
-                boolean nonNullFound = false;
-                boolean secondNullsFound = false;
-                for (int y = 0; y < specifiedHeight; y++) {
-                    TestCase.assertEquals(values.getValues()[y][x],
-                            values.getValue(y, x));
-                    if (!allowNulls) {
-                        if (values.getValues()[y][x] != null) {
-                            TestCase.assertFalse(secondNullsFound);
-                            nonNullFound = true;
-                        } else if (nonNullFound) {
-                            secondNullsFound = true;
-                        }
-                    }
-                }
-            }
-
-        }
-
-    }
-
-    /**
-     * Get the coverage data value at the coordinate
-     *
-     * @param geoPackage GeoPackage
-     * @param algorithm  algorithm
-     * @param latitude   latitude
-     * @param longitude  longitude
-     * @return coverage data value
-     * @throws Exception
-     */
-    public static Double getValue(GeoPackage geoPackage,
-                                  CoverageDataAlgorithm algorithm, double latitude,
-                                  double longitude, long epsg) throws Exception {
-
-        Double value = null;
-
-        List<String> coverageDataTables = CoverageDataTiff.getTables(geoPackage);
-        TileMatrixSetDao dao = geoPackage.getTileMatrixSetDao();
-
-        for (String coverageTable : coverageDataTables) {
-
-            TileMatrixSet tileMatrixSet = dao.queryForId(coverageTable);
-            TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
-
-            Projection requestProjection = ProjectionFactory
-                    .getProjection(epsg);
-
-            // Test getting the coverage data value of a single coordinate
-            CoverageDataTiff coverageData = new CoverageDataTiff(
-                    geoPackage, tileDao, requestProjection);
-            coverageData.setAlgorithm(algorithm);
-            value = coverageData.getValue(latitude, longitude);
-        }
-
-        return value;
-    }
-
-    /**
-     * Get the coverage data for the bounding box
-     *
-     * @param geoPackage  GeoPackage
-     * @param algorithm   algorithm
-     * @param boundingBox bounding box
-     * @param width       results width
-     * @param height       results height
-     * @param epsg        epsg code
-     * @return coverage data results
-     * @throws Exception
-     */
-    public static CoverageDataResults getValues(GeoPackage geoPackage,
-                                                CoverageDataAlgorithm algorithm, BoundingBox boundingBox,
-                                                int width, int height, long epsg) throws Exception {
-
-        CoverageDataResults values = null;
-
-        List<String> coverageDataTables = CoverageDataTiff.getTables(geoPackage);
-        TileMatrixSetDao dao = geoPackage.getTileMatrixSetDao();
-
-        for (String coverageTable : coverageDataTables) {
-
-            TileMatrixSet tileMatrixSet = dao.queryForId(coverageTable);
-            TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
-
-            Projection requestProjection = ProjectionFactory
-                    .getProjection(epsg);
-
-            // Test getting the coverage data value of a single coordinate
-            CoverageDataTiff coverageData = new CoverageDataTiff(
-                    geoPackage, tileDao, requestProjection);
-            coverageData.setAlgorithm(algorithm);
-            coverageData.setWidth(width);
-            coverageData.setHeight(height);
-            values = coverageData.getValues(boundingBox);
-        }
-
-        return values;
     }
 
 }

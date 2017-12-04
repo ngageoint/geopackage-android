@@ -4,7 +4,6 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.tiff.FileDirectory;
@@ -19,7 +18,7 @@ import mil.nga.tiff.util.TiffConstants;
  * @author osbornb
  * @since 2.0.1
  */
-public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> {
+public class CoverageDataTiff extends CoverageData<CoverageDataTiffImage> {
 
     /**
      * Single sample coverage data
@@ -83,7 +82,7 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
      */
     @Override
     public double getValue(GriddedTile griddedTile, TileRow tileRow,
-                                    int x, int y) {
+                           int x, int y) {
         byte[] imageBytes = tileRow.getTileData();
         double value = getValue(griddedTile, imageBytes, x, y);
         return value;
@@ -178,30 +177,22 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
     }
 
     /**
-     * Get the coverage data value
-     *
-     * @param griddedTile gridded tile
-     * @param imageBytes  image bytes
-     * @param x           x coordinate
-     * @param y           y coordinate
-     * @return coverage data value
+     * {@inheritDoc}
      */
+    @Override
     public Double getValue(GriddedTile griddedTile,
-                                    byte[] imageBytes, int x, int y) {
+                           byte[] imageBytes, int x, int y) {
         float pixelValue = getPixelValue(imageBytes, x, y);
         Double value = getValue(griddedTile, pixelValue);
         return value;
     }
 
     /**
-     * Get the coverage data values
-     *
-     * @param griddedTile gridded tile
-     * @param imageBytes  image bytes
-     * @return coverage data values
+     * {@inheritDoc}
      */
+    @Override
     public Double[] getValues(GriddedTile griddedTile,
-                                       byte[] imageBytes) {
+                              byte[] imageBytes) {
         float[] pixelValues = getPixelValues(imageBytes);
         Double[] values = getValues(griddedTile, pixelValues);
         return values;
@@ -291,7 +282,7 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
      * tileWidth * tileHeight where each coverage data value is at: (y * tileWidth) + x
      *
      * @param griddedTile gridded tile
-     * @param values  coverage data values of length tileWidth * tileHeight
+     * @param values      coverage data values of length tileWidth * tileHeight
      * @param tileWidth   tile width
      * @param tileHeight  tile height
      * @return coverage data image tile
@@ -313,16 +304,9 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
     }
 
     /**
-     * Draw a coverage data image tile and format as TIFF bytes from the flat array
-     * of coverage data values of length tileWidth * tileHeight where each coverage data value is
-     * at: (y * tileWidth) + x
-     *
-     * @param griddedTile gridded tile
-     * @param values  coverage data values of length tileWidth * tileHeight
-     * @param tileWidth   tile width
-     * @param tileHeight  tile height
-     * @return coverage data image tile bytes
+     * {@inheritDoc}
      */
+    @Override
     public byte[] drawTileData(GriddedTile griddedTile, Double[] values,
                                int tileWidth, int tileHeight) {
         CoverageDataTiffImage image = drawTile(griddedTile, values, tileWidth,
@@ -336,7 +320,7 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
      * formatted as Double[row][width]
      *
      * @param griddedTile gridded tile
-     * @param values  coverage data values as [row][width]
+     * @param values      coverage data values as [row][width]
      * @return coverage data image tile
      */
     public CoverageDataTiffImage drawTile(GriddedTile griddedTile, Double[][] values) {
@@ -358,13 +342,9 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
     }
 
     /**
-     * Draw a coverage data image tile and format as TIFF bytes from the double
-     * array of coverage data values formatted as Double[row][width]
-     *
-     * @param griddedTile gridded tile
-     * @param values  coverage data values as [row][width]
-     * @return coverage data image tile bytes
+     * {@inheritDoc}
      */
+    @Override
     public byte[] drawTileData(GriddedTile griddedTile, Double[][] values) {
         CoverageDataTiffImage image = drawTile(griddedTile, values);
         byte[] bytes = image.getImageBytes();
@@ -418,12 +398,12 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
     /**
      * Create the coverage data tile table with metadata and extension
      *
-     * @param geoPackage
-     * @param tableName
-     * @param contentsBoundingBox
-     * @param contentsSrsId
-     * @param tileMatrixSetBoundingBox
-     * @param tileMatrixSetSrsId
+     * @param geoPackage               GeoPackage
+     * @param tableName                table name
+     * @param contentsBoundingBox      contents bounding box
+     * @param contentsSrsId            contents srs id
+     * @param tileMatrixSetBoundingBox tile matrix set bounding box
+     * @param tileMatrixSetSrsId       tile matrix set srs id
      * @return coverage data
      */
     public static CoverageDataTiff createTileTableWithMetadata(
@@ -431,15 +411,11 @@ public class CoverageDataTiff extends CoverageDataCommon<CoverageDataTiffImage> 
             BoundingBox contentsBoundingBox, long contentsSrsId,
             BoundingBox tileMatrixSetBoundingBox, long tileMatrixSetSrsId) {
 
-        TileMatrixSet tileMatrixSet = CoverageDataCore
+        CoverageDataTiff coverageData = (CoverageDataTiff) CoverageData
                 .createTileTableWithMetadata(geoPackage, tableName,
                         contentsBoundingBox, contentsSrsId,
-                        tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-        TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
-        CoverageDataTiff coverageData = new CoverageDataTiff(geoPackage,
-                tileDao);
-        coverageData.getOrCreate();
-
+                        tileMatrixSetBoundingBox, tileMatrixSetSrsId,
+                        GriddedCoverageDataType.FLOAT);
         return coverageData;
     }
 
