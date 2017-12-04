@@ -99,7 +99,7 @@ public class CoverageDataPngImportTest extends
      */
     public void testPixelEncoding() throws Exception {
 
-        CoverageDataTestUtils.testPixelEncoding(geoPackage, allowNulls);
+        CoverageDataTestUtils.testPixelEncoding(geoPackage, true);
 
     }
 
