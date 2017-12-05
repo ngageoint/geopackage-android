@@ -68,7 +68,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Moved Play Services and Android Map Utility dependencies to [geopackage-android-map](http://github.com/ngageoint/geopackage-android-map)
 * MapFeatureTiles replaced by DefaultFeatureTiles, removes Map library dependency & fixes geometries drawn over the International Date Line
 * User Attributes table support
-* geopackage-tiff-java dependency for TIFF support
+* tiff-java dependency for TIFF support
 * Elevation query algorithms including Nearest Neighbor, Bilinear, and Bicubic
 * Elevation unbounded results elevation queries
 * Table and column name SQL quotations to allow uncommon but valid names
