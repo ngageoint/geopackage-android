@@ -50,7 +50,7 @@ android {
         classpath += files("${android.sdkDirectory}/extras/android/support/v13/android-support-v13.jar")
         options.links("http://ngageoint.github.io/geopackage-core-java/docs/api/");
         options.links("http://ngageoint.github.io/geopackage-wkb-java/docs/api/");
-        options.links("http://ngageoint.github.io/geopackage-tiff-java/docs/api/");
+        options.links("http://ngageoint.github.io/tiff-java/docs/api/");
         options.links("http://ormlite.com/javadoc/ormlite-core/");
         options.links("http://ormlite.com/javadoc/ormlite-android/");
         options.links("http://docs.oracle.com/javase/7/docs/api/");
