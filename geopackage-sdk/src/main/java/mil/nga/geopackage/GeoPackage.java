@@ -4,6 +4,7 @@ import android.database.Cursor;
 
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
@@ -91,6 +92,14 @@ public interface GeoPackage extends GeoPackageCore {
      * @since 1.2.1
      */
     public Cursor rawQuery(String sql, String[] args);
+
+    /**
+     * Get the GeoPackage connection
+     *
+     * @return GeoPackage connection
+     * @since 2.0.1
+     */
+    public GeoPackageConnection getConnection();
 
     /**
      * Perform a foreign key check on the database
