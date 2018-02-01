@@ -182,6 +182,8 @@ public class GeoPackageExample extends BaseTestCase {
             Log.i(LOG_NAME, "Feature Tile Link Extension: " + FEATURES);
             Log.i(LOG_NAME, "Non-Linear Geometry Types Extension: "
                     + FEATURES);
+            Log.i(LOG_NAME, "RTree Spatial Index Extension: "
+                    + FEATURES);
         }
 
         Log.i(LOG_NAME, "Tiles: " + TILES);
@@ -208,11 +210,12 @@ public class GeoPackageExample extends BaseTestCase {
             createMetadataExtension(geoPackage);
         }
 
-        Log.i(LOG_NAME, "Coverage Data: " + METADATA);
+        Log.i(LOG_NAME, "Coverage Data: " + COVERAGE_DATA);
         if (COVERAGE_DATA) {
             createCoverageDataExtension(geoPackage);
         }
 
+        geoPackage.close();
         exportGeoPackage(activity);
 
     }
@@ -846,25 +849,25 @@ public class GeoPackageExample extends BaseTestCase {
 
                     int value = 0;
 
-                    String contraintName = null;
+                    String constraintName = null;
                     switch (constraintType) {
                         case RANGE:
-                            contraintName = sampleRange.getConstraintName();
+                            constraintName = sampleRange.getConstraintName();
                             value = 1 + (int) (Math.random() * 10);
                             break;
                         case ENUM:
-                            contraintName = sampleEnum1.getConstraintName();
+                            constraintName = sampleEnum1.getConstraintName();
                             value = 1 + ((int) (Math.random() * 5) * 2);
                             break;
                         case GLOB:
-                            contraintName = sampleGlob.getConstraintName();
+                            constraintName = sampleGlob.getConstraintName();
                             value = 1000 + (int) (Math.random() * 2000);
                             break;
                         default:
                             throw new GeoPackageException(
                                     "Unexpected Constraint Type: " + constraintType);
                     }
-                    dataColumns.setConstraintName(contraintName);
+                    dataColumns.setConstraintName(constraintName);
 
                     ContentValues values = new ContentValues();
                     values.put(column.getName(), value);
@@ -916,9 +919,9 @@ public class GeoPackageExample extends BaseTestCase {
                     geometry = circularString;
                     break;
                 case COMPOUNDCURVE:
-                    CompoundCurve compundCurve = new CompoundCurve();
-                    compundCurve.addLineString(circularString);
-                    geometry = compundCurve;
+                    CompoundCurve compoundCurve = new CompoundCurve();
+                    compoundCurve.addLineString(circularString);
+                    geometry = compoundCurve;
                     break;
                 case CURVEPOLYGON:
                     CurvePolygon<CircularString> curvePolygon = new CurvePolygon<>();
