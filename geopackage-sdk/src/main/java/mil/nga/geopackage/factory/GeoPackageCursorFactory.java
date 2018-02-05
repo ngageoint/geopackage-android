@@ -51,7 +51,18 @@ class GeoPackageCursorFactory implements CursorFactory {
         // Add the wrapper
         if (existing == null) {
             tableCursors.put(tableName, cursorWrapper);
-            tableCursors.put(CoreSQLUtils.quoteWrap(tableName), cursorWrapper);
+            String quotedTableName = CoreSQLUtils.quoteWrap(tableName);
+            tableCursors.put(quotedTableName, cursorWrapper);
+
+            // The Android android.database.sqlite.SQLiteDatabase findEditTable method
+            // finds the new cursor edit table name based upon the first space or comma.
+            // Fix (hopefully temporary) to wrap with the expected cursor type
+            int spacePosition = tableName.indexOf(' ');
+            if(spacePosition > 0){
+                tableCursors.put(tableName.substring(0, spacePosition), cursorWrapper);
+                tableCursors.put(quotedTableName.substring(0, quotedTableName.indexOf(' ')), cursorWrapper);
+            }
+
         }
         // Verify that the wrapper is not different from the existing
         else if (!existing.getClass().equals(cursorWrapper.getClass())) {
