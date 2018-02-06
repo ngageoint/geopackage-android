@@ -6,7 +6,12 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.0.1 (TBD)
 
-* TBD
+* Coverage Data extension (previously Elevation Extension)
+* RTree Index Extension minimal support (user functions not supported)
+* Tile Generator contents bounding box fix to use the requested bounds
+* Handle table names containing spaces within the cursor factory
+* GeoPackage creation example
+* geopackage-core version updated to 2.0.1
 
 ## [2.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/2.0.0) (11-20-2017)
 
