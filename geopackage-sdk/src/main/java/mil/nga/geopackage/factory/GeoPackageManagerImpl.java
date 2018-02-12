@@ -1077,7 +1077,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             metadata.setExternalPath(path);
             dataSource.create(metadata);
 
-            GeoPackage geoPackage = open(database);
+            GeoPackage geoPackage = open(database, false);
             if (geoPackage != null) {
                 try {
                     GeoPackageValidate.validateMinimumTables(geoPackage);
@@ -1326,7 +1326,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                         "Invalid GeoPackage database file", e);
             }
 
-            GeoPackage geoPackage = open(database);
+            GeoPackage geoPackage = open(database, false);
             if (geoPackage != null) {
                 try {
                     if (!geoPackage.getSpatialReferenceSystemDao()
