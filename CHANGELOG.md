@@ -10,6 +10,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * RTree Index Extension minimal support (user functions not supported)
 * Tile Generator contents bounding box fix to use the requested bounds
 * Handle table names containing spaces within the cursor factory
+* Open GeoPackage with writable flag option
 * GeoPackage creation example
 * geopackage-core version updated to 2.0.1
 

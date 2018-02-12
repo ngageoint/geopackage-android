@@ -392,10 +392,20 @@ public interface GeoPackageManager {
     /**
      * Open the database
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return open GeoPackage
      */
     public GeoPackage open(String database);
+
+    /**
+     * Open the database
+     *
+     * @param database database name
+     * @param writable true to open as writable, false as read only
+     * @return open GeoPackage
+     * @since 2.0.1
+     */
+    public GeoPackage open(String database, boolean writable);
 
     /**
      * Is import database header validation enabled.
