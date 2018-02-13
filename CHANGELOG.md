@@ -11,6 +11,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Tile Generator contents bounding box fix to use the requested bounds
 * Handle table names containing spaces within the cursor factory
 * Open GeoPackage with writable flag option
+* Turn off Android auto backup
 * GeoPackage creation example
 * geopackage-core version updated to 2.0.1
 
