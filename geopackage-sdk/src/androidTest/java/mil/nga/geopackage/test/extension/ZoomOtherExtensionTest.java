@@ -36,7 +36,7 @@ public class ZoomOtherExtensionTest extends CreateGeoPackageTestCase {
         assertEquals(extension.getExtensionNameNoAuthor(),
                 ZoomOtherExtension.NAME);
         assertEquals(extension.getTableName(), tableName);
-        assertEquals(extension.getColumnName(), TileTable.COLUMN_TILE_ROW);
+        assertEquals(extension.getColumnName(), TileTable.COLUMN_TILE_DATA);
         assertEquals(extension.getScope(), ExtensionScopeType.READ_WRITE);
         assertEquals(extension.getDefinition(), ZoomOtherExtension.DEFINITION);
 

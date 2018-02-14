@@ -781,22 +781,34 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public GeoPackage open(String database) {
+        return open(database, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage open(String database, boolean writable) {
 
         GeoPackage db = null;
 
         if (exists(database)) {
             GeoPackageCursorFactory cursorFactory = new GeoPackageCursorFactory();
             String path = null;
-            boolean writable = true;
-            SQLiteDatabase sqlite;
+            SQLiteDatabase sqlite = null;
             GeoPackageMetadata metadata = getGeoPackageMetadata(database);
             if (metadata != null && metadata.isExternal()) {
                 path = metadata.getExternalPath();
-                try {
-                    sqlite = SQLiteDatabase.openDatabase(path,
-                            cursorFactory, SQLiteDatabase.OPEN_READWRITE
-                                    | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-                } catch (Exception e) {
+                if(writable){
+                    try {
+                        sqlite = SQLiteDatabase.openDatabase(path,
+                                cursorFactory, SQLiteDatabase.OPEN_READWRITE
+                                        | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+                    } catch (Exception e) {
+                        Log.e(GeoPackageManagerImpl.class.getSimpleName(), "Failed to open database as writable: " + database, e);
+                    }
+                }
+                if(sqlite == null){
                     sqlite = SQLiteDatabase.openDatabase(path,
                             cursorFactory, SQLiteDatabase.OPEN_READONLY
                                     | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
@@ -1065,7 +1077,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             metadata.setExternalPath(path);
             dataSource.create(metadata);
 
-            GeoPackage geoPackage = open(database);
+            GeoPackage geoPackage = open(database, false);
             if (geoPackage != null) {
                 try {
                     GeoPackageValidate.validateMinimumTables(geoPackage);
@@ -1314,7 +1326,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                         "Invalid GeoPackage database file", e);
             }
 
-            GeoPackage geoPackage = open(database);
+            GeoPackage geoPackage = open(database, false);
             if (geoPackage != null) {
                 try {
                     if (!geoPackage.getSpatialReferenceSystemDao()
