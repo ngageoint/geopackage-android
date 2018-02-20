@@ -10,8 +10,11 @@ import android.util.Log;
 import org.osgeo.proj4j.ProjCoordinate;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionFactory;
@@ -77,6 +80,11 @@ public class TileCreator {
      * Flag indicating the the tile and request projections are the same
      */
     private final boolean sameProjection;
+
+    /**
+     * Tile Creator options
+     */
+    private TileCreatorOptions options;
 
     /**
      * Constructor, specified tile size and projection
@@ -203,6 +211,26 @@ public class TileCreator {
     }
 
     /**
+     * Get the tile creator options
+     *
+     * @return tile creator options
+     * @since 2.0.2
+     */
+    public TileCreatorOptions getOptions() {
+        return options;
+    }
+
+    /**
+     * Set the tile creator options
+     *
+     * @param options tile creator options
+     * @since 2.0.2
+     */
+    public void setOptions(TileCreatorOptions options) {
+        this.options = options;
+    }
+
+    /**
      * Check if the tile table contains a tile for the request bounding box
      *
      * @param requestBoundingBox request bounding box in the request projection
@@ -216,15 +244,20 @@ public class TileCreator {
         ProjectionTransform transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
         BoundingBox tilesBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
 
-        TileMatrix tileMatrix = getTileMatrix(tilesBoundingBox);
+        List<TileMatrix> tileMatrices = getTileMatrices(tilesBoundingBox);
 
-        TileCursor tileResults = retrieveTileResults(tilesBoundingBox, tileMatrix);
-        if (tileResults != null) {
+        for (int i = 0; !hasTile && i < tileMatrices.size(); i++) {
 
-            try {
-                hasTile = tileResults.getCount() > 0;
-            } finally {
-                tileResults.close();
+            TileMatrix tileMatrix = tileMatrices.get(i);
+
+            TileCursor tileResults = retrieveTileResults(tilesBoundingBox, tileMatrix);
+            if (tileResults != null) {
+
+                try {
+                    hasTile = tileResults.getCount() > 0;
+                } finally {
+                    tileResults.close();
+                }
             }
         }
 
@@ -245,65 +278,70 @@ public class TileCreator {
         ProjectionTransform transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
         BoundingBox tilesBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
 
-        TileMatrix tileMatrix = getTileMatrix(tilesBoundingBox);
+        List<TileMatrix> tileMatrices = getTileMatrices(tilesBoundingBox);
 
-        TileCursor tileResults = retrieveTileResults(tilesBoundingBox, tileMatrix);
-        if (tileResults != null) {
+        for (int i = 0; tile == null && i < tileMatrices.size(); i++) {
 
-            try {
+            TileMatrix tileMatrix = tileMatrices.get(i);
 
-                if (tileResults.getCount() > 0) {
+            TileCursor tileResults = retrieveTileResults(tilesBoundingBox, tileMatrix);
+            if (tileResults != null) {
 
-                    BoundingBox requestProjectedBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
+                try {
 
-                    // Determine the requested tile dimensions, or use the dimensions of a single tile matrix tile
-                    int requestedTileWidth = width != null ? width : (int) tileMatrix
-                            .getTileWidth();
-                    int requestedTileHeight = height != null ? height : (int) tileMatrix
-                            .getTileHeight();
+                    if (tileResults.getCount() > 0) {
 
-                    // Determine the size of the tile to initially draw
-                    int tileWidth = requestedTileWidth;
-                    int tileHeight = requestedTileHeight;
-                    if (!sameProjection) {
-                        tileWidth = (int) Math.round(
-                                (requestProjectedBoundingBox.getMaxLongitude() - requestProjectedBoundingBox.getMinLongitude())
-                                        / tileMatrix.getPixelXSize());
-                        tileHeight = (int) Math.round(
-                                (requestProjectedBoundingBox.getMaxLatitude() - requestProjectedBoundingBox.getMinLatitude())
-                                        / tileMatrix.getPixelYSize());
-                    }
+                        BoundingBox requestProjectedBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
 
-                    // Draw the resulting bitmap with the matching tiles
-                    Bitmap tileBitmap = drawTile(tileMatrix, tileResults, requestProjectedBoundingBox, tileWidth, tileHeight);
+                        // Determine the requested tile dimensions, or use the dimensions of a single tile matrix tile
+                        int requestedTileWidth = width != null ? width : (int) tileMatrix
+                                .getTileWidth();
+                        int requestedTileHeight = height != null ? height : (int) tileMatrix
+                                .getTileHeight();
 
-                    // Create the tile
-                    if (tileBitmap != null) {
-
-                        // Project the tile if needed
+                        // Determine the size of the tile to initially draw
+                        int tileWidth = requestedTileWidth;
+                        int tileHeight = requestedTileHeight;
                         if (!sameProjection) {
-                            Bitmap reprojectTile = reprojectTile(tileBitmap, requestedTileWidth, requestedTileHeight, requestBoundingBox, transformRequestToTiles, tilesBoundingBox);
-                            tileBitmap.recycle();
-                            tileBitmap = reprojectTile;
+                            tileWidth = (int) Math.round(
+                                    (requestProjectedBoundingBox.getMaxLongitude() - requestProjectedBoundingBox.getMinLongitude())
+                                            / tileMatrix.getPixelXSize());
+                            tileHeight = (int) Math.round(
+                                    (requestProjectedBoundingBox.getMaxLatitude() - requestProjectedBoundingBox.getMinLatitude())
+                                            / tileMatrix.getPixelYSize());
                         }
 
-                        try {
-                            byte[] tileData = BitmapConverter.toBytes(
-                                    tileBitmap, COMPRESS_FORMAT);
-                            tileBitmap.recycle();
-                            tile = new GeoPackageTile(requestedTileWidth, requestedTileHeight, tileData);
-                        } catch (IOException e) {
-                            Log.e(TileCreator.class.getSimpleName(), "Failed to create tile. min lat: "
-                                    + requestBoundingBox.getMinLatitude()
-                                    + ", max lat: " + requestBoundingBox.getMaxLatitude()
-                                    + ", min lon: " + requestBoundingBox.getMinLongitude() +
-                                    ", max lon: " + requestBoundingBox.getMaxLongitude(), e);
+                        // Draw the resulting bitmap with the matching tiles
+                        Bitmap tileBitmap = drawTile(tileMatrix, tileResults, requestProjectedBoundingBox, tileWidth, tileHeight);
+
+                        // Create the tile
+                        if (tileBitmap != null) {
+
+                            // Project the tile if needed
+                            if (!sameProjection) {
+                                Bitmap reprojectTile = reprojectTile(tileBitmap, requestedTileWidth, requestedTileHeight, requestBoundingBox, transformRequestToTiles, tilesBoundingBox);
+                                tileBitmap.recycle();
+                                tileBitmap = reprojectTile;
+                            }
+
+                            try {
+                                byte[] tileData = BitmapConverter.toBytes(
+                                        tileBitmap, COMPRESS_FORMAT);
+                                tileBitmap.recycle();
+                                tile = new GeoPackageTile(requestedTileWidth, requestedTileHeight, tileData);
+                            } catch (IOException e) {
+                                Log.e(TileCreator.class.getSimpleName(), "Failed to create tile. min lat: "
+                                        + requestBoundingBox.getMinLatitude()
+                                        + ", max lat: " + requestBoundingBox.getMaxLatitude()
+                                        + ", min lon: " + requestBoundingBox.getMinLongitude() +
+                                        ", max lon: " + requestBoundingBox.getMaxLongitude(), e);
+                            }
                         }
+
                     }
-
+                } finally {
+                    tileResults.close();
                 }
-            } finally {
-                tileResults.close();
             }
         }
 
@@ -438,14 +476,14 @@ public class TileCreator {
     }
 
     /**
-     * Get the tile matrix that contains the tiles for the bounding box, matches against the bounding box and zoom level
+     * Get the tile matrices that may contain the tiles for the bounding box, matches against the bounding box and zoom level options
      *
      * @param projectedRequestBoundingBox bounding box projected to the tiles
-     * @return tile matrix or null
+     * @return tile matrices
      */
-    private TileMatrix getTileMatrix(BoundingBox projectedRequestBoundingBox) {
+    private List<TileMatrix> getTileMatrices(BoundingBox projectedRequestBoundingBox) {
 
-        TileMatrix tileMatrix = null;
+        List<TileMatrix> tileMatrices = new ArrayList<>();
 
         // Check if the request overlaps the tile matrix set
         if (TileBoundingBoxUtils.overlap(projectedRequestBoundingBox,
@@ -460,16 +498,113 @@ public class TileCreator {
                     - projectedRequestBoundingBox.getMinLatitude();
 
             // Get the zoom level to request based upon the tile size
-            Long zoomLevel = tileDao
-                    .getZoomLevel(distanceWidth, distanceHeight);
+            Long requestZoomLevel = null;
+            if (options != null) {
+                // When options are provided, get the approximate zoom level regardless of whether a tile level exists
+                requestZoomLevel = tileDao.getApproximateZoomLevel(distanceWidth, distanceHeight);
+            } else {
+                // Get the closest existing zoom level
+                requestZoomLevel = tileDao.getZoomLevel(distanceWidth, distanceHeight);
+            }
 
             // If there is a matching zoom level
-            if (zoomLevel != null) {
-                tileMatrix = tileDao.getTileMatrix(zoomLevel);
+            if (requestZoomLevel != null) {
+
+                List<Long> zoomLevels = null;
+
+                // If options are configured, build the possible zoom levels in order to request
+                if (options != null && options.getType() != null) {
+
+                    // Find zoom in levels
+                    List<Long> zoomInLevels = new ArrayList<>();
+                    if (options.isZoomIn()) {
+                        for (long zoomLevel = requestZoomLevel + 1; zoomLevel <= requestZoomLevel + options.getZoomIn(); zoomLevel++) {
+                            zoomInLevels.add(zoomLevel);
+                        }
+                    }
+
+                    // Find zoom out levels
+                    List<Long> zoomOutLevels = new ArrayList<>();
+                    if (options.isZoomOut()) {
+                        for (long zoomLevel = requestZoomLevel - 1; zoomLevel >= requestZoomLevel - options.getZoomOut(); zoomLevel--) {
+                            zoomOutLevels.add(zoomLevel);
+                        }
+                    }
+
+                    if (zoomInLevels.isEmpty()) {
+                        // Only zooming out
+                        zoomLevels = zoomOutLevels;
+                    } else if (zoomOutLevels.isEmpty()) {
+                        // Only zooming in
+                        zoomLevels = zoomInLevels;
+                    } else {
+                        // Determine how to order the zoom in and zoom out levels
+                        TileCreatorOptionsType type = options.getType();
+                        switch (type) {
+                            case ZOOM_IN:
+                            case ZOOM_IN_BEFORE_OUT:
+                                // Order zoom in levels before zoom out levels
+                                zoomLevels = zoomInLevels;
+                                zoomLevels.addAll(zoomOutLevels);
+                                break;
+                            case ZOOM_OUT:
+                            case ZOOM_OUT_BEFORE_IN:
+                                // Order zoom out levels before zoom in levels
+                                zoomLevels = zoomOutLevels;
+                                zoomLevels.addAll(zoomInLevels);
+                                break;
+                            case ZOOM_CLOSEST_IN_BEFORE_OUT:
+                            case ZOOM_CLOSEST_OUT_BEFORE_IN:
+                                // Alternate the zoom in and out levels
+
+                                List<Long> firstLevels;
+                                List<Long> secondLevels;
+                                if (type == TileCreatorOptionsType.ZOOM_CLOSEST_IN_BEFORE_OUT) {
+                                    // Alternate starting with zoom in
+                                    firstLevels = zoomInLevels;
+                                    secondLevels = zoomOutLevels;
+                                } else {
+                                    // Alternate starting with zoom out
+                                    firstLevels = zoomOutLevels;
+                                    secondLevels = zoomInLevels;
+                                }
+
+                                zoomLevels = new ArrayList<>();
+                                int maxLevels = Math.max(firstLevels.size(), secondLevels.size());
+                                for (int i = 0; i < maxLevels; i++) {
+                                    if (i < firstLevels.size()) {
+                                        zoomLevels.add(firstLevels.get(i));
+                                    }
+                                    if (i < secondLevels.size()) {
+                                        zoomLevels.add(secondLevels.get(i));
+                                    }
+                                }
+
+                                break;
+                            default:
+                                throw new GeoPackageException("Unsupported " + TileCreatorOptionsType.class.getSimpleName()
+                                        + ": " + type);
+                        }
+                    }
+                } else {
+                    zoomLevels = new ArrayList<>();
+                }
+
+                // Always check the request zoom level first
+                zoomLevels.add(0, requestZoomLevel);
+
+                // Build a list of tile matrices that exist for the zoom levels
+                for (long zoomLevel : zoomLevels) {
+                    TileMatrix tileMatrix = tileDao.getTileMatrix(zoomLevel);
+                    if (tileMatrix != null) {
+                        tileMatrices.add(tileMatrix);
+                    }
+                }
+
             }
         }
 
-        return tileMatrix;
+        return tileMatrices;
     }
 
     /**

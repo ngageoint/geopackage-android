@@ -76,4 +76,24 @@ public class GeoPackageTileRetriever implements TileRetriever {
         return tile;
     }
 
+    /**
+     * Get the Tile Creator options
+     *
+     * @return tile creator options
+     * @since 2.0.2
+     */
+    public TileCreatorOptions getOptions() {
+        return tileCreator.getOptions();
+    }
+
+    /**
+     * Set the Tile Creator options
+     *
+     * @param options tile creator options
+     * @since 2.0.2
+     */
+    public void setOptions(TileCreatorOptions options) {
+        tileCreator.setOptions(options);
+    }
+
 }
