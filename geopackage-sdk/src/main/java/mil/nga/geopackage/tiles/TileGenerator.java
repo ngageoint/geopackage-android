@@ -300,7 +300,10 @@ public abstract class TileGenerator {
                 requestBoundingBox = boundingBox;
             } else {
                 ProjectionTransform transform = projection.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
-                requestBoundingBox = transform.transform(boundingBox);
+                requestBoundingBox = boundingBox;
+                if (!transform.isSameProjection()) {
+                    requestBoundingBox = transform.transform(requestBoundingBox);
+                }
             }
             for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
                 // Get the tile grid that includes the entire bounding box
@@ -535,7 +538,10 @@ public abstract class TileGenerator {
         BoundingBox previousContentsBoundingBox = contents.getBoundingBox();
         if (previousContentsBoundingBox != null) {
             ProjectionTransform transformProjectionToContents = projection.getTransformation(ProjectionFactory.getProjection(contents.getSrs()));
-            BoundingBox contentsBoundingBox = transformProjectionToContents.transform(boundingBox);
+            BoundingBox contentsBoundingBox = boundingBox;
+            if (!transformProjectionToContents.isSameProjection()) {
+                contentsBoundingBox = transformProjectionToContents.transform(contentsBoundingBox);
+            }
             contentsBoundingBox = TileBoundingBoxUtils.union(contentsBoundingBox, previousContentsBoundingBox);
 
             // Update the contents if modified
@@ -554,18 +560,29 @@ public abstract class TileGenerator {
 
             // Adjust the bounds to include the request and existing bounds
             ProjectionTransform transformProjectionToTileMatrixSet = projection.getTransformation(tileMatrixProjection);
-            BoundingBox updateBoundingBox = transformProjectionToTileMatrixSet.transform(boundingBox);
+            boolean sameProjection = transformProjectionToTileMatrixSet.isSameProjection();
+            BoundingBox updateBoundingBox = boundingBox;
+            if (!sameProjection) {
+                updateBoundingBox = transformProjectionToTileMatrixSet.transform(updateBoundingBox);
+            }
             int minNewOrUpdateZoom = Math.min(minZoom, (int) tileDao.getMinZoom());
             adjustBounds(updateBoundingBox, minNewOrUpdateZoom);
 
             // Update the tile matrix set if modified
-            BoundingBox updateTileGridBoundingBox = transformProjectionToTileMatrixSet.transform(tileGridBoundingBox);
+            BoundingBox updateTileGridBoundingBox = tileGridBoundingBox;
+            if (!sameProjection) {
+                updateTileGridBoundingBox = transformProjectionToTileMatrixSet.transform(updateTileGridBoundingBox);
+            }
             if (!previousTileMatrixSetBoundingBox.equals(updateTileGridBoundingBox)) {
                 updateTileGridBoundingBox = TileBoundingBoxUtils.union(updateTileGridBoundingBox, previousTileMatrixSetBoundingBox);
+                adjustBounds(updateTileGridBoundingBox, minNewOrUpdateZoom);
+                updateTileGridBoundingBox = tileGridBoundingBox;
+                if (!sameProjection) {
+                    updateTileGridBoundingBox = transformProjectionToTileMatrixSet.transform(updateTileGridBoundingBox);
+                }
                 tileMatrixSet.setBoundingBox(updateTileGridBoundingBox);
                 TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
                 tileMatrixSetDao.update(tileMatrixSet);
-                adjustBounds(updateTileGridBoundingBox, minNewOrUpdateZoom);
             }
 
             TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
@@ -620,9 +637,11 @@ public abstract class TileGenerator {
                                             zoomMatrixWidth, midLongitude);
 
                             // Update the tile row
-                            tileRow.setTileRow(newTileRow);
-                            tileRow.setTileColumn(newTileColumn);
-                            tileDao.update(tileRow);
+                            if (tileRow.getTileRow() != newTileRow || tileRow.getTileColumn() != newTileColumn) {
+                                tileRow.setTileRow(newTileRow);
+                                tileRow.setTileColumn(newTileColumn);
+                                tileDao.update(tileRow);
+                            }
                         }
                     } finally {
                         tileCursor.close();
