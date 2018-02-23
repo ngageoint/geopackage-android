@@ -39,6 +39,7 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
 
         FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
         indexer.index();
+        indexer.close();
 
         createTiles(featureTiles, 0, 1);
 

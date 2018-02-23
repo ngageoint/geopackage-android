@@ -149,6 +149,8 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
         TestCase.assertTrue(indexer.index(pointRow));
         assertTrue(indexer.isIndexed());
 
+        indexer.close();
+
         GeometryEnvelope envelope = new GeometryEnvelope();
         envelope.setMinX(minX);
         envelope.setMaxX(maxX);
