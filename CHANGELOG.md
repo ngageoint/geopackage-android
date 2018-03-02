@@ -6,7 +6,13 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.0.2 (TBD)
 
-* TBD
+* Tile Creator options for displaying missing tiles using nearby zoom levels
+* Tile DAO approximate zoom level methods
+* Tile Generator fix to save updated bounds in the Tile Matrix Set
+* Tile Generator projection transformations only when projections differ
+* GeoPackage import fix to close input stream on error cases
+* GeoPackage Metadata DB close backing database connection
+* geopackage-core version updated to 2.0.2
 
 ## [2.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/2.0.1) (02-14-2018)
 
