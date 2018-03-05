@@ -15,6 +15,8 @@ import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.extension.scale.TileScaling;
+import mil.nga.geopackage.extension.scale.TileScalingType;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionFactory;
@@ -82,9 +84,9 @@ public class TileCreator {
     private final boolean sameProjection;
 
     /**
-     * Tile Creator options
+     * Tile Scaling options
      */
-    private TileCreatorOptions options;
+    private TileScaling scaling;
 
     /**
      * Constructor, specified tile size and projection
@@ -211,23 +213,23 @@ public class TileCreator {
     }
 
     /**
-     * Get the tile creator options
+     * Get the tile scaling options
      *
-     * @return tile creator options
+     * @return tile scaling options
      * @since 2.0.2
      */
-    public TileCreatorOptions getOptions() {
-        return options;
+    public TileScaling getScaling() {
+        return scaling;
     }
 
     /**
-     * Set the tile creator options
+     * Set the tile scaling options
      *
-     * @param options tile creator options
+     * @param scaling tile scaling options
      * @since 2.0.2
      */
-    public void setOptions(TileCreatorOptions options) {
-        this.options = options;
+    public void setScaling(TileScaling scaling) {
+        this.scaling = scaling;
     }
 
     /**
@@ -499,7 +501,7 @@ public class TileCreator {
 
             // Get the zoom level to request based upon the tile size
             Long requestZoomLevel = null;
-            if (options != null) {
+            if (scaling != null) {
                 // When options are provided, get the approximate zoom level regardless of whether a tile level exists
                 requestZoomLevel = tileDao.getApproximateZoomLevel(distanceWidth, distanceHeight);
             } else {
@@ -513,20 +515,22 @@ public class TileCreator {
                 List<Long> zoomLevels = null;
 
                 // If options are configured, build the possible zoom levels in order to request
-                if (options != null && options.getType() != null) {
+                if (scaling != null && scaling.getScalingType() != null) {
 
                     // Find zoom in levels
                     List<Long> zoomInLevels = new ArrayList<>();
-                    if (options.isZoomIn()) {
-                        for (long zoomLevel = requestZoomLevel + 1; zoomLevel <= requestZoomLevel + options.getZoomIn(); zoomLevel++) {
+                    if (scaling.isZoomIn()) {
+                        long zoomIn = scaling.getZoomIn() != null ? requestZoomLevel + scaling.getZoomIn() : tileDao.getMaxZoom();
+                        for (long zoomLevel = requestZoomLevel + 1; zoomLevel <= zoomIn; zoomLevel++) {
                             zoomInLevels.add(zoomLevel);
                         }
                     }
 
                     // Find zoom out levels
                     List<Long> zoomOutLevels = new ArrayList<>();
-                    if (options.isZoomOut()) {
-                        for (long zoomLevel = requestZoomLevel - 1; zoomLevel >= requestZoomLevel - options.getZoomOut(); zoomLevel--) {
+                    if (scaling.isZoomOut()) {
+                        long zoomOut = scaling.getZoomOut() != null ? requestZoomLevel - scaling.getZoomOut() : tileDao.getMinZoom();
+                        for (long zoomLevel = requestZoomLevel - 1; zoomLevel >= zoomOut; zoomLevel--) {
                             zoomOutLevels.add(zoomLevel);
                         }
                     }
@@ -539,27 +543,27 @@ public class TileCreator {
                         zoomLevels = zoomInLevels;
                     } else {
                         // Determine how to order the zoom in and zoom out levels
-                        TileCreatorOptionsType type = options.getType();
+                        TileScalingType type = scaling.getScalingType();
                         switch (type) {
-                            case ZOOM_IN:
-                            case ZOOM_IN_BEFORE_OUT:
+                            case IN:
+                            case IN_OUT:
                                 // Order zoom in levels before zoom out levels
                                 zoomLevels = zoomInLevels;
                                 zoomLevels.addAll(zoomOutLevels);
                                 break;
-                            case ZOOM_OUT:
-                            case ZOOM_OUT_BEFORE_IN:
+                            case OUT:
+                            case OUT_IN:
                                 // Order zoom out levels before zoom in levels
                                 zoomLevels = zoomOutLevels;
                                 zoomLevels.addAll(zoomInLevels);
                                 break;
-                            case ZOOM_CLOSEST_IN_BEFORE_OUT:
-                            case ZOOM_CLOSEST_OUT_BEFORE_IN:
+                            case CLOSEST_IN_OUT:
+                            case CLOSEST_OUT_IN:
                                 // Alternate the zoom in and out levels
 
                                 List<Long> firstLevels;
                                 List<Long> secondLevels;
-                                if (type == TileCreatorOptionsType.ZOOM_CLOSEST_IN_BEFORE_OUT) {
+                                if (type == TileScalingType.CLOSEST_IN_OUT) {
                                     // Alternate starting with zoom in
                                     firstLevels = zoomInLevels;
                                     secondLevels = zoomOutLevels;
@@ -582,7 +586,7 @@ public class TileCreator {
 
                                 break;
                             default:
-                                throw new GeoPackageException("Unsupported " + TileCreatorOptionsType.class.getSimpleName()
+                                throw new GeoPackageException("Unsupported " + TileScalingType.class.getSimpleName()
                                         + ": " + type);
                         }
                     }

@@ -1,6 +1,7 @@
 package mil.nga.geopackage.tiles.retriever;
 
 import mil.nga.geopackage.BoundingBox;
+import mil.nga.geopackage.extension.scale.TileScaling;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.projection.ProjectionFactory;
@@ -77,23 +78,23 @@ public class GeoPackageTileRetriever implements TileRetriever {
     }
 
     /**
-     * Get the Tile Creator options
+     * Get the Tile Scaling options
      *
-     * @return tile creator options
+     * @return tile scaling options
      * @since 2.0.2
      */
-    public TileCreatorOptions getOptions() {
-        return tileCreator.getOptions();
+    public TileScaling getScaling() {
+        return tileCreator.getScaling();
     }
 
     /**
-     * Set the Tile Creator options
+     * Set the Tile Scaling options
      *
-     * @param options tile creator options
+     * @param scaling tile scaling options
      * @since 2.0.2
      */
-    public void setOptions(TileCreatorOptions options) {
-        tileCreator.setOptions(options);
+    public void setScaling(TileScaling scaling) {
+        tileCreator.setScaling(scaling);
     }
 
 }

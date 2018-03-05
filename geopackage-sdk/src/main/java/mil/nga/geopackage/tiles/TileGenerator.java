@@ -20,6 +20,8 @@ import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.geopackage.extension.scale.TileScaling;
+import mil.nga.geopackage.extension.scale.TileTableScaling;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.projection.Projection;
@@ -129,6 +131,11 @@ public abstract class TileGenerator {
      * Matrix width when GeoPackage tile format
      */
     private long matrixWidth = 0;
+
+    /**
+     * Tile scaling settings
+     */
+    private TileScaling scaling = null;
 
     /**
      * Constructor
@@ -288,6 +295,24 @@ public abstract class TileGenerator {
     }
 
     /**
+     * Get the tile scaling settings
+     *
+     * @return tile scaling
+     */
+    public TileScaling getScaling() {
+        return scaling;
+    }
+
+    /**
+     * Set the tile scaling settings
+     *
+     * @param scaling tile scaling
+     */
+    public void setScaling(TileScaling scaling) {
+        this.scaling = scaling;
+    }
+
+    /**
      * Get the tile count of tiles to be generated
      *
      * @return tile count
@@ -371,6 +396,12 @@ public abstract class TileGenerator {
         }
 
         preTileGeneration();
+
+        // If tile scaling is set, create the tile scaling extension entry
+        if (scaling != null) {
+            TileTableScaling tileTableScaling = new TileTableScaling(geoPackage, tileMatrixSet);
+            tileTableScaling.createOrUpdate(scaling);
+        }
 
         // Create the tiles
         try {
