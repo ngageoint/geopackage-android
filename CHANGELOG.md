@@ -6,7 +6,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 2.0.2 (TBD)
 
-* Tile Creator options for displaying missing tiles using nearby zoom levels
+* Tile Scaling extension for displaying missing tiles using nearby zoom levels
 * Tile DAO approximate zoom level methods
 * Tile Generator fix to save updated bounds in the Tile Matrix Set
 * Tile Generator projection transformations only when projections differ
