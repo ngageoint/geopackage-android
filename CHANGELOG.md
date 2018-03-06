@@ -7,6 +7,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 2.0.2 (TBD)
 
 * Tile Scaling extension for displaying missing tiles using nearby zoom levels
+* Skip tiles drawn from features when no features overlap the tile
 * Tile DAO approximate zoom level methods
 * Tile Generator fix to save updated bounds in the Tile Matrix Set
 * Tile Generator projection transformations only when projections differ

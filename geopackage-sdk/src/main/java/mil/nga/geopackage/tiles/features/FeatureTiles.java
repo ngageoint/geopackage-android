@@ -619,20 +619,22 @@ public abstract class FeatureTiles {
 
         try {
 
-            Long tileCount = null;
-            if (maxFeaturesPerTile != null) {
-                tileCount = results.count();
-            }
+            long tileCount = results.count();
 
-            if (maxFeaturesPerTile == null || tileCount <= maxFeaturesPerTile.longValue()) {
+            // Draw if at least one geometry exists
+            if (tileCount > 0) {
 
-                // Draw the tile bitmap
-                bitmap = drawTile(zoom, webMercatorBoundingBox, results);
+                if (maxFeaturesPerTile == null || tileCount <= maxFeaturesPerTile.longValue()) {
 
-            } else if (maxFeaturesTileDraw != null) {
+                    // Draw the tile bitmap
+                    bitmap = drawTile(zoom, webMercatorBoundingBox, results);
 
-                // Draw the max features tile
-                bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, tileCount, results);
+                } else if (maxFeaturesTileDraw != null) {
+
+                    // Draw the max features tile
+                    bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, tileCount, results);
+                }
+
             }
         } finally {
             results.close();
@@ -717,20 +719,22 @@ public abstract class FeatureTiles {
 
         try {
 
-            Integer totalCount = null;
-            if (maxFeaturesPerTile != null) {
-                totalCount = cursor.getCount();
-            }
+            int totalCount = cursor.getCount();
 
-            if (maxFeaturesPerTile == null || totalCount <= maxFeaturesPerTile) {
+            // Draw if at least one geometry exists
+            if (totalCount > 0) {
 
-                // Draw the tile bitmap
-                bitmap = drawTile(zoom, boundingBox, cursor);
+                if (maxFeaturesPerTile == null || totalCount <= maxFeaturesPerTile) {
 
-            } else if (maxFeaturesTileDraw != null) {
+                    // Draw the tile bitmap
+                    bitmap = drawTile(zoom, boundingBox, cursor);
 
-                // Draw the unindexed max features tile
-                bitmap = maxFeaturesTileDraw.drawUnindexedTile(tileWidth, tileHeight, totalCount, cursor);
+                } else if (maxFeaturesTileDraw != null) {
+
+                    // Draw the unindexed max features tile
+                    bitmap = maxFeaturesTileDraw.drawUnindexedTile(tileWidth, tileHeight, totalCount, cursor);
+                }
+
             }
         } finally {
             cursor.close();
