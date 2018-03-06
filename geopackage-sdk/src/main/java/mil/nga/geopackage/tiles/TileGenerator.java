@@ -298,6 +298,7 @@ public abstract class TileGenerator {
      * Get the tile scaling settings
      *
      * @return tile scaling
+     * @since 2.0.2
      */
     public TileScaling getScaling() {
         return scaling;
@@ -307,6 +308,7 @@ public abstract class TileGenerator {
      * Set the tile scaling settings
      *
      * @param scaling tile scaling
+     * @since 2.0.2
      */
     public void setScaling(TileScaling scaling) {
         this.scaling = scaling;
