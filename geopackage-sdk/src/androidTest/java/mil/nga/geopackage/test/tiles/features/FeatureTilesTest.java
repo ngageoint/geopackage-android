@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.db.FeatureIndexer;
+import mil.nga.geopackage.features.index.FeatureIndexManager;
+import mil.nga.geopackage.features.index.FeatureIndexType;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
@@ -33,16 +35,29 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
 
-        FeatureTileUtils.insertFeatures(geoPackage, featureDao);
+        int num = FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
         FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, geoPackage, featureDao);
 
-        FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
-        indexer.index();
-        indexer.close();
+        try {
+            FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
+            try {
+                indexer.index();
+            } finally {
+                indexer.close();
+            }
 
-        createTiles(featureTiles, 0, 1);
+            FeatureIndexManager indexManager = new FeatureIndexManager(activity, geoPackage, featureDao);
+            featureTiles.setIndexManager(indexManager);
 
+            indexManager.setIndexLocation(FeatureIndexType.GEOPACKAGE);
+            int indexed = indexManager.index();
+            assertEquals(num, indexed);
+
+            createTiles(featureTiles, 0, 2);
+        } finally {
+            featureTiles.close();
+        }
     }
 
     private void createTiles(FeatureTiles featureTiles, int minZoom, int maxZoom) {
@@ -56,9 +71,14 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
         for (int i = 0; i < tilesPerSide; i++) {
             for (int j = 0; j < tilesPerSide; j++) {
                 Bitmap bitmap = featureTiles.drawTile(i, j, zoom);
-                assertTrue(bitmap.getByteCount() > 0);
-                assertEquals(featureTiles.getTileWidth(), bitmap.getWidth());
-                assertEquals(featureTiles.getTileHeight(), bitmap.getHeight());
+                long count = featureTiles.queryIndexedFeaturesCount(i, j, zoom);
+                if(count > 0) {
+                    assertTrue(bitmap.getByteCount() > 0);
+                    assertEquals(featureTiles.getTileWidth(), bitmap.getWidth());
+                    assertEquals(featureTiles.getTileHeight(), bitmap.getHeight());
+                }else{
+                    assertNull(bitmap);
+                }
             }
         }
     }

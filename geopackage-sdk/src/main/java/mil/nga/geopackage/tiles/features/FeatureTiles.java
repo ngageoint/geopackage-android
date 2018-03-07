@@ -681,21 +681,39 @@ public abstract class FeatureTiles {
      */
     public FeatureIndexResults queryIndexedFeatures(BoundingBox webMercatorBoundingBox) {
 
-        // Create an expanded bounding box to handle features outside the tile that overlap
-        double minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, 0 - widthOverlap);
-        double maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, tileWidth + widthOverlap);
-        double maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
-        double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
-        BoundingBox expandedQueryBoundingBox = new BoundingBox(
-                minLongitude,
-                minLatitude,
-                maxLongitude,
-                maxLatitude);
+        // Create an expanded bounding box to handle features outside the tile
+        // that overlap
+        BoundingBox expandedQueryBoundingBox = expandBoundingBox(webMercatorBoundingBox);
 
         // Query for geometries matching the bounds in the index
         FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
 
         return results;
+    }
+
+    /**
+     * Create an expanded bounding box to handle features outside the tile that
+     * overlap
+     *
+     * @param webMercatorBoundingBox
+     * @return
+     */
+    protected BoundingBox expandBoundingBox(BoundingBox webMercatorBoundingBox) {
+
+        // Create an expanded bounding box to handle features outside the tile
+        // that overlap
+        double minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
+                tileWidth, webMercatorBoundingBox, 0 - widthOverlap);
+        double maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
+                tileWidth, webMercatorBoundingBox, tileWidth + widthOverlap);
+        double maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
+                tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
+        double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
+                tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
+        BoundingBox expandedQueryBoundingBox = new BoundingBox(minLongitude,
+                minLatitude, maxLongitude, maxLatitude);
+
+        return expandedQueryBoundingBox;
     }
 
     /**

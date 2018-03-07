@@ -63,17 +63,18 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * {@inheritDoc}
      */
     @Override
-    public Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, FeatureIndexResults results) {
+    public Bitmap drawTile(int zoom, BoundingBox boundingBox, FeatureIndexResults results) {
 
         // Create bitmap and canvas
         Bitmap bitmap = createNewBitmap();
         Canvas canvas = new Canvas(bitmap);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
         boolean drawn = false;
         for (FeatureRow featureRow : results) {
-            if (drawFeature(zoom, webMercatorBoundingBox, transform, canvas, featureRow)) {
+            if (drawFeature(zoom, boundingBox, expandedBoundingBox, transform, canvas, featureRow)) {
                 drawn = true;
             }
         }
@@ -96,11 +97,12 @@ public class DefaultFeatureTiles extends FeatureTiles {
         Canvas canvas = new Canvas(bitmap);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
         boolean drawn = false;
         while (cursor.moveToNext()) {
             FeatureRow row = cursor.getRow();
-            if (drawFeature(zoom, boundingBox, transform, canvas, row)) {
+            if (drawFeature(zoom, boundingBox, expandedBoundingBox, transform, canvas, row)) {
                 drawn = true;
             }
         }
@@ -124,10 +126,11 @@ public class DefaultFeatureTiles extends FeatureTiles {
         Canvas canvas = new Canvas(bitmap);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
         boolean drawn = false;
         for (FeatureRow row : featureRow) {
-            if (drawFeature(zoom, boundingBox, transform, canvas, row)) {
+            if (drawFeature(zoom, boundingBox, expandedBoundingBox, transform, canvas, row)) {
                 drawn = true;
             }
         }
@@ -143,14 +146,15 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Draw the feature on the canvas
      *
-     * @param zoom        zoom level
-     * @param boundingBox bounding box
-     * @param transform   projection transform
-     * @param canvas      canvas to draw on
-     * @param row         feature row
+     * @param zoom                zoom level
+     * @param boundingBox         bounding box
+     * @param expandedBoundingBox expanded bounding box
+     * @param transform           projection transform
+     * @param canvas              canvas to draw on
+     * @param row                 feature row
      * @return true if at least one feature was drawn
      */
-    private boolean drawFeature(int zoom, BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
+    private boolean drawFeature(int zoom, BoundingBox boundingBox, BoundingBox expandedBoundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
 
         boolean drawn = false;
 
@@ -167,7 +171,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                     BoundingBox geometryBoundingBox = new BoundingBox(envelope);
                     BoundingBox transformedBoundingBox = transform.transform(geometryBoundingBox);
 
-                    if (TileBoundingBoxUtils.overlap(boundingBox, transformedBoundingBox) != null) {
+                    if (TileBoundingBoxUtils.overlap(expandedBoundingBox, transformedBoundingBox, true) != null) {
 
                         double simplifyTolerance = TileBoundingBoxUtils.toleranceDistance(zoom, tileWidth, tileHeight);
                         drawShape(simplifyTolerance, boundingBox, transform, canvas, geometry);
