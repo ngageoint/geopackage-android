@@ -712,44 +712,47 @@ public abstract class CoverageData<TImage extends CoverageDataImage> extends Cov
                     for (int y = minDestY; y <= maxDestY; y++) {
                         for (int x = minDestX; x <= maxDestX; x++) {
 
-                            // Determine the coverage data based upon the
-                            // selected algorithm
-                            Double value = null;
-                            switch (algorithm) {
-                                case NEAREST_NEIGHBOR:
-                                    value = getNearestNeighborValue(
-                                            griddedTile, image, leftLastColumns,
-                                            topLeftRows, topRows, y, x, widthRatio,
-                                            heightRatio, dest.top,
-                                            dest.left, src.top,
-                                            src.left);
-                                    break;
-                                case BILINEAR:
-                                    value = getBilinearInterpolationValue(
-                                            griddedTile, image, leftLastColumns,
-                                            topLeftRows, topRows, y, x, widthRatio,
-                                            heightRatio, dest.top,
-                                            dest.left, src.top,
-                                            src.left);
-                                    break;
-                                case BICUBIC:
-                                    value = getBicubicInterpolationValue(
-                                            griddedTile, image, leftLastColumns,
-                                            topLeftRows, topRows, y, x, widthRatio,
-                                            heightRatio, dest.top,
-                                            dest.left, src.top,
-                                            src.left);
-                                    break;
-                                default:
-                                    throw new UnsupportedOperationException(
-                                            "Algorithm is not supported: "
-                                                    + algorithm);
-                            }
+                            if (values[y][x] == null) {
 
-                            if (value != null) {
-                                values[y][x] = value;
-                            }
+                                // Determine the coverage data based upon the
+                                // selected algorithm
+                                Double value = null;
+                                switch (algorithm) {
+                                    case NEAREST_NEIGHBOR:
+                                        value = getNearestNeighborValue(
+                                                griddedTile, image, leftLastColumns,
+                                                topLeftRows, topRows, y, x, widthRatio,
+                                                heightRatio, dest.top,
+                                                dest.left, src.top,
+                                                src.left);
+                                        break;
+                                    case BILINEAR:
+                                        value = getBilinearInterpolationValue(
+                                                griddedTile, image, leftLastColumns,
+                                                topLeftRows, topRows, y, x, widthRatio,
+                                                heightRatio, dest.top,
+                                                dest.left, src.top,
+                                                src.left);
+                                        break;
+                                    case BICUBIC:
+                                        value = getBicubicInterpolationValue(
+                                                griddedTile, image, leftLastColumns,
+                                                topLeftRows, topRows, y, x, widthRatio,
+                                                heightRatio, dest.top,
+                                                dest.left, src.top,
+                                                src.left);
+                                        break;
+                                    default:
+                                        throw new UnsupportedOperationException(
+                                                "Algorithm is not supported: "
+                                                        + algorithm);
+                                }
 
+                                if (value != null) {
+                                    values[y][x] = value;
+                                }
+
+                            }
                         }
                     }
 
