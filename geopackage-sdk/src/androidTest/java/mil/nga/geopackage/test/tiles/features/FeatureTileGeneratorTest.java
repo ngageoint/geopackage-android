@@ -109,15 +109,15 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
     public void testTileGenerator(boolean index, boolean useIcon,
                                   boolean maxFeatures) throws IOException, SQLException {
 
-        int minZoom = 3;
-        int maxZoom = 3;
+        int minZoom = 0;
+        int maxZoom = 4;
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
 
         int num = FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
         FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(
-                activity, geoPackage, featureDao);
+                activity, geoPackage, featureDao, useIcon);
         try {
 
             if (index) {

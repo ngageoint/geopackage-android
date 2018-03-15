@@ -32,12 +32,30 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
      * @throws java.sql.SQLException
      */
     public void testFeatureTiles() throws SQLException {
+        testFeatureTiles(false);
+    }
+
+    /**
+     * Test feature tiles
+     *
+     * @throws java.sql.SQLException
+     */
+    public void testFeatureTilesWithIcon() throws SQLException {
+        testFeatureTiles(true);
+    }
+
+    /**
+     * Test feature tiles
+     *
+     * @throws java.sql.SQLException
+     */
+    public void testFeatureTiles(boolean useIcon) throws SQLException {
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
 
         int num = FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
-        FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, geoPackage, featureDao);
+        FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, geoPackage, featureDao, useIcon);
 
         try {
             FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
@@ -54,7 +72,7 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
             int indexed = indexManager.index();
             assertEquals(num, indexed);
 
-            createTiles(featureTiles, 0, 2);
+            createTiles(featureTiles, 0, 3);
         } finally {
             featureTiles.close();
         }
