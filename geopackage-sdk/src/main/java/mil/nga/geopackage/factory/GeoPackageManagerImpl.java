@@ -706,9 +706,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             connection.connect();
 
             int responseCode = connection.getResponseCode();
-            if(responseCode == HttpURLConnection.HTTP_MOVED_PERM
+            if (responseCode == HttpURLConnection.HTTP_MOVED_PERM
                     || responseCode == HttpURLConnection.HTTP_MOVED_TEMP
-                    || responseCode == HttpURLConnection.HTTP_SEE_OTHER){
+                    || responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
                 String redirect = connection.getHeaderField("Location");
                 connection.disconnect();
                 url = new URL(redirect);
@@ -799,7 +799,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             GeoPackageMetadata metadata = getGeoPackageMetadata(database);
             if (metadata != null && metadata.isExternal()) {
                 path = metadata.getExternalPath();
-                if(writable){
+                if (writable) {
                     try {
                         sqlite = SQLiteDatabase.openDatabase(path,
                                 cursorFactory, SQLiteDatabase.OPEN_READWRITE
@@ -808,7 +808,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                         Log.e(GeoPackageManagerImpl.class.getSimpleName(), "Failed to open database as writable: " + database, e);
                     }
                 }
-                if(sqlite == null){
+                if (sqlite == null) {
                     sqlite = SQLiteDatabase.openDatabase(path,
                             cursorFactory, SQLiteDatabase.OPEN_READONLY
                                     | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
@@ -1272,28 +1272,34 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     private boolean importGeoPackage(String database, boolean override,
                                      InputStream geoPackageStream, GeoPackageProgress progress) {
 
-        if (exists(database)) {
-            if (override) {
-                if (!delete(database)) {
-                    throw new GeoPackageException(
-                            "Failed to delete existing database: " + database);
-                }
-            } else {
-                throw new GeoPackageException(
-                        "GeoPackage database already exists: " + database);
-            }
-        }
-
-        // Copy the geopackage over as a database
-        File newDbFile = context.getDatabasePath(database);
         try {
-            SQLiteDatabase db = context.openOrCreateDatabase(database,
-                    Context.MODE_PRIVATE, null);
-            db.close();
-            GeoPackageIOUtils.copyStream(geoPackageStream, newDbFile, progress);
-        } catch (IOException e) {
-            throw new GeoPackageException(
-                    "Failed to import GeoPackage database: " + database, e);
+
+            if (exists(database)) {
+                if (override) {
+                    if (!delete(database)) {
+                        throw new GeoPackageException(
+                                "Failed to delete existing database: " + database);
+                    }
+                } else {
+                    throw new GeoPackageException(
+                            "GeoPackage database already exists: " + database);
+                }
+            }
+
+            // Copy the geopackage over as a database
+            File newDbFile = context.getDatabasePath(database);
+            try {
+                SQLiteDatabase db = context.openOrCreateDatabase(database,
+                        Context.MODE_PRIVATE, null);
+                db.close();
+                GeoPackageIOUtils.copyStream(geoPackageStream, newDbFile, progress);
+            } catch (IOException e) {
+                throw new GeoPackageException(
+                        "Failed to import GeoPackage database: " + database, e);
+            }
+
+        } finally {
+            GeoPackageIOUtils.closeQuietly(geoPackageStream);
         }
 
         if (progress == null || progress.isActive()) {

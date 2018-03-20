@@ -1,12 +1,19 @@
-#Change Log
+# Change Log
 All notable changes to this project will be documented in this file.
 Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 2.0.2 (TBD)
+## [2.0.2](https://github.com/ngageoint/geopackage-android/releases/tag/2.0.2) (03-20-2018)
 
-* TBD
+* Tile Scaling extension for displaying missing tiles using nearby zoom levels
+* Skip tiles drawn from features when no features overlap the tile
+* Tile DAO approximate zoom level methods
+* Tile Generator fix to save updated bounds in the Tile Matrix Set
+* Tile Generator projection transformations only when projections differ
+* GeoPackage import fix to close input stream on error cases
+* GeoPackage Metadata DB close backing database connection
+* geopackage-core version updated to 2.0.2
 
 ## [2.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/2.0.1) (02-14-2018)
 

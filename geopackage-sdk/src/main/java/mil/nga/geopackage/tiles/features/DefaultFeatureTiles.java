@@ -21,6 +21,7 @@ import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.wkb.geom.CompoundCurve;
 import mil.nga.wkb.geom.Geometry;
 import mil.nga.wkb.geom.GeometryCollection;
+import mil.nga.wkb.geom.GeometryEnvelope;
 import mil.nga.wkb.geom.LineString;
 import mil.nga.wkb.geom.MultiLineString;
 import mil.nga.wkb.geom.MultiPoint;
@@ -28,6 +29,7 @@ import mil.nga.wkb.geom.MultiPolygon;
 import mil.nga.wkb.geom.Point;
 import mil.nga.wkb.geom.Polygon;
 import mil.nga.wkb.geom.PolyhedralSurface;
+import mil.nga.wkb.util.GeometryEnvelopeBuilder;
 
 /**
  * Default Feature Tiles implementation using Android Graphics to draw tiles
@@ -61,16 +63,25 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * {@inheritDoc}
      */
     @Override
-    public Bitmap drawTile(int zoom, BoundingBox webMercatorBoundingBox, FeatureIndexResults results) {
+    public Bitmap drawTile(int zoom, BoundingBox boundingBox, FeatureIndexResults results) {
 
         // Create bitmap and canvas
         Bitmap bitmap = createNewBitmap();
         Canvas canvas = new Canvas(bitmap);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
+        boolean drawn = false;
         for (FeatureRow featureRow : results) {
-            drawFeature(zoom, webMercatorBoundingBox, transform, canvas, featureRow);
+            if (drawFeature(zoom, boundingBox, expandedBoundingBox, transform, canvas, featureRow)) {
+                drawn = true;
+            }
+        }
+
+        if (!drawn) {
+            bitmap.recycle();
+            bitmap = null;
         }
 
         return bitmap;
@@ -86,13 +97,21 @@ public class DefaultFeatureTiles extends FeatureTiles {
         Canvas canvas = new Canvas(bitmap);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
+        boolean drawn = false;
         while (cursor.moveToNext()) {
             FeatureRow row = cursor.getRow();
-            drawFeature(zoom, boundingBox, transform, canvas, row);
+            if (drawFeature(zoom, boundingBox, expandedBoundingBox, transform, canvas, row)) {
+                drawn = true;
+            }
         }
 
         cursor.close();
+        if (!drawn) {
+            bitmap.recycle();
+            bitmap = null;
+        }
 
         return bitmap;
     }
@@ -107,9 +126,18 @@ public class DefaultFeatureTiles extends FeatureTiles {
         Canvas canvas = new Canvas(bitmap);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
+        boolean drawn = false;
         for (FeatureRow row : featureRow) {
-            drawFeature(zoom, boundingBox, transform, canvas, row);
+            if (drawFeature(zoom, boundingBox, expandedBoundingBox, transform, canvas, row)) {
+                drawn = true;
+            }
+        }
+
+        if (!drawn) {
+            bitmap.recycle();
+            bitmap = null;
         }
 
         return bitmap;
@@ -118,24 +146,46 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Draw the feature on the canvas
      *
-     * @param zoom        zoom level
-     * @param boundingBox
-     * @param transform
-     * @param canvas
-     * @param row
+     * @param zoom                zoom level
+     * @param boundingBox         bounding box
+     * @param expandedBoundingBox expanded bounding box
+     * @param transform           projection transform
+     * @param canvas              canvas to draw on
+     * @param row                 feature row
+     * @return true if at least one feature was drawn
      */
-    private void drawFeature(int zoom, BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
+    private boolean drawFeature(int zoom, BoundingBox boundingBox, BoundingBox expandedBoundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
+
+        boolean drawn = false;
+
         try {
             GeoPackageGeometryData geomData = row.getGeometry();
             if (geomData != null) {
                 Geometry geometry = geomData.getGeometry();
-                double simplifyTolerance = TileBoundingBoxUtils.toleranceDistance(zoom, tileWidth, tileHeight);
-                drawShape(simplifyTolerance, boundingBox, transform, canvas, geometry);
+                if (geometry != null) {
+
+                    GeometryEnvelope envelope = geomData.getEnvelope();
+                    if (envelope == null) {
+                        envelope = GeometryEnvelopeBuilder.buildEnvelope(geometry);
+                    }
+                    BoundingBox geometryBoundingBox = new BoundingBox(envelope);
+                    BoundingBox transformedBoundingBox = transform.transform(geometryBoundingBox);
+
+                    if (TileBoundingBoxUtils.overlap(expandedBoundingBox, transformedBoundingBox, true) != null) {
+
+                        double simplifyTolerance = TileBoundingBoxUtils.toleranceDistance(zoom, tileWidth, tileHeight);
+                        drawShape(simplifyTolerance, boundingBox, transform, canvas, geometry);
+
+                        drawn = true;
+                    }
+                }
             }
         } catch (Exception e) {
             Log.e(DefaultFeatureTiles.class.getSimpleName(), "Failed to draw feature in tile. Table: "
                     + featureDao.getTableName(), e);
         }
+
+        return drawn;
     }
 
     /**

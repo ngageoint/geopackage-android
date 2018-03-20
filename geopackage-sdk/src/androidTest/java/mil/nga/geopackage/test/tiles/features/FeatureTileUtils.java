@@ -94,16 +94,19 @@ public class FeatureTileUtils {
      *
      * @return
      */
-    public static FeatureTiles createFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
+    public static FeatureTiles createFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, boolean useIcon) {
 
         FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao);
 
         Paint pointPaint = featureTiles.getPointPaint();
-        //pointPaint.setColor(Color.BLUE);
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), mil.nga.geopackage.test.R.drawable.ic_launcher);
-        bitmap = Bitmap.createScaledBitmap(bitmap, 25, 25, false);
-        FeatureTilePointIcon icon = new FeatureTilePointIcon(bitmap);
-        featureTiles.setPointIcon(icon);
+        if (useIcon) {
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), mil.nga.geopackage.test.R.drawable.ic_launcher);
+            bitmap = Bitmap.createScaledBitmap(bitmap, 25, 25, false);
+            FeatureTilePointIcon icon = new FeatureTilePointIcon(bitmap);
+            featureTiles.setPointIcon(icon);
+        } else {
+            pointPaint.setColor(Color.BLUE);
+        }
 
         Paint linePaint = featureTiles.getLinePaint();
         linePaint.setColor(Color.GREEN);

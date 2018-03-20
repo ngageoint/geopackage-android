@@ -212,6 +212,8 @@ public class FeatureIndexManagerUtils {
             featureIndexResults.close();
             TestCase.assertTrue(featureFound);
             TestCase.assertTrue(resultCount >= 1);
+
+            featureIndexManager.close();
         }
 
         // Delete the extensions
@@ -243,6 +245,8 @@ public class FeatureIndexManagerUtils {
 
             TestCase.assertFalse(featureIndexManager.isIndexed());
             everyOther = !everyOther;
+
+            featureIndexManager.close();
         }
 
     }

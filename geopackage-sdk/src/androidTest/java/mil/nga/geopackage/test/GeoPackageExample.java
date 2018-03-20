@@ -715,6 +715,7 @@ public class GeoPackageExample extends BaseTestCase {
             FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
             indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
             indexer.index();
+            indexer.close();
         }
 
     }
@@ -752,6 +753,7 @@ public class GeoPackageExample extends BaseTestCase {
                     requestBoundingBox, requestProjection);
 
             tileGenerator.generateTiles();
+            featureTiles.close();
         }
     }
 

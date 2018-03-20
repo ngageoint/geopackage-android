@@ -84,7 +84,10 @@ public class GeoPackageMetadataDb extends SQLiteOpenHelper {
     @Override
     public void close() {
         super.close();
-        db = null;
+        if(db != null) {
+            db.close();
+            db = null;
+        }
     }
 
 }

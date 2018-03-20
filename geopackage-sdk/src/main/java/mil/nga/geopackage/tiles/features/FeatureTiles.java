@@ -619,20 +619,22 @@ public abstract class FeatureTiles {
 
         try {
 
-            Long tileCount = null;
-            if (maxFeaturesPerTile != null) {
-                tileCount = results.count();
-            }
+            long tileCount = results.count();
 
-            if (maxFeaturesPerTile == null || tileCount <= maxFeaturesPerTile.longValue()) {
+            // Draw if at least one geometry exists
+            if (tileCount > 0) {
 
-                // Draw the tile bitmap
-                bitmap = drawTile(zoom, webMercatorBoundingBox, results);
+                if (maxFeaturesPerTile == null || tileCount <= maxFeaturesPerTile.longValue()) {
 
-            } else if (maxFeaturesTileDraw != null) {
+                    // Draw the tile bitmap
+                    bitmap = drawTile(zoom, webMercatorBoundingBox, results);
 
-                // Draw the max features tile
-                bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, tileCount, results);
+                } else if (maxFeaturesTileDraw != null) {
+
+                    // Draw the max features tile
+                    bitmap = maxFeaturesTileDraw.drawTile(tileWidth, tileHeight, tileCount, results);
+                }
+
             }
         } finally {
             results.close();
@@ -679,21 +681,39 @@ public abstract class FeatureTiles {
      */
     public FeatureIndexResults queryIndexedFeatures(BoundingBox webMercatorBoundingBox) {
 
-        // Create an expanded bounding box to handle features outside the tile that overlap
-        double minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, 0 - widthOverlap);
-        double maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(tileWidth, webMercatorBoundingBox, tileWidth + widthOverlap);
-        double maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
-        double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
-        BoundingBox expandedQueryBoundingBox = new BoundingBox(
-                minLongitude,
-                minLatitude,
-                maxLongitude,
-                maxLatitude);
+        // Create an expanded bounding box to handle features outside the tile
+        // that overlap
+        BoundingBox expandedQueryBoundingBox = expandBoundingBox(webMercatorBoundingBox);
 
         // Query for geometries matching the bounds in the index
         FeatureIndexResults results = indexManager.query(expandedQueryBoundingBox, WEB_MERCATOR_PROJECTION);
 
         return results;
+    }
+
+    /**
+     * Create an expanded bounding box to handle features outside the tile that
+     * overlap
+     *
+     * @param webMercatorBoundingBox
+     * @return
+     */
+    protected BoundingBox expandBoundingBox(BoundingBox webMercatorBoundingBox) {
+
+        // Create an expanded bounding box to handle features outside the tile
+        // that overlap
+        double minLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
+                tileWidth, webMercatorBoundingBox, 0 - widthOverlap);
+        double maxLongitude = TileBoundingBoxUtils.getLongitudeFromPixel(
+                tileWidth, webMercatorBoundingBox, tileWidth + widthOverlap);
+        double maxLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
+                tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
+        double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
+                tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
+        BoundingBox expandedQueryBoundingBox = new BoundingBox(minLongitude,
+                minLatitude, maxLongitude, maxLatitude);
+
+        return expandedQueryBoundingBox;
     }
 
     /**
@@ -717,20 +737,22 @@ public abstract class FeatureTiles {
 
         try {
 
-            Integer totalCount = null;
-            if (maxFeaturesPerTile != null) {
-                totalCount = cursor.getCount();
-            }
+            int totalCount = cursor.getCount();
 
-            if (maxFeaturesPerTile == null || totalCount <= maxFeaturesPerTile) {
+            // Draw if at least one geometry exists
+            if (totalCount > 0) {
 
-                // Draw the tile bitmap
-                bitmap = drawTile(zoom, boundingBox, cursor);
+                if (maxFeaturesPerTile == null || totalCount <= maxFeaturesPerTile) {
 
-            } else if (maxFeaturesTileDraw != null) {
+                    // Draw the tile bitmap
+                    bitmap = drawTile(zoom, boundingBox, cursor);
 
-                // Draw the unindexed max features tile
-                bitmap = maxFeaturesTileDraw.drawUnindexedTile(tileWidth, tileHeight, totalCount, cursor);
+                } else if (maxFeaturesTileDraw != null) {
+
+                    // Draw the unindexed max features tile
+                    bitmap = maxFeaturesTileDraw.drawUnindexedTile(tileWidth, tileHeight, totalCount, cursor);
+                }
+
             }
         } finally {
             cursor.close();

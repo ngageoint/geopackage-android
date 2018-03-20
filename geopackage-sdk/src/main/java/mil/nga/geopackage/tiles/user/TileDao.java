@@ -337,10 +337,8 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     /**
      * Get the zoom level for the provided width and height in the default units
      *
-     * @param width
-     *            in default units
-     * @param height
-     *            in default units
+     * @param width  in default units
+     * @param height in default units
      * @return zoom level
      * @since 1.3.1
      */
@@ -355,8 +353,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the closest zoom level for the provided width and height in the
      * default units
      *
-     * @param length
-     *            in default units
+     * @param length in default units
      * @return zoom level
      * @since 1.3.1
      */
@@ -371,10 +368,8 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the closest zoom level for the provided width and height in the
      * default units
      *
-     * @param width
-     *            in default units
-     * @param height
-     *            in default units
+     * @param width  in default units
+     * @param height in default units
      * @return zoom level
      * @since 1.3.1
      */
@@ -386,9 +381,44 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     }
 
     /**
+     * Get the approximate zoom level for the provided length in the default
+     * units. Tiles may or may not exist for the returned zoom level. The
+     * approximate zoom level is determined using a factor of 2 from the zoom
+     * levels with tiles.
+     *
+     * @param length length in default units
+     * @return approximate zoom level
+     * @since 2.0.2
+     */
+    public Long getApproximateZoomLevel(double length) {
+
+        Long zoomLevel = TileDaoUtils.getApproximateZoomLevel(widths, heights,
+                tileMatrices, length);
+        return zoomLevel;
+    }
+
+    /**
+     * Get the approximate zoom level for the provided width and height in the
+     * default units. Tiles may or may not exist for the returned zoom level.
+     * The approximate zoom level is determined using a factor of 2 from the
+     * zoom levels with tiles.
+     *
+     * @param width  width in default units
+     * @param height height in default units
+     * @return approximate zoom level
+     * @since 2.0.2
+     */
+    public Long getApproximateZoomLevel(double width, double height) {
+
+        Long zoomLevel = TileDaoUtils.getApproximateZoomLevel(widths, heights,
+                tileMatrices, width, height);
+        return zoomLevel;
+    }
+
+    /**
      * Query by tile grid and zoom level
      *
-     * @param tileGrid tile grid
+     * @param tileGrid  tile grid
      * @param zoomLevel zoom level
      * @return cursor from query or null if the zoom level tile ranges do not
      * overlap the bounding box
@@ -400,18 +430,15 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     /**
      * Query by tile grid and zoom level
      *
-     * @param tileGrid
-     *            tile grid
-     * @param zoomLevel
-     *            zoom level
-     * @param orderBy
-     *            order by
+     * @param tileGrid  tile grid
+     * @param zoomLevel zoom level
+     * @param orderBy   order by
      * @return cursor from query or null if the zoom level tile ranges do not
-     *         overlap the bounding box
+     * overlap the bounding box
      * @since 1.3.1
      */
     public TileCursor queryByTileGrid(TileGrid tileGrid, long zoomLevel,
-                                         String orderBy) {
+                                      String orderBy) {
 
         TileCursor tileCursor = null;
 

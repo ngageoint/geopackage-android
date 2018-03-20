@@ -392,66 +392,69 @@ public class CoverageDataTestUtils {
             TileCursor tileCursor = tileDao.queryForTile(tileDao
                     .getMaxZoom());
             TestCase.assertNotNull(tileCursor);
-            TestCase.assertTrue(tileCursor.getCount() > 0);
-            while (tileCursor.moveToNext()) {
-                TileRow tileRow = tileCursor.getRow();
+            try {
+                TestCase.assertTrue(tileCursor.getCount() > 0);
+                while (tileCursor.moveToNext()) {
+                    TileRow tileRow = tileCursor.getRow();
 
-                TileMatrix tileMatrix = tileDao.getTileMatrix(tileRow
-                        .getZoomLevel());
-                TestCase.assertNotNull(tileMatrix);
+                    TileMatrix tileMatrix = tileDao.getTileMatrix(tileRow
+                            .getZoomLevel());
+                    TestCase.assertNotNull(tileMatrix);
 
-                GriddedTile griddedTile = coverageData.getGriddedTile(tileRow
-                        .getId());
-                TestCase.assertNotNull(griddedTile);
+                    GriddedTile griddedTile = coverageData.getGriddedTile(tileRow
+                            .getId());
+                    TestCase.assertNotNull(griddedTile);
 
-                byte[] tileData = tileRow.getTileData();
-                TestCase.assertNotNull(tileData);
+                    byte[] tileData = tileRow.getTileData();
+                    TestCase.assertNotNull(tileData);
 
-                BoundingBox boundingBox = TileBoundingBoxUtils.getBoundingBox(
-                        tileMatrixSet.getBoundingBox(), tileMatrix,
-                        tileRow.getTileColumn(), tileRow.getTileRow());
+                    BoundingBox boundingBox = TileBoundingBoxUtils.getBoundingBox(
+                            tileMatrixSet.getBoundingBox(), tileMatrix,
+                            tileRow.getTileColumn(), tileRow.getTileRow());
 
-                int tileHeight = (int) tileMatrix.getTileHeight();
-                int tileWidth = (int) tileMatrix.getTileWidth();
+                    int tileHeight = (int) tileMatrix.getTileHeight();
+                    int tileWidth = (int) tileMatrix.getTileWidth();
 
-                int heightChunk = Math.max(tileHeight / 10, 1);
-                int widthChunk = Math.max(tileWidth / 10, 1);
+                    int heightChunk = Math.max(tileHeight / 10, 1);
+                    int widthChunk = Math.max(tileWidth / 10, 1);
 
-                for (int y = 0; y < tileHeight; y = Math.min(y + heightChunk,
-                        y == tileHeight - 1 ? tileHeight : tileHeight - 1)) {
-                    for (int x = 0; x < tileWidth; x = Math.min(x + widthChunk,
-                            x == tileWidth - 1 ? tileWidth : tileWidth - 1)) {
+                    for (int y = 0; y < tileHeight; y = Math.min(y + heightChunk,
+                            y == tileHeight - 1 ? tileHeight : tileHeight - 1)) {
+                        for (int x = 0; x < tileWidth; x = Math.min(x + widthChunk,
+                                x == tileWidth - 1 ? tileWidth : tileWidth - 1)) {
 
-                        Double pixelValue = coverageData.getValue(griddedTile,
-                                tileData, x, y);
-                        double pixelLongitude = boundingBox.getMinLongitude()
-                                + (x * tileMatrix.getPixelXSize());
-                        double pixelLatitude = boundingBox.getMaxLatitude()
-                                - (y * tileMatrix.getPixelYSize());
-                        switch (encoding) {
-                            case CENTER:
-                            case AREA:
-                                pixelLongitude += (tileMatrix.getPixelXSize() / 2.0);
-                                pixelLatitude -= (tileMatrix.getPixelYSize() / 2.0);
-                                break;
-                            case CORNER:
-                                pixelLatitude -= tileMatrix.getPixelYSize();
-                                break;
-                        }
-                        Double value = coverageData.getValue(pixelLatitude,
-                                pixelLongitude);
+                            Double pixelValue = coverageData.getValue(griddedTile,
+                                    tileData, x, y);
+                            double pixelLongitude = boundingBox.getMinLongitude()
+                                    + (x * tileMatrix.getPixelXSize());
+                            double pixelLatitude = boundingBox.getMaxLatitude()
+                                    - (y * tileMatrix.getPixelYSize());
+                            switch (encoding) {
+                                case CENTER:
+                                case AREA:
+                                    pixelLongitude += (tileMatrix.getPixelXSize() / 2.0);
+                                    pixelLatitude -= (tileMatrix.getPixelYSize() / 2.0);
+                                    break;
+                                case CORNER:
+                                    pixelLatitude -= tileMatrix.getPixelYSize();
+                                    break;
+                            }
+                            Double value = coverageData.getValue(pixelLatitude,
+                                    pixelLongitude);
 
-                        if (!allowNulls || pixelValue != null) {
-                            TestCase.assertEquals("x: " + x + ", y: " + y
-                                            + ", encoding: " + encoding, pixelValue,
-                                    value);
+                            if (!allowNulls || pixelValue != null) {
+                                TestCase.assertEquals("x: " + x + ", y: " + y
+                                                + ", encoding: " + encoding, pixelValue,
+                                        value);
+                            }
                         }
                     }
-                }
 
-                break;
+                    break;
+                }
+            }finally {
+                tileCursor.close();
             }
-            tileCursor.close();
         }
 
     }
