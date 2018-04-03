@@ -17,8 +17,8 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.geopackage.test.tiles.features.FeatureTileUtils;
-import mil.nga.wkb.geom.GeometryEnvelope;
-import mil.nga.wkb.geom.GeometryType;
+import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.GeometryType;
 
 /**
  * Test table indexer

@@ -84,18 +84,19 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
-import mil.nga.wkb.geom.CircularString;
-import mil.nga.wkb.geom.CompoundCurve;
-import mil.nga.wkb.geom.CurvePolygon;
-import mil.nga.wkb.geom.Geometry;
-import mil.nga.wkb.geom.GeometryEnvelope;
-import mil.nga.wkb.geom.GeometryType;
-import mil.nga.wkb.geom.LineString;
-import mil.nga.wkb.geom.MultiLineString;
-import mil.nga.wkb.geom.MultiPolygon;
-import mil.nga.wkb.geom.Point;
-import mil.nga.wkb.geom.Polygon;
-import mil.nga.wkb.util.GeometryEnvelopeBuilder;
+import mil.nga.sf.CircularString;
+import mil.nga.sf.CompoundCurve;
+import mil.nga.sf.CurvePolygon;
+import mil.nga.sf.Geometry;
+import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.GeometryType;
+import mil.nga.sf.LineString;
+import mil.nga.sf.MultiLineString;
+import mil.nga.sf.MultiPolygon;
+import mil.nga.sf.Point;
+import mil.nga.sf.Polygon;
+import mil.nga.sf.util.GeometryEnvelopeBuilder;
+import mil.nga.sf.wkb.GeometryCodes;
 
 /**
  * Creates an example GeoPackage file
@@ -908,10 +909,9 @@ public class GeoPackageExample extends BaseTestCase {
         circularString.addPoint(new Point(-122.358, 47.658));
         circularString.addPoint(new Point(-122.358, 47.653));
 
-        for (int i = GeometryType.CIRCULARSTRING.getCode(); i <= GeometryType.SURFACE
-                .getCode(); i++) {
+        for (int i = GeometryCodes.getCode(GeometryType.CIRCULARSTRING); i <= GeometryCodes.getCode(GeometryType.SURFACE); i++) {
 
-            GeometryType geometryType = GeometryType.fromCode(i);
+            GeometryType geometryType = GeometryCodes.getGeometryType(i);
             extensions.getOrCreate(tableName, GEOMETRY_COLUMN, geometryType);
 
             Geometry geometry = null;

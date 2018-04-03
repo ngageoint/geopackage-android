@@ -38,7 +38,7 @@ import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
 import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.validate.GeoPackageValidate;
-import mil.nga.wkb.io.ByteReader;
+import mil.nga.sf.util.ByteReader;
 
 /**
  * GeoPackage Database management implementation

@@ -6,7 +6,8 @@ import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
 import mil.nga.geopackage.extension.GeometryExtensions;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
-import mil.nga.wkb.geom.GeometryType;
+import mil.nga.sf.GeometryType;
+import mil.nga.sf.wkb.GeometryCodes;
 
 /**
  * Geometry Extensions Tests
@@ -296,10 +297,9 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
         ExtensionsDao extensionsDao = extensions.getExtensionsDao();
 
         // Test non extension geometries
-        for (int i = GeometryType.GEOMETRY.getCode(); i <= GeometryType.GEOMETRYCOLLECTION
-                .getCode(); i++) {
+        for (int i = GeometryCodes.getCode(GeometryType.GEOMETRY); i <= GeometryCodes.getCode(GeometryType.GEOMETRYCOLLECTION); i++) {
 
-            GeometryType geometryType = GeometryType.fromCode(i);
+            GeometryType geometryType = GeometryCodes.getGeometryType(i);
             try {
                 extensions.getOrCreate("table_name", "column_name",
                         geometryType);
@@ -310,10 +310,9 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
         }
 
         // Test user created extension geometries
-        for (int i = GeometryType.POLYHEDRALSURFACE.getCode(); i <= GeometryType.TRIANGLE
-                .getCode(); i++) {
+        for (int i = GeometryCodes.getCode(GeometryType.POLYHEDRALSURFACE); i <= GeometryCodes.getCode(GeometryType.TRIANGLE); i++) {
 
-            GeometryType geometryType = GeometryType.fromCode(i);
+            GeometryType geometryType = GeometryCodes.getGeometryType(i);
             try {
                 extensions.getOrCreate("table_name", "column_name",
                         geometryType);
@@ -325,10 +324,9 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
 
         // Test geometry extensions
         long count = extensionsDao.countOf();
-        for (int i = GeometryType.CIRCULARSTRING.getCode(); i <= GeometryType.SURFACE
-                .getCode(); i++) {
+        for (int i = GeometryCodes.getCode(GeometryType.CIRCULARSTRING); i <= GeometryCodes.getCode(GeometryType.SURFACE); i++) {
 
-            GeometryType geometryType = GeometryType.fromCode(i);
+            GeometryType geometryType = GeometryCodes.getGeometryType(i);
             String tableName = "table_" + geometryType.name();
             String columnName = "geom";
             Extensions extension = extensions.getOrCreate(tableName,
@@ -362,10 +360,9 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
         String author = "nga";
 
         // Test non extension geometries
-        for (int i = GeometryType.GEOMETRY.getCode(); i <= GeometryType.GEOMETRYCOLLECTION
-                .getCode(); i++) {
+        for (int i = GeometryCodes.getCode(GeometryType.GEOMETRY); i <= GeometryCodes.getCode(GeometryType.GEOMETRYCOLLECTION); i++) {
 
-            GeometryType geometryType = GeometryType.fromCode(i);
+            GeometryType geometryType = GeometryCodes.getGeometryType(i);
             try {
                 extensions.getOrCreate("table_name", "column_name", author,
                         geometryType);
@@ -377,10 +374,9 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
 
         // Test geometry extensions and user created extensions with author
         long count = extensionsDao.countOf();
-        for (int i = GeometryType.CIRCULARSTRING.getCode(); i <= GeometryType.TRIANGLE
-                .getCode(); i++) {
+        for (int i = GeometryCodes.getCode(GeometryType.CIRCULARSTRING); i <= GeometryCodes.getCode(GeometryType.TRIANGLE); i++) {
 
-            GeometryType geometryType = GeometryType.fromCode(i);
+            GeometryType geometryType = GeometryCodes.getGeometryType(i);
             String tableName = "table_" + geometryType.name();
             String columnName = "geom";
             Extensions extension = extensions.getOrCreate(tableName,
@@ -396,7 +392,7 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
             assertEquals(extension.getColumnName(), columnName);
             assertEquals(extension.getScope(), ExtensionScopeType.READ_WRITE);
 
-            if (i <= GeometryType.SURFACE.getCode()) {
+            if (i <= GeometryCodes.getCode(GeometryType.SURFACE)) {
                 assertEquals(extension.getExtensionName(),
                         expectedGeoPackageExtensionName(geometryType));
                 assertEquals(extension.getAuthor(),

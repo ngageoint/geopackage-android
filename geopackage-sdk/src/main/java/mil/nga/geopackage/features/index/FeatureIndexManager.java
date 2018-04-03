@@ -21,7 +21,7 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.projection.Projection;
-import mil.nga.wkb.geom.GeometryEnvelope;
+import mil.nga.sf.GeometryEnvelope;
 
 /**
  * Feature Index Manager to manage indexing of feature geometries in both Android metadata and

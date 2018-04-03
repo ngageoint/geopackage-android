@@ -22,9 +22,9 @@ import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.projection.ProjectionTransform;
-import mil.nga.wkb.geom.Geometry;
-import mil.nga.wkb.geom.GeometryEnvelope;
-import mil.nga.wkb.util.GeometryEnvelopeBuilder;
+import mil.nga.sf.Geometry;
+import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**
  * Feature Indexer, indexes feature geometries into a table for searching

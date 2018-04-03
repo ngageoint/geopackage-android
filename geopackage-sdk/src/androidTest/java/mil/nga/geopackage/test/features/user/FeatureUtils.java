@@ -28,17 +28,17 @@ import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.geopackage.user.ColumnValue;
-import mil.nga.wkb.geom.Geometry;
-import mil.nga.wkb.geom.GeometryCollection;
-import mil.nga.wkb.geom.GeometryType;
-import mil.nga.wkb.geom.LineString;
-import mil.nga.wkb.geom.MultiLineString;
-import mil.nga.wkb.geom.MultiPoint;
-import mil.nga.wkb.geom.MultiPolygon;
-import mil.nga.wkb.geom.Point;
-import mil.nga.wkb.geom.Polygon;
-import mil.nga.wkb.io.ByteReader;
-import mil.nga.wkb.io.WkbGeometryReader;
+import mil.nga.sf.Geometry;
+import mil.nga.sf.GeometryCollection;
+import mil.nga.sf.GeometryType;
+import mil.nga.sf.LineString;
+import mil.nga.sf.MultiLineString;
+import mil.nga.sf.MultiPoint;
+import mil.nga.sf.MultiPolygon;
+import mil.nga.sf.Point;
+import mil.nga.sf.Polygon;
+import mil.nga.sf.util.ByteReader;
+import mil.nga.sf.wkb.GeometryReader;
 
 /**
  * Features Utility test methods
@@ -113,7 +113,7 @@ public class FeatureUtils {
 						ByteReader wkbReader = new ByteReader(wkbBytes);
 						wkbReader.setByteOrder(geoPackageGeometryData
 								.getByteOrder());
-						Geometry geometryFromBytes = WkbGeometryReader
+						Geometry geometryFromBytes = GeometryReader
 								.readGeometry(wkbReader);
 						TestCase.assertNotNull(geometryFromBytes);
 						TestCase.assertEquals(geometry.getGeometryType(),
@@ -129,7 +129,7 @@ public class FeatureUtils {
 						ByteReader wkbReader2 = new ByteReader(wkbBytes2);
 						wkbReader2.setByteOrder(geoPackageGeometryData
 								.getByteOrder());
-						Geometry geometryFromBytes2 = WkbGeometryReader
+						Geometry geometryFromBytes2 = GeometryReader
 								.readGeometry(wkbReader2);
 						TestCase.assertNotNull(geometryFromBytes2);
 						TestCase.assertEquals(geometry.getGeometryType(),

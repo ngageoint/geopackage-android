@@ -29,10 +29,10 @@ import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.io.TestGeoPackageProgress;
-import mil.nga.wkb.geom.Geometry;
-import mil.nga.wkb.geom.GeometryEnvelope;
-import mil.nga.wkb.geom.Point;
-import mil.nga.wkb.util.GeometryEnvelopeBuilder;
+import mil.nga.sf.Geometry;
+import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.Point;
+import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**
  * Feature Table Index Utility test methods

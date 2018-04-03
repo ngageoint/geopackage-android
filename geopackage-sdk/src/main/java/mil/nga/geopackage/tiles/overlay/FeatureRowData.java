@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.wkb.geom.Geometry;
-import mil.nga.wkb.geom.GeometryType;
-import mil.nga.wkb.util.GeometryJSONCompatible;
+import mil.nga.sf.Geometry;
+import mil.nga.sf.GeometryType;
+import mil.nga.sf.util.GeometryJSONCompatible;
 
 /**
  * Represents the values of a single feature row

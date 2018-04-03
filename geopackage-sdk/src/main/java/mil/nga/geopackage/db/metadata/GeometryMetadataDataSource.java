@@ -6,7 +6,7 @@ import android.database.Cursor;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.GeoPackageDatabase;
-import mil.nga.wkb.geom.GeometryEnvelope;
+import mil.nga.sf.GeometryEnvelope;
 
 /**
  * Table metadata Data Source
