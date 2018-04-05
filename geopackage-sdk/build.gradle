@@ -49,7 +49,9 @@ android {
         classpath += configurations.javadocDeps
         classpath += files("${android.sdkDirectory}/extras/android/support/v13/android-support-v13.jar")
         options.links("http://ngageoint.github.io/geopackage-core-java/docs/api/");
-        options.links("http://ngageoint.github.io/geopackage-wkb-java/docs/api/");
+        options.links("http://ngageoint.github.io/simple-features-wkb-java/docs/api/");
+        options.links("http://ngageoint.github.io/simple-features-geojson-java/docs/api/");
+        options.links("http://ngageoint.github.io/simple-features-java/docs/api/");
         options.links("http://ngageoint.github.io/tiff-java/docs/api/");
         options.links("http://ormlite.com/javadoc/ormlite-core/");
         options.links("http://ormlite.com/javadoc/ormlite-android/");
@@ -142,6 +144,10 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+    }
+
 }
 
 dependencies {
@@ -150,8 +156,10 @@ dependencies {
     compile 'mil.nga.geopackage:geopackage-core:3.0.0'
     compile 'ar.com.hjg:pngj:2.1.0'
     compile 'mil.nga:tiff:2.0.0'
+    compile 'mil.nga.sf:sf-geojson:2.0.0'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.0',
-            'mil.nga.geopackage:geopackage-core:3.0.0' ,
-            'ar.com.hjg:pngj:2.1.0' ,
-            'mil.nga:tiff:2.0.0'
+            'mil.nga.geopackage:geopackage-core:3.0.0',
+            'ar.com.hjg:pngj:2.1.0',
+            'mil.nga:tiff:2.0.0',
+            'mil.nga.sf:sf-geojson:2.0.0'
 }

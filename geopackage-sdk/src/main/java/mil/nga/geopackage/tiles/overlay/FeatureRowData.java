@@ -6,7 +6,7 @@ import java.util.Map;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryType;
-import mil.nga.sf.util.GeometryJSONCompatible;
+import mil.nga.sf.geojson.GeoJsonObjectFactory;
 
 /**
  * Represents the values of a single feature row
@@ -76,7 +76,7 @@ public class FeatureRowData {
     /**
      * Build a JSON compatible object
      *
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatible() {
         return jsonCompatible(true, true);
@@ -86,7 +86,7 @@ public class FeatureRowData {
      * Build a JSON compatible object
      *
      * @param includePoints true to include point geometries, but no other geometry types
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatibleWithPoints(boolean includePoints) {
         return jsonCompatible(includePoints, false);
@@ -96,7 +96,7 @@ public class FeatureRowData {
      * Build a JSON compatible object
      *
      * @param includeGeometries true to include all geometries, false for no geometries
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatibleWithGeometries(boolean includeGeometries) {
         return jsonCompatible(includeGeometries, includeGeometries);
@@ -107,7 +107,7 @@ public class FeatureRowData {
      *
      * @param includePoints     true to include point geometries, ignored if includeGeometries is true
      * @param includeGeometries true to include all geometry types
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatible(boolean includePoints, boolean includeGeometries) {
 
@@ -120,7 +120,7 @@ public class FeatureRowData {
                 GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
                 if (geometryData.getGeometry() != null) {
                     if (includeGeometries || (includePoints && geometryData.getGeometry().getGeometryType() == GeometryType.POINT)) {
-                        jsonValue = GeometryJSONCompatible.getJSONCompatibleGeometry(geometryData.getGeometry());
+                        jsonValue = GeoJsonObjectFactory.toMap(geometryData.getGeometry());
                     }
                 } else {
                     jsonValue = value;

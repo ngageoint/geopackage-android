@@ -79,7 +79,7 @@ public class FeatureTableData {
     /**
      * Build a JSON compatible object
      *
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatible() {
         return jsonCompatible(true, true);
@@ -89,7 +89,7 @@ public class FeatureTableData {
      * Build a JSON compatible object
      *
      * @param includePoints true to include point geometries, but no other geometry types
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatibleWithPoints(boolean includePoints) {
         return jsonCompatible(includePoints, false);
@@ -99,7 +99,7 @@ public class FeatureTableData {
      * Build a JSON compatible object
      *
      * @param includeGeometries true to include all geometries, false for no geometries
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatibleWithGeometries(boolean includeGeometries) {
         return jsonCompatible(includeGeometries, includeGeometries);
@@ -110,7 +110,7 @@ public class FeatureTableData {
      *
      * @param includePoints     true to include point geometries, ignored if includeGeometries is true
      * @param includeGeometries true to include all geometry types
-     * @return JSON compatiable object
+     * @return JSON compatible object
      */
     public Object jsonCompatible(boolean includePoints, boolean includeGeometries) {
         Object jsonObject = null;
