@@ -20,10 +20,10 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureRowSync;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.GeoPackageProgress;
-import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionTransform;
 import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**
@@ -435,8 +435,8 @@ public class FeatureIndexer {
                                               Projection projection) {
         ProjectionTransform projectionTransform = projection
                 .getTransformation(featureDao.getProjection());
-        BoundingBox featureBoundingBox = projectionTransform
-                .transform(boundingBox);
+        BoundingBox featureBoundingBox = boundingBox
+                .transform(projectionTransform);
         return featureBoundingBox;
     }
 

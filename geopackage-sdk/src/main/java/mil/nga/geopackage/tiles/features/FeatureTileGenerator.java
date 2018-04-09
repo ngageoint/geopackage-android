@@ -5,7 +5,7 @@ import android.content.Context;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.extension.link.FeatureTileTableLinker;
-import mil.nga.geopackage.projection.Projection;
+import mil.nga.sf.proj.Projection;
 import mil.nga.geopackage.tiles.TileGenerator;
 
 /**

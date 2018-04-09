@@ -11,13 +11,12 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.db.GeoPackageConnection;
-import mil.nga.geopackage.projection.ProjectionConstants;
-import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGrid;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.user.UserDao;
+import mil.nga.sf.proj.ProjectionConstants;
 
 /**
  * Tile DAO for reading tile user tables
@@ -86,7 +85,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         this.widths = new double[tileMatrices.size()];
         this.heights = new double[tileMatrices.size()];
 
-        projection = ProjectionFactory.getProjection(tileMatrixSet.getSrs());
+        projection = tileMatrixSet.getSrs().getProjection();
 
         // Set the min and max zoom levels
         if (!tileMatrices.isEmpty()) {
@@ -568,9 +567,9 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
 
         // Convert the bounding box to wgs84
         BoundingBox boundingBox = tileMatrixSet.getBoundingBox();
-        BoundingBox wgs84BoundingBox = projection.getTransformation(
-                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM).transform(
-                boundingBox);
+        BoundingBox wgs84BoundingBox = boundingBox.transform(
+                projection.getTransformation(
+                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM));
 
         boolean googleTiles = false;
 

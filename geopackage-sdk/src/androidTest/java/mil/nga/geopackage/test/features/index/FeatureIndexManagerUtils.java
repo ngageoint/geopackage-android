@@ -17,14 +17,14 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.projection.ProjectionConstants;
-import mil.nga.geopackage.projection.ProjectionFactory;
-import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.test.io.TestGeoPackageProgress;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.Point;
+import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.sf.proj.ProjectionTransform;
 import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**
@@ -163,8 +163,8 @@ public class FeatureIndexManagerUtils {
             }
             ProjectionTransform transform = featureDao.getProjection()
                     .getTransformation(projection);
-            BoundingBox transformedBoundingBox = transform
-                    .transform(boundingBox);
+            BoundingBox transformedBoundingBox = boundingBox
+                    .transform(transform);
 
             // Test the query by projected bounding box
             resultCount = 0;

@@ -51,6 +51,7 @@ android {
         options.links("http://ngageoint.github.io/geopackage-core-java/docs/api/");
         options.links("http://ngageoint.github.io/simple-features-wkb-java/docs/api/");
         options.links("http://ngageoint.github.io/simple-features-geojson-java/docs/api/");
+        options.links("http://ngageoint.github.io/simple-features-proj-java/docs/api/");
         options.links("http://ngageoint.github.io/simple-features-java/docs/api/");
         options.links("http://ngageoint.github.io/tiff-java/docs/api/");
         options.links("http://ormlite.com/javadoc/ormlite-core/");

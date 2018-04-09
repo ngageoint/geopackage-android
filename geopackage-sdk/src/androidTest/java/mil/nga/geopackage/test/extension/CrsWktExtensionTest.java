@@ -5,10 +5,10 @@ import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.extension.CrsWktExtension;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
-import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.property.GeoPackageProperties;
 import mil.nga.geopackage.property.PropertyConstants;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
+import mil.nga.sf.proj.ProjectionConstants;
 
 /**
  * Geometry Extensions Tests
@@ -111,7 +111,7 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
 
         // Test the get or create auto set
         wgs84Srs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM) ;
+                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
         assertNotNull(wgs84Srs);
         assertNotNull(wgs84Srs.getDefinition_12_063());
         assertEquals(wgs84Srs.getDefinition_12_063(),

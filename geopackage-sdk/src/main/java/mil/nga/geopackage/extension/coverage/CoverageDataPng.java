@@ -10,9 +10,9 @@ import ar.com.hjg.pngj.PngWriter;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.projection.Projection;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
+import mil.nga.sf.proj.Projection;
 
 /**
  * Tiled Gridded Coverage Data, PNG Encoding, Extension

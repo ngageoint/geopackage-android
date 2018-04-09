@@ -62,10 +62,6 @@ import mil.nga.geopackage.metadata.MetadataScopeType;
 import mil.nga.geopackage.metadata.reference.MetadataReference;
 import mil.nga.geopackage.metadata.reference.MetadataReferenceDao;
 import mil.nga.geopackage.metadata.reference.ReferenceScopeType;
-import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.projection.ProjectionConstants;
-import mil.nga.geopackage.projection.ProjectionFactory;
-import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.schema.columns.DataColumns;
 import mil.nga.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.schema.constraints.DataColumnConstraintType;
@@ -95,6 +91,10 @@ import mil.nga.sf.MultiLineString;
 import mil.nga.sf.MultiPolygon;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
+import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.sf.proj.ProjectionTransform;
 import mil.nga.sf.util.GeometryEnvelopeBuilder;
 import mil.nga.sf.wkb.GeometryCodes;
 
@@ -740,7 +740,7 @@ public class GeoPackageExample extends BaseTestCase {
                     .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
             ProjectionTransform transform = projection
                     .getTransformation(requestProjection);
-            BoundingBox requestBoundingBox = transform.transform(boundingBox);
+            BoundingBox requestBoundingBox = boundingBox.transform(transform);
 
             int zoomLevel = TileBoundingBoxUtils
                     .getZoomLevel(requestBoundingBox);
@@ -1105,7 +1105,7 @@ public class GeoPackageExample extends BaseTestCase {
         ProjectionTransform transform = ProjectionFactory.getProjection(
                 ProjectionConstants.EPSG_WEB_MERCATOR).getTransformation(
                 ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
-        BoundingBox contentsBoundingBox = transform.transform(bbox);
+        BoundingBox contentsBoundingBox = bbox.transform(transform);
 
         CoverageDataPng coverageData = CoverageDataPng
                 .createTileTableWithMetadata(geoPackage, "coverage_png",
@@ -1195,7 +1195,7 @@ public class GeoPackageExample extends BaseTestCase {
         ProjectionTransform transform = ProjectionFactory.getProjection(
                 ProjectionConstants.EPSG_WEB_MERCATOR).getTransformation(
                 ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
-        BoundingBox contentsBoundingBox = transform.transform(bbox);
+        BoundingBox contentsBoundingBox = bbox.transform(transform);
 
         CoverageDataTiff coverageData = CoverageDataTiff
                 .createTileTableWithMetadata(geoPackage, "coverage_tiff",

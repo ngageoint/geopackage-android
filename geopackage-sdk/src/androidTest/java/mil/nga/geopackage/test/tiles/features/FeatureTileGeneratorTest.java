@@ -1,23 +1,20 @@
 package mil.nga.geopackage.test.tiles.features;
 
-import android.graphics.Bitmap;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.extension.index.FeatureTableIndex;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.index.FeatureIndexType;
 import mil.nga.geopackage.features.user.FeatureDao;
-import mil.nga.geopackage.projection.ProjectionConstants;
-import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
 import mil.nga.geopackage.tiles.features.FeatureTileGenerator;
 import mil.nga.geopackage.tiles.features.FeatureTiles;
 import mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile;
+import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.sf.proj.ProjectionFactory;
 
 /**
  * Test GeoPackage Feature Tile Generator
@@ -102,7 +99,6 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      * @param index
      * @param useIcon
      * @param maxFeatures
-     *
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
@@ -140,10 +136,10 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
             BoundingBox boundingBox = new BoundingBox();
             boundingBox = TileBoundingBoxUtils
                     .boundWgs84BoundingBoxWithWebMercatorLimits(boundingBox);
-            boundingBox = ProjectionFactory
-                    .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
-                    .getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR)
-                    .transform(boundingBox);
+            boundingBox = boundingBox
+                    .transform(ProjectionFactory
+                            .getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+                            .getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR));
             TileGenerator tileGenerator = new FeatureTileGenerator(activity, geoPackage,
                     "gen_feature_tiles", featureTiles, minZoom, maxZoom,
                     boundingBox,
@@ -178,7 +174,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
 
             assertEquals(expectedTiles, tiles);
 
-        }finally{
+        } finally {
             featureTiles.close();
         }
     }

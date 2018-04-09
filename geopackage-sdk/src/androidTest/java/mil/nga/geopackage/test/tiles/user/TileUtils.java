@@ -27,8 +27,6 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.io.BitmapConverter;
-import mil.nga.geopackage.projection.ProjectionConstants;
-import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
@@ -45,6 +43,8 @@ import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.geopackage.user.ColumnValue;
+import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.sf.proj.ProjectionFactory;
 
 /**
  * Tiles Utility test methods
@@ -913,20 +913,18 @@ public class TileUtils {
 
                     BoundingBox setProjectionBoundingBox = tileMatrixSet
                             .getBoundingBox();
-                    BoundingBox setWebMercatorBoundingBox = ProjectionFactory
-                            .getProjection(
-                                    tileMatrixSet.getSrs())
-                            .getTransformation(
-                                    ProjectionConstants.EPSG_WEB_MERCATOR)
-                            .transform(setProjectionBoundingBox);
+                    BoundingBox setWebMercatorBoundingBox = setProjectionBoundingBox
+                            .transform(tileMatrixSet.getSrs().getProjection()
+                                    .getTransformation(
+                                            ProjectionConstants.EPSG_WEB_MERCATOR));
                     BoundingBox boundingBox = new BoundingBox(-180.0, -90.0,
                             180.0, 90.0);
-                    BoundingBox webMercatorBoundingBox = ProjectionFactory
-                            .getProjection(
-                                    ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
-                            .getTransformation(
-                                    ProjectionConstants.EPSG_WEB_MERCATOR)
-                            .transform(boundingBox);
+                    BoundingBox webMercatorBoundingBox = boundingBox
+                            .transform(ProjectionFactory
+                                    .getProjection(
+                                            ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+                                    .getTransformation(
+                                            ProjectionConstants.EPSG_WEB_MERCATOR));
 
                     TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
                             setWebMercatorBoundingBox,
@@ -952,12 +950,12 @@ public class TileUtils {
                     double minLat = ((maxLon + 90.0) * Math.random()) - 90.0;
                     boundingBox = new BoundingBox(minLon, minLat, maxLon,
                             maxLat);
-                    webMercatorBoundingBox = ProjectionFactory
-                            .getProjection(
-                                    ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
-                            .getTransformation(
-                                    ProjectionConstants.EPSG_WEB_MERCATOR)
-                            .transform(boundingBox);
+                    webMercatorBoundingBox = boundingBox
+                            .transform(ProjectionFactory
+                                    .getProjection(
+                                            ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)
+                                    .getTransformation(
+                                            ProjectionConstants.EPSG_WEB_MERCATOR));
                     tileGrid = TileBoundingBoxUtils.getTileGrid(
                             setWebMercatorBoundingBox,
                             tileMatrix.getMatrixWidth(),

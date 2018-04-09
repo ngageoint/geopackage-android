@@ -16,13 +16,13 @@ import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
 import mil.nga.geopackage.factory.GeoPackageFactory;
-import mil.nga.geopackage.projection.ProjectionConstants;
 import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
+import mil.nga.sf.proj.ProjectionConstants;
 
 /**
  * Abstract Test Case for Created TIFF Tiled Gridded Coverage Data GeoPackages

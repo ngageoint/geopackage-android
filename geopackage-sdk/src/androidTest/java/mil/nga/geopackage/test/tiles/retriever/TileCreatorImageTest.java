@@ -10,9 +10,6 @@ import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.io.BitmapConverter;
-import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.projection.ProjectionConstants;
-import mil.nga.geopackage.projection.ProjectionFactory;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.TilesGeoPackageTestCase;
@@ -20,6 +17,9 @@ import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.TileCreator;
 import mil.nga.geopackage.tiles.user.TileDao;
+import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.sf.proj.ProjectionFactory;
 
 /**
  * Test Tile Creator image accuracy from a GeoPackage with tiles
@@ -62,7 +62,7 @@ public class TileCreatorImageTest extends TilesGeoPackageTestCase {
 
         BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(0, 4, 4);
-        BoundingBox wgs84BoundingBox = webMercator.getTransformation(wgs84).transform(webMercatorBoundingBox);
+        BoundingBox wgs84BoundingBox = webMercatorBoundingBox.transform(webMercator.getTransformation(wgs84));
 
         TestCase.assertTrue(webMeractorTileCreator.hasTile(webMercatorBoundingBox));
         TestCase.assertTrue(wgs84TileCreator.hasTile(wgs84BoundingBox));
@@ -122,7 +122,7 @@ public class TileCreatorImageTest extends TilesGeoPackageTestCase {
                 int webMercatorTestGreen = Color.green(webMercatorPixelTestPixel);
                 int webMercatorTestBlue = Color.blue(webMercatorPixelTestPixel);
                 int webMercatorTestAlpha = Color.alpha(webMercatorPixelTestPixel);
-                
+
                 // Colors differ between phones and emulators, try to validate within a tolerance range the colors are as expected
                 TestCase.assertTrue("Web Meractor Red pixel " + webMercatorRed + " is not within the " + COLOR_TOLERANCE + " range of test red pixel " + webMercatorTestRed,
                         Math.abs(webMercatorRed - webMercatorTestRed) <= COLOR_TOLERANCE);

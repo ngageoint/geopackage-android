@@ -15,7 +15,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.R;
 import mil.nga.geopackage.io.GeoPackageIOUtils;
-import mil.nga.geopackage.projection.Projection;
+import mil.nga.sf.proj.Projection;
 
 /**
  * Creates a set of tiles within a GeoPackage by downloading the tiles from a
@@ -244,9 +244,9 @@ public class UrlTileGenerator extends TileGenerator {
             connection.connect();
 
             int responseCode = connection.getResponseCode();
-            if(responseCode == HttpURLConnection.HTTP_MOVED_PERM
+            if (responseCode == HttpURLConnection.HTTP_MOVED_PERM
                     || responseCode == HttpURLConnection.HTTP_MOVED_TEMP
-                    || responseCode == HttpURLConnection.HTTP_SEE_OTHER){
+                    || responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
                 String redirect = connection.getHeaderField("Location");
                 connection.disconnect();
                 url = new URL(redirect);

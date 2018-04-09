@@ -18,9 +18,6 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.extension.scale.TileScaling;
 import mil.nga.geopackage.extension.scale.TileScalingType;
 import mil.nga.geopackage.io.BitmapConverter;
-import mil.nga.geopackage.projection.Projection;
-import mil.nga.geopackage.projection.ProjectionFactory;
-import mil.nga.geopackage.projection.ProjectionTransform;
 import mil.nga.geopackage.tiles.TileBoundingBoxAndroidUtils;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGrid;
@@ -29,6 +26,8 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
+import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Tile Creator, creates a tile from a tile matrix to the desired projection
@@ -103,7 +102,7 @@ public class TileCreator {
         this.requestProjection = requestProjection;
 
         tileMatrixSet = tileDao.getTileMatrixSet();
-        tilesProjection = ProjectionFactory.getProjection(tileDao.getTileMatrixSet().getSrs());
+        tilesProjection = tileDao.getTileMatrixSet().getSrs().getProjection();
         tileSetBoundingBox = tileMatrixSet.getBoundingBox();
 
         // Check if the projections have the same units
@@ -244,7 +243,7 @@ public class TileCreator {
 
         // Transform to the projection of the tiles
         ProjectionTransform transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
-        BoundingBox tilesBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
+        BoundingBox tilesBoundingBox = requestBoundingBox.transform(transformRequestToTiles);
 
         List<TileMatrix> tileMatrices = getTileMatrices(tilesBoundingBox);
 
@@ -278,7 +277,7 @@ public class TileCreator {
 
         // Transform to the projection of the tiles
         ProjectionTransform transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
-        BoundingBox tilesBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
+        BoundingBox tilesBoundingBox = requestBoundingBox.transform(transformRequestToTiles);
 
         List<TileMatrix> tileMatrices = getTileMatrices(tilesBoundingBox);
 
@@ -293,7 +292,7 @@ public class TileCreator {
 
                     if (tileResults.getCount() > 0) {
 
-                        BoundingBox requestProjectedBoundingBox = transformRequestToTiles.transform(requestBoundingBox);
+                        BoundingBox requestProjectedBoundingBox = requestBoundingBox.transform(transformRequestToTiles);
 
                         // Determine the requested tile dimensions, or use the dimensions of a single tile matrix tile
                         int requestedTileWidth = width != null ? width : (int) tileMatrix
