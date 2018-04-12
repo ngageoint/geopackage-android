@@ -6,7 +6,7 @@ import java.util.Map;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryType;
-import mil.nga.sf.geojson.GeometryFactory;
+import mil.nga.sf.geojson.GeometryConverter;
 
 /**
  * Represents the values of a single feature row
@@ -120,7 +120,7 @@ public class FeatureRowData {
                 GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
                 if (geometryData.getGeometry() != null) {
                     if (includeGeometries || (includePoints && geometryData.getGeometry().getGeometryType() == GeometryType.POINT)) {
-                        jsonValue = GeometryFactory.toMap(geometryData.getGeometry());
+                        jsonValue = GeometryConverter.toMap(geometryData.getGeometry());
                     }
                 } else {
                     jsonValue = value;
