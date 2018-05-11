@@ -4,9 +4,17 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 2.0.3 (TBD)
+## 3.0.0 (TBD)
 
-* TBD
+* geopackage-core version updated to 3.0.0
+* [GeoPackage Core](https://github.com/ngageoint/geopackage-core-java) new WKB dependency on [Simple Features WKB library](https://github.com/ngageoint/simple-features-wkb-java)
+  * Package names in dependent classes must be updated
+  * GeometryType code calls must be replaced using GeometryCodes
+* [GeoPackage Core](https://github.com/ngageoint/geopackage-core-java) new projection dependency on [Simple Features Projections library](https://github.com/ngageoint/simple-features-proj-java)
+  * Package names in dependent classes must be updated
+  * ProjectionFactory SRS calls must be replaced using SpatialReferenceSystem projection method
+  * ProjectionTransform bounding box calls must be replaced using BoundingBox transform method
+* [Simple Features GeoJSON library](https://github.com/ngageoint/simple-features-geojson-java) dependency
 
 ## [2.0.2](https://github.com/ngageoint/geopackage-android/releases/tag/2.0.2) (03-20-2018)
 
