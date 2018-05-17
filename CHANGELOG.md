@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 3.0.0 (TBD)
+## [3.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.0) (05-17-2018)
 
 * geopackage-core version updated to 3.0.0
 * [GeoPackage Core](https://github.com/ngageoint/geopackage-core-java) new WKB dependency on [Simple Features WKB library](https://github.com/ngageoint/simple-features-wkb-java)
