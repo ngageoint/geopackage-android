@@ -1,10 +1,12 @@
 package mil.nga.geopackage.test;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -24,6 +26,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.attributes.AttributesColumn;
+import mil.nga.geopackage.attributes.AttributesCursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.attributes.AttributesRow;
 import mil.nga.geopackage.attributes.AttributesTable;
@@ -45,12 +48,26 @@ import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
+import mil.nga.geopackage.extension.related.ExtendedRelation;
+import mil.nga.geopackage.extension.related.RelatedTablesExtension;
+import mil.nga.geopackage.extension.related.UserMappingDao;
+import mil.nga.geopackage.extension.related.UserMappingRow;
+import mil.nga.geopackage.extension.related.UserMappingTable;
+import mil.nga.geopackage.extension.related.dublin.DublinCoreMetadata;
+import mil.nga.geopackage.extension.related.dublin.DublinCoreType;
+import mil.nga.geopackage.extension.related.media.MediaDao;
+import mil.nga.geopackage.extension.related.media.MediaRow;
+import mil.nga.geopackage.extension.related.media.MediaTable;
+import mil.nga.geopackage.extension.related.simple.SimpleAttributesDao;
+import mil.nga.geopackage.extension.related.simple.SimpleAttributesRow;
+import mil.nga.geopackage.extension.related.simple.SimpleAttributesTable;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.index.FeatureIndexType;
 import mil.nga.geopackage.features.user.FeatureColumn;
+import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
@@ -67,6 +84,7 @@ import mil.nga.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.schema.constraints.DataColumnConstraintType;
 import mil.nga.geopackage.schema.constraints.DataColumnConstraints;
 import mil.nga.geopackage.schema.constraints.DataColumnConstraintsDao;
+import mil.nga.geopackage.test.extension.related.RelatedTablesUtils;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
 import mil.nga.geopackage.tiles.TileGrid;
@@ -80,6 +98,7 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
+import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.sf.CircularString;
 import mil.nga.sf.CompoundCurve;
 import mil.nga.sf.CurvePolygon;
@@ -117,6 +136,9 @@ public class GeoPackageExample extends BaseTestCase {
     private static final boolean CRS_WKT = true;
     private static final boolean METADATA = true;
     private static final boolean COVERAGE_DATA = true;
+    private static final boolean RELATED_TABLES_MEDIA = true;
+    private static final boolean RELATED_TABLES_FEATURES = true;
+    private static final boolean RELATED_TABLES_SIMPLE_ATTRIBUTES = true;
     private static final boolean GEOMETRY_INDEX = true;
     private static final boolean FEATURE_TILE_LINK = true;
 
@@ -177,6 +199,18 @@ public class GeoPackageExample extends BaseTestCase {
                 createRTreeSpatialIndexExtension(geoPackage);
             }
 
+            System.out.println("Related Tables Media Extension: "
+                    + RELATED_TABLES_MEDIA);
+            if (RELATED_TABLES_MEDIA) {
+                createRelatedTablesMediaExtension(activity, testContext, geoPackage);
+            }
+
+            System.out.println("Related Tables Features Extension: "
+                    + RELATED_TABLES_FEATURES);
+            if (RELATED_TABLES_FEATURES) {
+                createRelatedTablesFeaturesExtension(geoPackage);
+            }
+
         } else {
             Log.i(LOG_NAME, "Schema Extension: " + FEATURES);
             Log.i(LOG_NAME, "Geometry Index Extension: " + FEATURES);
@@ -185,6 +219,10 @@ public class GeoPackageExample extends BaseTestCase {
                     + FEATURES);
             Log.i(LOG_NAME, "RTree Spatial Index Extension: "
                     + FEATURES);
+            System.out.println("Related Tables Media Extension: "
+                    + RELATED_TABLES_MEDIA);
+            System.out.println("Related Tables Features Extension: "
+                    + RELATED_TABLES_FEATURES);
         }
 
         Log.i(LOG_NAME, "Tiles: " + TILES);
@@ -204,6 +242,15 @@ public class GeoPackageExample extends BaseTestCase {
         Log.i(LOG_NAME, "Attributes: " + ATTRIBUTES);
         if (ATTRIBUTES) {
             createAttributes(geoPackage);
+
+            System.out.println("Related Tables Simple Attributes Extension: "
+                    + RELATED_TABLES_SIMPLE_ATTRIBUTES);
+            if (RELATED_TABLES_SIMPLE_ATTRIBUTES) {
+                createRelatedTablesSimpleAttributesExtension(geoPackage);
+            }
+        } else {
+            System.out.println("Related Tables Simple Attributes Extension: "
+                    + RELATED_TABLES_SIMPLE_ATTRIBUTES);
         }
 
         Log.i(LOG_NAME, "Metadata: " + METADATA);
@@ -1287,6 +1334,258 @@ public class GeoPackageExample extends BaseTestCase {
 
             extension.create(featureTable);
         }
+
+    }
+
+    private static void createRelatedTablesMediaExtension(Activity activity, Context testContext, GeoPackage geoPackage) throws IOException {
+
+        RelatedTablesExtension relatedTables = new RelatedTablesExtension(
+                geoPackage);
+
+        List<UserCustomColumn> additionalMediaColumns = RelatedTablesUtils
+                .createAdditionalUserColumns(MediaTable.numRequiredColumns());
+        MediaTable mediaTable = MediaTable.create("media",
+                additionalMediaColumns);
+
+        List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
+                .createAdditionalUserColumns(UserMappingTable
+                        .numRequiredColumns());
+
+        String tableName1 = "geometry1";
+        UserMappingTable userMappingTable1 = UserMappingTable.create(tableName1
+                + "_" + mediaTable.getTableName(), additionalMappingColumns);
+        ExtendedRelation relation1 = relatedTables.addMediaRelationship(
+                tableName1, mediaTable, userMappingTable1);
+
+        insertRelatedTablesMediaExtensionRows(activity, testContext, geoPackage, relation1,
+                "BIT Systems%", "BIT Systems", "BITSystems_Logo.png",
+                "image/png", "BIT Systems Logo", "http://www.bit-sys.com");
+
+        String tableName2 = "geometry2";
+        UserMappingTable userMappingTable2 = UserMappingTable.create(tableName2
+                + "_" + mediaTable.getTableName(), additionalMappingColumns);
+        ExtendedRelation relation2 = relatedTables.addMediaRelationship(
+                tableName2, mediaTable, userMappingTable2);
+
+        insertRelatedTablesMediaExtensionRows(activity, testContext, geoPackage, relation2, "NGA%",
+                "NGA", "NGA_Logo.png", "image/png", "NGA Logo",
+                "http://www.nga.mil");
+        insertRelatedTablesMediaExtensionRows(activity, testContext, geoPackage, relation2, "NGA",
+                "NGA", "NGA.jpg", "image/jpeg", "Aerial View of NGA East",
+                "http://www.nga.mil");
+
+    }
+
+    private static void insertRelatedTablesMediaExtensionRows(Activity activity, Context testContext,
+                                                              GeoPackage geoPackage, ExtendedRelation relation, String query,
+                                                              String name, String file, String contentType, String description,
+                                                              String source) throws IOException {
+
+        RelatedTablesExtension relatedTables = new RelatedTablesExtension(
+                geoPackage);
+
+        FeatureDao featureDao = geoPackage.getFeatureDao(relation
+                .getBaseTableName());
+        MediaDao mediaDao = relatedTables.getMediaDao(relation);
+        UserMappingDao userMappingDao = relatedTables.getMappingDao(relation);
+
+        MediaRow mediaRow = mediaDao.newRow();
+
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext, file);
+        String mediaImageName = TestUtils.getAssetFileInternalStorageLocation(activity, file);
+        Bitmap mediaImage = BitmapFactory.decodeFile(mediaImageName);
+        byte[] mediaData = BitmapConverter.toBytes(mediaImage, Bitmap.CompressFormat.PNG);
+
+        mediaRow.setData(mediaData);
+        mediaRow.setContentType(contentType);
+        RelatedTablesUtils.populateUserRow(mediaDao.getTable(), mediaRow,
+                MediaTable.requiredColumns());
+        DublinCoreMetadata.setValue(mediaRow, DublinCoreType.TITLE, name);
+        DublinCoreMetadata.setValue(mediaRow, DublinCoreType.DESCRIPTION,
+                description);
+        DublinCoreMetadata.setValue(mediaRow, DublinCoreType.SOURCE, source);
+        long mediaRowId = mediaDao.create(mediaRow);
+
+        FeatureCursor featureCursor = featureDao.queryForLike(
+                TEXT_COLUMN, query);
+        while (featureCursor.moveToNext()) {
+            FeatureRow featureRow = featureCursor.getRow();
+            UserMappingRow userMappingRow = userMappingDao.newRow();
+            userMappingRow.setBaseId(featureRow.getId());
+            userMappingRow.setRelatedId(mediaRowId);
+            RelatedTablesUtils.populateUserRow(userMappingDao.getTable(),
+                    userMappingRow, UserMappingTable.requiredColumns());
+            String featureName = featureRow.getValue(TEXT_COLUMN).toString();
+            DublinCoreMetadata.setValue(userMappingRow, DublinCoreType.TITLE,
+                    featureName + " - " + name);
+            DublinCoreMetadata.setValue(userMappingRow,
+                    DublinCoreType.DESCRIPTION, featureName + " - "
+                            + description);
+            DublinCoreMetadata.setValue(userMappingRow, DublinCoreType.SOURCE,
+                    source);
+            userMappingDao.create(userMappingRow);
+        }
+        featureCursor.close();
+    }
+
+    private static void createRelatedTablesFeaturesExtension(
+            GeoPackage geoPackage) {
+
+        createRelatedTablesFeaturesExtension(geoPackage, "point1", "polygon1");
+
+        createRelatedTablesFeaturesExtension(geoPackage, "point2", "line2");
+
+    }
+
+    private static void createRelatedTablesFeaturesExtension(
+            GeoPackage geoPackage, String tableName1, String tableName2) {
+
+        RelatedTablesExtension relatedTables = new RelatedTablesExtension(
+                geoPackage);
+
+        List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
+                .createAdditionalUserColumns(UserMappingTable
+                        .numRequiredColumns());
+
+        UserMappingTable userMappingTable = UserMappingTable.create(tableName1
+                + "_" + tableName2, additionalMappingColumns);
+        ExtendedRelation relation = relatedTables.addFeaturesRelationship(
+                tableName1, tableName2, userMappingTable);
+
+        insertRelatedTablesFeaturesExtensionRows(geoPackage, relation);
+    }
+
+    private static void insertRelatedTablesFeaturesExtensionRows(
+            GeoPackage geoPackage, ExtendedRelation relation) {
+
+        RelatedTablesExtension relatedTables = new RelatedTablesExtension(
+                geoPackage);
+        UserMappingDao userMappingDao = relatedTables.getMappingDao(relation);
+
+        FeatureDao featureDao1 = geoPackage.getFeatureDao(relation
+                .getBaseTableName());
+        FeatureDao featureDao2 = geoPackage.getFeatureDao(relation
+                .getRelatedTableName());
+
+        FeatureCursor featureCursor1 = featureDao1.queryForAll();
+        while (featureCursor1.moveToNext()) {
+
+            FeatureRow featureRow1 = featureCursor1.getRow();
+            String featureName = featureRow1.getValue(TEXT_COLUMN).toString();
+
+            FeatureCursor featureCursor2 = featureDao2.queryForEq(
+                    TEXT_COLUMN, featureName);
+            while (featureCursor2.moveToNext()) {
+
+                FeatureRow featureRow2 = featureCursor2.getRow();
+
+                UserMappingRow userMappingRow = userMappingDao.newRow();
+                userMappingRow.setBaseId(featureRow1.getId());
+                userMappingRow.setRelatedId(featureRow2.getId());
+                RelatedTablesUtils.populateUserRow(userMappingDao.getTable(),
+                        userMappingRow, UserMappingTable.requiredColumns());
+                DublinCoreMetadata.setValue(userMappingRow,
+                        DublinCoreType.TITLE, featureName);
+                DublinCoreMetadata.setValue(userMappingRow,
+                        DublinCoreType.DESCRIPTION, featureName);
+                DublinCoreMetadata.setValue(userMappingRow,
+                        DublinCoreType.SOURCE, featureName);
+                userMappingDao.create(userMappingRow);
+            }
+            featureCursor2.close();
+
+        }
+        featureCursor1.close();
+
+    }
+
+    private static void createRelatedTablesSimpleAttributesExtension(GeoPackage geoPackage) {
+
+        RelatedTablesExtension relatedTables = new RelatedTablesExtension(
+                geoPackage);
+
+        List<UserCustomColumn> simpleUserColumns = RelatedTablesUtils
+                .creatSimpleUserColumns(SimpleAttributesTable
+                        .numRequiredColumns());
+        SimpleAttributesTable simpleTable = SimpleAttributesTable.create(
+                "simple_attributes", simpleUserColumns);
+
+        String tableName = geoPackage.getAttributesTables().get(0);
+
+        List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
+                .createAdditionalUserColumns(UserMappingTable
+                        .numRequiredColumns());
+        UserMappingTable userMappingTable = UserMappingTable.create(tableName
+                + "_" + simpleTable.getTableName(), additionalMappingColumns);
+        ExtendedRelation relation = relatedTables
+                .addSimpleAttributesRelationship(tableName, simpleTable,
+                        userMappingTable);
+
+        SimpleAttributesDao simpleAttributesDao = relatedTables
+                .getSimpleAttributesDao(simpleTable);
+        List<Long> simpleAttributesIds = new ArrayList<>();
+        for (int i = 1; i <= 3; i++) {
+
+            SimpleAttributesRow simpleAttributesRow = simpleAttributesDao
+                    .newRow();
+            RelatedTablesUtils.populateUserRow(simpleAttributesRow.getTable(),
+                    simpleAttributesRow,
+                    SimpleAttributesTable.requiredColumns());
+            DublinCoreMetadata.setValue(simpleAttributesRow,
+                    DublinCoreType.TITLE, DublinCoreType.TITLE.getName() + i);
+            DublinCoreMetadata.setValue(simpleAttributesRow,
+                    DublinCoreType.DESCRIPTION,
+                    DublinCoreType.DESCRIPTION.getName() + i);
+            DublinCoreMetadata.setValue(simpleAttributesRow,
+                    DublinCoreType.SOURCE, DublinCoreType.SOURCE.getName() + i);
+            simpleAttributesIds.add(simpleAttributesDao
+                    .create(simpleAttributesRow));
+
+        }
+
+        UserMappingDao userMappingDao = relatedTables.getMappingDao(relation);
+        AttributesDao attributesDao = geoPackage.getAttributesDao(tableName);
+
+        AttributesCursor attributesCursor = attributesDao.queryForAll();
+        while (attributesCursor.moveToNext()) {
+            AttributesRow attributesRow = attributesCursor.getRow();
+            long randomSimpleRowId = simpleAttributesIds.get((int) (Math
+                    .random() * simpleAttributesIds.size()));
+            SimpleAttributesRow simpleAttributesRow = simpleAttributesDao
+                    .getRow(simpleAttributesDao
+                            .queryForIdRow(randomSimpleRowId));
+
+            UserMappingRow userMappingRow = userMappingDao.newRow();
+            userMappingRow.setBaseId(attributesRow.getId());
+            userMappingRow.setRelatedId(simpleAttributesRow.getId());
+            RelatedTablesUtils.populateUserRow(userMappingDao.getTable(),
+                    userMappingRow, UserMappingTable.requiredColumns());
+            String attributesName = attributesRow.getValue(TEXT_COLUMN)
+                    .toString();
+            DublinCoreMetadata.setValue(
+                    userMappingRow,
+                    DublinCoreType.TITLE,
+                    attributesName
+                            + " - "
+                            + DublinCoreMetadata.getValue(simpleAttributesRow,
+                            DublinCoreType.TITLE));
+            DublinCoreMetadata.setValue(
+                    userMappingRow,
+                    DublinCoreType.DESCRIPTION,
+                    attributesName
+                            + " - "
+                            + DublinCoreMetadata.getValue(simpleAttributesRow,
+                            DublinCoreType.DESCRIPTION));
+            DublinCoreMetadata.setValue(
+                    userMappingRow,
+                    DublinCoreType.SOURCE,
+                    attributesName
+                            + " - "
+                            + DublinCoreMetadata.getValue(simpleAttributesRow,
+                            DublinCoreType.SOURCE));
+            userMappingDao.create(userMappingRow);
+        }
+        attributesCursor.close();
 
     }
 

@@ -719,7 +719,7 @@ public class TileUtils {
                     cursor.close();
 
                     // Test copied row
-                    TileRow copyRow = new TileRow(queryTileRow2);
+                    TileRow copyRow = queryTileRow2.copy();
                     for (TileColumn column : dao.getTable().getColumns()) {
                         if (column.getIndex() == queryTileRow2
                                 .getTileDataColumnIndex()) {

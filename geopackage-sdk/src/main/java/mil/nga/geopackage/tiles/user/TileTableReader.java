@@ -39,7 +39,7 @@ public class TileTableReader extends
 			String type, Long max, boolean notNull, int defaultValueIndex,
 			boolean primaryKey) {
 
-		GeoPackageDataType dataType = GeoPackageDataType.fromName(type);
+		GeoPackageDataType dataType = getDataType(type);
 
 		Object defaultValue = cursor.getValue(
                 defaultValueIndex, dataType);

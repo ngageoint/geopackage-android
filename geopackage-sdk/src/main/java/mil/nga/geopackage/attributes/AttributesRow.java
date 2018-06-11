@@ -40,4 +40,14 @@ public class AttributesRow extends UserRow<AttributesColumn, AttributesTable> {
         super(attributesRow);
     }
 
+    /**
+     * Copy the row
+     *
+     * @return row copy
+     * @since 3.0.1
+     */
+    public AttributesRow copy() {
+        return new AttributesRow(this);
+    }
+
 }

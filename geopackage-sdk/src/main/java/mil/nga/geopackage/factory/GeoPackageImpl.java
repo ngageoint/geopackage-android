@@ -80,6 +80,15 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
+    public void registerCursorWrapper(String table, GeoPackageCursorWrapper cursorWrapper) {
+        cursorFactory.registerTable(table,
+                cursorWrapper);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public FeatureDao getFeatureDao(GeometryColumns geometryColumns) {
 
         if (geometryColumns == null) {
@@ -96,7 +105,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         FeatureDao dao = new FeatureDao(getName(), database, userDb, geometryColumns, featureTable);
 
         // Register the table name (with and without quotes) to wrap cursors with the feature cursor
-        cursorFactory.registerTable(geometryColumns.getTableName(),
+        registerCursorWrapper(geometryColumns.getTableName(),
                 new GeoPackageCursorWrapper() {
 
                     @Override
@@ -210,7 +219,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                 tileTable);
 
         // Register the table name (with and without quotes) to wrap cursors with the tile cursor
-        cursorFactory.registerTable(tileMatrixSet.getTableName(),
+        registerCursorWrapper(tileMatrixSet.getTableName(),
                 new GeoPackageCursorWrapper() {
 
                     @Override
@@ -304,7 +313,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                 attributesTable);
 
         // Register the table name (with and without quotes) to wrap cursors with the attributes cursor
-        cursorFactory.registerTable(attributesTable.getTableName(),
+        registerCursorWrapper(attributesTable.getTableName(),
                 new GeoPackageCursorWrapper() {
 
                     @Override
@@ -312,7 +321,6 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                         return new AttributesCursor(attributesTable, cursor);
                     }
                 });
-
 
         return dao;
     }

@@ -67,4 +67,15 @@ public class GeoPackageImportTest extends ImportGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test delete tables
+	 *
+	 * @throws SQLException
+	 */
+	public void testDeleteTables() throws SQLException {
+
+		GeoPackageTestUtils.testDeleteTables(geoPackage);
+
+	}
+
 }

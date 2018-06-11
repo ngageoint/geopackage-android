@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.CoreSQLUtils;
 
 /**
@@ -45,33 +44,23 @@ class GeoPackageCursorFactory implements CursorFactory {
     public void registerTable(String tableName,
                               GeoPackageCursorWrapper cursorWrapper) {
 
-        // Check for an existing wrapper
-        GeoPackageCursorWrapper existing = tableCursors.get(tableName);
+        // Remove an existing cursor wrapper
+        tableCursors.remove(tableName);
 
         // Add the wrapper
-        if (existing == null) {
-            tableCursors.put(tableName, cursorWrapper);
-            String quotedTableName = CoreSQLUtils.quoteWrap(tableName);
-            tableCursors.put(quotedTableName, cursorWrapper);
+        tableCursors.put(tableName, cursorWrapper);
+        String quotedTableName = CoreSQLUtils.quoteWrap(tableName);
+        tableCursors.put(quotedTableName, cursorWrapper);
 
-            // The Android android.database.sqlite.SQLiteDatabase findEditTable method
-            // finds the new cursor edit table name based upon the first space or comma.
-            // Fix (hopefully temporary) to wrap with the expected cursor type
-            int spacePosition = tableName.indexOf(' ');
-            if(spacePosition > 0){
-                tableCursors.put(tableName.substring(0, spacePosition), cursorWrapper);
-                tableCursors.put(quotedTableName.substring(0, quotedTableName.indexOf(' ')), cursorWrapper);
-            }
+        // The Android android.database.sqlite.SQLiteDatabase findEditTable method
+        // finds the new cursor edit table name based upon the first space or comma.
+        // Fix (hopefully temporary) to wrap with the expected cursor type
+        int spacePosition = tableName.indexOf(' ');
+        if (spacePosition > 0) {
+            tableCursors.put(tableName.substring(0, spacePosition), cursorWrapper);
+            tableCursors.put(quotedTableName.substring(0, quotedTableName.indexOf(' ')), cursorWrapper);
+        }
 
-        }
-        // Verify that the wrapper is not different from the existing
-        else if (!existing.getClass().equals(cursorWrapper.getClass())) {
-            throw new GeoPackageException("Table '" + tableName
-                    + "' was already registered for cursor wrapper '"
-                    + existing.getClass().getSimpleName()
-                    + "' and can not be registered for '"
-                    + cursorWrapper.getClass().getSimpleName() + "'");
-        }
     }
 
     /**

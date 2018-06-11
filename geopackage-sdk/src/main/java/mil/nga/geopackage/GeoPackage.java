@@ -5,6 +5,7 @@ import android.database.Cursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.factory.GeoPackageCursorWrapper;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
@@ -16,6 +17,15 @@ import mil.nga.geopackage.tiles.user.TileDao;
  * @author osbornb
  */
 public interface GeoPackage extends GeoPackageCore {
+
+    /**
+     * Register a GeoPackage Cursor Wrapper for table name
+     *
+     * @param table         table name
+     * @param cursorWrapper cursor wrapper
+     * @since 3.0.1
+     */
+    public void registerCursorWrapper(String table, GeoPackageCursorWrapper cursorWrapper);
 
     /**
      * Get a Feature DAO from Geometry Columns

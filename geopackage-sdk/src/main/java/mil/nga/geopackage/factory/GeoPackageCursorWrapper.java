@@ -8,7 +8,7 @@ import android.database.Cursor;
  * 
  * @author osbornb
  */
-interface GeoPackageCursorWrapper {
+public interface GeoPackageCursorWrapper {
 
 	/**
 	 * Wrap the cursor

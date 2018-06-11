@@ -714,8 +714,7 @@ public class AttributesUtils {
 					cursor.close();
 
 					// Test copied row
-					AttributesRow copyRow = new AttributesRow(
-							queryAttributesRow2);
+					AttributesRow copyRow = queryAttributesRow2.copy();
 					for (AttributesColumn column : dao.getTable().getColumns()) {
 						if (column.getDataType() == GeoPackageDataType.BLOB) {
 							byte[] blob1 = (byte[]) queryAttributesRow2

@@ -1105,7 +1105,7 @@ public class FeatureUtils {
 					cursor.close();
 
 					// Test copied row
-					FeatureRow copyRow = new FeatureRow(queryFeatureRow2);
+					FeatureRow copyRow = queryFeatureRow2.copy();
 					for (FeatureColumn column : dao.getTable().getColumns()) {
 						if (column.getIndex() == queryFeatureRow2
 								.getGeometryColumnIndex()) {

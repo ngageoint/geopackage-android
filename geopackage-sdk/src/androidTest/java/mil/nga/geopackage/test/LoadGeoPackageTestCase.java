@@ -10,11 +10,11 @@ import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 
 /**
- * Abstract Test Case for Tile GeoPackage tests
+ * Abstract Test Case for loading a GeoPackage for tests
  *
  * @author osbornb
  */
-public abstract class TilesGeoPackageTestCase extends GeoPackageTestCase {
+public abstract class LoadGeoPackageTestCase extends GeoPackageTestCase {
 
     private final String name;
     private final String file;
@@ -22,7 +22,7 @@ public abstract class TilesGeoPackageTestCase extends GeoPackageTestCase {
     /**
      * Constructor
      */
-    public TilesGeoPackageTestCase(String name, String file) {
+    public LoadGeoPackageTestCase(String name, String file) {
         this.name = name;
         this.file = file;
     }

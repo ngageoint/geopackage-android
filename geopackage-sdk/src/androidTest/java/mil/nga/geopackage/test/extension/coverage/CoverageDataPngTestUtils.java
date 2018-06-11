@@ -208,18 +208,18 @@ public class CoverageDataPngTestUtils {
                         allowNulls);
             }
 
-            TileCursor tileResultSet = tileDao.queryForAll();
-            TestCase.assertNotNull(tileResultSet);
-            TestCase.assertTrue(tileResultSet.getCount() > 0);
-            while (tileResultSet.moveToNext()) {
-                TileRow tileRow = tileResultSet.getRow();
+            TileCursor tileCursor = tileDao.queryForAll();
+            TestCase.assertNotNull(tileCursor);
+            TestCase.assertTrue(tileCursor.getCount() > 0);
+            while (tileCursor.moveToNext()) {
+                TileRow tileRow = tileCursor.getRow();
                 GriddedTile griddedTile = coverageData.getGriddedTile(tileRow
                         .getId());
                 testTileRow(geoPackage, coverageDataValues, coverageData,
                         tileMatrixSet, griddedTile, tileRow, algorithm,
                         allowNulls);
             }
-            tileResultSet.close();
+            tileCursor.close();
 
             // Perform coverage data query tests
             CoverageDataTestUtils.testCoverageDataQueries(geoPackage, coverageData, tileMatrixSet,

@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.test.TestConstants;
-import mil.nga.geopackage.test.TilesGeoPackageTestCase;
+import mil.nga.geopackage.test.LoadGeoPackageTestCase;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.TileCreator;
@@ -23,7 +23,7 @@ import mil.nga.sf.proj.ProjectionFactory;
  *
  * @author osbornb
  */
-public class TileCreatorGetTileTest extends TilesGeoPackageTestCase {
+public class TileCreatorGetTileTest extends LoadGeoPackageTestCase {
 
     /**
      * Constructor

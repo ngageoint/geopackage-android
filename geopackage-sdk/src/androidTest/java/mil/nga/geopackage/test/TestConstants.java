@@ -33,6 +33,11 @@ public class TestConstants {
 	public static final String TILES2_DB_NAME = "tiles2";
 
 	/**
+	 * Related Tables database name
+	 */
+	public static final String RTE_DB_NAME = "rte";
+
+	/**
 	 * Import url
 	 */
 	public static final String IMPORT_URL = "http://www.geopackage.org/data/gdal_sample.gpkg";
@@ -53,6 +58,12 @@ public class TestConstants {
 	 * Tiles 2 database file name, located in the test assets
 	 */
 	public static final String TILES2_DB_FILE_NAME = TILES2_DB_NAME + "."
+			+ GEO_PACKAGE_EXTENSION;
+
+	/**
+	 * Related Tables Extension database file name, located in the test assets
+	 */
+	public static final String RTE_DB_FILE_NAME = RTE_DB_NAME + "."
 			+ GEO_PACKAGE_EXTENSION;
 
 	/**

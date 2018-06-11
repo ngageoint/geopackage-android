@@ -49,6 +49,14 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackageConnection getDb() {
+        return (GeoPackageConnection) super.getDb();
+    }
+
+    /**
      * Get the database connection
      *
      * @return database
@@ -164,7 +172,9 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     @Override
     public long insert(TRow row) {
         long id = db.insertOrThrow(getTableName(), null, row.toContentValues());
-        row.setId(id);
+        if (row.hasIdColumn()) {
+            row.setId(id);
+        }
         return id;
     }
 
