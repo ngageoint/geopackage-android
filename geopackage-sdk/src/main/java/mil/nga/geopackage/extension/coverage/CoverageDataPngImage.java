@@ -72,7 +72,7 @@ public class CoverageDataPngImage implements CoverageDataImage {
     /**
      * Constructor, used for writing a PNG
      *
-     * @param imageInfo
+     * @param imageInfo image info
      */
     public CoverageDataPngImage(ImageInfo imageInfo) {
         outputStream = new ByteArrayOutputStream();

@@ -16,7 +16,7 @@ public class AttributesConnection
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     public AttributesConnection(GeoPackageConnection database) {
         super(database);

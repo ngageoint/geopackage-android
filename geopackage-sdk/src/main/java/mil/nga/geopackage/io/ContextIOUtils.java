@@ -14,9 +14,9 @@ public class ContextIOUtils {
     /**
      * Get the internal storage file for the file path
      *
-     * @param context
-     * @param filePath
-     * @return
+     * @param context  context
+     * @param filePath file path
+     * @return file
      */
     public static File getInternalFile(Context context, String filePath) {
         File internalFile = null;
@@ -31,9 +31,9 @@ public class ContextIOUtils {
     /**
      * Get the internal storage patch for the file path
      *
-     * @param context
-     * @param filePath
-     * @return
+     * @param context  context
+     * @param filePath file path
+     * @return file path
      */
     public static String getInternalFilePath(Context context, String filePath) {
         return getInternalFile(context, filePath).getAbsolutePath();

@@ -8,10 +8,10 @@ import mil.nga.geopackage.db.GeoPackageDatabase;
 /**
  * Abstract User DAO for reading user tables
  *
- * @param <TColumn>
- * @param <TTable>
- * @param <TRow>
- * @param <TResult>
+ * @param <TColumn> column type
+ * @param <TTable>  table type
+ * @param <TRow>    row type
+ * @param <TResult> result type
  * @author osbornb
  */
 public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TResult extends UserCursor<TColumn, TTable, TRow>>
@@ -35,10 +35,10 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     /**
      * Constructor
      *
-     * @param database
-     * @param db
-     * @param userDb
-     * @param table
+     * @param database database name
+     * @param db       GeoPackage connection
+     * @param userDb   user connection
+     * @param table    table
      */
     protected UserDao(String database, GeoPackageConnection db,
                       UserConnection<TColumn, TTable, TRow, TResult> userDb,
@@ -156,10 +156,10 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     /**
      * Update all rows matching the where clause with the provided values
      *
-     * @param values
-     * @param whereClause
-     * @param whereArgs
-     * @return
+     * @param values      content values
+     * @param whereClause where clause
+     * @param whereArgs   where arguments
+     * @return updated rows
      */
     public int update(ContentValues values, String whereClause,
                       String[] whereArgs) {
@@ -181,7 +181,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     /**
      * Inserts a new row
      *
-     * @param values
+     * @param values content values
      * @return row id, -1 on error
      */
     public long insert(ContentValues values) {
@@ -191,7 +191,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     /**
      * Inserts a new row
      *
-     * @param values
+     * @param values content values
      * @return row id
      */
     public long insertOrThrow(ContentValues values) {

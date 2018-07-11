@@ -16,7 +16,7 @@ public class TileWrapperConnection extends
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     public TileWrapperConnection(GeoPackageConnection database) {
         super(database);

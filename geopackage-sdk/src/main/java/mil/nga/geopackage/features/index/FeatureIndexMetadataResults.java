@@ -29,8 +29,8 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
     /**
      * Constructor
      *
-     * @param featureIndexer
-     * @param geometryMetadata
+     * @param featureIndexer   feature indexer
+     * @param geometryMetadata geometry metadata
      */
     public FeatureIndexMetadataResults(FeatureIndexer featureIndexer, Cursor geometryMetadata) {
         this.featureIndexer = featureIndexer;
@@ -68,7 +68,7 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
      * {@inheritDoc}
      */
     @Override
-    public long count(){
+    public long count() {
         return geometryMetadata.getCount();
     }
 

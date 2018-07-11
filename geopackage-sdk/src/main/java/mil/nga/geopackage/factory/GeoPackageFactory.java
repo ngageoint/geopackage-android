@@ -21,8 +21,8 @@ public class GeoPackageFactory {
     /**
      * Get a GeoPackage Manager
      *
-     * @param context
-     * @return
+     * @param context context
+     * @return GeoPackage manager
      */
     public static GeoPackageManager getManager(Context context) {
         Thread.currentThread().setContextClassLoader(GeoPackageManager.class.getClassLoader());

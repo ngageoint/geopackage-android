@@ -8,10 +8,10 @@ import mil.nga.geopackage.db.GeoPackageConnection;
  * GeoPackage Connection used to define common functionality within different
  * connection types. Wraps Cursor results.
  *
- * @param <TColumn>
- * @param <TTable>
- * @param <TRow>
- * @param <TResult>
+ * @param <TColumn> column type
+ * @param <TTable>  table type
+ * @param <TRow>    row type
+ * @param <TResult> result type
  * @author osbornb
  */
 public abstract class UserWrapperConnection<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TResult extends UserCursor<TColumn, TTable, TRow>>
@@ -20,7 +20,7 @@ public abstract class UserWrapperConnection<TColumn extends UserColumn, TTable e
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     protected UserWrapperConnection(GeoPackageConnection database) {
         super(database);
@@ -29,8 +29,8 @@ public abstract class UserWrapperConnection<TColumn extends UserColumn, TTable e
     /**
      * Wrap the cursor in a result
      *
-     * @param cursor
-     * @return
+     * @param cursor cursor
+     * @return result
      */
     protected abstract TResult wrapCursor(Cursor cursor);
 

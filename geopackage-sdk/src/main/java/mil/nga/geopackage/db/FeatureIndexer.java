@@ -64,8 +64,8 @@ public class FeatureIndexer {
     /**
      * Constructor
      *
-     * @param context
-     * @param featureDao
+     * @param context    context
+     * @param featureDao feature dao
      */
     public FeatureIndexer(Context context, FeatureDao featureDao) {
         this.context = context;
@@ -87,7 +87,7 @@ public class FeatureIndexer {
     /**
      * Set the progress tracker
      *
-     * @param progress
+     * @param progress progress tracker
      */
     public void setProgress(GeoPackageProgress progress) {
         this.progress = progress;
@@ -120,7 +120,7 @@ public class FeatureIndexer {
      * Index the feature row. This method assumes that indexing has been completed and
      * maintained as the last indexed time is updated.
      *
-     * @param row
+     * @param row feature row
      * @return true if indexed
      */
     public boolean index(FeatureRow row) {
@@ -183,9 +183,9 @@ public class FeatureIndexer {
     /**
      * Index the feature row
      *
-     * @param geoPackageId
-     * @param row
-     * @param possibleUpdate
+     * @param geoPackageId   GeoPackage id
+     * @param row            feature row
+     * @param possibleUpdate possible update flag
      * @return true if indexed
      */
     private boolean index(long geoPackageId, FeatureRow row, boolean possibleUpdate) {
@@ -224,8 +224,8 @@ public class FeatureIndexer {
     /**
      * Update the least indexed time
      *
-     * @param db
-     * @param geoPackageId
+     * @param db           metadata db
+     * @param geoPackageId GeoPackage id
      */
     private void updateLastIndexed(GeoPackageMetadataDb db, long geoPackageId) {
 
@@ -254,7 +254,7 @@ public class FeatureIndexer {
     /**
      * Delete the index for the feature row
      *
-     * @param row
+     * @param row feature row
      * @return true if deleted
      * @since 1.1.0
      */
@@ -265,7 +265,7 @@ public class FeatureIndexer {
     /**
      * Delete the index for the geometry id
      *
-     * @param geomId
+     * @param geomId geometry id
      * @return true if deleted
      */
     public boolean deleteIndex(long geomId) {
@@ -338,7 +338,7 @@ public class FeatureIndexer {
      * Query for Geometry Metadata within the bounding box, projected
      * correctly
      *
-     * @param boundingBox
+     * @param boundingBox bounding box
      * @return geometry metadata cursor
      * @since 1.1.0
      */
@@ -351,7 +351,7 @@ public class FeatureIndexer {
      * Query for Geometry Metadata count within the bounding box, projected
      * correctly
      *
-     * @param boundingBox
+     * @param boundingBox bounding box
      * @return count
      * @since 1.1.0
      */
@@ -363,7 +363,7 @@ public class FeatureIndexer {
     /**
      * Query for Geometry Metadata within the Geometry Envelope
      *
-     * @param envelope
+     * @param envelope geometry envelope
      * @return geometry metadata cursor
      * @since 1.1.0
      */
@@ -375,7 +375,7 @@ public class FeatureIndexer {
     /**
      * Query for Geometry Metadata count within the Geometry Envelope
      *
-     * @param envelope
+     * @param envelope geometry envelope
      * @return count
      * @since 1.1.0
      */
@@ -388,7 +388,7 @@ public class FeatureIndexer {
      * Query for Geometry Metadata within the bounding box in
      * the provided projection
      *
-     * @param boundingBox
+     * @param boundingBox bounding box
      * @param projection  projection of the provided bounding box
      * @return geometry metadata cursor
      * @since 1.1.0
@@ -408,7 +408,7 @@ public class FeatureIndexer {
      * Query for Geometry Metadata count within the bounding box in
      * the provided projection
      *
-     * @param boundingBox
+     * @param boundingBox bounding box
      * @param projection  projection of the provided bounding box
      * @return count
      * @since 1.1.0
@@ -427,8 +427,8 @@ public class FeatureIndexer {
      * Get the bounding box in the feature projection from the bounding box in
      * the provided projection
      *
-     * @param boundingBox
-     * @param projection
+     * @param boundingBox bounding box
+     * @param projection  projection
      * @return feature projected bounding box
      */
     private BoundingBox getFeatureBoundingBox(BoundingBox boundingBox,
@@ -443,7 +443,7 @@ public class FeatureIndexer {
     /**
      * Get the Geometry Metadata for the current place in the cursor
      *
-     * @param cursor
+     * @param cursor cursor
      * @return geometry metadata
      * @since 1.1.0
      */
@@ -455,7 +455,7 @@ public class FeatureIndexer {
     /**
      * Get the feature row for the current place in the cursor
      *
-     * @param cursor
+     * @param cursor cursor
      * @return feature row
      * @since 1.1.0
      */
@@ -468,7 +468,7 @@ public class FeatureIndexer {
     /**
      * Get the feature row for the Geometry Metadata
      *
-     * @param geometryMetadata
+     * @param geometryMetadata geometry metadata
      * @return feature row
      * @since 1.1.0
      */

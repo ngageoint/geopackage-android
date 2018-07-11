@@ -9,10 +9,10 @@ import mil.nga.geopackage.db.GeoPackageDatabase;
  * GeoPackage Connection used to define common functionality within different
  * connection types
  *
- * @param <TColumn>
- * @param <TTable>
- * @param <TRow>
- * @param <TResult>
+ * @param <TColumn> column type
+ * @param <TTable>  table type
+ * @param <TRow>    row type
+ * @param <TResult> result type
  * @author osbornb
  */
 public abstract class UserConnection<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TResult extends UserCursor<TColumn, TTable, TRow>>
@@ -26,7 +26,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     protected UserConnection(GeoPackageConnection database) {
         this.database = database.getDb();

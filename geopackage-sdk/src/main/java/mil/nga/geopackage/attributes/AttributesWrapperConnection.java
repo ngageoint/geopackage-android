@@ -18,7 +18,7 @@ public class AttributesWrapperConnection
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     public AttributesWrapperConnection(GeoPackageConnection database) {
         super(database);

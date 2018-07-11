@@ -23,7 +23,7 @@ public class GeometryMetadataDataSource {
     /**
      * Constructor
      *
-     * @param db
+     * @param db metadata db
      */
     public GeometryMetadataDataSource(GeoPackageMetadataDb db) {
         this.db = db.getDb();
@@ -32,7 +32,7 @@ public class GeometryMetadataDataSource {
     /**
      * Constructor
      *
-     * @param db
+     * @param db GeoPackage database
      */
     GeometryMetadataDataSource(GeoPackageDatabase db) {
         this.db = db;
@@ -41,8 +41,8 @@ public class GeometryMetadataDataSource {
     /**
      * Create a new geometry metadata
      *
-     * @param metadata
-     * @return
+     * @param metadata geometry metadata
+     * @return id
      */
     public long create(GeometryMetadata metadata) {
         ContentValues values = new ContentValues();
@@ -74,11 +74,11 @@ public class GeometryMetadataDataSource {
     /**
      * Create a new geometry metadata from an envelope
      *
-     * @param geoPackage
-     * @param tableName
-     * @param geomId
-     * @param envelope
-     * @return
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param geomId     geometry id
+     * @param envelope   geometry envelope
+     * @return geometry metadata
      */
     public GeometryMetadata create(String geoPackage, String tableName, long geomId, GeometryEnvelope envelope) {
         return create(getGeoPackageId(geoPackage), tableName, geomId, envelope);
@@ -87,11 +87,11 @@ public class GeometryMetadataDataSource {
     /**
      * Create a new geometry metadata from an envelope
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param geomId
-     * @param envelope
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param geomId       geometry id
+     * @param envelope     geometry envelope
+     * @return geometry metadata
      */
     public GeometryMetadata create(long geoPackageId, String tableName, long geomId, GeometryEnvelope envelope) {
 
@@ -103,11 +103,11 @@ public class GeometryMetadataDataSource {
     /**
      * Populate a new geometry metadata from an envelope
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param geomId
-     * @param envelope
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param geomId       geometry id
+     * @param envelope     geometry envelope
+     * @return geometry metadata
      */
     public GeometryMetadata populate(long geoPackageId, String tableName, long geomId, GeometryEnvelope envelope) {
 
@@ -133,8 +133,8 @@ public class GeometryMetadataDataSource {
     /**
      * Delete the geometry metadata
      *
-     * @param metadata
-     * @return
+     * @param metadata geometry metadata
+     * @return deleted count
      */
     public boolean delete(GeometryMetadata metadata) {
         return delete(metadata.getGeoPackageId(), metadata.getTableName(), metadata.getId());
@@ -143,8 +143,8 @@ public class GeometryMetadataDataSource {
     /**
      * Delete geometry metadata by database
      *
-     * @param geoPackage
-     * @return
+     * @param geoPackage GeoPackage name
+     * @return deleted count
      */
     public int delete(String geoPackage) {
         return delete(getGeoPackageId(geoPackage));
@@ -153,8 +153,8 @@ public class GeometryMetadataDataSource {
     /**
      * Delete geometry metadata by database
      *
-     * @param geoPackageId
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @return deleted count
      */
     public int delete(long geoPackageId) {
         String whereClause = GeometryMetadata.COLUMN_GEOPACKAGE_ID + " = ?";
@@ -168,9 +168,9 @@ public class GeometryMetadataDataSource {
     /**
      * Delete geometry metadata by table name
      *
-     * @param geoPackage
-     * @param tableName
-     * @return
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @return deleted count
      */
     public int delete(String geoPackage, String tableName) {
         return delete(getGeoPackageId(geoPackage), tableName);
@@ -179,9 +179,9 @@ public class GeometryMetadataDataSource {
     /**
      * Delete geometry metadata by table name
      *
-     * @param geoPackageId
-     * @param tableName
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @return deleted count
      */
     public int delete(long geoPackageId, String tableName) {
         String whereClause = GeometryMetadata.COLUMN_GEOPACKAGE_ID
@@ -196,10 +196,10 @@ public class GeometryMetadataDataSource {
     /**
      * Delete the geometry metadata
      *
-     * @param geoPackage
-     * @param tableName
-     * @param id
-     * @return
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param id         id
+     * @return deleted flag
      */
     public boolean delete(String geoPackage, String tableName, long id) {
         return delete(getGeoPackageId(geoPackage), tableName, id);
@@ -208,10 +208,10 @@ public class GeometryMetadataDataSource {
     /**
      * Delete the geometry metadata
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param id
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param id           id
+     * @return deleted flag
      */
     public boolean delete(long geoPackageId, String tableName, long id) {
         String whereClause = GeometryMetadata.COLUMN_GEOPACKAGE_ID
@@ -227,8 +227,8 @@ public class GeometryMetadataDataSource {
     /**
      * Create the geometry metadata or update if it already exists
      *
-     * @param metadata
-     * @return
+     * @param metadata geometry metadata
+     * @return created flag
      */
     public boolean createOrUpdate(GeometryMetadata metadata) {
 
@@ -247,8 +247,8 @@ public class GeometryMetadataDataSource {
     /**
      * Update the geometry metadata
      *
-     * @param metadata
-     * @return
+     * @param metadata geometry metadata
+     * @return updated flag
      */
     public boolean update(GeometryMetadata metadata) {
         String whereClause = GeometryMetadata.COLUMN_GEOPACKAGE_ID
@@ -273,8 +273,8 @@ public class GeometryMetadataDataSource {
     /**
      * Check if a table metadata exists
      *
-     * @param metadata
-     * @return
+     * @param metadata geometry metadata
+     * @return exists flag
      */
     public boolean exists(GeometryMetadata metadata) {
         return get(metadata) != null;
@@ -283,8 +283,8 @@ public class GeometryMetadataDataSource {
     /**
      * Get a table metadata
      *
-     * @param metadata
-     * @return
+     * @param metadata geometry metadata
+     * @return geometry metadata
      */
     public GeometryMetadata get(GeometryMetadata metadata) {
         return get(metadata.getGeoPackageId(), metadata.getTableName(), metadata.getId());
@@ -294,10 +294,10 @@ public class GeometryMetadataDataSource {
     /**
      * Get a table metadata
      *
-     * @param geoPackage
-     * @param tableName
-     * @param id
-     * @return
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param id         id
+     * @return geometry metadata
      */
     public GeometryMetadata get(String geoPackage, String tableName, long id) {
         return get(getGeoPackageId(geoPackage), tableName, id);
@@ -306,10 +306,10 @@ public class GeometryMetadataDataSource {
     /**
      * Get a table metadata
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param id
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param id           id
+     * @return geometry metadata
      */
     public GeometryMetadata get(long geoPackageId, String tableName, long id) {
         String selection = GeometryMetadata.COLUMN_GEOPACKAGE_ID
@@ -333,8 +333,8 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata
      *
-     * @param geoPackage
-     * @param tableName
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
      * @return cursor that must be closed
      */
     public Cursor query(String geoPackage, String tableName) {
@@ -344,8 +344,8 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata count
      *
-     * @param geoPackage
-     * @param tableName
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
      * @return count
      * @since 1.1.0
      */
@@ -356,8 +356,8 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata
      *
-     * @param geoPackageId
-     * @param tableName
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
      * @return cursor that must be closed
      */
     public Cursor query(long geoPackageId, String tableName) {
@@ -373,8 +373,8 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata count
      *
-     * @param geoPackageId
-     * @param tableName
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
      * @return count
      * @since 1.1.0
      */
@@ -388,9 +388,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata matching the bounding box in the same projection
      *
-     * @param geoPackage
-     * @param tableName
-     * @param boundingBox
+     * @param geoPackage  GeoPackage name
+     * @param tableName   table name
+     * @param boundingBox bounding box
      * @return cursor that must be closed
      */
     public Cursor query(String geoPackage, String tableName, BoundingBox boundingBox) {
@@ -400,9 +400,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata count matching the bounding box in the same projection
      *
-     * @param geoPackage
-     * @param tableName
-     * @param boundingBox
+     * @param geoPackage  GeoPackage name
+     * @param tableName   table name
+     * @param boundingBox bounding box
      * @return count
      * @since 1.1.0
      */
@@ -413,9 +413,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata matching the bounding box in the same projection
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param boundingBox
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param boundingBox  bounding box
      * @return cursor that must be closed
      */
     public Cursor query(long geoPackageId, String tableName, BoundingBox boundingBox) {
@@ -430,9 +430,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata count matching the bounding box in the same projection
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param boundingBox
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param boundingBox  bounding box
      * @return count
      * @since 1.1.0
      */
@@ -446,9 +446,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata matching the envelope
      *
-     * @param geoPackage
-     * @param tableName
-     * @param envelope
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param envelope   geometry envelope
      * @return cursor that must be closed
      */
     public Cursor query(String geoPackage, String tableName, GeometryEnvelope envelope) {
@@ -458,9 +458,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata count matching the envelope
      *
-     * @param geoPackage
-     * @param tableName
-     * @param envelope
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param envelope   geometry envelope
      * @return count
      * @since 1.1.0
      */
@@ -471,9 +471,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata matching the envelope
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param envelope
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param envelope     geometry envelope
      * @return cursor that must be closed
      */
     public Cursor query(long geoPackageId, String tableName, GeometryEnvelope envelope) {
@@ -520,9 +520,9 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata count matching the envelope
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param envelope
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param envelope     geometry envelope
      * @return count
      * @since 1.1.0
      */
@@ -536,8 +536,8 @@ public class GeometryMetadataDataSource {
     /**
      * Get a GeoPackage id from the name
      *
-     * @param geoPackage
-     * @return
+     * @param geoPackage GeoPackage name
+     * @return id
      */
     public long getGeoPackageId(String geoPackage) {
         long id = -1;
@@ -552,8 +552,8 @@ public class GeometryMetadataDataSource {
     /**
      * Create a geometry metadata from the current cursor location
      *
-     * @param cursor
-     * @return
+     * @param cursor cursor
+     * @return geometry metadata
      */
     public static GeometryMetadata createGeometryMetadata(Cursor cursor) {
         GeometryMetadata metadata = new GeometryMetadata();

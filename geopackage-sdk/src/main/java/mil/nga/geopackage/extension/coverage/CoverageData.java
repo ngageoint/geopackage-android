@@ -39,6 +39,7 @@ public abstract class CoverageData<TImage extends CoverageDataImage> extends Cov
      * @param width             coverage data response width
      * @param height            coverage data response height
      * @param requestProjection request projection
+     * @return coverage data
      */
     public static CoverageData<?> getCoverageData(GeoPackage geoPackage,
                                                   TileDao tileDao, Integer width, Integer height,
@@ -85,6 +86,7 @@ public abstract class CoverageData<TImage extends CoverageDataImage> extends Cov
      *
      * @param geoPackage GeoPackage
      * @param tileDao    tile dao
+     * @return coverage data
      */
     public static CoverageData<?> getCoverageData(GeoPackage geoPackage,
                                                   TileDao tileDao) {
@@ -99,6 +101,7 @@ public abstract class CoverageData<TImage extends CoverageDataImage> extends Cov
      * @param geoPackage        GeoPackage
      * @param tileDao           tile dao
      * @param requestProjection request projection
+     * @return coverage data
      */
     public static CoverageData<?> getCoverageData(GeoPackage geoPackage,
                                                   TileDao tileDao, Projection requestProjection) {

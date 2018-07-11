@@ -37,6 +37,7 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param sql sql command
      * @see SQLiteDatabase#execSQL(String)
      */
     public void execSQL(String sql) throws SQLException {
@@ -44,6 +45,10 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table       table name
+     * @param whereClause where clause
+     * @param whereArgs   where arguments
+     * @return deleted rows
      * @see SQLiteDatabase#delete(String, String, String[])
      */
     public int delete(String table, String whereClause, String[] whereArgs) {
@@ -51,6 +56,9 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param sql           sql command
+     * @param selectionArgs selection arguments
+     * @return cursor
      * @see SQLiteDatabase#rawQuery(String, String[])
      */
     public Cursor rawQuery(String sql, String[] selectionArgs) {
@@ -65,6 +73,14 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table         table name
+     * @param columns       columns
+     * @param selection     selection
+     * @param selectionArgs selection arguments
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @return cursor
      * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String)
      */
     public Cursor query(String table, String[] columns, String selection,
@@ -74,6 +90,15 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table         table name
+     * @param columns       columns
+     * @param columnsAs     columns as
+     * @param selection     selection
+     * @param selectionArgs selection arguments
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @return cursor
      * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String)
      * @since 2.0.0
      */
@@ -86,6 +111,15 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table         table name
+     * @param columns       columns
+     * @param selection     selection
+     * @param selectionArgs selection arguments
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @param limit         limit
+     * @return cursor
      * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String, String)
      */
     public Cursor query(String table, String[] columns, String selection,
@@ -95,6 +129,16 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table         table name
+     * @param columns       columns
+     * @param columnsAs     columns as
+     * @param selection     selection
+     * @param selectionArgs selection arguments
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @param limit         limit
+     * @return cursor
      * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String, String)
      * @since 2.0.0
      */
@@ -107,6 +151,11 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table       table name
+     * @param values      content values
+     * @param whereClause where clause
+     * @param whereArgs   where arguments
+     * @return updated rows
      * @see SQLiteDatabase#update(String, ContentValues, String, String[])
      */
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
@@ -114,6 +163,10 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table          table name
+     * @param nullColumnHack null column hack
+     * @param values         content values
+     * @return row id
      * @see SQLiteDatabase#insertOrThrow(String, String, ContentValues)
      */
     public long insertOrThrow(String table, String nullColumnHack, ContentValues values) throws SQLException {
@@ -121,6 +174,10 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * @param table          table name
+     * @param nullColumnHack null column hack
+     * @param values         content values
+     * @return row id
      * @see SQLiteDatabase#insert(String, String, ContentValues)
      */
     public long insert(String table, String nullColumnHack, ContentValues values) {

@@ -49,7 +49,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the zoom level column index
      *
-     * @return
+     * @return zoom level column index
      */
     public int getZoomLevelColumnIndex() {
         return getTable().getZoomLevelColumnIndex();
@@ -58,7 +58,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the zoom level column
      *
-     * @return
+     * @return zoom level column
      */
     public TileColumn getZoomLevelColumn() {
         return getTable().getZoomLevelColumn();
@@ -67,7 +67,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the zoom level
      *
-     * @return
+     * @return zoom level
      */
     public long getZoomLevel() {
         return ((Number) getValue(getZoomLevelColumnIndex())).longValue();
@@ -76,7 +76,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Set the zoom level
      *
-     * @param zoomLevel
+     * @param zoomLevel zoom level
      */
     public void setZoomLevel(long zoomLevel) {
         setValue(getZoomLevelColumnIndex(), zoomLevel);
@@ -85,7 +85,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile column column index
      *
-     * @return
+     * @return tile column column index
      */
     public int getTileColumnColumnIndex() {
         return getTable().getTileColumnColumnIndex();
@@ -94,7 +94,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile column column
      *
-     * @return
+     * @return tile column column
      */
     public TileColumn getTileColumnColumn() {
         return getTable().getTileColumnColumn();
@@ -103,7 +103,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile column
      *
-     * @return
+     * @return tile column
      */
     public long getTileColumn() {
         return ((Number) getValue(getTileColumnColumnIndex())).longValue();
@@ -112,7 +112,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Set the tile column
      *
-     * @param tileColumn
+     * @param tileColumn tile column
      */
     public void setTileColumn(long tileColumn) {
         setValue(getTileColumnColumnIndex(), tileColumn);
@@ -121,7 +121,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile row column index
      *
-     * @return
+     * @return tile row column index
      */
     public int getTileRowColumnIndex() {
         return getTable().getTileRowColumnIndex();
@@ -130,7 +130,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile row column
      *
-     * @return
+     * @return tile column
      */
     public TileColumn getTileRowColumn() {
         return getTable().getTileRowColumn();
@@ -139,7 +139,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile row
      *
-     * @return
+     * @return tile row
      */
     public long getTileRow() {
         return ((Number) getValue(getTileRowColumnIndex())).longValue();
@@ -148,7 +148,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Set the tile row
      *
-     * @param tileRow
+     * @param tileRow tile row
      */
     public void setTileRow(long tileRow) {
         setValue(getTileRowColumnIndex(), tileRow);
@@ -157,7 +157,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile data column index
      *
-     * @return
+     * @return tile data column index
      */
     public int getTileDataColumnIndex() {
         return getTable().getTileDataColumnIndex();
@@ -166,7 +166,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile data column
      *
-     * @return
+     * @return tile data column
      */
     public TileColumn getTileDataColumn() {
         return getTable().getTileDataColumn();
@@ -175,7 +175,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile data
      *
-     * @return
+     * @return tile data bytes
      */
     public byte[] getTileData() {
         return (byte[]) getValue(getTileDataColumnIndex());
@@ -184,7 +184,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Set the tile data
      *
-     * @param tileData
+     * @param tileData tile data bytes
      */
     public void setTileData(byte[] tileData) {
         setValue(getTileDataColumnIndex(), tileData);
@@ -193,7 +193,7 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile data bitmap
      *
-     * @return
+     * @return tile data bitmap
      */
     public Bitmap getTileDataBitmap() {
         return getTileDataBitmap(null);
@@ -202,8 +202,8 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Get the tile data bitmap with decoding options
      *
-     * @param options
-     * @return
+     * @param options bitmap options
+     * @return tile data bitmap
      */
     public Bitmap getTileDataBitmap(Options options) {
         return BitmapConverter.toBitmap(getTileData(), options);
@@ -212,9 +212,9 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Set the tile data from a full quality bitmap
      *
-     * @param bitmap
-     * @param format
-     * @throws IOException
+     * @param bitmap tile bitmap
+     * @param format compress format
+     * @throws IOException upon failure
      */
     public void setTileData(Bitmap bitmap, CompressFormat format)
             throws IOException {
@@ -224,10 +224,10 @@ public class TileRow extends UserRow<TileColumn, TileTable> {
     /**
      * Set the tile data from a bitmap
      *
-     * @param bitmap
-     * @param format
-     * @param quality
-     * @throws IOException
+     * @param bitmap  tile bitmap
+     * @param format  compress format
+     * @param quality quality
+     * @throws IOException upon failure
      */
     public void setTileData(Bitmap bitmap, CompressFormat format, int quality)
             throws IOException {

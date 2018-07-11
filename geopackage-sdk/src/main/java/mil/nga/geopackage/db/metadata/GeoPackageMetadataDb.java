@@ -32,7 +32,7 @@ public class GeoPackageMetadataDb extends SQLiteOpenHelper {
     /**
      * Constructor
      *
-     * @param context
+     * @param context context
      */
     public GeoPackageMetadataDb(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

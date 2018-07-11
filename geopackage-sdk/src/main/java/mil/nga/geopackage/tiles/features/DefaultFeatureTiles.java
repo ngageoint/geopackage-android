@@ -43,8 +43,8 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Constructor
      *
-     * @param context
-     * @param featureDao
+     * @param context context
+     * @param featureDao feature dao
      */
     public DefaultFeatureTiles(Context context, FeatureDao featureDao) {
         super(context, featureDao);
@@ -53,7 +53,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Constructor, only for retrieving default feature attributes
      *
-     * @param context
+     * @param context context
      */
     public DefaultFeatureTiles(Context context) {
         this(context, null);

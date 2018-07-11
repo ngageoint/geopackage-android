@@ -15,7 +15,7 @@ public class GeoPackageCache extends GeoPackageCoreCache<GeoPackage> {
     /**
      * Constructor
      *
-     * @param manager
+     * @param manager GeoPackage manager
      */
     public GeoPackageCache(GeoPackageManager manager) {
         this.manager = manager;
@@ -24,8 +24,8 @@ public class GeoPackageCache extends GeoPackageCoreCache<GeoPackage> {
     /**
      * Get the cached GeoPackage or open and cache the GeoPackage
      *
-     * @param name
-     * @return
+     * @param name GeoPackage name
+     * @return GeoPackage
      */
     public GeoPackage getOrOpen(String name) {
         GeoPackage geoPackage = get(name);

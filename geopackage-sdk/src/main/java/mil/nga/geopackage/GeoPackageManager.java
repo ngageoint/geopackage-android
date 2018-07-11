@@ -58,7 +58,7 @@ public interface GeoPackageManager {
     /**
      * Get the count of GeoPackage databases
      *
-     * @return
+     * @return count
      */
     public int count();
 
@@ -103,7 +103,7 @@ public interface GeoPackageManager {
     /**
      * Determine if the database exists
      *
-     * @param database
+     * @param database database name
      * @return true if exists
      */
     public boolean exists(String database);
@@ -111,16 +111,16 @@ public interface GeoPackageManager {
     /**
      * Size of the database in bytes
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return bytes
      */
     public long size(String database);
 
     /**
      * Determine if the database is a linked external file
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return external flag
      */
     public boolean isExternal(String database);
 
@@ -145,16 +145,16 @@ public interface GeoPackageManager {
     /**
      * Get the path of the database
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return path
      */
     public String getPath(String database);
 
     /**
      * Get the file of the database
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return file
      */
     public File getFile(String database);
 
@@ -179,15 +179,15 @@ public interface GeoPackageManager {
     /**
      * Get a readable version of the database size
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return size
      */
     public String readableSize(String database);
 
     /**
      * Delete a database
      *
-     * @param database
+     * @param database database name
      * @return true if deleted
      */
     public boolean delete(String database);
@@ -282,7 +282,7 @@ public interface GeoPackageManager {
      *
      * @param database database name to save as
      * @param stream   GeoPackage stream to import
-     * @param progress
+     * @param progress progress tracker
      * @return true if loaded
      */
     public boolean importGeoPackage(String database, InputStream stream,
@@ -305,7 +305,7 @@ public interface GeoPackageManager {
      * @param database database name to save as
      * @param stream   GeoPackage stream to import
      * @param override true to override existing
-     * @param progress
+     * @param progress progress tracker
      * @return true if created successfully
      */
     public boolean importGeoPackage(String database, InputStream stream,
@@ -333,8 +333,8 @@ public interface GeoPackageManager {
     /**
      * Import a GeoPackage file from a URL
      *
-     * @param name
-     * @param url
+     * @param name GeoPackage name
+     * @param url  url
      * @return true if created successfully
      */
     public boolean importGeoPackage(String name, URL url);
@@ -342,9 +342,9 @@ public interface GeoPackageManager {
     /**
      * Import a GeoPackage file from a URL
      *
-     * @param name
-     * @param url
-     * @param progress
+     * @param name     GeoPackage name
+     * @param url      url
+     * @param progress progress tracker
      * @return true if created successfully
      */
     public boolean importGeoPackage(String name, URL url,
@@ -353,9 +353,9 @@ public interface GeoPackageManager {
     /**
      * Import a GeoPackage file from a URL
      *
-     * @param name
-     * @param url
-     * @param override
+     * @param name     GeoPackage name
+     * @param url      url
+     * @param override override flag
      * @return true if created successfully
      */
     public boolean importGeoPackage(String name, URL url, boolean override);
@@ -363,10 +363,10 @@ public interface GeoPackageManager {
     /**
      * Import a GeoPackage file from a URL
      *
-     * @param name
-     * @param url
-     * @param override
-     * @param progress
+     * @param name     GeoPackage name
+     * @param url      url
+     * @param override override flag
+     * @param progress progress tracker
      * @return true if created successfully
      */
     public boolean importGeoPackage(String name, URL url, boolean override,
@@ -375,17 +375,17 @@ public interface GeoPackageManager {
     /**
      * Export a GeoPackage database to a file
      *
-     * @param database
-     * @param directory
+     * @param database  database name
+     * @param directory export directory
      */
     public void exportGeoPackage(String database, File directory);
 
     /**
      * Export a GeoPackage database to a file
      *
-     * @param database
-     * @param name
-     * @param directory
+     * @param database  database name
+     * @param name      name
+     * @param directory export directory
      */
     public void exportGeoPackage(String database, String name, File directory);
 
@@ -490,7 +490,7 @@ public interface GeoPackageManager {
     /**
      * Validate the database header and integrity.
      *
-     * @param database
+     * @param database database name
      * @return true if valid, false if not
      * @since 1.1.1
      */
@@ -499,7 +499,7 @@ public interface GeoPackageManager {
     /**
      * Validate the database header. Checks the beginning bytes for the SQLite header string.
      *
-     * @param database
+     * @param database database name
      * @return true if valid, false if not
      * @since 1.1.1
      */
@@ -508,7 +508,7 @@ public interface GeoPackageManager {
     /**
      * Validate the database integrity. Performs a database integrity ok check.
      *
-     * @param database
+     * @param database database name
      * @return true if valid, false if not
      * @since 1.1.1
      */
@@ -517,18 +517,18 @@ public interface GeoPackageManager {
     /**
      * Copy the database
      *
-     * @param database
-     * @param databaseCopy
-     * @return
+     * @param database     database name
+     * @param databaseCopy database copy name
+     * @return true if copied
      */
     public boolean copy(String database, String databaseCopy);
 
     /**
      * Rename the database to the new name
      *
-     * @param database
-     * @param newDatabase
-     * @return
+     * @param database    database name
+     * @param newDatabase new database name
+     * @return true if renamed
      */
     public boolean rename(String database, String newDatabase);
 

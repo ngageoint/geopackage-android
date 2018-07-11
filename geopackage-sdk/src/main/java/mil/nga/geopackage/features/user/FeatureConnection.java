@@ -15,7 +15,7 @@ public class FeatureConnection
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     public FeatureConnection(GeoPackageConnection database) {
         super(database);

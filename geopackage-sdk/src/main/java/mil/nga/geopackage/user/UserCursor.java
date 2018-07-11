@@ -13,9 +13,9 @@ import mil.nga.geopackage.db.GeoPackageDataType;
 /**
  * Abstract User Cursor
  *
- * @param <TColumn>
- * @param <TTable>
- * @param <TRow>
+ * @param <TColumn> column type
+ * @param <TTable>  table type
+ * @param <TRow>    row type
  * @author osbornb
  */
 public abstract class UserCursor<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>>

@@ -66,7 +66,7 @@ public class TableMetadata {
     /**
      * Get the GeoPackage id
      *
-     * @return
+     * @return GeoPackage id
      */
     public long getGeoPackageId() {
         return geoPackageId;
@@ -75,7 +75,7 @@ public class TableMetadata {
     /**
      * Set the GeoPackage id
      *
-     * @param geoPackageId
+     * @param geoPackageId GeoPackage id
      */
     public void setGeoPackageId(long geoPackageId) {
         this.geoPackageId = geoPackageId;
@@ -84,7 +84,7 @@ public class TableMetadata {
     /**
      * Get the table name
      *
-     * @return
+     * @return table name
      */
     public String getTableName() {
         return tableName;
@@ -93,7 +93,7 @@ public class TableMetadata {
     /**
      * Set the table name
      *
-     * @param tableName
+     * @param tableName table name
      */
     public void setTableName(String tableName) {
         this.tableName = tableName;
@@ -102,7 +102,7 @@ public class TableMetadata {
     /**
      * Get the last indexed date
      *
-     * @return
+     * @return last indexed date
      */
     public Long getLastIndexed() {
         return lastIndexed;
@@ -111,7 +111,7 @@ public class TableMetadata {
     /**
      * Set the last indexed date
      *
-     * @param lastIndexed
+     * @param lastIndexed last indexed date
      */
     public void setLastIndexed(Long lastIndexed) {
         this.lastIndexed = lastIndexed;

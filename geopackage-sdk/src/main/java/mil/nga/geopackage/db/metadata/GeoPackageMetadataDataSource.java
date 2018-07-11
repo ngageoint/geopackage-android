@@ -24,7 +24,7 @@ public class GeoPackageMetadataDataSource {
     /**
      * Constructor
      *
-     * @param db
+     * @param db GeoPackage metadata db
      */
     public GeoPackageMetadataDataSource(GeoPackageMetadataDb db) {
         this.db = db.getDb();
@@ -42,7 +42,7 @@ public class GeoPackageMetadataDataSource {
     /**
      * Create a new GeoPackage metadata
      *
-     * @param metadata
+     * @param metadata GeoPackage metadata
      */
     public void create(GeoPackageMetadata metadata) {
         ContentValues values = new ContentValues();
@@ -63,8 +63,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Delete the GeoPackage metadata
      *
-     * @param metadata
-     * @return
+     * @param metadata GeoPackage metadata
+     * @return deleted flag
      */
     public boolean delete(GeoPackageMetadata metadata) {
         return delete(metadata.getName());
@@ -73,8 +73,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Delete the database
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return deleted flag
      */
     public boolean delete(String database) {
 
@@ -95,9 +95,9 @@ public class GeoPackageMetadataDataSource {
     /**
      * Rename the GeoPackage metadata to the new name
      *
-     * @param metadata
-     * @param newName
-     * @return
+     * @param metadata GeoPackage metadata
+     * @param newName  new name
+     * @return renamed flag
      */
     public boolean rename(GeoPackageMetadata metadata, String newName) {
         boolean renamed = rename(metadata.getName(), newName);
@@ -110,9 +110,9 @@ public class GeoPackageMetadataDataSource {
     /**
      * Rename the GeoPackage name to the new name
      *
-     * @param name
-     * @param newName
-     * @return
+     * @param name    GeoPackage name
+     * @param newName new name
+     * @return renamed flag
      */
     public boolean rename(String name, String newName) {
         String whereClause = GeoPackageMetadata.COLUMN_NAME + " = ?";
@@ -128,7 +128,7 @@ public class GeoPackageMetadataDataSource {
     /**
      * Get all GeoPackage metadata
      *
-     * @return
+     * @return all GeoPackage metadata
      */
     public List<GeoPackageMetadata> getAll() {
         List<GeoPackageMetadata> allMetadata = new ArrayList<GeoPackageMetadata>();
@@ -150,7 +150,7 @@ public class GeoPackageMetadataDataSource {
     /**
      * Get all external GeoPackage metadata
      *
-     * @return
+     * @return external GeoPackage metadata
      */
     public List<GeoPackageMetadata> getAllExternal() {
         List<GeoPackageMetadata> allMetadata = new ArrayList<GeoPackageMetadata>();
@@ -174,7 +174,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Get GeoPackage metadata by name
      *
-     * @return
+     * @param database database name
+     * @return GeoPackage metadata
      */
     public GeoPackageMetadata get(String database) {
         GeoPackageMetadata metadata = null;
@@ -196,7 +197,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Get GeoPackage metadata by id
      *
-     * @return
+     * @param id id
+     * @return GeoPackage metadata
      */
     public GeoPackageMetadata get(long id) {
         GeoPackageMetadata metadata = null;
@@ -218,7 +220,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Get GeoPackage metadata or create it if it does not exist
      *
-     * @return
+     * @param geoPackage GeoPackage name
+     * @return GeoPackage metadata
      */
     public GeoPackageMetadata getOrCreate(String geoPackage) {
         GeoPackageMetadata metadata = get(geoPackage);
@@ -235,8 +238,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Determine if the metadata exists
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return exists flag
      */
     public boolean exists(String database) {
         return get(database) != null;
@@ -245,8 +248,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Determine if the GeoPackage is external
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return external flag
      */
     public boolean isExternal(String database) {
         GeoPackageMetadata metadata = get(database);
@@ -256,7 +259,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Get external GeoPackage metadata by external path
      *
-     * @return
+     * @param path path
+     * @return GeoPackage metadata
      */
     public GeoPackageMetadata getExternalAtPath(String path) {
         GeoPackageMetadata metadata = null;
@@ -329,8 +333,8 @@ public class GeoPackageMetadataDataSource {
     /**
      * Create a GeoPackage metadata from the current cursor location
      *
-     * @param cursor
-     * @return
+     * @param cursor cursor
+     * @return GeoPackage metadata
      */
     private GeoPackageMetadata createGeoPackageMetadata(Cursor cursor) {
         GeoPackageMetadata metadata = new GeoPackageMetadata();

@@ -17,7 +17,7 @@ public class FeatureWrapperConnection
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     public FeatureWrapperConnection(GeoPackageConnection database) {
         super(database);

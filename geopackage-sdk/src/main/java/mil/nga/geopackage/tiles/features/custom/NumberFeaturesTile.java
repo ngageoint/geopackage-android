@@ -65,7 +65,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Constructor
      *
-     * @param context
+     * @param context context
      */
     public NumberFeaturesTile(Context context) {
 
@@ -133,7 +133,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Set the paint object used to draw the text
      *
-     * @param textPaint
+     * @param textPaint text paint
      */
     public void setTextPaint(Paint textPaint) {
         if (textPaint == null) {
@@ -154,7 +154,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Set the paint object used to draw the circle
      *
-     * @param circlePaint
+     * @param circlePaint circle paint
      */
     public void setCirclePaint(Paint circlePaint) {
         this.circlePaint = circlePaint;
@@ -172,7 +172,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Set the paint object used to draw the filled circle
      *
-     * @param circleFillPaint
+     * @param circleFillPaint circle fill paint
      */
     public void setCircleFillPaint(Paint circleFillPaint) {
         this.circleFillPaint = circleFillPaint;
@@ -190,7 +190,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Set the circle padding percentage to pad around the text, value between 0.0 and 1.0
      *
-     * @param circlePaddingPercentage
+     * @param circlePaddingPercentage circle padding percentage
      */
     public void setCirclePaddingPercentage(float circlePaddingPercentage) {
         if (circlePaddingPercentage < 0.0 || circlePaddingPercentage > 1.0) {
@@ -212,7 +212,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Set the tile border paint object used to draw a border around the tile
      *
-     * @param tileBorderPaint
+     * @param tileBorderPaint tile border paint
      */
     public void setTileBorderPaint(Paint tileBorderPaint) {
         this.tileBorderPaint = tileBorderPaint;
@@ -230,7 +230,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Set the tile fill paint object used to color the entire tile
      *
-     * @param tileFillPaint
+     * @param tileFillPaint tile fill paint
      */
     public void setTileFillPaint(Paint tileFillPaint) {
         this.tileFillPaint = tileFillPaint;
@@ -248,7 +248,7 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Set the draw unindexed tiles option
      *
-     * @param drawUnindexedTiles
+     * @param drawUnindexedTiles draw unindexed tiles flag
      */
     public void setDrawUnindexedTiles(boolean drawUnindexedTiles) {
         this.drawUnindexedTiles = drawUnindexedTiles;
@@ -286,10 +286,10 @@ public class NumberFeaturesTile implements CustomFeaturesTile {
     /**
      * Draw a tile with the provided text label in the middle
      *
-     * @param tileWidth
-     * @param tileHeight
-     * @param text
-     * @return
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @param text       text
+     * @return tile bitmap
      */
     private Bitmap drawTile(int tileWidth, int tileHeight, String text) {
 

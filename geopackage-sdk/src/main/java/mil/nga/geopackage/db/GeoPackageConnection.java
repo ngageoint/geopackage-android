@@ -30,7 +30,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     /**
      * Constructor
      *
-     * @param db
+     * @param db GeoPackage connection
      */
     public GeoPackageConnection(GeoPackageDatabase db) {
         this.db = db;
@@ -40,7 +40,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     /**
      * Get the database connection
      *
-     * @return
+     * @return GeoPackage database
      */
     public GeoPackageDatabase getDb() {
         return db;
@@ -232,8 +232,8 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     /**
      * Perform a raw database query
      *
-     * @param sql
-     * @param args
+     * @param sql  sql command
+     * @param args arguments
      * @return cursor
      * @since 1.2.1
      */

@@ -5,8 +5,8 @@ import android.content.Context;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.extension.link.FeatureTileTableLinker;
-import mil.nga.sf.proj.Projection;
 import mil.nga.geopackage.tiles.TileGenerator;
+import mil.nga.sf.proj.Projection;
 
 /**
  * Creates a set of tiles within a GeoPackage by generating tiles from features
@@ -58,7 +58,7 @@ public class FeatureTileGenerator extends TileGenerator {
     /**
      * Set the link tables flag
      *
-     * @param linkTables
+     * @param linkTables link tables flag
      * @since 1.2.5
      */
     public void setLinkTables(boolean linkTables) {

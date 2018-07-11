@@ -26,9 +26,9 @@ public class GeoPackageTile {
     /**
      * Constructor
      *
-     * @param width
-     * @param height
-     * @param data
+     * @param width  tile width
+     * @param height tile height
+     * @param data   tile bytes
      */
     public GeoPackageTile(int width, int height, byte[] data) {
         this.width = width;

@@ -7,47 +7,47 @@ import mil.nga.geopackage.user.UserTableReader;
 
 /**
  * Reads the metadata from an existing tile table
- * 
+ *
  * @author osbornb
  */
 public class TileTableReader extends
         UserTableReader<TileColumn, TileTable, TileRow, TileCursor> {
 
-	/**
-	 * Constructor
-	 * 
-	 * @param tableName
-	 */
-	public TileTableReader(String tableName) {
-		super(tableName);
-	}
+    /**
+     * Constructor
+     *
+     * @param tableName table name
+     */
+    public TileTableReader(String tableName) {
+        super(tableName);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected TileTable createTable(String tableName,
-			List<TileColumn> columnList) {
-		return new TileTable(tableName, columnList);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TileTable createTable(String tableName,
+                                    List<TileColumn> columnList) {
+        return new TileTable(tableName, columnList);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected TileColumn createColumn(TileCursor cursor, int index, String name,
-			String type, Long max, boolean notNull, int defaultValueIndex,
-			boolean primaryKey) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TileColumn createColumn(TileCursor cursor, int index, String name,
+                                      String type, Long max, boolean notNull, int defaultValueIndex,
+                                      boolean primaryKey) {
 
-		GeoPackageDataType dataType = getDataType(type);
+        GeoPackageDataType dataType = getDataType(type);
 
-		Object defaultValue = cursor.getValue(
+        Object defaultValue = cursor.getValue(
                 defaultValueIndex, dataType);
 
-		TileColumn column = new TileColumn(index, name, dataType, max, notNull,
-				defaultValue, primaryKey);
+        TileColumn column = new TileColumn(index, name, dataType, max, notNull,
+                defaultValue, primaryKey);
 
-		return column;
-	}
+        return column;
+    }
 
 }

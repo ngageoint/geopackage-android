@@ -354,8 +354,8 @@ public abstract class TileGenerator {
      * Generate the tiles
      *
      * @return tiles created
-     * @throws java.sql.SQLException
-     * @throws java.io.IOException
+     * @throws java.sql.SQLException upon failure
+     * @throws java.io.IOException   upon failure
      */
     public int generateTiles() throws SQLException, IOException {
 
@@ -908,10 +908,10 @@ public abstract class TileGenerator {
     /**
      * Create the tile
      *
-     * @param z
-     * @param x
-     * @param y
-     * @return
+     * @param z zoom level
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return tile bytes
      */
     protected abstract byte[] createTile(int z, long x, long y);
 

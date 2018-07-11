@@ -21,7 +21,7 @@ public class GoogleAPIGeoPackageTileRetriever implements TileRetriever {
     /**
      * Constructor
      *
-     * @param tileDao
+     * @param tileDao tile dao
      */
     public GoogleAPIGeoPackageTileRetriever(TileDao tileDao) {
         this.tileDao = tileDao;

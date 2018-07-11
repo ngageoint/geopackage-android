@@ -64,7 +64,7 @@ public class GeoPackageMetadata {
     /**
      * Get the id
      *
-     * @return
+     * @return id
      */
     public long getId() {
         return id;
@@ -73,7 +73,7 @@ public class GeoPackageMetadata {
     /**
      * Set the id
      *
-     * @param id
+     * @param id id
      */
     public void setId(long id) {
         this.id = id;
@@ -82,7 +82,7 @@ public class GeoPackageMetadata {
     /**
      * Get the name
      *
-     * @return
+     * @return name
      */
     public String getName() {
         return name;
@@ -91,7 +91,7 @@ public class GeoPackageMetadata {
     /**
      * Set the name
      *
-     * @param name
+     * @param name name
      */
     public void setName(String name) {
         this.name = name;
@@ -100,7 +100,7 @@ public class GeoPackageMetadata {
     /**
      * Get the external path
      *
-     * @return
+     * @return external path
      */
     public String getExternalPath() {
         return externalPath;
@@ -109,7 +109,7 @@ public class GeoPackageMetadata {
     /**
      * Set the external path
      *
-     * @param externalPath
+     * @param externalPath external path
      */
     public void setExternalPath(String externalPath) {
         this.externalPath = externalPath;
@@ -118,7 +118,7 @@ public class GeoPackageMetadata {
     /**
      * Is the GeoPackage external
      *
-     * @return
+     * @return external flag
      */
     public boolean isExternal() {
         return externalPath != null;

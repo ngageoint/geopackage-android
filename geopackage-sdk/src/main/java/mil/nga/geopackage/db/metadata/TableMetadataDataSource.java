@@ -21,7 +21,7 @@ public class TableMetadataDataSource {
     /**
      * Constructor
      *
-     * @param db
+     * @param db GeoPackage metadata db
      */
     public TableMetadataDataSource(GeoPackageMetadataDb db) {
         this.db = db.getDb();
@@ -39,7 +39,7 @@ public class TableMetadataDataSource {
     /**
      * Create a new table metadata
      *
-     * @param metadata
+     * @param metadata table metadata
      */
     public void create(TableMetadata metadata) {
         ContentValues values = new ContentValues();
@@ -61,8 +61,8 @@ public class TableMetadataDataSource {
     /**
      * Delete the table metadata
      *
-     * @param metadata
-     * @return
+     * @param metadata table metadata
+     * @return deleted flag
      */
     public boolean delete(TableMetadata metadata) {
         return delete(metadata.getGeoPackageId(), metadata.getTableName());
@@ -71,8 +71,8 @@ public class TableMetadataDataSource {
     /**
      * Delete the database
      *
-     * @param geoPackage
-     * @return
+     * @param geoPackage GeoPackage name
+     * @return deleted count
      */
     public int delete(String geoPackage) {
         return delete(getGeoPackageId(geoPackage));
@@ -81,8 +81,8 @@ public class TableMetadataDataSource {
     /**
      * Delete the database
      *
-     * @param geoPackageId
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @return deleted count
      */
     public int delete(long geoPackageId) {
 
@@ -100,9 +100,9 @@ public class TableMetadataDataSource {
     /**
      * Delete the database table name
      *
-     * @param geoPackage
-     * @param tableName
-     * @return
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @return deleted flag
      */
     public boolean delete(String geoPackage, String tableName) {
         return delete(getGeoPackageId(geoPackage), tableName);
@@ -111,9 +111,9 @@ public class TableMetadataDataSource {
     /**
      * Delete the database table name
      *
-     * @param geoPackageId
-     * @param tableName
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @return deleted flag
      */
     public boolean delete(long geoPackageId, String tableName) {
 
@@ -132,9 +132,9 @@ public class TableMetadataDataSource {
     /**
      * Update the last indexed time
      *
-     * @param metadata
-     * @param lastIndexed
-     * @return
+     * @param metadata    table metadata
+     * @param lastIndexed last indexed
+     * @return updated flag
      */
     public boolean updateLastIndexed(TableMetadata metadata, long lastIndexed) {
         boolean updated = updateLastIndexed(metadata.getGeoPackageId(), metadata.getTableName(), lastIndexed);
@@ -147,10 +147,10 @@ public class TableMetadataDataSource {
     /**
      * Update the last indexed time
      *
-     * @param geoPackage
-     * @param tableName
-     * @param lastIndexed
-     * @return
+     * @param geoPackage  GeoPackage name
+     * @param tableName   table name
+     * @param lastIndexed last indexed
+     * @return updated flag
      */
     public boolean updateLastIndexed(String geoPackage, String tableName, long lastIndexed) {
         return updateLastIndexed(getGeoPackageId(geoPackage), tableName, lastIndexed);
@@ -159,10 +159,10 @@ public class TableMetadataDataSource {
     /**
      * Update the last indexed time
      *
-     * @param geoPackageId
-     * @param tableName
-     * @param lastIndexed
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param lastIndexed  last indexed
+     * @return updated flag
      */
     public boolean updateLastIndexed(long geoPackageId, String tableName, long lastIndexed) {
         String whereClause = TableMetadata.COLUMN_GEOPACKAGE_ID
@@ -179,9 +179,9 @@ public class TableMetadataDataSource {
     /**
      * Get a table metadata
      *
-     * @param geoPackage
-     * @param tableName
-     * @return
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @return table metadata
      */
     public TableMetadata get(String geoPackage, String tableName) {
         return get(getGeoPackageId(geoPackage), tableName);
@@ -190,9 +190,9 @@ public class TableMetadataDataSource {
     /**
      * Get a table metadata
      *
-     * @param geoPackageId
-     * @param tableName
-     * @return
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @return table metadata
      */
     public TableMetadata get(long geoPackageId, String tableName) {
 
@@ -216,9 +216,9 @@ public class TableMetadataDataSource {
     /**
      * Get a table metadata or create if it does not exist
      *
-     * @param geoPackage
-     * @param tableName
-     * @return
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @return table metadata
      */
     public TableMetadata getOrCreate(String geoPackage, String tableName) {
 
@@ -227,7 +227,7 @@ public class TableMetadataDataSource {
 
         TableMetadata metadata = get(geoPackageMetadata.getId(), tableName);
 
-        if(metadata == null){
+        if (metadata == null) {
             metadata = new TableMetadata();
             metadata.setGeoPackageId(geoPackageMetadata.getId());
             metadata.setTableName(tableName);
@@ -239,8 +239,8 @@ public class TableMetadataDataSource {
     /**
      * Get a GeoPackage id from the name
      *
-     * @param geoPackage
-     * @return
+     * @param geoPackage GeoPackage name
+     * @return id
      */
     public long getGeoPackageId(String geoPackage) {
         long id = -1;
@@ -255,8 +255,8 @@ public class TableMetadataDataSource {
     /**
      * Create a table metadata from the current cursor location
      *
-     * @param cursor
-     * @return
+     * @param cursor cursor
+     * @return table metadata
      */
     private TableMetadata createTableMetadata(Cursor cursor) {
         TableMetadata metadata = new TableMetadata();

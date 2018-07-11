@@ -32,11 +32,11 @@ public class FeatureDao extends
     /**
      * Constructor
      *
-     * @param database
-     * @param db
-     * @param featureDb
-     * @param geometryColumns
-     * @param table
+     * @param database        database name
+     * @param db              GeoPackage connection
+     * @param featureDb       feature connection
+     * @param geometryColumns geometry columns
+     * @param table           feature table
      */
     public FeatureDao(String database, GeoPackageConnection db, FeatureConnection featureDb, GeometryColumns geometryColumns,
                       FeatureTable table) {
@@ -89,7 +89,7 @@ public class FeatureDao extends
     /**
      * Get the Feature connection
      *
-     * @return
+     * @return feature connection
      */
     public FeatureConnection getFeatureDb() {
         return featureDb;
@@ -98,7 +98,7 @@ public class FeatureDao extends
     /**
      * Get the Geometry Columns
      *
-     * @return
+     * @return geometry columns
      */
     public GeometryColumns getGeometryColumns() {
         return geometryColumns;
@@ -107,7 +107,7 @@ public class FeatureDao extends
     /**
      * The the Geometry Column name
      *
-     * @return
+     * @return geometry column name
      */
     public String getGeometryColumnName() {
         return geometryColumns.getColumnName();
@@ -116,7 +116,7 @@ public class FeatureDao extends
     /**
      * Get the Geometry Type
      *
-     * @return
+     * @return geometry type
      */
     public GeometryType getGeometryType() {
         return geometryColumns.getGeometryType();

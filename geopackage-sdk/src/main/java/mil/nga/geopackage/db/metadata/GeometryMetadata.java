@@ -163,7 +163,7 @@ public class GeometryMetadata {
     /**
      * Get the GeoPackage id
      *
-     * @return
+     * @return GeoPackage id
      */
     public long getGeoPackageId() {
         return geoPackageId;
@@ -172,7 +172,7 @@ public class GeometryMetadata {
     /**
      * Set the GeoPackage id
      *
-     * @param geoPackageId
+     * @param geoPackageId GeoPackage id
      */
     public void setGeoPackageId(long geoPackageId) {
         this.geoPackageId = geoPackageId;
@@ -181,7 +181,7 @@ public class GeometryMetadata {
     /**
      * Get the table name
      *
-     * @return
+     * @return table name
      */
     public String getTableName() {
         return tableName;
@@ -190,7 +190,7 @@ public class GeometryMetadata {
     /**
      * Set the table name
      *
-     * @param tableName
+     * @param tableName table name
      */
     public void setTableName(String tableName) {
         this.tableName = tableName;
@@ -199,7 +199,7 @@ public class GeometryMetadata {
     /**
      * Get the id
      *
-     * @return
+     * @return id
      */
     public long getId() {
         return id;
@@ -208,7 +208,7 @@ public class GeometryMetadata {
     /**
      * Set the id
      *
-     * @param id
+     * @param id id
      */
     public void setId(long id) {
         this.id = id;
@@ -217,7 +217,7 @@ public class GeometryMetadata {
     /**
      * Get min X
      *
-     * @return
+     * @return min x
      */
     public double getMinX() {
         return minX;
@@ -226,7 +226,7 @@ public class GeometryMetadata {
     /**
      * Set min X
      *
-     * @param minX
+     * @param minX min x
      */
     public void setMinX(double minX) {
         this.minX = minX;
@@ -235,14 +235,16 @@ public class GeometryMetadata {
     /**
      * Get max X
      *
-     * @return
+     * @return max x
      */
     public double getMaxX() {
         return maxX;
     }
 
-    /*
-    Set max X
+    /**
+     * Set max X
+     *
+     * @param maxX max x
      */
     public void setMaxX(double maxX) {
         this.maxX = maxX;
@@ -251,7 +253,7 @@ public class GeometryMetadata {
     /**
      * Get min Y
      *
-     * @return
+     * @return min y
      */
     public double getMinY() {
         return minY;
@@ -260,7 +262,7 @@ public class GeometryMetadata {
     /**
      * Set min Y
      *
-     * @param minY
+     * @param minY min y
      */
     public void setMinY(double minY) {
         this.minY = minY;
@@ -269,7 +271,7 @@ public class GeometryMetadata {
     /**
      * Get max Y
      *
-     * @return
+     * @return max y
      */
     public double getMaxY() {
         return maxY;
@@ -278,7 +280,7 @@ public class GeometryMetadata {
     /**
      * Set max Y
      *
-     * @param maxY
+     * @param maxY max y
      */
     public void setMaxY(double maxY) {
         this.maxY = maxY;
@@ -287,7 +289,7 @@ public class GeometryMetadata {
     /**
      * Get min Z
      *
-     * @return
+     * @return min z
      */
     public Double getMinZ() {
         return minZ;
@@ -296,7 +298,7 @@ public class GeometryMetadata {
     /**
      * Set min Z
      *
-     * @param minZ
+     * @param minZ min z
      */
     public void setMinZ(Double minZ) {
         this.minZ = minZ;
@@ -305,7 +307,7 @@ public class GeometryMetadata {
     /**
      * Get max Z
      *
-     * @return
+     * @return max z
      */
     public Double getMaxZ() {
         return maxZ;
@@ -314,7 +316,7 @@ public class GeometryMetadata {
     /**
      * Set max Z
      *
-     * @param maxZ
+     * @param maxZ max z
      */
     public void setMaxZ(Double maxZ) {
         this.maxZ = maxZ;
@@ -323,7 +325,7 @@ public class GeometryMetadata {
     /**
      * Get min M
      *
-     * @return
+     * @return min m
      */
     public Double getMinM() {
         return minM;
@@ -332,7 +334,7 @@ public class GeometryMetadata {
     /**
      * Set min M
      *
-     * @param minM
+     * @param minM min m
      */
     public void setMinM(Double minM) {
         this.minM = minM;
@@ -341,7 +343,7 @@ public class GeometryMetadata {
     /**
      * Get max M
      *
-     * @return
+     * @return max m
      */
     public Double getMaxM() {
         return maxM;
@@ -350,7 +352,7 @@ public class GeometryMetadata {
     /**
      * Set max M
      *
-     * @param maxM
+     * @param maxM max m
      */
     public void setMaxM(Double maxM) {
         this.maxM = maxM;

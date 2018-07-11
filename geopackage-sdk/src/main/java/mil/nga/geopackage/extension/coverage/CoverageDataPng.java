@@ -509,12 +509,12 @@ public class CoverageDataPng extends CoverageData<CoverageDataPngImage> {
     /**
      * Create the coverage data tile table with metadata and extension
      *
-     * @param geoPackage
-     * @param tableName
-     * @param contentsBoundingBox
-     * @param contentsSrsId
-     * @param tileMatrixSetBoundingBox
-     * @param tileMatrixSetSrsId
+     * @param geoPackage               GeoPackage
+     * @param tableName                table name
+     * @param contentsBoundingBox      contents bounding box
+     * @param contentsSrsId            contents srs id
+     * @param tileMatrixSetBoundingBox tile matrix set bounding box
+     * @param tileMatrixSetSrsId       tile matrix set srs id
      * @return coverage data
      */
     public static CoverageDataPng createTileTableWithMetadata(

@@ -15,11 +15,11 @@ import mil.nga.geopackage.db.GeoPackageDataType;
 /**
  * Abstract User Invalid Cursor for handling failed rows due to large blobs
  *
- * @param <TColumn>
- * @param <TTable>
- * @param <TRow>
- * @param <TCursor>
- * @param <TUserDao>
+ * @param <TColumn>  column type
+ * @param <TTable>   table type
+ * @param <TRow>     row type
+ * @param <TCursor>  cursor type
+ * @param <TUserDao> user dao type
  * @since 2.0.0
  */
 public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TCursor extends UserCursor<TColumn, TTable, TRow>, TUserDao extends UserDao<TColumn, TTable, TRow, TCursor>>

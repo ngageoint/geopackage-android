@@ -37,7 +37,7 @@ public class FeatureTilePointIcon {
     /**
      * Constructor
      *
-     * @param icon
+     * @param icon icon bitmap
      */
     public FeatureTilePointIcon(Bitmap icon) {
         this.icon = icon;
@@ -65,7 +65,7 @@ public class FeatureTilePointIcon {
     /**
      * Get the icon
      *
-     * @return
+     * @return icon bitmap
      */
     public Bitmap getIcon() {
         return icon;
@@ -74,7 +74,7 @@ public class FeatureTilePointIcon {
     /**
      * Get the width
      *
-     * @return
+     * @return icon width
      */
     public int getWidth() {
         return width;
@@ -83,7 +83,7 @@ public class FeatureTilePointIcon {
     /**
      * Get the height
      *
-     * @return
+     * @return icon height
      */
     public int getHeight() {
         return height;
@@ -92,7 +92,7 @@ public class FeatureTilePointIcon {
     /**
      * Get the x offset
      *
-     * @return
+     * @return x offset
      */
     public float getXOffset() {
         return xOffset;
@@ -101,7 +101,7 @@ public class FeatureTilePointIcon {
     /**
      * Set the x offset
      *
-     * @param xOffset
+     * @param xOffset x offset
      */
     public void setXOffset(float xOffset) {
         this.xOffset = xOffset;
@@ -110,7 +110,7 @@ public class FeatureTilePointIcon {
     /**
      * Get the y offset
      *
-     * @return
+     * @return y offset
      */
     public float getYOffset() {
         return yOffset;
@@ -119,7 +119,7 @@ public class FeatureTilePointIcon {
     /**
      * Set the y offset
      *
-     * @param yOffset
+     * @param yOffset y offset
      */
     public void setYOffset(float yOffset) {
         this.yOffset = yOffset;

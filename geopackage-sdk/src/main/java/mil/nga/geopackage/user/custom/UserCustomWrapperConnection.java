@@ -18,7 +18,7 @@ public class UserCustomWrapperConnection
     /**
      * Constructor
      *
-     * @param database
+     * @param database GeoPackage connection
      */
     public UserCustomWrapperConnection(GeoPackageConnection database) {
         super(database);
