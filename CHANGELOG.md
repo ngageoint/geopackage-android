@@ -6,8 +6,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.1) (07-13-2018)
 
-* geopackage-core version 3.0.1 (DRAFT version 0.1)
-* Related Tables Extension support
+* geopackage-core version 3.0.1
+* Related Tables Extension support (DRAFT version 0.1)
 * User row copy methods
 * GeoPackage register cursor wrapper method
 * Cursor Factory allows replacement of existing cursor wrappers with updated ones
