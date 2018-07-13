@@ -4,9 +4,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 3.0.1 (TBD)
+## [3.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.1) (07-13-2018)
 
-* geopackage-core version 3.0.1
+* geopackage-core version 3.0.1 (DRAFT version 0.1)
 * Related Tables Extension support
 * User row copy methods
 * GeoPackage register cursor wrapper method
