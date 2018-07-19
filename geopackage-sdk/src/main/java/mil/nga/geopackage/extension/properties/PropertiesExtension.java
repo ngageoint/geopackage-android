@@ -14,12 +14,7 @@ import mil.nga.geopackage.attributes.AttributesRow;
  */
 public class PropertiesExtension
         extends
-        PropertiesCoreExtension<AttributesRow, AttributesCursor, AttributesDao> {
-
-    /**
-     * GeoPackage
-     */
-    private final GeoPackage geoPackage;
+        PropertiesCoreExtension<GeoPackage, AttributesRow, AttributesCursor, AttributesDao> {
 
     /**
      * Constructor
@@ -28,7 +23,6 @@ public class PropertiesExtension
      */
     public PropertiesExtension(GeoPackage geoPackage) {
         super(geoPackage);
-        this.geoPackage = geoPackage;
     }
 
     /**
@@ -36,7 +30,7 @@ public class PropertiesExtension
      */
     @Override
     protected AttributesDao getDao() {
-        return geoPackage.getAttributesDao(TABLE_NAME);
+        return getGeoPackage().getAttributesDao(TABLE_NAME);
     }
 
     /**
