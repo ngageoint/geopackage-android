@@ -6,7 +6,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 3.0.2 (TBD)
 
-* TBD
+* geopackage-core version 3.0.2
+* Properties Extension for saving GeoPackage metadata in the file
+* Additional GeoPackage Connection query method
 
 ## [3.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.1) (07-13-2018)
 
