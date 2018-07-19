@@ -35,6 +35,7 @@ import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.CrsWktExtension;
 import mil.nga.geopackage.extension.GeometryExtensions;
@@ -48,6 +49,8 @@ import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
+import mil.nga.geopackage.extension.properties.PropertiesExtension;
+import mil.nga.geopackage.extension.properties.PropertyNames;
 import mil.nga.geopackage.extension.related.ExtendedRelation;
 import mil.nga.geopackage.extension.related.RelatedTablesExtension;
 import mil.nga.geopackage.extension.related.UserMappingDao;
@@ -141,6 +144,7 @@ public class GeoPackageExample extends BaseTestCase {
     private static final boolean RELATED_TABLES_SIMPLE_ATTRIBUTES = true;
     private static final boolean GEOMETRY_INDEX = true;
     private static final boolean FEATURE_TILE_LINK = true;
+    private static final boolean PROPERTIES = true;
 
     private static final String ID_COLUMN = "id";
     private static final String GEOMETRY_COLUMN = "geometry";
@@ -156,6 +160,12 @@ public class GeoPackageExample extends BaseTestCase {
 
     private static final String LOG_NAME = GeoPackageExample.class.getSimpleName();
 
+    /**
+     * Create the GeoPackage example file
+     *
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
     public void testExample() throws SQLException, IOException {
 
         Log.i(LOG_NAME, "Creating: " + GEOPACKAGE_NAME);
@@ -199,14 +209,12 @@ public class GeoPackageExample extends BaseTestCase {
                 createRTreeSpatialIndexExtension(geoPackage);
             }
 
-            System.out.println("Related Tables Media Extension: "
-                    + RELATED_TABLES_MEDIA);
+            Log.i(LOG_NAME, "Related Tables Media Extension: " + RELATED_TABLES_MEDIA);
             if (RELATED_TABLES_MEDIA) {
                 createRelatedTablesMediaExtension(activity, testContext, geoPackage);
             }
 
-            System.out.println("Related Tables Features Extension: "
-                    + RELATED_TABLES_FEATURES);
+            Log.i(LOG_NAME, "Related Tables Features Extension: " + RELATED_TABLES_FEATURES);
             if (RELATED_TABLES_FEATURES) {
                 createRelatedTablesFeaturesExtension(geoPackage);
             }
@@ -219,10 +227,8 @@ public class GeoPackageExample extends BaseTestCase {
                     + FEATURES);
             Log.i(LOG_NAME, "RTree Spatial Index Extension: "
                     + FEATURES);
-            System.out.println("Related Tables Media Extension: "
-                    + RELATED_TABLES_MEDIA);
-            System.out.println("Related Tables Features Extension: "
-                    + RELATED_TABLES_FEATURES);
+            Log.i(LOG_NAME, "Related Tables Media Extension: " + FEATURES);
+            Log.i(LOG_NAME, "Related Tables Features Extension: " + FEATURES);
         }
 
         Log.i(LOG_NAME, "Tiles: " + TILES);
@@ -243,14 +249,12 @@ public class GeoPackageExample extends BaseTestCase {
         if (ATTRIBUTES) {
             createAttributes(geoPackage);
 
-            System.out.println("Related Tables Simple Attributes Extension: "
-                    + RELATED_TABLES_SIMPLE_ATTRIBUTES);
+            Log.i(LOG_NAME, "Related Tables Simple Attributes Extension: " + RELATED_TABLES_SIMPLE_ATTRIBUTES);
             if (RELATED_TABLES_SIMPLE_ATTRIBUTES) {
                 createRelatedTablesSimpleAttributesExtension(geoPackage);
             }
         } else {
-            System.out.println("Related Tables Simple Attributes Extension: "
-                    + RELATED_TABLES_SIMPLE_ATTRIBUTES);
+            Log.i(LOG_NAME, "Related Tables Simple Attributes Extension: " + ATTRIBUTES);
         }
 
         Log.i(LOG_NAME, "Metadata: " + METADATA);
@@ -261,6 +265,11 @@ public class GeoPackageExample extends BaseTestCase {
         Log.i(LOG_NAME, "Coverage Data: " + COVERAGE_DATA);
         if (COVERAGE_DATA) {
             createCoverageDataExtension(geoPackage);
+        }
+
+        Log.i(LOG_NAME, "Properties: " + PROPERTIES);
+        if (PROPERTIES) {
+            createPropertiesExtension(geoPackage);
         }
 
         geoPackage.close();
@@ -1586,6 +1595,43 @@ public class GeoPackageExample extends BaseTestCase {
             userMappingDao.create(userMappingRow);
         }
         attributesCursor.close();
+
+    }
+
+    private static void createPropertiesExtension(GeoPackage geoPackage) {
+
+        PropertiesExtension properties = new PropertiesExtension(geoPackage);
+        properties.getOrCreate();
+
+        String dateTime = DateConverter.dateTimeConverter().stringValue(
+                new Date());
+
+        properties.addValue(PropertyNames.TITLE, "GeoPackage Java Example");
+        properties.addValue(PropertyNames.VERSION, "3.0.2");
+        properties.addValue(PropertyNames.CREATOR, "NGA");
+        properties.addValue(PropertyNames.PUBLISHER, "NGA");
+        properties.addValue(PropertyNames.CONTRIBUTOR, "Brian Osborn");
+        properties.addValue(PropertyNames.CONTRIBUTOR, "Dan Barela");
+        properties.addValue(PropertyNames.CREATED, dateTime);
+        properties.addValue(PropertyNames.DATE, dateTime);
+        properties.addValue(PropertyNames.MODIFIED, dateTime);
+        properties
+                .addValue(
+                        PropertyNames.DESCRIPTION,
+                        "GeoPackage example created by http://github.com/ngageoint/geopackage-java/blob/master/src/test/java/mil/nga/geopackage/test/GeoPackageExample.java");
+        properties.addValue(PropertyNames.IDENTIFIER, "geopackage-java");
+        properties.addValue(PropertyNames.LICENSE, "MIT");
+        properties
+                .addValue(
+                        PropertyNames.SOURCE,
+                        "http://github.com/ngageoint/GeoPackage/blob/master/docs/examples/java/example.gpkg");
+        properties.addValue(PropertyNames.SUBJECT, "Examples");
+        properties.addValue(PropertyNames.TYPE, "Examples");
+        properties.addValue(PropertyNames.URI,
+                "http://github.com/ngageoint/geopackage-java");
+        properties.addValue(PropertyNames.TAG, "NGA");
+        properties.addValue(PropertyNames.TAG, "Example");
+        properties.addValue(PropertyNames.TAG, "BIT Systems");
 
     }
 

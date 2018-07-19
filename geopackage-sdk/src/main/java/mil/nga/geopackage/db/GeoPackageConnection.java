@@ -5,6 +5,9 @@ import android.database.Cursor;
 import com.j256.ormlite.android.AndroidConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * GeoPackage Android Connection wrapper
  *
@@ -227,6 +230,26 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
         }
 
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> querySingleColumnStringResults(String sql, String[] args) {
+
+        Cursor cursor = db.rawQuery(sql, args);
+
+        List<String> results = new ArrayList<>();
+        try {
+            while (cursor.moveToNext()) {
+                results.add(cursor.getString(0));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return results;
     }
 
     /**
