@@ -3,7 +3,6 @@ package mil.nga.geopackage.test.extension.properties;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -71,7 +70,8 @@ public class PropertiesManagerTest extends BaseTestCase {
             cache.add(geoPackage);
         }
 
-        testPropertiesManager(cache.getGeoPackages());
+        PropertiesManager propertiesManager = new PropertiesManager(cache);
+        testPropertiesManager(propertiesManager);
     }
 
     /**
@@ -80,7 +80,8 @@ public class PropertiesManagerTest extends BaseTestCase {
      * @throws Exception upon error
      */
     public void testPropertiesManagerWithGeoPackages() throws Exception {
-        testPropertiesManager(createGeoPackages());
+        PropertiesManager manager = new PropertiesManager(createGeoPackages());
+        testPropertiesManager(manager);
     }
 
     private List<GeoPackage> createGeoPackages() throws Exception {
@@ -141,12 +142,10 @@ public class PropertiesManagerTest extends BaseTestCase {
 
     }
 
-    private void testPropertiesManager(Collection<GeoPackage> geoPackages) {
+    private void testPropertiesManager(PropertiesManager manager) {
 
         int numProperties = 5;
         int numTagged = 7;
-
-        PropertiesManager manager = new PropertiesManager(geoPackages);
 
         // getNames
         Set<String> names = manager.getNames();
