@@ -49,12 +49,10 @@ public class PropertiesManager extends PropertiesManagerCore<GeoPackage> {
     }
 
     /**
-     * Create a properties extension from the GeoPackage
-     *
-     * @param geoPackage GeoPackage
-     * @return properties extension
+     * {@inheritDoc}
      */
-    public PropertiesCoreExtension<GeoPackage, ?, ?, ?> getPropertiesExtension(
+    @Override
+    public PropertiesExtension getPropertiesExtension(
             GeoPackage geoPackage) {
         return new PropertiesExtension(geoPackage);
     }

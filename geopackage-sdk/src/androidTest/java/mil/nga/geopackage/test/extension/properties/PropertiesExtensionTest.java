@@ -51,7 +51,6 @@ public class PropertiesExtensionTest extends CreateGeoPackageTestCase {
         TestCase.assertTrue(extension.hasSingleValue(PropertyNames.TITLE));
         TestCase.assertTrue(extension.hasValues(PropertyNames.TITLE));
         TestCase.assertEquals(1, extension.numValues(PropertyNames.TITLE));
-        TestCase.assertEquals(1, extension.numValues());
         TestCase.assertEquals(name, extension.getValue(PropertyNames.TITLE));
         TestCase.assertTrue(extension.hasValue(PropertyNames.TITLE, name));
 
