@@ -28,6 +28,25 @@ public class PropertiesExtensionTest extends CreateGeoPackageTestCase {
         TestCase.assertFalse(extension.has());
         TestCase.assertFalse(geoPackage.isTable(PropertiesExtension.TABLE_NAME));
 
+        final String name = "My GeoPackage";
+
+        // Test before the extension exists
+        TestCase.assertEquals(0, extension.numProperties());
+        TestCase.assertTrue(extension.getProperties().isEmpty());
+        TestCase.assertFalse(extension.hasProperty(PropertyNames.TITLE));
+        TestCase.assertEquals(0, extension.numValues());
+        TestCase.assertEquals(0, extension.numValues(PropertyNames.TITLE));
+        TestCase.assertFalse(extension.hasSingleValue(PropertyNames.TITLE));
+        TestCase.assertFalse(extension.hasValues(PropertyNames.TITLE));
+        TestCase.assertNull(extension.getValue(PropertyNames.TITLE));
+        TestCase.assertTrue(extension.getValues(PropertyNames.TITLE).isEmpty());
+        TestCase.assertFalse(extension.hasValue(PropertyNames.TITLE, name));
+        TestCase.assertEquals(0, extension.deleteProperty(PropertyNames.TITLE));
+        TestCase.assertEquals(0,
+                extension.deleteValue(PropertyNames.TITLE, name));
+        TestCase.assertEquals(0, extension.deleteAll());
+        extension.removeExtension();
+
         Extensions extensions = extension.getOrCreate();
         TestCase.assertNotNull(extensions);
         TestCase.assertTrue(extension.has());
@@ -41,7 +60,6 @@ public class PropertiesExtensionTest extends CreateGeoPackageTestCase {
         TestCase.assertFalse(extension.hasValues(PropertyNames.TITLE));
         TestCase.assertEquals(0, extension.numValues(PropertyNames.TITLE));
 
-        final String name = "My GeoPackage";
         TestCase.assertTrue(extension.addValue(PropertyNames.TITLE, name));
         TestCase.assertEquals(1, extension.numProperties());
         TestCase.assertEquals(1, extension.getProperties().size());
@@ -113,7 +131,6 @@ public class PropertiesExtensionTest extends CreateGeoPackageTestCase {
     public void testPropertyNames() {
 
         PropertiesExtension extension = new PropertiesExtension(geoPackage);
-        extension.getOrCreate();
 
         int count = 0;
 

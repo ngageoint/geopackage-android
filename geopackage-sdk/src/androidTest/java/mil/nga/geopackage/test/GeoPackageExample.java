@@ -1601,7 +1601,6 @@ public class GeoPackageExample extends BaseTestCase {
     private static void createPropertiesExtension(GeoPackage geoPackage) {
 
         PropertiesExtension properties = new PropertiesExtension(geoPackage);
-        properties.getOrCreate();
 
         String dateTime = DateConverter.dateTimeConverter().stringValue(
                 new Date());

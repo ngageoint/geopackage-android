@@ -119,7 +119,6 @@ public class PropertiesManagerTest extends BaseTestCase {
     private void addProperties(GeoPackage geoPackage, int i) {
 
         PropertiesExtension properties = new PropertiesExtension(geoPackage);
-        properties.getOrCreate();
 
         properties.addValue(PropertyNames.TITLE, GEOPACKAGE_NAME + (i + 1));
         properties.addValue(PropertyNames.IDENTIFIER, Integer.toString(i));
