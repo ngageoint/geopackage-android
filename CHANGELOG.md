@@ -8,6 +8,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 * geopackage-core version 3.0.2
 * Properties Extension for saving GeoPackage metadata in the file
+* Properties Manager for using the Properties Extension on multiple open GeoPackages
 * Additional GeoPackage Connection query method
 
 ## [3.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.1) (07-13-2018)
