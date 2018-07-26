@@ -1151,22 +1151,29 @@ public class GeoPackageExample extends BaseTestCase {
         BoundingBox bbox = new BoundingBox(-11667347.997449303,
                 4824705.2253603265, -11666125.00499674, 4825928.217812888);
 
+        int contentsEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
+        int tileMatrixSetEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
+
         SpatialReferenceSystemDao srsDao = geoPackage
                 .getSpatialReferenceSystemDao();
-        SpatialReferenceSystem contentsSrs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
-        SpatialReferenceSystem tileMatrixSrs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WEB_MERCATOR);
+        srsDao.getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
 
-        ProjectionTransform transform = ProjectionFactory.getProjection(
-                ProjectionConstants.EPSG_WEB_MERCATOR).getTransformation(
-                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
-        BoundingBox contentsBoundingBox = bbox.transform(transform);
+        SpatialReferenceSystem contentsSrs = srsDao
+                .getOrCreateFromEpsg(contentsEpsg);
+        SpatialReferenceSystem tileMatrixSetSrs = srsDao
+                .getOrCreateFromEpsg(tileMatrixSetEpsg);
+
+        ProjectionTransform transform = tileMatrixSetSrs.getProjection()
+                .getTransformation(contentsSrs.getProjection());
+        BoundingBox contentsBoundingBox = bbox;
+        if (!transform.isSameProjection()) {
+            contentsBoundingBox = bbox.transform(transform);
+        }
 
         CoverageDataPng coverageData = CoverageDataPng
                 .createTileTableWithMetadata(geoPackage, "coverage_png",
                         contentsBoundingBox, contentsSrs.getId(), bbox,
-                        tileMatrixSrs.getId());
+                        tileMatrixSetSrs.getId());
         TileDao tileDao = coverageData.getTileDao();
         TileMatrixSet tileMatrixSet = coverageData.getTileMatrixSet();
 
@@ -1241,22 +1248,29 @@ public class GeoPackageExample extends BaseTestCase {
         BoundingBox bbox = new BoundingBox(-8593967.964158937,
                 4685284.085768163, -8592744.971706374, 4687730.070673289);
 
+        int contentsEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
+        int tileMatrixSetEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
+
         SpatialReferenceSystemDao srsDao = geoPackage
                 .getSpatialReferenceSystemDao();
-        SpatialReferenceSystem contentsSrs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
-        SpatialReferenceSystem tileMatrixSrs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WEB_MERCATOR);
+        srsDao.getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
 
-        ProjectionTransform transform = ProjectionFactory.getProjection(
-                ProjectionConstants.EPSG_WEB_MERCATOR).getTransformation(
-                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
-        BoundingBox contentsBoundingBox = bbox.transform(transform);
+        SpatialReferenceSystem contentsSrs = srsDao
+                .getOrCreateFromEpsg(contentsEpsg);
+        SpatialReferenceSystem tileMatrixSetSrs = srsDao
+                .getOrCreateFromEpsg(tileMatrixSetEpsg);
+
+        ProjectionTransform transform = tileMatrixSetSrs.getProjection()
+                .getTransformation(contentsSrs.getProjection());
+        BoundingBox contentsBoundingBox = bbox;
+        if (!transform.isSameProjection()) {
+            contentsBoundingBox = bbox.transform(transform);
+        }
 
         CoverageDataTiff coverageData = CoverageDataTiff
                 .createTileTableWithMetadata(geoPackage, "coverage_tiff",
                         contentsBoundingBox, contentsSrs.getId(), bbox,
-                        tileMatrixSrs.getId());
+                        tileMatrixSetSrs.getId());
         TileDao tileDao = coverageData.getTileDao();
         TileMatrixSet tileMatrixSet = coverageData.getTileMatrixSet();
 

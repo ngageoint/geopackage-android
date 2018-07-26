@@ -91,13 +91,13 @@ public abstract class CreateCoverageDataTiffGeoPackageTestCase extends
                 .getSpatialReferenceSystemDao();
         SpatialReferenceSystem contentsSrs = srsDao
                 .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
-        SpatialReferenceSystem tileMatrixSrs = srsDao
-                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+        SpatialReferenceSystem tileMatrixSetSrs = srsDao
+                .getOrCreateFromEpsg(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM_GEOGRAPHICAL_3D);
 
         CoverageDataTiff coverageData = CoverageDataTiff
                 .createTileTableWithMetadata(geoPackage,
                         TestConstants.CREATE_COVERAGE_DATA_DB_TABLE_NAME,
-                        bbox, contentsSrs.getId(), bbox, tileMatrixSrs.getId());
+                        bbox, contentsSrs.getId(), bbox, tileMatrixSetSrs.getId());
         TileDao tileDao = coverageData.getTileDao();
         TileMatrixSet tileMatrixSet = coverageData.getTileMatrixSet();
 
