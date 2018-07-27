@@ -6,6 +6,7 @@ mil.nga.geopackage.extension
 mil.nga.geopackage.extension.coverage
 mil.nga.geopackage.extension.index
 mil.nga.geopackage.extension.link
+mil.nga.geopackage.extension.properties
 mil.nga.geopackage.extension.related
 mil.nga.geopackage.extension.related.media
 mil.nga.geopackage.extension.related.simple
