@@ -4,6 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## 3.0.3 (TBD)
+
+* TBD
+
 ## [3.0.2](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.2) (07-27-2018)
 
 * geopackage-core version 3.0.2
