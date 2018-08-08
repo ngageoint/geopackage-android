@@ -2,10 +2,14 @@ package mil.nga.geopackage.extension;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.features.user.FeatureDao;
+import mil.nga.geopackage.user.custom.UserCustomConnection;
+import mil.nga.geopackage.user.custom.UserCustomDao;
+import mil.nga.geopackage.user.custom.UserCustomTable;
 
 /**
  * RTree Index Extension
- * TODO Not currently supported for Android, user defined functions are not supported.
+ * TODO User defined functions are not currently supported for Android
  *
  * @author osbornb
  * @since 2.0.1
@@ -25,6 +29,43 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
     public RTreeIndexExtension(GeoPackage geoPackage) {
         super(geoPackage);
         connection = geoPackage.getConnection();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage getGeoPackage() {
+        return (GeoPackage) super.getGeoPackage();
+    }
+
+    /**
+     * Get a RTree Index Table DAO for the feature table
+     *
+     * @param featureTable feature table
+     * @return RTree Index Table DAO
+     * @since 3.0.3
+     */
+    public RTreeIndexTableDao getTableDao(String featureTable) {
+        return getTableDao(getGeoPackage().getFeatureDao(featureTable));
+    }
+
+    /**
+     * Get a RTree Index Table DAO for the feature dao
+     *
+     * @param featureDao feature DAO
+     * @return RTree Index Table DAO
+     * @since 3.0.3
+     */
+    public RTreeIndexTableDao getTableDao(FeatureDao featureDao) {
+
+        GeoPackageConnection connection = getGeoPackage().getConnection();
+        UserCustomConnection userDb = new UserCustomConnection(connection);
+        UserCustomTable userCustomTable = getRTreeTable(featureDao.getTable());
+        UserCustomDao userCustomDao = new UserCustomDao(geoPackage.getName(),
+                connection, userDb, userCustomTable);
+
+        return new RTreeIndexTableDao(this, userCustomDao, featureDao);
     }
 
     /**

@@ -164,10 +164,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 Geometry geometry = geomData.getGeometry();
                 if (geometry != null) {
 
-                    GeometryEnvelope envelope = geomData.getEnvelope();
-                    if (envelope == null) {
-                        envelope = GeometryEnvelopeBuilder.buildEnvelope(geometry);
-                    }
+                    GeometryEnvelope envelope = geomData.getOrBuildEnvelope();
                     BoundingBox geometryBoundingBox = new BoundingBox(envelope);
                     BoundingBox transformedBoundingBox = geometryBoundingBox.transform(transform);
 

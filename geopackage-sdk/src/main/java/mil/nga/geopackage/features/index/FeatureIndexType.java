@@ -16,6 +16,20 @@ public enum FeatureIndexType {
     /**
      * GeoPackage extension tables
      */
-    GEOPACKAGE;
+    GEOPACKAGE,
+
+    /**
+     * RTree Index extension
+     *
+     * @since 3.0.3
+     */
+    RTREE,
+
+    /**
+     * No index
+     *
+     * @since 3.0.3
+     */
+    NONE;
 
 }

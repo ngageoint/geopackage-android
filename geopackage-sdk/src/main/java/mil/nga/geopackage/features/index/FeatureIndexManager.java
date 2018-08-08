@@ -6,6 +6,7 @@ import android.database.Cursor;
 import com.j256.ormlite.dao.CloseableIterator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,11 +16,16 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.FeatureIndexer;
+import mil.nga.geopackage.extension.RTreeIndexExtension;
+import mil.nga.geopackage.extension.RTreeIndexTableDao;
 import mil.nga.geopackage.extension.index.FeatureTableIndex;
 import mil.nga.geopackage.extension.index.GeometryIndex;
+import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
+import mil.nga.geopackage.features.user.ManualFeatureQuery;
 import mil.nga.geopackage.io.GeoPackageProgress;
+import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.proj.Projection;
 
@@ -50,6 +56,16 @@ public class FeatureIndexManager {
     private final FeatureIndexer featureIndexer;
 
     /**
+     * RTree Index Table DAO
+     */
+    private final RTreeIndexTableDao rTreeIndexTableDao;
+
+    /**
+     * Manual Feature Queries
+     */
+    private final ManualFeatureQuery manualFeatureQuery;
+
+    /**
      * Ordered set of index locations to check in order when checking if features are indexed
      * and when querying for features
      */
@@ -63,6 +79,18 @@ public class FeatureIndexManager {
     /**
      * Constructor
      *
+     * @param context      context
+     * @param geoPackage   GeoPackage
+     * @param featureTable feature table
+     * @since 3.0.3
+     */
+    public FeatureIndexManager(Context context, GeoPackage geoPackage, String featureTable) {
+        this(context, geoPackage, geoPackage.getFeatureDao(featureTable));
+    }
+
+    /**
+     * Constructor
+     *
      * @param context    context
      * @param geoPackage GeoPackage
      * @param featureDao feature DAO
@@ -71,8 +99,12 @@ public class FeatureIndexManager {
         this.featureDao = featureDao;
         featureTableIndex = new FeatureTableIndex(geoPackage, featureDao);
         featureIndexer = new FeatureIndexer(context, featureDao);
+        RTreeIndexExtension rTreeExtension = new RTreeIndexExtension(geoPackage);
+        rTreeIndexTableDao = rTreeExtension.getTableDao(featureDao);
+        manualFeatureQuery = new ManualFeatureQuery(featureDao);
 
         // Set the default indexed check and query order
+        //indexLocationQueryOrder.add(FeatureIndexType.RTREE); // TODO
         indexLocationQueryOrder.add(FeatureIndexType.GEOPACKAGE);
         indexLocationQueryOrder.add(FeatureIndexType.METADATA);
     }
@@ -83,6 +115,7 @@ public class FeatureIndexManager {
     public void close() {
         featureTableIndex.close();
         featureIndexer.close();
+        // rTreeIndexTableDao.close();
     }
 
     /**
@@ -114,6 +147,16 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Get the RTree Index Table DAO
+     *
+     * @return RTree index table DAO
+     * @since 3.0.3
+     */
+    public RTreeIndexTableDao getRTreeIndexTableDao() {
+        return rTreeIndexTableDao;
+    }
+
+    /**
      * Get the index location
      *
      * @return index location or null if not set
@@ -132,7 +175,9 @@ public class FeatureIndexManager {
         // Create a new query order set
         Set<FeatureIndexType> queryOrder = new LinkedHashSet<>();
         for (FeatureIndexType type : types) {
-            queryOrder.add(type);
+            if (type != FeatureIndexType.NONE) {
+                queryOrder.add(type);
+            }
         }
         // Add any locations not provided to this method
         queryOrder.addAll(indexLocationQueryOrder);
@@ -157,6 +202,7 @@ public class FeatureIndexManager {
     public void setProgress(GeoPackageProgress progress) {
         featureTableIndex.setProgress(progress);
         featureIndexer.setProgress(progress);
+        rTreeIndexTableDao.setProgress(progress);
     }
 
     /**
@@ -240,8 +286,19 @@ public class FeatureIndexManager {
             case METADATA:
                 count = featureIndexer.index(force);
                 break;
+            case RTREE:
+                boolean rTreeIndexed = rTreeIndexTableDao.has();
+                if (!rTreeIndexed || force) {
+                    if (rTreeIndexed) {
+                        rTreeIndexTableDao.delete();
+                    }
+                    rTreeIndexTableDao.create();
+                    count = rTreeIndexTableDao.count();
+                }
+                break;
             default:
-                throw new GeoPackageException("Unsupported FeatureIndexType: " + type);
+                throw new GeoPackageException("Unsupported FeatureIndexType: "
+                        + type);
         }
         return count;
     }
@@ -298,6 +355,10 @@ public class FeatureIndexManager {
             case METADATA:
                 indexed = featureIndexer.index(row);
                 break;
+            case RTREE:
+                // Updated by triggers, ignore for RTree
+                indexed = true;
+                break;
             default:
                 throw new GeoPackageException("Unsupported FeatureIndexType: " + type);
         }
@@ -314,13 +375,23 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Delete the feature index from all query order locations
+     *
+     * @return true if deleted
+     * @since 3.0.3
+     */
+    public boolean deleteAllIndexes() {
+        return deleteIndex(indexLocationQueryOrder);
+    }
+
+    /**
      * Delete the feature index from the index types
      *
      * @param types feature index types
      * @return true if deleted from any type
      * @since 2.0.0
      */
-    public boolean deleteIndex(List<FeatureIndexType> types) {
+    public boolean deleteIndex(Collection<FeatureIndexType> types) {
         boolean deleted = false;
         for (FeatureIndexType type : types) {
             if (deleteIndex(type)) {
@@ -347,6 +418,10 @@ public class FeatureIndexManager {
                 break;
             case METADATA:
                 deleted = featureIndexer.deleteIndex();
+                break;
+            case RTREE:
+                rTreeIndexTableDao.delete();
+                deleted = true;
                 break;
             default:
                 throw new GeoPackageException("Unsupported FeatureIndexType: " + type);
@@ -440,6 +515,10 @@ public class FeatureIndexManager {
             case METADATA:
                 deleted = featureIndexer.deleteIndex(geomId);
                 break;
+            case RTREE:
+                // Updated by triggers, ignore for RTree
+                deleted = true;
+                break;
             default:
                 throw new GeoPackageException("Unsupported FeatureIndexType: " + type);
         }
@@ -479,6 +558,9 @@ public class FeatureIndexManager {
                     break;
                 case METADATA:
                     indexed = featureIndexer.isIndexed();
+                    break;
+                case RTREE:
+                    indexed = rTreeIndexTableDao.has();
                     break;
                 default:
                     throw new GeoPackageException("Unsupported FeatureIndexType: " + type);
@@ -537,6 +619,12 @@ public class FeatureIndexManager {
                 case METADATA:
                     lastIndexed = featureIndexer.getLastIndexed();
                     break;
+                case RTREE:
+                    if (rTreeIndexTableDao.has()) {
+                        // Updated by triggers, assume up to date
+                        lastIndexed = new Date();
+                    }
+                    break;
                 default:
                     throw new GeoPackageException("Unsupported FeatureIndexType: " + type);
             }
@@ -561,6 +649,14 @@ public class FeatureIndexManager {
                 Cursor geometryMetadata = featureIndexer.query();
                 results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
                 break;
+            case RTREE:
+                UserCustomCursor cursor = rTreeIndexTableDao.queryForAll();
+                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                        cursor);
+                break;
+            default:
+                FeatureCursor featureCursor = featureDao.queryForAll();
+                results = new FeatureIndexFeatureResults(featureCursor);
         }
         return results;
     }
@@ -579,6 +675,11 @@ public class FeatureIndexManager {
             case METADATA:
                 count = featureIndexer.count();
                 break;
+            case RTREE:
+                count = rTreeIndexTableDao.count();
+                break;
+            default:
+                count = featureDao.count();
         }
         return count;
     }
@@ -602,6 +703,14 @@ public class FeatureIndexManager {
                 Cursor geometryMetadata = featureIndexer.query(boundingBox);
                 results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
                 break;
+            case RTREE:
+                UserCustomCursor cursor = rTreeIndexTableDao
+                        .query(boundingBox);
+                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                        cursor);
+                break;
+            default:
+                results = manualFeatureQuery.query(boundingBox);
         }
         return results;
     }
@@ -622,6 +731,11 @@ public class FeatureIndexManager {
             case METADATA:
                 count = featureIndexer.count(boundingBox);
                 break;
+            case RTREE:
+                count = rTreeIndexTableDao.count(boundingBox);
+                break;
+            default:
+                count = manualFeatureQuery.count(boundingBox);
         }
         return count;
     }
@@ -644,6 +758,13 @@ public class FeatureIndexManager {
                 Cursor geometryMetadata = featureIndexer.query(envelope);
                 results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
                 break;
+            case RTREE:
+                UserCustomCursor cursor = rTreeIndexTableDao.query(envelope);
+                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                        cursor);
+                break;
+            default:
+                results = manualFeatureQuery.query(envelope);
         }
         return results;
     }
@@ -663,6 +784,11 @@ public class FeatureIndexManager {
             case METADATA:
                 count = featureIndexer.count(envelope);
                 break;
+            case RTREE:
+                count = rTreeIndexTableDao.count(envelope);
+                break;
+            default:
+                count = manualFeatureQuery.count(envelope);
         }
         return count;
     }
@@ -687,6 +813,14 @@ public class FeatureIndexManager {
                 Cursor geometryMetadata = featureIndexer.query(boundingBox, projection);
                 results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
                 break;
+            case RTREE:
+                UserCustomCursor cursor = rTreeIndexTableDao.query(
+                        boundingBox, projection);
+                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                        cursor);
+                break;
+            default:
+                results = manualFeatureQuery.query(boundingBox, projection);
         }
         return results;
     }
@@ -708,6 +842,11 @@ public class FeatureIndexManager {
             case METADATA:
                 count = featureIndexer.count(boundingBox, projection);
                 break;
+            case RTREE:
+                count = rTreeIndexTableDao.count(boundingBox, projection);
+                break;
+            default:
+                count = manualFeatureQuery.count(boundingBox, projection);
         }
         return count;
     }
@@ -729,7 +868,7 @@ public class FeatureIndexManager {
      */
     private FeatureIndexType getIndexedType() {
 
-        FeatureIndexType indexType = null;
+        FeatureIndexType indexType = FeatureIndexType.NONE;
 
         // Check for an indexed type
         for (FeatureIndexType type : indexLocationQueryOrder) {
@@ -737,13 +876,6 @@ public class FeatureIndexManager {
                 indexType = type;
                 break;
             }
-        }
-
-        // Verify features are indexed
-        if (indexType == null) {
-            throw new GeoPackageException("Features are not indexed. GeoPackage: "
-                    + featureTableIndex.getGeoPackage().getName()
-                    + ", Table: " + featureTableIndex.getTableName());
         }
 
         return indexType;

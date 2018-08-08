@@ -25,7 +25,6 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.io.TestGeoPackageProgress;
-import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.Point;
 import mil.nga.sf.proj.Projection;
@@ -63,10 +62,7 @@ public class FeatureTableIndexUtils {
             FeatureCursor featureCursor = featureDao.queryForAll();
             while (featureCursor.moveToNext()) {
                 FeatureRow featureRow = featureCursor.getRow();
-                GeoPackageGeometryData geometryData = featureRow.getGeometry();
-                if (geometryData != null
-                        && (geometryData.getEnvelope() != null || geometryData
-                        .getGeometry() != null)) {
+                if (featureRow.getGeometryEnvelope() != null) {
                     expectedCount++;
                     // Randomly choose a feature row with Geometry for testing
                     // queries later
@@ -120,12 +116,7 @@ public class FeatureTableIndexUtils {
             TestCase.assertEquals(expectedCount, resultCount);
 
             // Test the query by envelope
-            GeoPackageGeometryData geometryData = testFeatureRow.getGeometry();
-            GeometryEnvelope envelope = geometryData.getEnvelope();
-            if (envelope == null) {
-                envelope = GeometryEnvelopeBuilder.buildEnvelope(geometryData
-                        .getGeometry());
-            }
+            GeometryEnvelope envelope = testFeatureRow.getGeometryEnvelope();
             envelope.setMinX(envelope.getMinX() - .000001);
             envelope.setMaxX(envelope.getMaxX() + .000001);
             envelope.setMinY(envelope.getMinY() - .000001);
@@ -192,7 +183,7 @@ public class FeatureTableIndexUtils {
             TestCase.assertTrue(resultCount >= 1);
 
             // Update a Geometry and update the index of a single feature row
-            geometryData = new GeoPackageGeometryData(featureDao
+            GeoPackageGeometryData geometryData = new GeoPackageGeometryData(featureDao
                     .getGeometryColumns().getSrsId());
             Point point = new Point(5, 5);
             geometryData.setGeometry(point);
@@ -366,14 +357,7 @@ public class FeatureTableIndexUtils {
         TestCase.assertEquals(featureTableIndex.getTableName(),
                 geometryIndex.getTableName());
         TestCase.assertEquals(geometryIndex.getGeomId(), featureRow.getId());
-        GeoPackageGeometryData geometryData = featureRow.getGeometry();
-        GeometryEnvelope envelope = geometryData.getEnvelope();
-        if (envelope == null) {
-            Geometry geometry = geometryData.getGeometry();
-            if (geometry != null) {
-                envelope = GeometryEnvelopeBuilder.buildEnvelope(geometry);
-            }
-        }
+        GeometryEnvelope envelope = featureRow.getGeometryEnvelope();
 
         TestCase.assertNotNull(envelope);
 

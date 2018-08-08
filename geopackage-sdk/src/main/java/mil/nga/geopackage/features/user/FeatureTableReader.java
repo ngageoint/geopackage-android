@@ -47,7 +47,7 @@ public class FeatureTableReader extends
                                          String type, Long max, boolean notNull, int defaultValueIndex,
                                          boolean primaryKey) {
 
-        boolean geometry = name.equals(geometryColumns.getColumnName());
+        boolean geometry = name.equalsIgnoreCase(geometryColumns.getColumnName());
 
         GeometryType geometryType = null;
         GeoPackageDataType dataType = null;

@@ -79,6 +79,9 @@ public class MultipleFeatureIndexResults implements FeatureIndexResults {
             int index = -1;
             private Iterator<FeatureRow> currentResults = null;
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public boolean hasNext() {
                 boolean hasNext = false;
@@ -102,6 +105,9 @@ public class MultipleFeatureIndexResults implements FeatureIndexResults {
                 return hasNext;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public FeatureRow next() {
                 FeatureRow row = null;
@@ -111,6 +117,9 @@ public class MultipleFeatureIndexResults implements FeatureIndexResults {
                 return row;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void remove() {
                 throw new UnsupportedOperationException();

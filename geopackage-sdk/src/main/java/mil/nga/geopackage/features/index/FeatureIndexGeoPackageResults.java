@@ -52,11 +52,17 @@ class FeatureIndexGeoPackageResults implements FeatureIndexResults {
     public Iterator<FeatureRow> iterator() {
         Iterator<FeatureRow> iterator = new Iterator<FeatureRow>() {
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public boolean hasNext() {
                 return geometryIndices.hasNext();
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public FeatureRow next() {
                 GeometryIndex geometryIndex = geometryIndices.next();
@@ -64,6 +70,9 @@ class FeatureIndexGeoPackageResults implements FeatureIndexResults {
                 return featureRow;
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public void remove() {
                 throw new UnsupportedOperationException();

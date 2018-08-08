@@ -22,7 +22,8 @@ public class FeatureTableIndexCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test index
      *
-     * @throws SQLException
+     * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     public void testIndex() throws SQLException, IOException {
 
@@ -33,7 +34,7 @@ public class FeatureTableIndexCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test delete all table indices
      *
-     * @throws SQLException
+     * @throws SQLException upon error
      */
     public void testDeleteAll() throws SQLException {
 

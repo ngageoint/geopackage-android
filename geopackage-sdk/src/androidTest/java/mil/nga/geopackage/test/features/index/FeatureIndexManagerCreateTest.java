@@ -29,6 +29,17 @@ public class FeatureIndexManagerCreateTest extends CreateGeoPackageTestCase {
 
     }
 
+    /**
+     * Test large index
+     *
+     * @throws SQLException upon error
+     */
+    public void testLargeIndex() throws SQLException {
+
+        FeatureIndexManagerUtils.testLargeIndex(activity, geoPackage, 2000); // TODO
+
+    }
+
     @Override
     public boolean allowEmptyFeatures() {
         return false;

@@ -8,6 +8,7 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicLong;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
@@ -89,31 +90,44 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
     @Override
     protected int indexTable(final TableIndex tableIndex) {
 
-        int count;
+        int count = 0;
 
-        try {
-            // Iterate through each row and index as a single transaction
-            ConnectionSource connectionSource = getGeoPackage().getDatabase()
-                    .getConnectionSource();
-            count = TransactionManager.callInTransaction(connectionSource,
-                    new Callable<Integer>() {
-                        public Integer call() throws Exception {
+        final AtomicLong lastId = new AtomicLong(-1);
+        int chunkCount = 0;
 
-                            FeatureCursor cursor = featureDao.queryForAll();
+        while (chunkCount >= 0) {
 
-                            int count = indexRows(tableIndex, cursor);
+            lastId.incrementAndGet();
 
-                            // Update the last indexed time
-                            if (progress == null || progress.isActive()) {
-                                updateLastIndexed();
+            try {
+                // Iterate through each row and index as a single transaction
+                ConnectionSource connectionSource = getGeoPackage().getDatabase()
+                        .getConnectionSource();
+                chunkCount = TransactionManager.callInTransaction(connectionSource,
+                        new Callable<Integer>() {
+                            public Integer call() throws Exception {
+
+                                FeatureCursor cursor = featureDao.queryForChunk(lastId.longValue(),
+                                                chunkLimit);
+                                int count = indexRows(tableIndex, cursor, lastId);
+
+                                return count;
                             }
-                            return count;
-                        }
-                    });
-        } catch (SQLException e) {
-            throw new GeoPackageException("Failed to Index Table. GeoPackage: "
-                    + getGeoPackage().getName() + ", Table: " + getTableName(),
-                    e);
+                        });
+                if (chunkCount > 0) {
+                    count += chunkCount;
+                }
+            } catch (SQLException e) {
+                throw new GeoPackageException("Failed to Index Table. GeoPackage: "
+                        + getGeoPackage().getName() + ", Table: " + getTableName(),
+                        e);
+            }
+
+        }
+
+        // Update the last indexed time
+        if (progress == null || progress.isActive()) {
+            updateLastIndexed();
         }
 
         return count;
@@ -124,20 +138,27 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      *
      * @param tableIndex table index
      * @param cursor     feature cursor
-     * @return count
+     * @param lastId     updated to the last id indexed
+     * @return count, -1 if no results or canceled
      */
-    private int indexRows(TableIndex tableIndex, FeatureCursor cursor) {
+    private int indexRows(TableIndex tableIndex, FeatureCursor cursor,
+                          AtomicLong lastId) {
 
-        int count = 0;
+        int count = -1;
 
         try {
             while ((progress == null || progress.isActive())
                     && cursor.moveToNext()) {
+                if (count < 0) {
+                    count++;
+                }
                 try {
                     FeatureRow row = cursor.getRow();
                     if (row.isValid()) {
+                        long id = row.getId();
+                        lastId.set(id);
                         boolean indexed = index(tableIndex,
-                                row.getId(), row.getGeometry());
+                                id, row.getGeometry());
                         if (indexed) {
                             count++;
                         }
