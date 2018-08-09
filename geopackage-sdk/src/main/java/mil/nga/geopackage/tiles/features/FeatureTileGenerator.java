@@ -45,6 +45,15 @@ public class FeatureTileGenerator extends TileGenerator {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void close() {
+        featureTiles.close();
+        super.close();
+    }
+
+    /**
      * Is the feature table going to be linked with the tile table? Defaults to
      * true.
      *
