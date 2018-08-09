@@ -1440,8 +1440,9 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * @return
      */
     private boolean isTemporary(String database) {
-        return database.endsWith(context
-                .getString(R.string.geopackage_db_rollback_suffix));
+        return database.endsWith(context.getString(R.string.geopackage_db_rollback_journal_suffix))
+                || database.endsWith(context.getString(R.string.geopackage_db_write_ahead_log_suffix))
+                || database.endsWith(context.getString(R.string.geopackage_db_shared_memory_suffix));
     }
 
 }

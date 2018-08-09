@@ -2,7 +2,9 @@
 
     <string name="app_name">GeoPackageSDK</string>
 
-    <string name="geopackage_db_rollback_suffix">-journal</string>
+    <string name="geopackage_db_rollback_journal_suffix">-journal</string>
+    <string name="geopackage_db_write_ahead_log_suffix">-wal</string>
+    <string name="geopackage_db_shared_memory_suffix">-shm</string>
 
     <string name="tile_generator_variable_z">\\{z\\}</string>
     <string name="tile_generator_variable_x">\\{x\\}</string>
