@@ -50,8 +50,8 @@ public class FeatureIndexManagerUtils {
      */
     public static void testIndex(Activity activity, GeoPackage geoPackage) throws SQLException {
         testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
-        testIndex(activity, geoPackage, FeatureIndexType.METADATA, false); // TODO
-        //testIndex(activity, geoPackage, FeatureIndexType.RTREE, true); // TODO
+        testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);
+        //testIndex(activity, geoPackage, FeatureIndexType.RTREE, true); // TODO RTree not supported
     }
 
     private static void testIndex(Activity activity, GeoPackage geoPackage, FeatureIndexType type,
@@ -422,7 +422,7 @@ public class FeatureIndexManagerUtils {
         testLargeIndex(activity, geoPackage, FeatureIndexType.METADATA, featureDao,
                 envelopes, compareProjectionCounts, verbose);
         //testLargeIndex(activity, geoPackage, FeatureIndexType.RTREE, featureDao,
-        //        envelopes, compareProjectionCounts, verbose); // TODO
+        //        envelopes, compareProjectionCounts, verbose); // TODO RTree not supported
         testLargeIndex(activity, geoPackage, FeatureIndexType.NONE, featureDao,
                 envelopes, compareProjectionCounts, verbose);
     }

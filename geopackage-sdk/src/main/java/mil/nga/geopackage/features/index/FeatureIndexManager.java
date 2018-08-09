@@ -104,7 +104,7 @@ public class FeatureIndexManager {
         manualFeatureQuery = new ManualFeatureQuery(featureDao);
 
         // Set the default indexed check and query order
-        //indexLocationQueryOrder.add(FeatureIndexType.RTREE); // TODO
+        //indexLocationQueryOrder.add(FeatureIndexType.RTREE); // TODO not supported on Android
         indexLocationQueryOrder.add(FeatureIndexType.GEOPACKAGE);
         indexLocationQueryOrder.add(FeatureIndexType.METADATA);
     }
