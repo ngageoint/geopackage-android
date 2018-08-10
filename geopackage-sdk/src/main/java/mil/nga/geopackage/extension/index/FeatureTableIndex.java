@@ -8,7 +8,6 @@ import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicLong;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
@@ -92,12 +91,12 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
 
         int count = 0;
 
-        final AtomicLong lastId = new AtomicLong(-1);
+        long offset = 0;
         int chunkCount = 0;
 
         while (chunkCount >= 0) {
 
-            lastId.incrementAndGet();
+            final long chunkOffset = offset;
 
             try {
                 // Iterate through each row and index as a single transaction
@@ -107,9 +106,8 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
                         new Callable<Integer>() {
                             public Integer call() throws Exception {
 
-                                FeatureCursor cursor = featureDao.queryForChunk(lastId.longValue(),
-                                                chunkLimit);
-                                int count = indexRows(tableIndex, cursor, lastId);
+                                FeatureCursor cursor = featureDao.queryForChunk(chunkLimit, chunkOffset);
+                                int count = indexRows(tableIndex, cursor);
 
                                 return count;
                             }
@@ -123,6 +121,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
                         e);
             }
 
+            offset += chunkLimit;
         }
 
         // Update the last indexed time
@@ -138,11 +137,9 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      *
      * @param tableIndex table index
      * @param cursor     feature cursor
-     * @param lastId     updated to the last id indexed
      * @return count, -1 if no results or canceled
      */
-    private int indexRows(TableIndex tableIndex, FeatureCursor cursor,
-                          AtomicLong lastId) {
+    private int indexRows(TableIndex tableIndex, FeatureCursor cursor) {
 
         int count = -1;
 
@@ -155,10 +152,8 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
                 try {
                     FeatureRow row = cursor.getRow();
                     if (row.isValid()) {
-                        long id = row.getId();
-                        lastId.set(id);
                         boolean indexed = index(tableIndex,
-                                id, row.getGeometry());
+                                row.getId(), row.getGeometry());
                         if (indexed) {
                             count++;
                         }
