@@ -1533,7 +1533,7 @@ public class GeoPackageExample extends BaseTestCase {
         SimpleAttributesTable simpleTable = SimpleAttributesTable.create(
                 "simple_attributes", simpleUserColumns);
 
-        String tableName = geoPackage.getAttributesTables().get(0);
+        String tableName = "attributes";
 
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
                 .createAdditionalUserColumns(UserMappingTable

@@ -143,10 +143,10 @@ public class RelatedMediaUtils {
                 mediaTable.getTableName()));
         validateContents(mediaTable,
                 contentsDao.queryForId(mediaTable.getTableName()));
-        TestCase.assertEquals(MediaTable.RELATION_TYPE.getName(),
+        TestCase.assertEquals(MediaTable.RELATION_TYPE.getDataType(),
                 geoPackage.getTableType(mediaTable.getTableName()));
         TestCase.assertTrue(geoPackage.isTableType(
-                MediaTable.RELATION_TYPE.getName(), mediaTable.getTableName()));
+                MediaTable.RELATION_TYPE.getDataType(), mediaTable.getTableName()));
 
         // Validate the media DAO
         MediaDao mediaDao = rte.getMediaDao(mediaTable);
@@ -461,8 +461,10 @@ public class RelatedMediaUtils {
     private static void validateContents(MediaTable mediaTable,
                                          Contents contents) {
         TestCase.assertNotNull(contents);
-        TestCase.assertNull(contents.getDataType());
-        TestCase.assertEquals(MediaTable.RELATION_TYPE.getName(),
+        TestCase.assertNotNull(contents.getDataType());
+        TestCase.assertEquals(MediaTable.RELATION_TYPE.getDataType(), contents
+                .getDataType().getName());
+        TestCase.assertEquals(MediaTable.RELATION_TYPE.getDataType(),
                 contents.getDataTypeString());
         TestCase.assertEquals(mediaTable.getTableName(),
                 contents.getTableName());
