@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.extension;
 
+import org.junit.Test;
+
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
@@ -8,6 +10,12 @@ import mil.nga.geopackage.extension.GeometryExtensions;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.wkb.GeometryCodes;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Geometry Extensions Tests
@@ -19,6 +27,7 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
     /**
      * Test the is extension check
      */
+    @Test
     public void testIsExtension() {
 
         assertFalse(GeometryExtensions.isExtension(GeometryType.GEOMETRY));
@@ -50,6 +59,7 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
     /**
      * Test the is GeoPackage extension check
      */
+    @Test
     public void testIsGeoPackageExtension() {
 
         assertFalse(GeometryExtensions
@@ -94,6 +104,7 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
     /**
      * Test the GeoPackage get extension name
      */
+    @Test
     public void testGeoPackageExtensionName() {
 
         try {
@@ -190,6 +201,7 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
     /**
      * Test the get extension name
      */
+    @Test
     public void testExtensionName() {
 
         String author = "nga";
@@ -291,6 +303,7 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
     /**
      * Test the Geometry Extension creation
      */
+    @Test
     public void testGeometryExtension() throws Exception {
 
         GeometryExtensions extensions = new GeometryExtensions(geoPackage);
@@ -352,6 +365,7 @@ public class GeometryExtensionsTest extends CreateGeoPackageTestCase {
     /**
      * Test the User Geometry Extension creation
      */
+    @Test
     public void testUserGeometryExtension() throws Exception {
 
         GeometryExtensions extensions = new GeometryExtensions(geoPackage);

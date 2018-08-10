@@ -2,6 +2,8 @@ package mil.nga.geopackage.test.extension.related;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -39,6 +41,7 @@ public class RelatedTablesWriteTest extends LoadGeoPackageTestCase {
      * @throws SQLException
      * @throws IOException
      */
+    @Test
     public void testGetRelationships() throws SQLException, IOException {
 
         RelatedTablesExtension rte = new RelatedTablesExtension(geoPackage);

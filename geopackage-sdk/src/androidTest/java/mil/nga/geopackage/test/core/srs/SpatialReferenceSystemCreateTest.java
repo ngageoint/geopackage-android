@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.core.srs;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -24,6 +26,7 @@ public class SpatialReferenceSystemCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		SpatialReferenceSystemUtils.testRead(geoPackage,
@@ -36,6 +39,7 @@ public class SpatialReferenceSystemCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testSqlMmRead() throws SQLException {
 
 		SpatialReferenceSystemUtils.testSqlMmRead(geoPackage,
@@ -48,6 +52,7 @@ public class SpatialReferenceSystemCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testSfSqlRead() throws SQLException {
 
 		SpatialReferenceSystemUtils.testSfSqlRead(geoPackage,
@@ -60,6 +65,7 @@ public class SpatialReferenceSystemCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		SpatialReferenceSystemUtils.testUpdate(geoPackage);
@@ -71,6 +77,7 @@ public class SpatialReferenceSystemCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		SpatialReferenceSystemUtils.testCreate(geoPackage);
@@ -82,6 +89,7 @@ public class SpatialReferenceSystemCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		SpatialReferenceSystemUtils.testDelete(geoPackage);
@@ -93,6 +101,7 @@ public class SpatialReferenceSystemCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDeleteCascade() throws SQLException {
 
 		SpatialReferenceSystemUtils.testDeleteCascade(geoPackage);

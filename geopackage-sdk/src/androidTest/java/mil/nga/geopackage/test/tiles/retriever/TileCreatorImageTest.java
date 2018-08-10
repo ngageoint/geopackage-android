@@ -6,6 +6,8 @@ import android.graphics.Color;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
@@ -42,6 +44,7 @@ public class TileCreatorImageTest extends LoadGeoPackageTestCase {
      *
      * @throws SQLException
      */
+    @Test
     public void testTileImage() throws SQLException {
 
         TileDao tileDao = geoPackage.getTileDao(TestConstants.TILES2_DB_TABLE_NAME);

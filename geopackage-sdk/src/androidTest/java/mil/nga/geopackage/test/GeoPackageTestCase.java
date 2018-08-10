@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test;
 
+import org.junit.Before;
+
 import mil.nga.geopackage.GeoPackage;
 
 /**
@@ -28,13 +30,8 @@ public abstract class GeoPackageTestCase extends BaseTestCase {
 	 */
 	protected abstract GeoPackage getGeoPackage() throws Exception;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
+	@Before
+	public void geoPackageSetUp() throws Exception {
 		// Get the geo package
 		geoPackage = getGeoPackage();
 	}

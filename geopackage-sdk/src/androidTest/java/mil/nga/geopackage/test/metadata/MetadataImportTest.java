@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.metadata;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.ImportGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class MetadataImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		MetadataUtils.testRead(geoPackage, null);
@@ -34,6 +37,7 @@ public class MetadataImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		MetadataUtils.testUpdate(geoPackage);
@@ -45,6 +49,7 @@ public class MetadataImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		MetadataUtils.testCreate(geoPackage);
@@ -56,6 +61,7 @@ public class MetadataImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		MetadataUtils.testDelete(geoPackage);
@@ -67,6 +73,7 @@ public class MetadataImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDeleteCascade() throws SQLException {
 
 		MetadataUtils.testDeleteCascade(geoPackage);

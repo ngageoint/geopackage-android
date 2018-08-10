@@ -2,6 +2,8 @@ package mil.nga.geopackage.test;
 
 import junit.framework.TestCase;
 
+import org.junit.After;
+
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
@@ -278,18 +280,14 @@ public abstract class CreateCoverageDataTiffGeoPackageTestCase extends
         return geoPackage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
 
         // Close
         if (geoPackage != null) {
             geoPackage.close();
         }
 
-        super.tearDown();
     }
 
     /**

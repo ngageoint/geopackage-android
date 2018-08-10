@@ -2,6 +2,8 @@ package mil.nga.geopackage.test.extension.coverage;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
@@ -35,6 +37,7 @@ public class CoverageDataPngImportTest extends
      * Test the coverage data extension with a newly created GeoPackage using the
      * Nearest Neighbor Algorithm
      */
+    @Test
     public void testNearestNeighbor() throws Exception {
 
         CoverageDataPngTestUtils.testCoverageData(geoPackage, null,
@@ -46,6 +49,7 @@ public class CoverageDataPngImportTest extends
      * Test the coverage data extension with a newly created GeoPackage using the
      * Bilinear Algorithm
      */
+    @Test
     public void testBilinear() throws Exception {
 
         CoverageDataPngTestUtils.testCoverageData(geoPackage, null,
@@ -57,6 +61,7 @@ public class CoverageDataPngImportTest extends
      * Test the coverage data extension with a newly created GeoPackage using the
      * Bicubic Algorithm
      */
+    @Test
     public void testBicubic() throws Exception {
 
         CoverageDataPngTestUtils.testCoverageData(geoPackage, null,
@@ -67,6 +72,7 @@ public class CoverageDataPngImportTest extends
     /**
      * Test a random bounding box using the Nearest Neighbor Algorithm
      */
+    @Test
     public void testRandomBoundingBoxNearestNeighbor() throws Exception {
 
         CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
@@ -77,6 +83,7 @@ public class CoverageDataPngImportTest extends
     /**
      * Test a random bounding box using the Bilinear Algorithm
      */
+    @Test
     public void testRandomBoundingBoxBilinear() throws Exception {
 
         CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
@@ -87,6 +94,7 @@ public class CoverageDataPngImportTest extends
     /**
      * Test a random bounding box using the Bicubic Algorithm
      */
+    @Test
     public void testRandomBoundingBoxBicubic() throws Exception {
 
         CoverageDataTestUtils.testRandomBoundingBox(geoPackage,
@@ -97,6 +105,7 @@ public class CoverageDataPngImportTest extends
     /**
      * Test the pixel encoding
      */
+    @Test
     public void testPixelEncoding() throws Exception {
 
         CoverageDataTestUtils.testPixelEncoding(geoPackage, true);
@@ -108,6 +117,7 @@ public class CoverageDataPngImportTest extends
      *
      * @throws Exception
      */
+    @Test
     public void testLocation() throws Exception {
 
         double latitude = 61.57941522271581;
@@ -121,6 +131,7 @@ public class CoverageDataPngImportTest extends
      *
      * @throws Exception
      */
+    @Test
     public void testRandomLocations() throws Exception {
 
         BoundingBox projectedBoundingBox = null;
@@ -195,6 +206,7 @@ public class CoverageDataPngImportTest extends
      *
      * @throws Exception
      */
+    @Test
     public void testBounds() throws Exception {
 
         long requestEpsg = ProjectionConstants.EPSG_WEB_MERCATOR;
@@ -323,6 +335,7 @@ public class CoverageDataPngImportTest extends
      *
      * @throws Exception
      */
+    @Test
     public void testFullBoundingBox() throws Exception {
 
         int width = 10;

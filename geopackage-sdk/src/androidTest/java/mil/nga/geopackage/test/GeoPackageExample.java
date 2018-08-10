@@ -11,6 +11,8 @@ import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -166,6 +168,7 @@ public class GeoPackageExample extends BaseTestCase {
      * @throws SQLException upon error
      * @throws IOException  upon error
      */
+    @Test
     public void testExample() throws SQLException, IOException {
 
         Log.i(LOG_NAME, "Creating: " + GEOPACKAGE_NAME);

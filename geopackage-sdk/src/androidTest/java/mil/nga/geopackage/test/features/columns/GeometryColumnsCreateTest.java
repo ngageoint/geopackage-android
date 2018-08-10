@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.features.columns;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -24,6 +26,7 @@ public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		GeometryColumnsUtils.testRead(geoPackage,
@@ -36,6 +39,7 @@ public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testSqlMmRead() throws SQLException {
 
 		GeometryColumnsUtils.testSqlMmRead(geoPackage,
@@ -48,6 +52,7 @@ public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testSfSqlRead() throws SQLException {
 
 		GeometryColumnsUtils.testSfSqlRead(geoPackage,
@@ -60,6 +65,7 @@ public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		GeometryColumnsUtils.testUpdate(geoPackage);
@@ -71,6 +77,7 @@ public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		GeometryColumnsUtils.testCreate(geoPackage);
@@ -82,6 +89,7 @@ public class GeometryColumnsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		GeometryColumnsUtils.testDelete(geoPackage);

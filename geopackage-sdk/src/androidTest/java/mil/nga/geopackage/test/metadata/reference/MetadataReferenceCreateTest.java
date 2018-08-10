@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.metadata.reference;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -24,6 +26,7 @@ public class MetadataReferenceCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		MetadataReferenceUtils.testRead(geoPackage,
@@ -36,6 +39,7 @@ public class MetadataReferenceCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		MetadataReferenceUtils.testUpdate(geoPackage);
@@ -47,6 +51,7 @@ public class MetadataReferenceCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		MetadataReferenceUtils.testCreate(geoPackage);
@@ -58,6 +63,7 @@ public class MetadataReferenceCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		MetadataReferenceUtils.testDelete(geoPackage);

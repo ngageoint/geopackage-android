@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.schema.columns;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.ImportGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class DataColumnsImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		DataColumnsUtils.testRead(geoPackage, null);
@@ -34,6 +37,7 @@ public class DataColumnsImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		DataColumnsUtils.testUpdate(geoPackage);
@@ -45,6 +49,7 @@ public class DataColumnsImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		DataColumnsUtils.testCreate(geoPackage);
@@ -56,6 +61,7 @@ public class DataColumnsImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		DataColumnsUtils.testDelete(geoPackage);

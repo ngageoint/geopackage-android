@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.extension.scale;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class TileTableScalingCreateTest extends CreateGeoPackageTestCase {
      *
      * @throws SQLException
      */
+    @Test
     public void testScaling() throws SQLException {
 
         TileTableScalingUtils.testScaling(geoPackage);

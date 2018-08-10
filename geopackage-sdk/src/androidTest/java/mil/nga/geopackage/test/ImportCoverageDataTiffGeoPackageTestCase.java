@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test;
 
+import org.junit.After;
+
 import java.io.File;
 
 import mil.nga.geopackage.GeoPackage;
@@ -48,18 +50,14 @@ public abstract class ImportCoverageDataTiffGeoPackageTestCase extends
         return geoPackage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
 
         // Close
         if (geoPackage != null) {
             geoPackage.close();
         }
 
-        super.tearDown();
     }
 
 }

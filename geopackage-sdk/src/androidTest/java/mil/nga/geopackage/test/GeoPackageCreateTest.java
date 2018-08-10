@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 /**
@@ -21,6 +23,7 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreateFeatureTableWithMetadata() throws SQLException {
 
 		GeoPackageTestUtils.testCreateFeatureTableWithMetadata(geoPackage);
@@ -32,6 +35,7 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreateFeatureTableWithMetadataIdColumn()
 			throws SQLException {
 
@@ -45,6 +49,7 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreateFeatureTableWithMetadataAdditionalColumns()
 			throws SQLException {
 
@@ -59,6 +64,7 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreateFeatureTableWithMetadataIdColumnAdditionalColumns()
 			throws SQLException {
 
@@ -72,6 +78,7 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 	 *
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDeleteTables() throws SQLException {
 
 		GeoPackageTestUtils.testDeleteTables(geoPackage);

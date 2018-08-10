@@ -4,6 +4,8 @@ import android.database.Cursor;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -19,6 +21,12 @@ import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.geopackage.test.tiles.features.FeatureTileUtils;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.GeometryType;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test table indexer
@@ -39,6 +47,7 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
      *
      * @throws java.sql.SQLException
      */
+    @Test
     public void testIndexer() throws SQLException {
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
@@ -185,24 +194,24 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
                     if (id == id1) {
                         id1Found = true;
                         assertEquals(GeometryType.POINT, geometryType);
-                        assertEquals(maxX, metadata.getMinX());
-                        assertEquals(maxX, metadata.getMaxX());
-                        assertEquals(minY, metadata.getMinY());
-                        assertEquals(minY, metadata.getMaxY());
+                        assertEquals(maxX, metadata.getMinX(), .0000000001);
+                        assertEquals(maxX, metadata.getMaxX(), .0000000001);
+                        assertEquals(minY, metadata.getMinY(), .0000000001);
+                        assertEquals(minY, metadata.getMaxY(), .0000000001);
                     } else if (id == id2) {
                         id2Found = true;
                         assertEquals(GeometryType.LINESTRING, geometryType);
-                        assertEquals(minX, metadata.getMinX());
-                        assertEquals(maxX, metadata.getMaxX());
-                        assertEquals(minY, metadata.getMinY());
-                        assertEquals(maxY, metadata.getMaxY());
+                        assertEquals(minX, metadata.getMinX(), .0000000001);
+                        assertEquals(maxX, metadata.getMaxX(), .0000000001);
+                        assertEquals(minY, metadata.getMinY(), .0000000001);
+                        assertEquals(maxY, metadata.getMaxY(), .0000000001);
                     } else if (id == id3) {
                         id3Found = true;
                         assertEquals(GeometryType.POLYGON, geometryType);
-                        assertEquals(minX, metadata.getMinX());
-                        assertEquals(maxX, metadata.getMaxX());
-                        assertEquals(minY, metadata.getMinY());
-                        assertEquals(maxY, metadata.getMaxY());
+                        assertEquals(minX, metadata.getMinX(), .0000000001);
+                        assertEquals(maxX, metadata.getMaxX(), .0000000001);
+                        assertEquals(minY, metadata.getMinY(), .0000000001);
+                        assertEquals(maxY, metadata.getMaxY(), .0000000001);
                     }
                 }
             } finally {

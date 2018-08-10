@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.extension;
 
+import org.junit.Test;
+
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.extension.CrsWktExtension;
@@ -9,6 +11,12 @@ import mil.nga.geopackage.property.GeoPackageProperties;
 import mil.nga.geopackage.property.PropertyConstants;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.sf.proj.ProjectionConstants;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Geometry Extensions Tests
@@ -20,6 +28,7 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
     /**
      * Test the Extension creation
      */
+    @Test
     public void testExtension() throws Exception {
 
         SpatialReferenceSystemDao srsDao = geoPackage

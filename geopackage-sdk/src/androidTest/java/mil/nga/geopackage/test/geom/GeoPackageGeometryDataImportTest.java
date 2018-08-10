@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.geom;
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -25,6 +27,7 @@ public class GeoPackageGeometryDataImportTest extends ImportGeoPackageTestCase {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
+	@Test
 	public void testReadWriteBytes() throws SQLException, IOException {
 
 		GeoPackageGeometryDataUtils.testReadWriteBytes(geoPackage);
@@ -37,6 +40,7 @@ public class GeoPackageGeometryDataImportTest extends ImportGeoPackageTestCase {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
+	@Test
 	public void testGeometryProjectionTransform() throws SQLException,
 			IOException {
 

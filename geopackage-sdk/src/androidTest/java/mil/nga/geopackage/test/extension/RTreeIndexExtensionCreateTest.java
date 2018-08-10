@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.extension;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class RTreeIndexExtensionCreateTest extends CreateGeoPackageTestCase {
      *
      * @throws SQLException upon error
      */
+    @Test
     public void testRTree() throws SQLException {
 
         RTreeIndexExtensionUtils.testRTree(geoPackage);

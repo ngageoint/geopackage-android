@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.schema.constraints;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -24,6 +26,7 @@ public class DataColumnConstraintsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		DataColumnConstraintsUtils.testRead(geoPackage,
@@ -36,6 +39,7 @@ public class DataColumnConstraintsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		DataColumnConstraintsUtils.testUpdate(geoPackage);
@@ -47,6 +51,7 @@ public class DataColumnConstraintsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		DataColumnConstraintsUtils.testCreate(geoPackage);
@@ -58,6 +63,7 @@ public class DataColumnConstraintsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		DataColumnConstraintsUtils.testDelete(geoPackage);

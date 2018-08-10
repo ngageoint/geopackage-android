@@ -2,6 +2,8 @@ package mil.nga.geopackage.test.extension.related;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -40,6 +42,7 @@ public class RelatedTablesReadTest extends LoadGeoPackageTestCase {
      * @throws SQLException
      * @throws IOException
      */
+    @Test
     public void testGetRelationships() throws SQLException, IOException {
 
         // 1. has

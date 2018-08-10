@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
@@ -37,6 +39,7 @@ public class TileCreatorGetTileTest extends LoadGeoPackageTestCase {
      *
      * @throws SQLException
      */
+    @Test
     public void testGetTile() throws SQLException {
 
         TileDao tileDao = geoPackage.getTileDao(TestConstants.TILES_DB_TABLE_NAME);

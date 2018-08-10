@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.tiles.user;
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -24,6 +26,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		TileUtils.testRead(geoPackage);
@@ -36,6 +39,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 * @throws SQLException
 	 * @throws IOException
 	 */
+	@Test
 	public void testUpdate() throws SQLException, IOException {
 
 		TileUtils.testUpdate(testContext, geoPackage);
@@ -47,6 +51,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		TileUtils.testCreate(geoPackage);
@@ -58,6 +63,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		TileUtils.testDelete(geoPackage);
@@ -69,6 +75,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testGetZoomLevel() throws SQLException {
 
 		TileUtils.testGetZoomLevel(geoPackage);
@@ -80,6 +87,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testQueryByRange() throws SQLException {
 
 		TileUtils.testQueryByRange(geoPackage);
@@ -91,6 +99,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 *
 	 * @throws SQLException
 	 */
+	@Test
 	public void testTileMatrixBoundingBox() throws SQLException {
 
 		TileUtils.testTileMatrixBoundingBox(geoPackage);
@@ -102,6 +111,7 @@ public class TileImportTest extends ImportGeoPackageTestCase {
 	 *
 	 * @throws SQLException
 	 */
+	@Test
 	public void testThreadedTileDao() throws SQLException {
 
 		TileUtils.testThreadedTileDao(geoPackage);

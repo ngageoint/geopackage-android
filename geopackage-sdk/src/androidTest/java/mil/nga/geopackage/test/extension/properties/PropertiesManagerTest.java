@@ -2,6 +2,8 @@ package mil.nga.geopackage.test.extension.properties;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -58,6 +60,7 @@ public class PropertiesManagerTest extends BaseTestCase {
      *
      * @throws Exception upon error
      */
+    @Test
     public void testPropertiesManagerWithCache() throws Exception {
 
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -78,6 +81,7 @@ public class PropertiesManagerTest extends BaseTestCase {
      *
      * @throws Exception upon error
      */
+    @Test
     public void testPropertiesManagerWithGeoPackages() throws Exception {
         PropertiesManager manager = new PropertiesManager(createGeoPackages());
         testPropertiesManager(manager);

@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test;
 
+import org.junit.After;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -58,11 +60,8 @@ public abstract class LoadGeoPackageTestCase extends GeoPackageTestCase {
         return geoPackage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
 
         // Close
         if (geoPackage != null) {
@@ -73,7 +72,6 @@ public abstract class LoadGeoPackageTestCase extends GeoPackageTestCase {
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
         manager.delete(name);
 
-        super.tearDown();
     }
 
 }

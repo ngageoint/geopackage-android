@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test;
 
+import org.junit.After;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -30,16 +32,12 @@ public abstract class CreateGeoPackageTestCase extends GeoPackageTestCase {
 		return TestSetupTeardown.setUpCreate(activity, testContext, true, true);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 
 		// Tear down the create database
 		TestSetupTeardown.tearDownCreate(activity, geoPackage);
 
-		super.tearDown();
 	}
 
 	/**

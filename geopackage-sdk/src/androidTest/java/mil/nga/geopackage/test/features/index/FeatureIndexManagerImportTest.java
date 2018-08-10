@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.features.index;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.ImportGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class FeatureIndexManagerImportTest extends ImportGeoPackageTestCase {
      *
      * @throws SQLException
      */
+    @Test
     public void testIndex() throws SQLException {
 
         FeatureIndexManagerUtils.testIndex(activity, geoPackage);
@@ -34,6 +37,7 @@ public class FeatureIndexManagerImportTest extends ImportGeoPackageTestCase {
      *
      * @throws SQLException upon error
      */
+    @Test
     public void testLargeIndex() throws SQLException {
 
         FeatureIndexManagerUtils.testLargeIndex(activity, geoPackage, 2000); // TODO

@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.core.contents;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -24,6 +26,7 @@ public class ContentsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		ContentsUtils.testRead(geoPackage,
@@ -36,6 +39,7 @@ public class ContentsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		ContentsUtils.testUpdate(geoPackage);
@@ -47,6 +51,7 @@ public class ContentsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		ContentsUtils.testCreate(geoPackage);
@@ -58,6 +63,7 @@ public class ContentsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		ContentsUtils.testDelete(geoPackage);
@@ -69,6 +75,7 @@ public class ContentsCreateTest extends CreateGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDeleteCascade() throws SQLException {
 
 		ContentsUtils.testDeleteCascade(geoPackage);

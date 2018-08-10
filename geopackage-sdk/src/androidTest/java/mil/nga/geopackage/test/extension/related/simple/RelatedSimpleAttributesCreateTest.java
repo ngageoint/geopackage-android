@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.extension.related.simple;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class RelatedSimpleAttributesCreateTest extends CreateGeoPackageTestCase 
      *
      * @throws SQLException
      */
+    @Test
     public void testSimpleAttributes() throws Exception {
 
         RelatedSimpleAttributesUtils.testSimpleAttributes(geoPackage);

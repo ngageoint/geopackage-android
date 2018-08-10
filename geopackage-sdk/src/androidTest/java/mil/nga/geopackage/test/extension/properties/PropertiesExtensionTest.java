@@ -2,6 +2,8 @@ package mil.nga.geopackage.test.extension.properties;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +24,7 @@ public class PropertiesExtensionTest extends CreateGeoPackageTestCase {
     /**
      * Test properties extension
      */
+    @Test
     public void testPropertiesExtension() {
 
         PropertiesExtension extension = new PropertiesExtension(geoPackage);
@@ -128,6 +131,7 @@ public class PropertiesExtensionTest extends CreateGeoPackageTestCase {
     /**
      * Test property names
      */
+    @Test
     public void testPropertyNames() {
 
         PropertiesExtension extension = new PropertiesExtension(geoPackage);

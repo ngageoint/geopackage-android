@@ -1,5 +1,8 @@
 package mil.nga.geopackage.test;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +13,11 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.io.ContextIOUtils;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test GeoPackage Manager methods
@@ -36,12 +44,8 @@ public class GeoPackageManagerTest extends BaseTestCase {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
 
         // Delete existing test databases
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -53,6 +57,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
     /**
      * Test creating and deleting a database
      */
+    @Test
     public void testCreateOpenDelete() {
 
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -95,6 +100,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
     /**
      * Test importing a database from a GeoPackage file
      */
+    @Test
     public void testImport() {
 
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -229,6 +235,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
      *
      * @throws MalformedURLException
      */
+    @Test
     public void testImportUrl() throws MalformedURLException {
 
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -304,6 +311,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
      *
      * @throws SQLException
      */
+    @Test
     public void testExport() throws SQLException {
 
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -406,6 +414,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
     /**
      * Test importing a database from a GeoPackage file as an external link
      */
+    @Test
     public void testImportAsExternalLink() {
 
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
@@ -508,6 +517,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
     /**
      * Test creating a database GeoPackage at a file
      */
+    @Test
     public void testCreateFile() {
         createExternal(0);
     }
@@ -515,6 +525,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
     /**
      * Test creating a database GeoPackage at a file with specified name
      */
+    @Test
     public void testCreateFileWithName() {
         createExternal(1);
     }
@@ -522,6 +533,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
     /**
      * Test creating a database GeoPackage at a path with specified name
      */
+    @Test
     public void testCreateAtPath() {
         createExternal(2);
     }

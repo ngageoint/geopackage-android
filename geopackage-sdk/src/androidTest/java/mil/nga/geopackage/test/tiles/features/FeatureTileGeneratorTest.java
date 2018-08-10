@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.tiles.features;
 
+import org.junit.Test;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -15,6 +17,8 @@ import mil.nga.geopackage.tiles.features.FeatureTiles;
 import mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile;
 import mil.nga.sf.proj.ProjectionConstants;
 import mil.nga.sf.proj.ProjectionFactory;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test GeoPackage Feature Tile Generator
@@ -36,6 +40,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
+    @Test
     public void testTileGenerator() throws IOException, SQLException {
         testTileGenerator(false, false, false);
     }
@@ -46,6 +51,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
+    @Test
     public void testTileGeneratorWithIndex() throws IOException, SQLException {
         testTileGenerator(true, false, false);
     }
@@ -56,6 +62,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
+    @Test
     public void testTileGeneratorWithIcon() throws IOException, SQLException {
         testTileGenerator(false, true, false);
     }
@@ -66,6 +73,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
+    @Test
     public void testTileGeneratorWithMaxFeatures() throws IOException,
             SQLException {
         testTileGenerator(false, false, true);
@@ -77,6 +85,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
+    @Test
     public void testTileGeneratorWithIndexAndIcon() throws IOException,
             SQLException {
         testTileGenerator(true, true, false);
@@ -88,6 +97,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
+    @Test
     public void testTileGeneratorWithIndexAndIconAndMaxFeatures()
             throws IOException, SQLException {
         testTileGenerator(true, true, true);

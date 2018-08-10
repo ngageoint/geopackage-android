@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.tiles.matrix;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.ImportGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class TileMatrixImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testRead() throws SQLException {
 
 		TileMatrixUtils.testRead(geoPackage, null);
@@ -34,6 +37,7 @@ public class TileMatrixImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testUpdate() throws SQLException {
 
 		TileMatrixUtils.testUpdate(geoPackage);
@@ -45,6 +49,7 @@ public class TileMatrixImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testCreate() throws SQLException {
 
 		TileMatrixUtils.testCreate(geoPackage);
@@ -56,6 +61,7 @@ public class TileMatrixImportTest extends ImportGeoPackageTestCase {
 	 * 
 	 * @throws SQLException
 	 */
+	@Test
 	public void testDelete() throws SQLException {
 
 		TileMatrixUtils.testDelete(geoPackage);

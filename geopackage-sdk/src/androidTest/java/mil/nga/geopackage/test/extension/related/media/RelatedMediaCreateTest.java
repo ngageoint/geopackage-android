@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test.extension.related.media;
 
+import org.junit.Test;
+
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -23,6 +25,7 @@ public class RelatedMediaCreateTest extends CreateGeoPackageTestCase {
      *
      * @throws SQLException
      */
+    @Test
     public void testMedia() throws Exception {
 
         RelatedMediaUtils.testMedia(activity, testContext, geoPackage);
