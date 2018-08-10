@@ -36,7 +36,7 @@ public abstract class BaseTestCase{
      * Constructor
      */
     public BaseTestCase() {
-        //super(GeoPackageActivity.class);
+
     }
 
     @Before
