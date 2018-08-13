@@ -62,6 +62,11 @@ public class FeatureIndexer {
     private GeoPackageProgress progress;
 
     /**
+     * Query single chunk limit
+     */
+    protected Integer chunkLimit = 1000;
+
+    /**
      * Constructor
      *
      * @param context    context
@@ -91,6 +96,26 @@ public class FeatureIndexer {
      */
     public void setProgress(GeoPackageProgress progress) {
         this.progress = progress;
+    }
+
+    /**
+     * Get the SQL query chunk limit
+     *
+     * @return chunk limit
+     * @since 3.0.3
+     */
+    public Integer getChunkLimit() {
+        return chunkLimit;
+    }
+
+    /**
+     * Set the SQL query chunk limit
+     *
+     * @param chunkLimit chunk limit
+     * @since 3.0.3
+     */
+    public void setChunkLimit(Integer chunkLimit) {
+        this.chunkLimit = chunkLimit;
     }
 
     /**
@@ -150,18 +175,57 @@ public class FeatureIndexer {
         // Delete existing index rows
         geometryMetadataDataSource.delete(featureDao.getDatabase(), featureDao.getTableName());
 
+        long offset = 0;
+        int chunkCount = 0;
+
         // Index all features
-        FeatureCursor cursor = featureDao.queryForAll();
+        while (chunkCount >= 0) {
+
+            FeatureCursor cursor = featureDao.queryForChunk(chunkLimit, offset);
+            chunkCount = indexRows(metadata.getGeoPackageId(), cursor);
+
+            if (chunkCount > 0) {
+                count += chunkCount;
+            }
+
+            offset += chunkLimit;
+        }
+
+        // Update the last indexed time
+        if (progress == null || progress.isActive()) {
+            updateLastIndexed(db, metadata.getGeoPackageId());
+        }
+
+        return count;
+    }
+
+    /**
+     * Index the feature rows in the cursor
+     *
+     * @param geoPackageId GeoPackage id
+     * @param cursor       feature cursor
+     * @return count, -1 if no results or canceled
+     */
+    private int indexRows(long geoPackageId, FeatureCursor cursor) {
+
+        int count = -1;
+
         try {
-            while ((progress == null || progress.isActive()) && cursor.moveToNext()) {
+            while ((progress == null || progress.isActive())
+                    && cursor.moveToNext()) {
+                if (count < 0) {
+                    count++;
+                }
                 try {
                     FeatureRow row = cursor.getRow();
-                    boolean indexed = index(metadata.getGeoPackageId(), row, false);
-                    if (indexed) {
-                        count++;
-                    }
-                    if (progress != null) {
-                        progress.addProgress(1);
+                    if (row.isValid()) {
+                        boolean indexed = index(geoPackageId, row, false);
+                        if (indexed) {
+                            count++;
+                        }
+                        if (progress != null) {
+                            progress.addProgress(1);
+                        }
                     }
                 } catch (Exception e) {
                     Log.e(FeatureIndexer.class.getSimpleName(), "Failed to index feature. Table: "
@@ -170,11 +234,6 @@ public class FeatureIndexer {
             }
         } finally {
             cursor.close();
-        }
-
-        // Update the last indexed time
-        if (progress == null || progress.isActive()) {
-            updateLastIndexed(db, metadata.getGeoPackageId());
         }
 
         return count;
