@@ -2,14 +2,12 @@ package mil.nga.geopackage.extension.index;
 
 import android.util.Log;
 
-import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.support.ConnectionSource;
 
 import java.sql.SQLException;
 import java.util.concurrent.Callable;
 
-import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.features.user.FeatureCursor;
@@ -17,7 +15,6 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureRowSync;
 import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to
@@ -51,6 +48,14 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
         super(geoPackage, featureDao.getTableName(), featureDao
                 .getGeometryColumnName());
         this.featureDao = featureDao;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Projection getProjection() {
+        return featureDao.getProjection();
     }
 
     /**
@@ -181,60 +186,6 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      */
     public int deleteIndex(FeatureRow row) {
         return deleteIndex(row.getId());
-    }
-
-    /**
-     * Query for Geometry Index objects within the bounding box in
-     * the provided projection
-     *
-     * @param boundingBox bounding box
-     * @param projection  projection of the provided bounding box
-     * @return geometry indices iterator
-     */
-    public CloseableIterator<GeometryIndex> query(BoundingBox boundingBox,
-                                                  Projection projection) {
-
-        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
-                projection);
-
-        CloseableIterator<GeometryIndex> geometryIndices = query(featureBoundingBox);
-
-        return geometryIndices;
-    }
-
-    /**
-     * Query for Geometry Index count within the bounding box in
-     * the provided projection
-     *
-     * @param boundingBox bounding box
-     * @param projection  projection of the provided bounding box
-     * @return count
-     */
-    public long count(BoundingBox boundingBox, Projection projection) {
-
-        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
-                projection);
-
-        long count = count(featureBoundingBox);
-
-        return count;
-    }
-
-    /**
-     * Get the bounding box in the feature projection from the bounding box in
-     * the provided projection
-     *
-     * @param boundingBox bounding box
-     * @param projection  projection
-     * @return feature projected bounding box
-     */
-    private BoundingBox getFeatureBoundingBox(BoundingBox boundingBox,
-                                              Projection projection) {
-        ProjectionTransform projectionTransform = projection
-                .getTransformation(featureDao.getProjection());
-        BoundingBox featureBoundingBox = boundingBox
-                .transform(projectionTransform);
-        return featureBoundingBox;
     }
 
     /**

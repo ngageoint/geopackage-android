@@ -685,6 +685,53 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Query for the feature index bounds
+     *
+     * @return bounding box
+     */
+    public BoundingBox bounds() {
+        BoundingBox bounds = null;
+        switch (getIndexedType()) {
+            case GEOPACKAGE:
+                bounds = featureTableIndex.bounds();
+                break;
+            case METADATA:
+                bounds = featureIndexer.bounds();
+                break;
+            case RTREE:
+                bounds = rTreeIndexTableDao.bounds();
+                break;
+            default:
+                bounds = manualFeatureQuery.bounds();
+        }
+        return bounds;
+    }
+
+    /**
+     * Query for the feature index bounds and return in the provided projection
+     *
+     * @param projection desired projection
+     * @return bounding box
+     */
+    public BoundingBox bounds(Projection projection) {
+        BoundingBox bounds = null;
+        switch (getIndexedType()) {
+            case GEOPACKAGE:
+                bounds = featureTableIndex.bounds(projection);
+                break;
+            case METADATA:
+                bounds = featureIndexer.bounds(projection);
+                break;
+            case RTREE:
+                bounds = rTreeIndexTableDao.bounds(projection);
+                break;
+            default:
+                bounds = manualFeatureQuery.bounds(projection);
+        }
+        return bounds;
+    }
+
+    /**
      * Query for feature index results within the bounding box, projected
      * correctly
      *

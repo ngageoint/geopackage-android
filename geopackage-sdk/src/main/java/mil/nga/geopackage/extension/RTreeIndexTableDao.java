@@ -10,6 +10,7 @@ import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomRow;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * RTree Index Table DAO for reading geometry index ranges
@@ -175,6 +176,38 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public int count() {
         validateRTree();
         return super.count();
+    }
+
+    /**
+     * Query for the bounds of the feature table index
+     *
+     * @return bounding box
+     */
+    public BoundingBox bounds() {
+        String[] values = querySingleRowStringResults(
+                "SELECT MIN(" + RTreeIndexExtension.COLUMN_MIN_X + "), MIN("
+                        + RTreeIndexExtension.COLUMN_MIN_Y + "), MAX("
+                        + RTreeIndexExtension.COLUMN_MAX_X + "), MAX("
+                        + RTreeIndexExtension.COLUMN_MAX_Y + ") FROM "
+                        + getTableName(), null);
+        BoundingBox boundingBox = new BoundingBox(Double.valueOf(values[0]),
+                Double.valueOf(values[1]), Double.valueOf(values[2]),
+                Double.valueOf(values[3]));
+        return boundingBox;
+    }
+
+    /**
+     * Query for the feature index bounds and return in the provided projection
+     *
+     * @param projection desired projection
+     * @return bounding box
+     */
+    public BoundingBox bounds(Projection projection) {
+        BoundingBox bounds = bounds();
+        ProjectionTransform projectionTransform = featureDao.getProjection()
+                .getTransformation(projection);
+        BoundingBox requestedBounds = bounds.transform(projectionTransform);
+        return requestedBounds;
     }
 
     /**

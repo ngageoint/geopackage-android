@@ -354,6 +354,34 @@ public class GeometryMetadataDataSource {
     }
 
     /**
+     * Query for the bounds of the feature table index
+     *
+     * @return bounding box
+     * @since 3.0.3
+     */
+    public BoundingBox bounds() {
+
+        BoundingBox boundingBox = null;
+
+        Cursor result = db.rawQuery("SELECT MIN(" + GeometryMetadata.COLUMN_MIN_X + "), MIN("
+                + GeometryMetadata.COLUMN_MIN_Y + "), MAX("
+                + GeometryMetadata.COLUMN_MAX_X + "), MAX("
+                + GeometryMetadata.COLUMN_MAX_Y + ") FROM "
+                + GeometryMetadata.TABLE_NAME, null);
+        try {
+            if (result.moveToNext()) {
+                boundingBox = new BoundingBox(result.getDouble(0),
+                        result.getDouble(1), result.getDouble(2),
+                        result.getDouble(3));
+            }
+        } finally {
+            result.close();
+        }
+
+        return boundingBox;
+    }
+
+    /**
      * Query for all table geometry metadata
      *
      * @param geoPackageId GeoPackage id

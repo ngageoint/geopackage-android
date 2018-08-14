@@ -394,6 +394,31 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for the bounds of the feature table index
+     *
+     * @return bounding box
+     * @since 3.0.3
+     */
+    public BoundingBox bounds() {
+        return geometryMetadataDataSource.bounds();
+    }
+
+    /**
+     * Query for the feature index bounds and return in the provided projection
+     *
+     * @param projection desired projection
+     * @return bounding box
+     * @since 3.0.3
+     */
+    public BoundingBox bounds(Projection projection) {
+        BoundingBox bounds = bounds();
+        ProjectionTransform projectionTransform = featureDao.getProjection()
+                .getTransformation(projection);
+        BoundingBox requestedBounds = bounds.transform(projectionTransform);
+        return requestedBounds;
+    }
+
+    /**
      * Query for Geometry Metadata within the bounding box, projected
      * correctly
      *

@@ -253,6 +253,56 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String[]> queryStringResults(String sql, String[] args) {
+        return queryStringResults(sql, args, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] querySingleRowStringResults(String sql, String[] args) {
+        List<String[]> results = queryStringResults(sql, args, 1);
+        String[] singleRow = null;
+        if (!results.isEmpty()) {
+            singleRow = results.get(0);
+        }
+        return singleRow;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String[]> queryStringResults(String sql, String[] args,
+                                             Integer limit) {
+
+        Cursor cursor = rawQuery(sql, args);
+
+        List<String[]> results = new ArrayList<>();
+        try {
+            int columns = cursor.getColumnCount();
+            while (cursor.moveToNext()) {
+                String[] row = new String[columns];
+                for (int i = 0; i < columns; i++) {
+                    row[i] = cursor.getString(i);
+                }
+                results.add(row);
+                if (limit != null && results.size() >= limit) {
+                    break;
+                }
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return results;
+    }
+
+    /**
      * Perform a raw database query
      *
      * @param sql  sql command

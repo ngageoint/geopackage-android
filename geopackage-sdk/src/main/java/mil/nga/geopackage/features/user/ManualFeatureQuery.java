@@ -7,6 +7,7 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Performs manual brute force queries against feature rows. See
@@ -21,6 +22,11 @@ public class ManualFeatureQuery {
      * Feature DAO
      */
     private final FeatureDao featureDao;
+
+    /**
+     * Query single chunk limit
+     */
+    protected Integer chunkLimit = 1000;
 
     /**
      * Constructor
@@ -38,6 +44,85 @@ public class ManualFeatureQuery {
      */
     public FeatureDao getFeatureDao() {
         return featureDao;
+    }
+
+    /**
+     * Get the SQL query chunk limit
+     *
+     * @return chunk limit
+     */
+    public Integer getChunkLimit() {
+        return chunkLimit;
+    }
+
+    /**
+     * Set the SQL query chunk limit
+     *
+     * @param chunkLimit chunk limit
+     */
+    public void setChunkLimit(Integer chunkLimit) {
+        this.chunkLimit = chunkLimit;
+    }
+
+    /**
+     * Manually build the bounds of the feature table
+     *
+     * @return bounding box
+     */
+    public BoundingBox bounds() {
+
+        GeometryEnvelope envelope = null;
+
+        long offset = 0;
+        boolean hasResults = true;
+
+        while (hasResults) {
+
+            hasResults = false;
+
+            FeatureCursor featureCursor = featureDao.queryForChunk(chunkLimit,
+                    offset);
+            try {
+                while (featureCursor.moveToNext()) {
+                    hasResults = true;
+
+                    FeatureRow featureRow = featureCursor.getRow();
+                    GeometryEnvelope featureEnvelope = featureRow
+                            .getGeometryEnvelope();
+                    if (featureEnvelope != null) {
+
+                        if (envelope == null) {
+                            envelope = featureEnvelope;
+                        } else {
+                            envelope = envelope.union(featureEnvelope);
+                        }
+
+                    }
+                }
+            } finally {
+                featureCursor.close();
+            }
+
+            offset += chunkLimit;
+        }
+
+        BoundingBox boundingBox = new BoundingBox(envelope);
+
+        return boundingBox;
+    }
+
+    /**
+     * Manually build the bounds of the feature table in the provided projection
+     *
+     * @param projection desired projection
+     * @return bounding box
+     */
+    public BoundingBox bounds(Projection projection) {
+        BoundingBox bounds = bounds();
+        ProjectionTransform projectionTransform = featureDao.getProjection()
+                .getTransformation(projection);
+        BoundingBox requestedBounds = bounds.transform(projectionTransform);
+        return requestedBounds;
     }
 
     /**
@@ -125,26 +210,40 @@ public class ManualFeatureQuery {
 
         List<Long> featureIds = new ArrayList<>();
 
-        FeatureCursor cursor = featureDao.queryForAll();
-        try {
-            while (cursor.moveToNext()) {
-                FeatureRow featureRow = cursor.getRow();
-                GeometryEnvelope envelope = featureRow.getGeometryEnvelope();
-                if (envelope != null) {
+        long offset = 0;
+        boolean hasResults = true;
 
-                    double minXMax = Math.max(minX, envelope.getMinX());
-                    double maxXMin = Math.min(maxX, envelope.getMaxX());
-                    double minYMax = Math.max(minY, envelope.getMinY());
-                    double maxYMin = Math.min(maxY, envelope.getMaxY());
+        while (hasResults) {
 
-                    if (minXMax <= maxXMin && minYMax <= maxYMin) {
-                        featureIds.add(featureRow.getId());
+            hasResults = false;
+
+            FeatureCursor featureCursor = featureDao.queryForChunk(chunkLimit,
+                    offset);
+            try {
+                while (featureCursor.moveToNext()) {
+                    hasResults = true;
+
+                    FeatureRow featureRow = featureCursor.getRow();
+                    GeometryEnvelope envelope = featureRow
+                            .getGeometryEnvelope();
+                    if (envelope != null) {
+
+                        double minXMax = Math.max(minX, envelope.getMinX());
+                        double maxXMin = Math.min(maxX, envelope.getMaxX());
+                        double minYMax = Math.max(minY, envelope.getMinY());
+                        double maxYMin = Math.min(maxY, envelope.getMaxY());
+
+                        if (minXMax <= maxXMin && minYMax <= maxYMin) {
+                            featureIds.add(featureRow.getId());
+                        }
+
                     }
-
                 }
+            } finally {
+                featureCursor.close();
             }
-        } finally {
-            cursor.close();
+
+            offset += chunkLimit;
         }
 
         ManualFeatureQueryResults results = new ManualFeatureQueryResults(
