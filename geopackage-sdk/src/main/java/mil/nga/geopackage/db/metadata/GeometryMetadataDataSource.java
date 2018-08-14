@@ -356,18 +356,35 @@ public class GeometryMetadataDataSource {
     /**
      * Query for the bounds of the feature table index
      *
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
      * @return bounding box
      * @since 3.0.3
      */
-    public BoundingBox bounds() {
+    public BoundingBox bounds(String geoPackage, String tableName) {
+        return bounds(getGeoPackageId(geoPackage), tableName);
+    }
+
+    /**
+     * Query for the bounds of the feature table index
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @return bounding box
+     * @since 3.0.3
+     */
+    public BoundingBox bounds(long geoPackageId, String tableName) {
 
         BoundingBox boundingBox = null;
 
         Cursor result = db.rawQuery("SELECT MIN(" + GeometryMetadata.COLUMN_MIN_X + "), MIN("
-                + GeometryMetadata.COLUMN_MIN_Y + "), MAX("
-                + GeometryMetadata.COLUMN_MAX_X + "), MAX("
-                + GeometryMetadata.COLUMN_MAX_Y + ") FROM "
-                + GeometryMetadata.TABLE_NAME, null);
+                        + GeometryMetadata.COLUMN_MIN_Y + "), MAX("
+                        + GeometryMetadata.COLUMN_MAX_X + "), MAX("
+                        + GeometryMetadata.COLUMN_MAX_Y + ") FROM "
+                        + GeometryMetadata.TABLE_NAME
+                        + " WHERE " + GeometryMetadata.COLUMN_GEOPACKAGE_ID + " = ? AND "
+                        + GeometryMetadata.COLUMN_TABLE_NAME + " = ?",
+                new String[]{String.valueOf(geoPackageId), tableName});
         try {
             if (result.moveToNext()) {
                 boundingBox = new BoundingBox(result.getDouble(0),

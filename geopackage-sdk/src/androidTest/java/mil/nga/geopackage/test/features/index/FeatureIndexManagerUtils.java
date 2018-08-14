@@ -418,7 +418,7 @@ public class FeatureIndexManagerUtils {
         cursor.close();
 
         testLargeIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, featureDao,
-                envelopes, .001, compareProjectionCounts, verbose); // TODO
+                envelopes, .0000000001, compareProjectionCounts, verbose);
         testLargeIndex(activity, geoPackage, FeatureIndexType.METADATA, featureDao,
                 envelopes, .0000000001, compareProjectionCounts, verbose);
         //testLargeIndex(activity, geoPackage, FeatureIndexType.RTREE, featureDao,
