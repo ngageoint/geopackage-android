@@ -168,7 +168,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                     BoundingBox geometryBoundingBox = new BoundingBox(envelope);
                     BoundingBox transformedBoundingBox = geometryBoundingBox.transform(transform);
 
-                    if (TileBoundingBoxUtils.overlap(expandedBoundingBox, transformedBoundingBox, true) != null) {
+                    if (expandedBoundingBox.intersects(transformedBoundingBox, true)) {
 
                         double simplifyTolerance = TileBoundingBoxUtils.toleranceDistance(zoom, tileWidth, tileHeight);
                         drawShape(simplifyTolerance, boundingBox, transform, canvas, geometry);

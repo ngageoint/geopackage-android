@@ -12,11 +12,11 @@ import java.util.UUID;
 
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
+import mil.nga.geopackage.db.ResultUtils;
 import mil.nga.geopackage.extension.related.dublin.DublinCoreMetadata;
 import mil.nga.geopackage.extension.related.dublin.DublinCoreType;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesTable;
 import mil.nga.geopackage.test.TestUtils;
-import mil.nga.geopackage.user.UserCoreResultUtils;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.user.custom.UserCustomRow;
 import mil.nga.geopackage.user.custom.UserCustomTable;
@@ -220,15 +220,15 @@ public class RelatedTablesUtils {
 
             switch (rowType) {
 
-                case UserCoreResultUtils.FIELD_TYPE_INTEGER:
+                case ResultUtils.FIELD_TYPE_INTEGER:
                     TestUtils.validateIntegerValue(value, column.getDataType());
                     break;
 
-                case UserCoreResultUtils.FIELD_TYPE_FLOAT:
+                case ResultUtils.FIELD_TYPE_FLOAT:
                     TestUtils.validateFloatValue(value, column.getDataType());
                     break;
 
-                case UserCoreResultUtils.FIELD_TYPE_STRING:
+                case ResultUtils.FIELD_TYPE_STRING:
                     if (dataType == GeoPackageDataType.DATE
                             || dataType == GeoPackageDataType.DATETIME) {
                         TestCase.assertTrue(value instanceof Date);
@@ -242,11 +242,11 @@ public class RelatedTablesUtils {
                     }
                     break;
 
-                case UserCoreResultUtils.FIELD_TYPE_BLOB:
+                case ResultUtils.FIELD_TYPE_BLOB:
                     TestCase.assertTrue(value instanceof byte[]);
                     break;
 
-                case UserCoreResultUtils.FIELD_TYPE_NULL:
+                case ResultUtils.FIELD_TYPE_NULL:
                     TestCase.assertNull(value);
                     break;
 

@@ -85,4 +85,17 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test bounds
+	 *
+	 * @throws SQLException
+	 *             upon error
+	 */
+	@Test
+	public void testBounds() throws SQLException {
+
+		GeoPackageTestUtils.testBounds(activity, geoPackage);
+
+	}
+
 }

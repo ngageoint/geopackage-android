@@ -5,8 +5,9 @@ import android.database.Cursor;
 import com.j256.ormlite.android.AndroidConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import mil.nga.geopackage.GeoPackageException;
 
 /**
  * GeoPackage Android Connection wrapper
@@ -86,7 +87,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
         }
         String sql = countQuery.toString();
 
-        int count = singleResultQuery(sql, args);
+        int count = querySingleInteger(sql, args, true);
 
         return count;
     }
@@ -107,7 +108,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
             }
             String sql = minQuery.toString();
 
-            min = singleResultQuery(sql, args);
+            min = querySingleInteger(sql, args, false);
         }
 
         return min;
@@ -129,7 +130,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
             }
             String sql = maxQuery.toString();
 
-            max = singleResultQuery(sql, args);
+            max = querySingleInteger(sql, args, false);
         }
 
         return max;
@@ -138,21 +139,22 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     /**
      * Query the SQL for a single integer result
      *
-     * @param sql
-     * @param args
+     * @param sql               SQL
+     * @param args              arguments
+     * @param allowEmptyResults true to accept empty results as a 0 return
      * @return int result
      */
-    private int singleResultQuery(String sql, String[] args) {
-
-        Cursor countCursor = db.rawQuery(sql, args);
+    private int querySingleInteger(String sql, String[] args, boolean allowEmptyResults) {
 
         int result = 0;
-        try {
-            if (countCursor.moveToFirst()) {
-                result = countCursor.getInt(0);
-            }
-        } finally {
-            countCursor.close();
+
+        Object value = querySingleResult(sql, args, 0,
+                GeoPackageDataType.MEDIUMINT);
+        if (value != null) {
+            result = ((Number) value).intValue();
+        } else if (!allowEmptyResults) {
+            throw new GeoPackageException(
+                    "Failed to query for single result. SQL: " + sql);
         }
 
         return result;
@@ -196,59 +198,22 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * {@inheritDoc}
      */
     @Override
-    public String querySingleStringResult(String sql, String[] args) {
-
-        Cursor cursor = db.rawQuery(sql, args);
-
-        String result = null;
-        try {
-            if (cursor.moveToFirst()) {
-                result = cursor.getString(0);
-            }
-        } finally {
-            cursor.close();
-        }
-
-        return result;
+    public Object querySingleResult(String sql, String[] args, int column,
+                                    GeoPackageDataType dataType) {
+        CursorResult result = wrapQuery(sql, args);
+        Object value = ResultUtils.buildSingleResult(result, column, dataType);
+        return value;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Integer querySingleIntResult(String sql, String[] args) {
-
-        Cursor cursor = db.rawQuery(sql, args);
-
-        Integer result = null;
-        try {
-            if (cursor.moveToFirst()) {
-                result = cursor.getInt(0);
-            }
-        } finally {
-            cursor.close();
-        }
-
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> querySingleColumnStringResults(String sql, String[] args) {
-
-        Cursor cursor = db.rawQuery(sql, args);
-
-        List<String> results = new ArrayList<>();
-        try {
-            while (cursor.moveToNext()) {
-                results.add(cursor.getString(0));
-            }
-        } finally {
-            cursor.close();
-        }
-
+    public List<Object> querySingleColumnResults(String sql, String[] args,
+                                                 int column, GeoPackageDataType dataType, Integer limit) {
+        CursorResult result = wrapQuery(sql, args);
+        List<Object> results = ResultUtils.buildSingleColumnResults(result,
+                column, dataType, limit);
         return results;
     }
 
@@ -256,49 +221,11 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * {@inheritDoc}
      */
     @Override
-    public List<String[]> queryStringResults(String sql, String[] args) {
-        return queryStringResults(sql, args, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String[] querySingleRowStringResults(String sql, String[] args) {
-        List<String[]> results = queryStringResults(sql, args, 1);
-        String[] singleRow = null;
-        if (!results.isEmpty()) {
-            singleRow = results.get(0);
-        }
-        return singleRow;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String[]> queryStringResults(String sql, String[] args,
-                                             Integer limit) {
-
-        Cursor cursor = rawQuery(sql, args);
-
-        List<String[]> results = new ArrayList<>();
-        try {
-            int columns = cursor.getColumnCount();
-            while (cursor.moveToNext()) {
-                String[] row = new String[columns];
-                for (int i = 0; i < columns; i++) {
-                    row[i] = cursor.getString(i);
-                }
-                results.add(row);
-                if (limit != null && results.size() >= limit) {
-                    break;
-                }
-            }
-        } finally {
-            cursor.close();
-        }
-
+    public List<List<Object>> queryResults(String sql, String[] args,
+                                           GeoPackageDataType[] dataTypes, Integer limit) {
+        CursorResult result = wrapQuery(sql, args);
+        List<List<Object>> results = ResultUtils.buildResults(result,
+                dataTypes, limit);
         return results;
     }
 
@@ -312,6 +239,19 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      */
     public Cursor rawQuery(String sql, String[] args) {
         return db.rawQuery(sql, args);
+    }
+
+    /**
+     * Perform the query and wrap as a result
+     *
+     * @param sql           sql statement
+     * @param selectionArgs selection arguments
+     * @return result
+     * @since 3.0.3
+     */
+    public CursorResult wrapQuery(String sql,
+                                  String[] selectionArgs) {
+        return new CursorResult(rawQuery(sql, selectionArgs));
     }
 
 }

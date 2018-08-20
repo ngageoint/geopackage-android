@@ -1,14 +1,15 @@
 package mil.nga.geopackage.user;
 
 import android.database.Cursor;
-import android.database.CursorWrapper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import mil.nga.geopackage.db.CursorResult;
 import mil.nga.geopackage.db.GeoPackageDataType;
+import mil.nga.geopackage.db.ResultUtils;
 
 /**
  * Abstract User Cursor
@@ -19,7 +20,7 @@ import mil.nga.geopackage.db.GeoPackageDataType;
  * @author osbornb
  */
 public abstract class UserCursor<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>>
-        extends CursorWrapper implements UserCoreResult<TColumn, TTable, TRow> {
+        extends CursorResult implements UserCoreResult<TColumn, TTable, TRow> {
 
     /**
      * Table
@@ -166,17 +167,8 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * {@inheritDoc}
      */
     @Override
-    public Object getValue(int index,
-                           GeoPackageDataType dataType) {
-        return UserCoreResultUtils.getValue(invalidCursor == null ? this : invalidCursor, index, dataType);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean wasNull() {
-        return false;
+    public Object getValue(int index, GeoPackageDataType dataType) {
+        return ResultUtils.getValue(invalidCursor == null ? this : invalidCursor, index, dataType);
     }
 
     /**

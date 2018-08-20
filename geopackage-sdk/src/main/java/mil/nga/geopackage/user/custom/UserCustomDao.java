@@ -8,6 +8,7 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.factory.GeoPackageCursorWrapper;
 import mil.nga.geopackage.user.UserDao;
+import mil.nga.sf.proj.Projection;
 
 /**
  * User Custom DAO for reading user custom data tables
@@ -63,6 +64,15 @@ public class UserCustomDao
      */
     @Override
     public BoundingBox getBoundingBox() {
+        throw new GeoPackageException(
+                "Bounding Box not supported for User Custom");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BoundingBox getBoundingBox(Projection projection) {
         throw new GeoPackageException(
                 "Bounding Box not supported for User Custom");
     }

@@ -689,20 +689,20 @@ public class FeatureIndexManager {
      *
      * @return bounding box
      */
-    public BoundingBox bounds() {
+    public BoundingBox getBoundingBox() {
         BoundingBox bounds = null;
         switch (getIndexedType()) {
             case GEOPACKAGE:
-                bounds = featureTableIndex.bounds();
+                bounds = featureTableIndex.getBoundingBox();
                 break;
             case METADATA:
-                bounds = featureIndexer.bounds();
+                bounds = featureIndexer.getBoundingBox();
                 break;
             case RTREE:
-                bounds = rTreeIndexTableDao.bounds();
+                bounds = rTreeIndexTableDao.getBoundingBox();
                 break;
             default:
-                bounds = manualFeatureQuery.bounds();
+                bounds = manualFeatureQuery.getBoundingBox();
         }
         return bounds;
     }
@@ -713,20 +713,20 @@ public class FeatureIndexManager {
      * @param projection desired projection
      * @return bounding box
      */
-    public BoundingBox bounds(Projection projection) {
+    public BoundingBox getBoundingBox(Projection projection) {
         BoundingBox bounds = null;
         switch (getIndexedType()) {
             case GEOPACKAGE:
-                bounds = featureTableIndex.bounds(projection);
+                bounds = featureTableIndex.getBoundingBox(projection);
                 break;
             case METADATA:
-                bounds = featureIndexer.bounds(projection);
+                bounds = featureIndexer.getBoundingBox(projection);
                 break;
             case RTREE:
-                bounds = rTreeIndexTableDao.bounds(projection);
+                bounds = rTreeIndexTableDao.getBoundingBox(projection);
                 break;
             default:
-                bounds = manualFeatureQuery.bounds(projection);
+                bounds = manualFeatureQuery.getBoundingBox(projection);
         }
         return bounds;
     }

@@ -559,7 +559,7 @@ public abstract class TileGenerator {
                             + " which already contains GeoPackage formatted tiles");
         }
 
-        Projection tileMatrixProjection = tileMatrixSet.getSrs().getProjection();
+        Projection tileMatrixProjection = tileMatrixSet.getProjection();
         if (!tileMatrixProjection.equals(projection)) {
             throw new GeoPackageException("Can not update tiles projected at "
                     + tileMatrixProjection.getCode() + " with tiles projected at " + projection.getCode());
@@ -570,12 +570,12 @@ public abstract class TileGenerator {
         // Combine the existing content and request bounding boxes
         BoundingBox previousContentsBoundingBox = contents.getBoundingBox();
         if (previousContentsBoundingBox != null) {
-            ProjectionTransform transformProjectionToContents = projection.getTransformation(contents.getSrs().getProjection());
+            ProjectionTransform transformProjectionToContents = projection.getTransformation(contents.getProjection());
             BoundingBox contentsBoundingBox = boundingBox;
             if (!transformProjectionToContents.isSameProjection()) {
                 contentsBoundingBox = contentsBoundingBox.transform(transformProjectionToContents);
             }
-            contentsBoundingBox = TileBoundingBoxUtils.union(contentsBoundingBox, previousContentsBoundingBox);
+            contentsBoundingBox = contentsBoundingBox.union(previousContentsBoundingBox);
 
             // Update the contents if modified
             if (!contentsBoundingBox.equals(previousContentsBoundingBox)) {
@@ -607,7 +607,7 @@ public abstract class TileGenerator {
                 updateTileGridBoundingBox = updateTileGridBoundingBox.transform(transformProjectionToTileMatrixSet);
             }
             if (!previousTileMatrixSetBoundingBox.equals(updateTileGridBoundingBox)) {
-                updateTileGridBoundingBox = TileBoundingBoxUtils.union(updateTileGridBoundingBox, previousTileMatrixSetBoundingBox);
+                updateTileGridBoundingBox = updateTileGridBoundingBox.union(previousTileMatrixSetBoundingBox);
                 adjustBounds(updateTileGridBoundingBox, minNewOrUpdateZoom);
                 updateTileGridBoundingBox = tileGridBoundingBox;
                 if (!sameProjection) {

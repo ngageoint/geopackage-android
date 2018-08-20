@@ -824,7 +824,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
             GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite));
             GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
-            db = new GeoPackageImpl(database, path, connection, cursorFactory, tableCreator, writable);
+            db = new GeoPackageImpl(context, database, path, connection, cursorFactory, tableCreator, writable);
         }
 
         return db;

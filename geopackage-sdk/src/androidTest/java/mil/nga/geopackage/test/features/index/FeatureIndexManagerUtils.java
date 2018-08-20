@@ -24,7 +24,6 @@ import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.schema.TableColumnKey;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.io.TestGeoPackageProgress;
-import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.Point;
@@ -408,8 +407,7 @@ public class FeatureIndexManagerUtils {
             if (rowEnvelope != null) {
                 BoundingBox rowBoundingBox = new BoundingBox(rowEnvelope);
                 for (FeatureIndexTestEnvelope testEnvelope : envelopes) {
-                    if (TileBoundingBoxUtils.overlap(rowBoundingBox,
-                            new BoundingBox(testEnvelope.envelope), true) != null) {
+                    if (rowBoundingBox.intersects(new BoundingBox(testEnvelope.envelope), true)) {
                         testEnvelope.count++;
                     }
                 }
@@ -422,7 +420,7 @@ public class FeatureIndexManagerUtils {
         testLargeIndex(activity, geoPackage, FeatureIndexType.METADATA, featureDao,
                 envelopes, .0000000001, compareProjectionCounts, verbose);
         //testLargeIndex(activity, geoPackage, FeatureIndexType.RTREE, featureDao,
-        //        envelopes, .0001, compareProjectionCounts, verbose); // TODO RTree not supported
+        //      envelopes, .0000000001, .0001, compareProjectionCounts, verbose); // TODO RTree not supported
         testLargeIndex(activity, geoPackage, FeatureIndexType.NONE, featureDao,
                 envelopes, .0000000001, compareProjectionCounts, verbose);
     }
@@ -463,6 +461,15 @@ public class FeatureIndexManagerUtils {
     private static void testLargeIndex(Activity activity, GeoPackage geoPackage,
                                        FeatureIndexType type, FeatureDao featureDao,
                                        List<FeatureIndexTestEnvelope> envelopes, double precision,
+                                       boolean compareProjectionCounts, boolean verbose) {
+        testLargeIndex(activity, geoPackage, type, featureDao, envelopes, precision,
+                precision, compareProjectionCounts, verbose);
+    }
+
+    private static void testLargeIndex(Activity activity, GeoPackage geoPackage,
+                                       FeatureIndexType type, FeatureDao featureDao,
+                                       List<FeatureIndexTestEnvelope> envelopes, double innerPrecision,
+                                       double outerPrecision,
                                        boolean compareProjectionCounts, boolean verbose) {
 
         System.out.println();
@@ -507,37 +514,41 @@ public class FeatureIndexManagerUtils {
                 .getTransformation(projection);
 
         timerCount.start();
-        BoundingBox bounds = featureIndexManager.bounds();
+        BoundingBox bounds = featureIndexManager.getBoundingBox();
         timerCount.end("Bounds Query");
         TestCase.assertNotNull(bounds);
         FeatureIndexTestEnvelope firstEnvelope = envelopes.get(0);
         BoundingBox firstBounds = new BoundingBox(firstEnvelope.envelope);
 
-        TestCase.assertEquals(firstBounds.getMinLongitude(),
-                bounds.getMinLongitude(), precision);
-        TestCase.assertEquals(firstBounds.getMinLatitude(),
-                bounds.getMinLatitude(), precision);
-        TestCase.assertEquals(firstBounds.getMaxLongitude(),
-                bounds.getMaxLongitude(), precision);
-        TestCase.assertEquals(firstBounds.getMaxLatitude(),
-                bounds.getMaxLatitude(), precision);
+        assertRange(firstBounds.getMinLongitude(), bounds.getMinLongitude(),
+                outerPrecision, innerPrecision);
+        assertRange(firstBounds.getMinLatitude(), bounds.getMinLatitude(),
+                outerPrecision, innerPrecision);
+        assertRange(firstBounds.getMaxLongitude(), bounds.getMaxLongitude(),
+                innerPrecision, outerPrecision);
+        assertRange(firstBounds.getMaxLatitude(), bounds.getMaxLatitude(),
+                innerPrecision, outerPrecision);
 
         timerCount.start();
         BoundingBox projectedBounds = featureIndexManager
-                .bounds(webMercatorProjection);
+                .getBoundingBox(webMercatorProjection);
         timerCount.end("Bounds Projection Query");
         TestCase.assertNotNull(projectedBounds);
         BoundingBox reprojectedBounds = projectedBounds
                 .transform(transformToProjection);
 
-        TestCase.assertEquals(reprojectedBounds.getMinLongitude(),
-                bounds.getMinLongitude(), precision);
-        TestCase.assertEquals(reprojectedBounds.getMinLatitude(),
-                bounds.getMinLatitude(), precision);
-        TestCase.assertEquals(reprojectedBounds.getMaxLongitude(),
-                bounds.getMaxLongitude(), precision);
-        TestCase.assertEquals(reprojectedBounds.getMaxLatitude(),
-                bounds.getMaxLatitude(), precision);
+        assertRange(firstBounds.getMinLongitude(),
+                reprojectedBounds.getMinLongitude(), outerPrecision,
+                innerPrecision);
+        assertRange(firstBounds.getMinLatitude(),
+                reprojectedBounds.getMinLatitude(), outerPrecision,
+                innerPrecision);
+        assertRange(firstBounds.getMaxLongitude(),
+                reprojectedBounds.getMaxLongitude(), innerPrecision,
+                outerPrecision);
+        assertRange(firstBounds.getMaxLatitude(),
+                reprojectedBounds.getMaxLatitude(), innerPrecision,
+                outerPrecision);
 
         timerQuery.reset();
         timerCount.reset();
@@ -605,6 +616,14 @@ public class FeatureIndexManagerUtils {
                 + " ms");
 
         featureIndexManager.close();
+    }
+
+    private static void assertRange(double expected, double actual,
+                                    double lowPrecision, double highPrecision) {
+        double low = expected - lowPrecision;
+        double high = expected + highPrecision;
+        TestCase.assertTrue("Value: " + actual + ", not within range: " + low
+                + " - " + high, low <= actual && actual <= high);
     }
 
     private class TestTimer {

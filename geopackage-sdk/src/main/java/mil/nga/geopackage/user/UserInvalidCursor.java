@@ -222,6 +222,22 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      * {@inheritDoc}
      */
     @Override
+    public Object getValue(int index) {
+        return cursor.getValue(index);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getColumnCount() {
+        return cursor.getColumnCount();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getType(int columnIndex) {
         return cursor.getType(columnIndex);
     }

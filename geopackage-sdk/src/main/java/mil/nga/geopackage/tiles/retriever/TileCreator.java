@@ -102,7 +102,7 @@ public class TileCreator {
         this.requestProjection = requestProjection;
 
         tileMatrixSet = tileDao.getTileMatrixSet();
-        tilesProjection = tileDao.getTileMatrixSet().getSrs().getProjection();
+        tilesProjection = tileDao.getTileMatrixSet().getProjection();
         tileSetBoundingBox = tileMatrixSet.getBoundingBox();
 
         // Check if the projections have the same units
@@ -379,8 +379,7 @@ public class TileCreator {
 
             // Get the bounding box where the requested image and
             // tile overlap
-            BoundingBox overlap = TileBoundingBoxUtils.overlap(
-                    requestProjectedBoundingBox,
+            BoundingBox overlap = requestProjectedBoundingBox.overlap(
                     tileBoundingBox);
 
             // If the tile overlaps with the requested box
@@ -487,8 +486,8 @@ public class TileCreator {
         List<TileMatrix> tileMatrices = new ArrayList<>();
 
         // Check if the request overlaps the tile matrix set
-        if (TileBoundingBoxUtils.overlap(projectedRequestBoundingBox,
-                tileSetBoundingBox) != null) {
+        if (projectedRequestBoundingBox.intersects(
+                tileSetBoundingBox)) {
 
             // Get the tile distance
             double distanceWidth = projectedRequestBoundingBox

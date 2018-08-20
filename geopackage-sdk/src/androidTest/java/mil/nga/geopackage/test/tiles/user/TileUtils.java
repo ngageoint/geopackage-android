@@ -914,7 +914,7 @@ public class TileUtils {
                     BoundingBox setProjectionBoundingBox = tileMatrixSet
                             .getBoundingBox();
                     BoundingBox setWebMercatorBoundingBox = setProjectionBoundingBox
-                            .transform(tileMatrixSet.getSrs().getProjection()
+                            .transform(tileMatrixSet.getProjection()
                                     .getTransformation(
                                             ProjectionConstants.EPSG_WEB_MERCATOR));
                     BoundingBox boundingBox = new BoundingBox(-180.0, -90.0,

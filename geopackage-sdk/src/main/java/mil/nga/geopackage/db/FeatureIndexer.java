@@ -399,7 +399,7 @@ public class FeatureIndexer {
      * @return bounding box
      * @since 3.0.3
      */
-    public BoundingBox bounds() {
+    public BoundingBox getBoundingBox() {
         return geometryMetadataDataSource.bounds(featureDao.getDatabase(), featureDao.getTableName());
     }
 
@@ -410,12 +410,14 @@ public class FeatureIndexer {
      * @return bounding box
      * @since 3.0.3
      */
-    public BoundingBox bounds(Projection projection) {
-        BoundingBox bounds = bounds();
-        ProjectionTransform projectionTransform = featureDao.getProjection()
-                .getTransformation(projection);
-        BoundingBox requestedBounds = bounds.transform(projectionTransform);
-        return requestedBounds;
+    public BoundingBox getBoundingBox(Projection projection) {
+        BoundingBox boundingBox = getBoundingBox();
+        if (boundingBox != null && projection != null) {
+            ProjectionTransform projectionTransform = featureDao.getProjection()
+                    .getTransformation(projection);
+            boundingBox = boundingBox.transform(projectionTransform);
+        }
+        return boundingBox;
     }
 
     /**

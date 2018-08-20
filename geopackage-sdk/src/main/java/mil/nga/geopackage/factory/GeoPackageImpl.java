@@ -1,5 +1,6 @@
 package mil.nga.geopackage.factory;
 
+import android.content.Context;
 import android.database.Cursor;
 
 import com.j256.ormlite.stmt.PreparedQuery;
@@ -8,6 +9,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import java.sql.SQLException;
 import java.util.List;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.attributes.AttributesConnection;
@@ -24,6 +26,7 @@ import mil.nga.geopackage.db.GeoPackageTableCreator;
 import mil.nga.geopackage.extension.RTreeIndexExtension;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.user.FeatureConnection;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -41,6 +44,7 @@ import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.geopackage.tiles.user.TileTableReader;
 import mil.nga.geopackage.tiles.user.TileWrapperConnection;
+import mil.nga.sf.proj.Projection;
 
 /**
  * A single GeoPackage database connection implementation
@@ -48,6 +52,11 @@ import mil.nga.geopackage.tiles.user.TileWrapperConnection;
  * @author osbornb
  */
 class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
+
+    /**
+     * Context
+     */
+    private final Context context;
 
     /**
      * Database connection
@@ -62,18 +71,42 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
     /**
      * Constructor
      *
-     * @param name
-     * @param database
-     * @param cursorFactory
-     * @param tableCreator
-     * @param writable
+     * @param context       context
+     * @param name          GeoPackage name
+     * @param path          database path
+     * @param database      database connection
+     * @param cursorFactory cursor factory
+     * @param tableCreator  table creator
+     * @param writable      writable flag
      */
-    GeoPackageImpl(String name, String path, GeoPackageConnection database,
+    GeoPackageImpl(Context context, String name, String path, GeoPackageConnection database,
                    GeoPackageCursorFactory cursorFactory,
                    GeoPackageTableCreator tableCreator, boolean writable) {
         super(name, path, database, tableCreator, writable);
+        this.context = context;
         this.database = database;
         this.cursorFactory = cursorFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BoundingBox getFeatureBoundingBox(Projection projection,
+                                                String table, boolean manual) {
+
+        BoundingBox boundingBox = null;
+
+        FeatureIndexManager indexManager = new FeatureIndexManager(context, this, table);
+        try {
+            if (manual || indexManager.isIndexed()) {
+                boundingBox = indexManager.getBoundingBox(projection);
+            }
+        } finally {
+            indexManager.close();
+        }
+
+        return boundingBox;
     }
 
     /**
