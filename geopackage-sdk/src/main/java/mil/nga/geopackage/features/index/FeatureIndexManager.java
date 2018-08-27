@@ -7,7 +7,9 @@ import com.j256.ormlite.dao.CloseableIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -104,7 +106,7 @@ public class FeatureIndexManager {
         manualFeatureQuery = new ManualFeatureQuery(featureDao);
 
         // Set the default indexed check and query order
-        //indexLocationQueryOrder.add(FeatureIndexType.RTREE); // TODO not supported on Android
+        indexLocationQueryOrder.add(FeatureIndexType.RTREE);
         indexLocationQueryOrder.add(FeatureIndexType.GEOPACKAGE);
         indexLocationQueryOrder.add(FeatureIndexType.METADATA);
     }
@@ -157,12 +159,33 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Get the ordered set of ordered index query locations
+     *
+     * @return set of ordered index types
+     * @since 3.0.3
+     */
+    public Set<FeatureIndexType> getIndexLocationQueryOrder() {
+        return Collections.unmodifiableSet(indexLocationQueryOrder);
+    }
+
+    /**
      * Get the index location
      *
      * @return index location or null if not set
      */
     public FeatureIndexType getIndexLocation() {
         return indexLocation;
+    }
+
+    /**
+     * Prioritize the query location order.  All types are placed at the front of the query order
+     * in the order they are given. Omitting a location leaves it at it's current priority location.
+     *
+     * @param types feature index types
+     * @since 3.0.3
+     */
+    public void prioritizeQueryLocation(Collection<FeatureIndexType> types) {
+        prioritizeQueryLocation(types.toArray(new FeatureIndexType[types.size()]));
     }
 
     /**
@@ -181,6 +204,34 @@ public class FeatureIndexManager {
         }
         // Add any locations not provided to this method
         queryOrder.addAll(indexLocationQueryOrder);
+        // Update the query order set
+        indexLocationQueryOrder = queryOrder;
+    }
+
+    /**
+     * Set the index location order, overriding all previously set types
+     *
+     * @param types feature index types
+     * @since 3.0.3
+     */
+    public void setIndexLocationOrder(Collection<FeatureIndexType> types) {
+        setIndexLocationOrder(types.toArray(new FeatureIndexType[types.size()]));
+    }
+
+    /**
+     * Set the index location order, overriding all previously set types
+     *
+     * @param types feature index types
+     * @since 3.0.3
+     */
+    public void setIndexLocationOrder(FeatureIndexType... types) {
+        // Create a new query order set
+        Set<FeatureIndexType> queryOrder = new LinkedHashSet<>();
+        for (FeatureIndexType type : types) {
+            if (type != FeatureIndexType.NONE) {
+                queryOrder.add(type);
+            }
+        }
         // Update the query order set
         indexLocationQueryOrder = queryOrder;
     }
@@ -526,6 +577,32 @@ public class FeatureIndexManager {
     }
 
     /**
+     * Retain the feature index from the index types and delete the others
+     *
+     * @param type feature index type to retain
+     * @return true if deleted from any type
+     * @since 3.0.3
+     */
+    public boolean retainIndex(FeatureIndexType type) {
+        List<FeatureIndexType> retain = new ArrayList<FeatureIndexType>();
+        retain.add(type);
+        return retainIndex(retain);
+    }
+
+    /**
+     * Retain the feature index from the index types and delete the others
+     *
+     * @param types feature index types to retain
+     * @return true if deleted from any type
+     * @since 3.0.3
+     */
+    public boolean retainIndex(Collection<FeatureIndexType> types) {
+        Set<FeatureIndexType> delete = new HashSet<>(indexLocationQueryOrder);
+        delete.removeAll(types);
+        return deleteIndex(delete);
+    }
+
+    /**
      * Determine if the feature table is indexed
      *
      * @return true if indexed
@@ -679,7 +756,7 @@ public class FeatureIndexManager {
                 count = rTreeIndexTableDao.count();
                 break;
             default:
-                count = featureDao.count();
+                count = manualFeatureQuery.countWithGeometries();
         }
         return count;
     }

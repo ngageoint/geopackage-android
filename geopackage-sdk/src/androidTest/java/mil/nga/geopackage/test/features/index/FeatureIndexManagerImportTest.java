@@ -44,4 +44,16 @@ public class FeatureIndexManagerImportTest extends ImportGeoPackageTestCase {
 
     }
 
+    /**
+     * Test timed index
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testTimedIndex() throws SQLException {
+
+        FeatureIndexManagerUtils.testTimedIndex(activity, geoPackage, false, false);
+
+    }
+
 }

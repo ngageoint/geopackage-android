@@ -4,10 +4,7 @@ import org.junit.Test;
 
 import java.sql.SQLException;
 
-import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.test.ImportGeoPackageTestCase;
-
-import static org.junit.Assert.fail;
 
 /**
  * Test Spatial Reference System from an imported database
@@ -37,31 +34,25 @@ public class SpatialReferenceSystemImportTest extends ImportGeoPackageTestCase {
 
     /**
      * Test reading using the SQL/MM view
+     *
+     * @throws SQLException
      */
     @Test
-    public void testSqlMmRead() {
+    public void testSqlMmRead() throws SQLException {
 
-        try {
-            geoPackage.getSpatialReferenceSystemSqlMmDao();
-            fail("No exception was thrown when the SQL/MM view was not expected to exist");
-        } catch (GeoPackageException e) {
-            // Expected
-        }
+        SpatialReferenceSystemUtils.testSqlMmRead(geoPackage,null);
 
     }
 
     /**
      * Test reading using the SF/SQL view
+     *
+     * @throws SQLException
      */
     @Test
-    public void testSfSqlRead() {
+    public void testSfSqlRead() throws SQLException {
 
-        try {
-            geoPackage.getSpatialReferenceSystemSfSqlDao();
-            fail("No exception was thrown when the SF/SQL view was not expected to exist");
-        } catch (GeoPackageException e) {
-            // Expected
-        }
+        SpatialReferenceSystemUtils.testSfSqlRead(geoPackage,null);
 
     }
 

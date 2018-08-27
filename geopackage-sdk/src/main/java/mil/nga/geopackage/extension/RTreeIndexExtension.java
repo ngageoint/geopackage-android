@@ -1,5 +1,7 @@
 package mil.nga.geopackage.extension;
 
+import org.sqlite.database.sqlite.SQLiteDatabase;
+
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -22,6 +24,11 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
     private GeoPackageConnection connection;
 
     /**
+     * SQLite Android Bindings connection
+     */
+    private final SQLiteDatabase database;
+
+    /**
      * Constructor
      *
      * @param geoPackage GeoPackage
@@ -29,6 +36,7 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
     public RTreeIndexExtension(GeoPackage geoPackage) {
         super(geoPackage);
         connection = geoPackage.getConnection();
+        database = connection.getDb().openOrGetBindingsDb();
     }
 
     /**
@@ -115,6 +123,18 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     private void createFunction(String name) {
         throw new UnsupportedOperationException("User defined SQL functions are not supported. name: " + name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void executeSQL(String sql, boolean trigger) {
+        if (trigger) {
+            connection.execSQL(sql);
+        } else {
+            database.execSQL(sql);
+        }
     }
 
 }

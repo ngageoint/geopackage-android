@@ -51,6 +51,11 @@ public class RelatedMediaUtils {
 
         // Create a related tables extension
         RelatedTablesExtension rte = new RelatedTablesExtension(geoPackage);
+
+        if(rte.has()){
+            rte.removeExtension();
+        }
+
         TestCase.assertFalse(rte.has());
         TestCase.assertTrue(rte.getRelationships().isEmpty());
 

@@ -124,15 +124,17 @@ public class SpatialReferenceSystemUtils {
 	 * @param expectedResults
 	 * @throws SQLException
 	 */
-	public static void testSqlMmRead(GeoPackage geoPackage, int expectedResults)
+	public static void testSqlMmRead(GeoPackage geoPackage, Integer expectedResults)
 			throws SQLException {
 
 		SpatialReferenceSystemSqlMmDao dao = geoPackage
 				.getSpatialReferenceSystemSqlMmDao();
 		List<SpatialReferenceSystemSqlMm> results = dao.queryForAll();
-		TestCase.assertEquals(
-				"Unexpected number of spatial reference system rows",
-				expectedResults, results.size());
+		if (expectedResults != null) {
+			TestCase.assertEquals(
+					"Unexpected number of spatial reference system rows",
+					expectedResults.intValue(), results.size());
+		}
 
 		if (!results.isEmpty()) {
 
@@ -205,15 +207,17 @@ public class SpatialReferenceSystemUtils {
 	 * @param expectedResults
 	 * @throws SQLException
 	 */
-	public static void testSfSqlRead(GeoPackage geoPackage, int expectedResults)
+	public static void testSfSqlRead(GeoPackage geoPackage, Integer expectedResults)
 			throws SQLException {
 
 		SpatialReferenceSystemSfSqlDao dao = geoPackage
 				.getSpatialReferenceSystemSfSqlDao();
 		List<SpatialReferenceSystemSfSql> results = dao.queryForAll();
-		TestCase.assertEquals(
-				"Unexpected number of spatial reference system rows",
-				expectedResults, results.size());
+		if (expectedResults != null) {
+			TestCase.assertEquals(
+					"Unexpected number of spatial reference system rows",
+					expectedResults.intValue(), results.size());
+		}
 
 		if (!results.isEmpty()) {
 

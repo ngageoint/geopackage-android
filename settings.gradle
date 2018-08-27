@@ -1,1 +1,2 @@
 include ':geopackage-sdk'
+include ':sqlite-android-3240000'

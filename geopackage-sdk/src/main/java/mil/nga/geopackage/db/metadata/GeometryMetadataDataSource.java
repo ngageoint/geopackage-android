@@ -361,8 +361,8 @@ public class GeometryMetadataDataSource {
      * @return bounding box
      * @since 3.0.3
      */
-    public BoundingBox bounds(String geoPackage, String tableName) {
-        return bounds(getGeoPackageId(geoPackage), tableName);
+    public BoundingBox getBoundingBox(String geoPackage, String tableName) {
+        return getBoundingBox(getGeoPackageId(geoPackage), tableName);
     }
 
     /**
@@ -373,7 +373,7 @@ public class GeometryMetadataDataSource {
      * @return bounding box
      * @since 3.0.3
      */
-    public BoundingBox bounds(long geoPackageId, String tableName) {
+    public BoundingBox getBoundingBox(long geoPackageId, String tableName) {
 
         BoundingBox boundingBox = null;
 

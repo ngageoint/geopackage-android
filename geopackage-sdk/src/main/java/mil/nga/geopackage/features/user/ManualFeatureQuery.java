@@ -65,6 +65,24 @@ public class ManualFeatureQuery {
     }
 
     /**
+     * Get the count of features
+     *
+     * @return count
+     */
+    public int count() {
+        return featureDao.count();
+    }
+
+    /**
+     * Get the count of features with non null geometries
+     *
+     * @return count
+     */
+    public int countWithGeometries() {
+        return featureDao.count(featureDao.getGeometryColumnName() + " IS NOT NULL", null);
+    }
+
+    /**
      * Manually build the bounds of the feature table
      *
      * @return bounding box

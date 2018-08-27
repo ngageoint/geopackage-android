@@ -46,6 +46,10 @@ public class RelatedTablesWriteTest extends LoadGeoPackageTestCase {
 
         RelatedTablesExtension rte = new RelatedTablesExtension(geoPackage);
 
+        if(rte.has()){
+            rte.removeExtension();
+        }
+
         // 1. Has extension
         TestCase.assertFalse(rte.has());
 
@@ -55,9 +59,9 @@ public class RelatedTablesWriteTest extends LoadGeoPackageTestCase {
 
         // 2. Add extension
         // 5. Add relationship between "geometry2d" and "geometry3d"
-        final String baseTableName = "geometry2d";
-        final String relatedTableName = "geometry3d";
-        final String mappingTableName = "g2d_3d";
+        final String baseTableName = "geometry1";
+        final String relatedTableName = "geometry2";
+        final String mappingTableName = "g1_g2";
 
         List<UserCustomColumn> additionalColumns = RelatedTablesUtils
                 .createAdditionalUserColumns(UserMappingTable

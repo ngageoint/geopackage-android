@@ -19,6 +19,11 @@ public class GeoPackageDatabase {
     private final SQLiteDatabase db;
 
     /**
+     * SQLite Android Bindings connection
+     */
+    private org.sqlite.database.sqlite.SQLiteDatabase bindingsDb;
+
+    /**
      * Constructor
      *
      * @param db database
@@ -34,6 +39,23 @@ public class GeoPackageDatabase {
      */
     public SQLiteDatabase getDb() {
         return db;
+    }
+
+    /**
+     * Open or get a connection using the SQLite Android Bindings connection
+     *
+     * @return bindings connection
+     */
+    public org.sqlite.database.sqlite.SQLiteDatabase openOrGetBindingsDb() {
+        if (bindingsDb == null) {
+            synchronized (db) {
+                if (bindingsDb == null) {
+                    System.loadLibrary("sqliteX");
+                    bindingsDb = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(db.getPath(), null, org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
+                }
+            }
+        }
+        return bindingsDb;
     }
 
     /**
@@ -70,6 +92,9 @@ public class GeoPackageDatabase {
      */
     public void close() {
         db.close();
+        if (bindingsDb != null) {
+            bindingsDb.close();
+        }
     }
 
     /**

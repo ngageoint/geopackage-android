@@ -400,7 +400,7 @@ public class FeatureIndexer {
      * @since 3.0.3
      */
     public BoundingBox getBoundingBox() {
-        return geometryMetadataDataSource.bounds(featureDao.getDatabase(), featureDao.getTableName());
+        return geometryMetadataDataSource.getBoundingBox(featureDao.getDatabase(), featureDao.getTableName());
     }
 
     /**

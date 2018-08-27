@@ -344,7 +344,7 @@ public class FeatureIndexManagerUtils {
         TestUtils.addRowsToFeatureTable(geoPackage, geometryColumns,
                 featureDao.getTable(), numFeatures, false, false, false);
 
-        testLargeIndex(activity, geoPackage, featureTable, true, false);
+        testTimedIndex(activity, geoPackage, featureTable, true, false);
     }
 
     /**
@@ -355,11 +355,11 @@ public class FeatureIndexManagerUtils {
      * @param verbose                 verbose printing
      * @throws SQLException upon error
      */
-    public static void testLargeIndex(Activity activity, GeoPackage geoPackage,
+    public static void testTimedIndex(Activity activity, GeoPackage geoPackage,
                                       boolean compareProjectionCounts, boolean verbose)
             throws SQLException {
         for (String featureTable : geoPackage.getFeatureTables()) {
-            testLargeIndex(activity, geoPackage, featureTable, compareProjectionCounts,
+            testTimedIndex(activity, geoPackage, featureTable, compareProjectionCounts,
                     verbose);
         }
     }
@@ -373,7 +373,7 @@ public class FeatureIndexManagerUtils {
      * @param verbose                 verbose printing
      * @throws SQLException upon error
      */
-    public static void testLargeIndex(Activity activity, GeoPackage geoPackage,
+    public static void testTimedIndex(Activity activity, GeoPackage geoPackage,
                                       String featureTable, boolean compareProjectionCounts,
                                       boolean verbose) throws SQLException {
 
@@ -381,8 +381,8 @@ public class FeatureIndexManagerUtils {
 
         System.out.println();
         System.out.println("+++++++++++++++++++++++++++++++++++++");
-        System.out.println("Large Index Test");
-        System.out.println("Features: " + featureDao.count());
+        System.out.println("Timed Index Test");
+        System.out.println(featureTable + ", Features: " + featureDao.count());
         System.out.println("+++++++++++++++++++++++++++++++++++++");
 
         GeometryEnvelope envelope = null;
@@ -415,14 +415,14 @@ public class FeatureIndexManagerUtils {
         }
         cursor.close();
 
-        testLargeIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, featureDao,
-                envelopes, .0000000001, compareProjectionCounts, verbose);
-        testLargeIndex(activity, geoPackage, FeatureIndexType.METADATA, featureDao,
-                envelopes, .0000000001, compareProjectionCounts, verbose);
-        //testLargeIndex(activity, geoPackage, FeatureIndexType.RTREE, featureDao,
-        //      envelopes, .0000000001, .0001, compareProjectionCounts, verbose); // TODO RTree not supported
-        testLargeIndex(activity, geoPackage, FeatureIndexType.NONE, featureDao,
-                envelopes, .0000000001, compareProjectionCounts, verbose);
+        testTimedIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, featureDao,
+                envelopes, .0000000001, compareProjectionCounts, .001, verbose);
+        testTimedIndex(activity, geoPackage, FeatureIndexType.METADATA, featureDao,
+                envelopes, .0000000001, compareProjectionCounts, .001, verbose);
+        testTimedIndex(activity, geoPackage, FeatureIndexType.RTREE, featureDao,
+                envelopes, .0000000001, .0001, compareProjectionCounts, .001, verbose);
+        testTimedIndex(activity, geoPackage, FeatureIndexType.NONE, featureDao,
+                envelopes, .0000000001, compareProjectionCounts, .001, verbose);
     }
 
     private static List<FeatureIndexTestEnvelope> createEnvelopes(
@@ -458,19 +458,19 @@ public class FeatureIndexManagerUtils {
         return testEnvelope;
     }
 
-    private static void testLargeIndex(Activity activity, GeoPackage geoPackage,
+    private static void testTimedIndex(Activity activity, GeoPackage geoPackage,
                                        FeatureIndexType type, FeatureDao featureDao,
                                        List<FeatureIndexTestEnvelope> envelopes, double precision,
-                                       boolean compareProjectionCounts, boolean verbose) {
-        testLargeIndex(activity, geoPackage, type, featureDao, envelopes, precision,
-                precision, compareProjectionCounts, verbose);
+                                       boolean compareProjectionCounts, double projectionPrecision, boolean verbose) {
+        testTimedIndex(activity, geoPackage, type, featureDao, envelopes, precision,
+                precision, compareProjectionCounts, projectionPrecision, verbose);
     }
 
-    private static void testLargeIndex(Activity activity, GeoPackage geoPackage,
+    private static void testTimedIndex(Activity activity, GeoPackage geoPackage,
                                        FeatureIndexType type, FeatureDao featureDao,
                                        List<FeatureIndexTestEnvelope> envelopes, double innerPrecision,
                                        double outerPrecision,
-                                       boolean compareProjectionCounts, boolean verbose) {
+                                       boolean compareProjectionCounts, double projectionPrecision, boolean verbose) {
 
         System.out.println();
         System.out.println("-------------------------------------");
@@ -478,144 +478,159 @@ public class FeatureIndexManagerUtils {
         System.out.println("-------------------------------------");
         System.out.println();
 
-        int featureCount = featureDao.count();
+        int geometryFeatureCount = featureDao.count(featureDao.getGeometryColumnName() + " IS NOT NULL", null);
+        int totalFeatureCount = featureDao.count();
 
         FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                 geoPackage, featureDao);
-        featureIndexManager.setIndexLocation(type);
-        featureIndexManager.deleteAllIndexes();
+        try {
 
-        TestTimer timerQuery = new FeatureIndexManagerUtils().new TestTimer();
-        TestTimer timerCount = new FeatureIndexManagerUtils().new TestTimer();
-        timerCount.print = verbose;
+            featureIndexManager.setIndexLocation(type);
+            featureIndexManager.prioritizeQueryLocation(type);
 
-        if (type != FeatureIndexType.NONE) {
-            timerQuery.start();
-            int indexCount = featureIndexManager.index();
-            timerQuery.end("Index");
-            TestCase.assertEquals(featureCount, indexCount);
+            if (type == FeatureIndexType.RTREE) {
+                if (!featureIndexManager.isIndexed(FeatureIndexType.RTREE)) {
+                    System.out.println("Not Indexed");
+                    return;
+                }
+            } else if (type != FeatureIndexType.NONE) {
+                featureIndexManager.deleteIndex(type);
+                TestCase.assertFalse(featureIndexManager.isIndexed(type));
+            } else {
+                featureIndexManager.setIndexLocationOrder(type);
+                TestCase.assertFalse(featureIndexManager.isIndexed());
+            }
 
-            TestCase.assertTrue(featureIndexManager.isIndexed());
-        } else {
-            TestCase.assertFalse(featureIndexManager.isIndexed());
-        }
+            TestTimer timerQuery = new FeatureIndexManagerUtils().new TestTimer();
+            TestTimer timerCount = new FeatureIndexManagerUtils().new TestTimer();
+            timerCount.print = verbose;
 
-        timerCount.start();
-        TestCase.assertEquals(featureCount, featureIndexManager.count());
-        timerCount.end("Count Query");
-
-        Projection projection = featureDao.getProjection();
-        Projection webMercatorProjection = ProjectionFactory.getProjection(
-                ProjectionConstants.AUTHORITY_EPSG,
-                ProjectionConstants.EPSG_WEB_MERCATOR);
-        ProjectionTransform transformToWebMercator = projection
-                .getTransformation(webMercatorProjection);
-        ProjectionTransform transformToProjection = webMercatorProjection
-                .getTransformation(projection);
-
-        timerCount.start();
-        BoundingBox bounds = featureIndexManager.getBoundingBox();
-        timerCount.end("Bounds Query");
-        TestCase.assertNotNull(bounds);
-        FeatureIndexTestEnvelope firstEnvelope = envelopes.get(0);
-        BoundingBox firstBounds = new BoundingBox(firstEnvelope.envelope);
-
-        assertRange(firstBounds.getMinLongitude(), bounds.getMinLongitude(),
-                outerPrecision, innerPrecision);
-        assertRange(firstBounds.getMinLatitude(), bounds.getMinLatitude(),
-                outerPrecision, innerPrecision);
-        assertRange(firstBounds.getMaxLongitude(), bounds.getMaxLongitude(),
-                innerPrecision, outerPrecision);
-        assertRange(firstBounds.getMaxLatitude(), bounds.getMaxLatitude(),
-                innerPrecision, outerPrecision);
-
-        timerCount.start();
-        BoundingBox projectedBounds = featureIndexManager
-                .getBoundingBox(webMercatorProjection);
-        timerCount.end("Bounds Projection Query");
-        TestCase.assertNotNull(projectedBounds);
-        BoundingBox reprojectedBounds = projectedBounds
-                .transform(transformToProjection);
-
-        assertRange(firstBounds.getMinLongitude(),
-                reprojectedBounds.getMinLongitude(), outerPrecision,
-                innerPrecision);
-        assertRange(firstBounds.getMinLatitude(),
-                reprojectedBounds.getMinLatitude(), outerPrecision,
-                innerPrecision);
-        assertRange(firstBounds.getMaxLongitude(),
-                reprojectedBounds.getMaxLongitude(), innerPrecision,
-                outerPrecision);
-        assertRange(firstBounds.getMaxLatitude(),
-                reprojectedBounds.getMaxLatitude(), innerPrecision,
-                outerPrecision);
-
-        timerQuery.reset();
-        timerCount.reset();
-
-        timerQuery.print = timerCount.print;
-
-        for (FeatureIndexTestEnvelope testEnvelope : envelopes) {
-
-            String percentage = Integer.toString(testEnvelope.percentage);
-            GeometryEnvelope envelope = testEnvelope.envelope;
-            int expectedCount = testEnvelope.count;
-
-            if (verbose) {
-                System.out.println(percentage + "% Feature Count: "
-                        + expectedCount);
+            if (type != FeatureIndexType.NONE && !featureIndexManager.isIndexed(type)) {
+                timerQuery.start();
+                int indexCount = featureIndexManager.index();
+                timerQuery.end("Index");
+                TestCase.assertEquals(geometryFeatureCount, indexCount);
+                TestCase.assertTrue(featureIndexManager.isIndexed());
             }
 
             timerCount.start();
-            long fullCount = featureIndexManager.count(envelope);
-            timerCount.end(percentage + "% Envelope Count Query");
-            TestCase.assertEquals(expectedCount, fullCount);
+            long queryCount = featureIndexManager.count();
+            timerCount.end("Count Query");
+            TestCase.assertTrue(queryCount == geometryFeatureCount || queryCount == totalFeatureCount);
 
-            timerQuery.start();
-            FeatureIndexResults results = featureIndexManager.query(envelope);
-            timerQuery.end(percentage + "% Envelope Query");
-            TestCase.assertEquals(expectedCount, results.count());
-            results.close();
+            Projection projection = featureDao.getProjection();
+            Projection webMercatorProjection = ProjectionFactory.getProjection(
+                    ProjectionConstants.AUTHORITY_EPSG,
+                    ProjectionConstants.EPSG_WEB_MERCATOR);
+            ProjectionTransform transformToWebMercator = projection
+                    .getTransformation(webMercatorProjection);
+            ProjectionTransform transformToProjection = webMercatorProjection
+                    .getTransformation(projection);
 
-            BoundingBox boundingBox = new BoundingBox(envelope);
             timerCount.start();
-            fullCount = featureIndexManager.count(boundingBox);
-            timerCount.end(percentage + "% Bounding Box Count Query");
-            TestCase.assertEquals(expectedCount, fullCount);
+            BoundingBox bounds = featureIndexManager.getBoundingBox();
+            timerCount.end("Bounds Query");
+            TestCase.assertNotNull(bounds);
+            FeatureIndexTestEnvelope firstEnvelope = envelopes.get(0);
+            BoundingBox firstBounds = new BoundingBox(firstEnvelope.envelope);
 
-            timerQuery.start();
-            results = featureIndexManager.query(boundingBox);
-            timerQuery.end(percentage + "% Bounding Box Query");
-            TestCase.assertEquals(expectedCount, results.count());
-            results.close();
+            assertRange(firstBounds.getMinLongitude(), bounds.getMinLongitude(),
+                    outerPrecision, innerPrecision);
+            assertRange(firstBounds.getMinLatitude(), bounds.getMinLatitude(),
+                    outerPrecision, innerPrecision);
+            assertRange(firstBounds.getMaxLongitude(), bounds.getMaxLongitude(),
+                    innerPrecision, outerPrecision);
+            assertRange(firstBounds.getMaxLatitude(), bounds.getMaxLatitude(),
+                    innerPrecision, outerPrecision);
 
-            BoundingBox webMercatorBoundingBox = boundingBox
-                    .transform(transformToWebMercator);
             timerCount.start();
-            fullCount = featureIndexManager.count(webMercatorBoundingBox,
-                    webMercatorProjection);
-            timerCount.end(percentage + "% Projected Bounding Box Count Query");
-            if (compareProjectionCounts) {
+            BoundingBox projectedBounds = featureIndexManager
+                    .getBoundingBox(webMercatorProjection);
+            timerCount.end("Bounds Projection Query");
+            TestCase.assertNotNull(projectedBounds);
+            BoundingBox reprojectedBounds = projectedBounds
+                    .transform(transformToProjection);
+
+            assertRange(firstBounds.getMinLongitude(),
+                    reprojectedBounds.getMinLongitude(), projectionPrecision,
+                    projectionPrecision);
+            assertRange(firstBounds.getMinLatitude(),
+                    reprojectedBounds.getMinLatitude(), projectionPrecision,
+                    projectionPrecision);
+            assertRange(firstBounds.getMaxLongitude(),
+                    reprojectedBounds.getMaxLongitude(), projectionPrecision,
+                    projectionPrecision);
+            assertRange(firstBounds.getMaxLatitude(),
+                    reprojectedBounds.getMaxLatitude(), projectionPrecision,
+                    projectionPrecision);
+
+            timerQuery.reset();
+            timerCount.reset();
+
+            timerQuery.print = timerCount.print;
+
+            for (FeatureIndexTestEnvelope testEnvelope : envelopes) {
+
+                String percentage = Integer.toString(testEnvelope.percentage);
+                GeometryEnvelope envelope = testEnvelope.envelope;
+                int expectedCount = testEnvelope.count;
+
+                if (verbose) {
+                    System.out.println(percentage + "% Feature Count: "
+                            + expectedCount);
+                }
+
+                timerCount.start();
+                long fullCount = featureIndexManager.count(envelope);
+                timerCount.end(percentage + "% Envelope Count Query");
                 TestCase.assertEquals(expectedCount, fullCount);
-            }
 
-            timerQuery.start();
-            results = featureIndexManager.query(webMercatorBoundingBox,
-                    webMercatorProjection);
-            timerQuery.end(percentage + "% Projected Bounding Box Query");
-            if (compareProjectionCounts) {
+                timerQuery.start();
+                FeatureIndexResults results = featureIndexManager.query(envelope);
+                timerQuery.end(percentage + "% Envelope Query");
                 TestCase.assertEquals(expectedCount, results.count());
+                results.close();
+
+                BoundingBox boundingBox = new BoundingBox(envelope);
+                timerCount.start();
+                fullCount = featureIndexManager.count(boundingBox);
+                timerCount.end(percentage + "% Bounding Box Count Query");
+                TestCase.assertEquals(expectedCount, fullCount);
+
+                timerQuery.start();
+                results = featureIndexManager.query(boundingBox);
+                timerQuery.end(percentage + "% Bounding Box Query");
+                TestCase.assertEquals(expectedCount, results.count());
+                results.close();
+
+                BoundingBox webMercatorBoundingBox = boundingBox
+                        .transform(transformToWebMercator);
+                timerCount.start();
+                fullCount = featureIndexManager.count(webMercatorBoundingBox,
+                        webMercatorProjection);
+                timerCount.end(percentage + "% Projected Bounding Box Count Query");
+                if (compareProjectionCounts) {
+                    TestCase.assertEquals(expectedCount, fullCount);
+                }
+
+                timerQuery.start();
+                results = featureIndexManager.query(webMercatorBoundingBox,
+                        webMercatorProjection);
+                timerQuery.end(percentage + "% Projected Bounding Box Query");
+                if (compareProjectionCounts) {
+                    TestCase.assertEquals(expectedCount, results.count());
+                }
+                results.close();
             }
-            results.close();
+
+            System.out.println();
+            System.out.println("Average Count: " + timerCount.averageString()
+                    + " ms");
+            System.out.println("Average Query: " + timerQuery.averageString()
+                    + " ms");
+        } finally {
+            featureIndexManager.close();
         }
-
-        System.out.println();
-        System.out.println("Average Count: " + timerCount.averageString()
-                + " ms");
-        System.out.println("Average Query: " + timerQuery.averageString()
-                + " ms");
-
-        featureIndexManager.close();
     }
 
     private static void assertRange(double expected, double actual,

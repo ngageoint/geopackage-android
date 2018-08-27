@@ -56,8 +56,8 @@ public class GeoPackageTestUtils {
 
         BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
-                .createWebMercator();
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
         geometryColumns = geoPackage.createFeatureTableWithMetadata(
                 geometryColumns, boundingBox, srs.getId());
 
@@ -82,8 +82,8 @@ public class GeoPackageTestUtils {
 
         BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
-                .createWebMercator();
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
         String idColumn = "my_id";
         geometryColumns = geoPackage.createFeatureTableWithMetadata(
                 geometryColumns, idColumn, boundingBox, srs.getId());
@@ -111,8 +111,8 @@ public class GeoPackageTestUtils {
 
         List<FeatureColumn> additionalColumns = getFeatureColumns();
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
-                .createWebMercator();
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
         geometryColumns = geoPackage.createFeatureTableWithMetadata(
                 geometryColumns, additionalColumns, boundingBox, srs.getId());
 
@@ -140,8 +140,8 @@ public class GeoPackageTestUtils {
 
         List<FeatureColumn> additionalColumns = getFeatureColumns();
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
-                .createWebMercator();
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
         String idColumn = "my_other_id";
         geometryColumns = geoPackage.createFeatureTableWithMetadata(
                 geometryColumns, idColumn, additionalColumns, boundingBox,
@@ -276,7 +276,7 @@ public class GeoPackageTestUtils {
             TestCase.assertTrue(tileMatrixSetDao.isTableExists());
             TestCase.assertTrue(tileMatrixDao.isTableExists());
 
-            TestCase.assertEquals(geoPackage.getTileTables().size(),
+            TestCase.assertEquals(geoPackage.getTables(ContentsDataType.TILES).size() + geoPackage.getTables(ContentsDataType.GRIDDED_COVERAGE).size(),
                     tileMatrixSetDao.countOf());
             for (String tileTable : geoPackage.getTileTables()) {
                 TestCase.assertTrue(geoPackage.isTable(tileTable));
@@ -285,7 +285,7 @@ public class GeoPackageTestUtils {
                 TestCase.assertFalse(geoPackage.isTable(tileTable));
                 TestCase.assertNull(contentsDao.queryForId(tileTable));
             }
-            TestCase.assertEquals(0, tileMatrixSetDao.countOf());
+            TestCase.assertEquals(geoPackage.getTables(ContentsDataType.GRIDDED_COVERAGE).size(), tileMatrixSetDao.countOf());
 
             geoPackage.dropTable(TileMatrix.TABLE_NAME);
             geoPackage.dropTable(TileMatrixSet.TABLE_NAME);

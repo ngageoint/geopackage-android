@@ -26,6 +26,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
+import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
@@ -288,10 +289,12 @@ public class TileUtils {
 
         if (testBitmap) {
             Bitmap bitmap = tileRow.getTileDataBitmap();
-            TestCase.assertNotNull(bitmap);
-            TestCase.assertEquals(tileMatrix.getTileWidth(), bitmap.getWidth());
-            TestCase.assertEquals(tileMatrix.getTileHeight(),
-                    bitmap.getHeight());
+            if(dao.getTileMatrixSet().getContents().getDataType() != ContentsDataType.GRIDDED_COVERAGE) {
+                TestCase.assertNotNull(bitmap);
+                TestCase.assertEquals(tileMatrix.getTileWidth(), bitmap.getWidth());
+                TestCase.assertEquals(tileMatrix.getTileHeight(),
+                        bitmap.getHeight());
+            }
         }
     }
 
@@ -1052,19 +1055,57 @@ public class TileUtils {
                                 .getMaxLatitude());
                     }
 
+                    boolean minYDeleted = false;
+                    boolean maxYDeleted = false;
+                    boolean minXDeleted = false;
+                    boolean maxXDeleted = false;
+
                     int deleted = 0;
                     if (tileMatrix.getMatrixHeight() > 1 || tileMatrix.getMatrixWidth() > 1) {
 
                         for (int column = 0; column < tileMatrix.getMatrixWidth(); column++) {
-                            TestCase.assertEquals(1, dao.deleteTile(column, 0, zoomLevel));
-                            TestCase.assertEquals(1, dao.deleteTile(column, tileMatrix.getMatrixHeight() - 1, zoomLevel));
-                            deleted += 2;
+                            int expectedDelete = dao.queryForTile(column, 0,
+                                    zoomLevel) != null ? 1 : 0;
+                            TestCase.assertEquals(expectedDelete,
+                                    dao.deleteTile(column, 0, zoomLevel));
+                            if (expectedDelete > 0) {
+                                minYDeleted = true;
+                            }
+                            deleted += expectedDelete;
+                            expectedDelete = dao
+                                    .queryForTile(column,
+                                            tileMatrix.getMatrixHeight() - 1,
+                                            zoomLevel) != null ? 1 : 0;
+                            TestCase.assertEquals(expectedDelete, dao
+                                    .deleteTile(column,
+                                            tileMatrix.getMatrixHeight() - 1,
+                                            zoomLevel));
+                            if (expectedDelete > 0) {
+                                maxYDeleted = true;
+                            }
+                            deleted += expectedDelete;
                         }
 
                         for (int row = 1; row < tileMatrix.getMatrixHeight() - 1; row++) {
-                            TestCase.assertEquals(1, dao.deleteTile(0, row, zoomLevel));
-                            TestCase.assertEquals(1, dao.deleteTile(tileMatrix.getMatrixWidth() - 1, row, zoomLevel));
-                            deleted += 2;
+                            int expectedDelete = dao.queryForTile(0, row,
+                                    zoomLevel) != null ? 1 : 0;
+                            TestCase.assertEquals(expectedDelete,
+                                    dao.deleteTile(0, row, zoomLevel));
+                            if (expectedDelete > 0) {
+                                minXDeleted = true;
+                            }
+                            deleted += expectedDelete;
+                            expectedDelete = dao.queryForTile(
+                                    tileMatrix.getMatrixWidth() - 1, row,
+                                    zoomLevel) != null ? 1 : 0;
+                            TestCase.assertEquals(expectedDelete, dao
+                                    .deleteTile(
+                                            tileMatrix.getMatrixWidth() - 1,
+                                            row, zoomLevel));
+                            if (expectedDelete > 0) {
+                                maxXDeleted = true;
+                            }
+                            deleted += expectedDelete;
                         }
                     } else {
                         TestCase.assertEquals(1, dao.deleteTile(0, 0, zoomLevel));
@@ -1077,17 +1118,27 @@ public class TileUtils {
                     TileGrid updatedTileGrid = dao.queryForTileGrid(zoomLevel);
                     BoundingBox updatedBoundingBox = dao.getBoundingBox(zoomLevel);
 
-                    if (tileMatrix.getMatrixHeight() <= 2 && tileMatrix.getMatrixWidth() <= 2) {
+                    if (updatedCount == 0
+                            || (tileMatrix.getMatrixHeight() <= 2 && tileMatrix
+                            .getMatrixWidth() <= 2)) {
                         TestCase.assertNull(updatedTileGrid);
                         TestCase.assertNull(updatedBoundingBox);
                     } else {
                         TestCase.assertNotNull(updatedTileGrid);
                         TestCase.assertNotNull(updatedBoundingBox);
 
-                        TestCase.assertEquals(tileGrid.getMinX() + 1, updatedTileGrid.getMinX());
-                        TestCase.assertEquals(tileGrid.getMaxX() - 1, updatedTileGrid.getMaxX());
-                        TestCase.assertEquals(tileGrid.getMinY() + 1, updatedTileGrid.getMinY());
-                        TestCase.assertEquals(tileGrid.getMaxY() - 1, updatedTileGrid.getMaxY());
+                        TestCase.assertEquals(
+                                minXDeleted ? tileGrid.getMinX() + 1 : tileGrid
+                                        .getMinX(), updatedTileGrid.getMinX());
+                        TestCase.assertEquals(
+                                maxXDeleted ? tileGrid.getMaxX() - 1 : tileGrid
+                                        .getMaxX(), updatedTileGrid.getMaxX());
+                        TestCase.assertEquals(
+                                minYDeleted ? tileGrid.getMinY() + 1 : tileGrid
+                                        .getMinY(), updatedTileGrid.getMinY());
+                        TestCase.assertEquals(
+                                maxYDeleted ? tileGrid.getMaxY() - 1 : tileGrid
+                                        .getMaxY(), updatedTileGrid.getMaxY());
 
                         BoundingBox tileGridBoundingBox = TileBoundingBoxUtils.getBoundingBox(totalBoundingBox, tileMatrix, updatedTileGrid);
                         TestCase.assertEquals(tileGridBoundingBox, updatedBoundingBox);

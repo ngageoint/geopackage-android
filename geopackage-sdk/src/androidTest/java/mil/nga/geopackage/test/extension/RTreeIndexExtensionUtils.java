@@ -45,7 +45,7 @@ public class RTreeIndexExtensionUtils {
             FeatureTable table = featureDao.getTable();
 
             if (!extension.has(table)) {
-                // TODO RTree currently not supported in Android
+                // TODO RTree write functionality currently not supported in Android
                 if(true) {
                     continue;
                 }
@@ -55,11 +55,6 @@ public class RTreeIndexExtensionUtils {
 
             RTreeIndexTableDao tableDao = extension.getTableDao(featureDao);
             TestCase.assertTrue(tableDao.has());
-
-            // TODO RTree currently not supported in Android
-            if(true) {
-                continue;
-            }
 
             TestCase.assertEquals(featureDao.count(), tableDao.count());
 
