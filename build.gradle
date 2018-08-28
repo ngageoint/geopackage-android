@@ -16,5 +16,12 @@ allprojects {
         google()
         jcenter()
         mavenLocal()
+        ivy {
+            url "https://www.sqlite.org/2018/"
+            layout "pattern", {
+                artifact "[organisation]-[module]-[revision].[ext]"
+                m2compatible = false
+            }
+        }
     }
 }
