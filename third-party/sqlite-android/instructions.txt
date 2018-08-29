@@ -1,0 +1,8 @@
+sqlite-android downloaded from https://sqlite.org/download.html
+
+Sign Files:
+gpg2 -ab sqlite-android-3240000.pom
+gpg2 -ab sqlite-android-3240000.aar
+
+Bundle:
+jar -cvf bundle.jar sqlite-android-3240000.pom sqlite-android-3240000.pom.asc sqlite-android-3240000.aar sqlite-android-3240000.aar.asc

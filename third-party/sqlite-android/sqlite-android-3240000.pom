@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>mil.nga</groupId>
+  <artifactId>sqlite-android</artifactId>
+  <version>3240000</version>
+  <packaging>aar</packaging>
+  <name>SQLite Android Bindings</name>
+  <description>SQLite Android Bindings from https://sqlite.org</description>
+  <url>https://sqlite.org</url>
+  <licenses>
+    <license>
+      <name>Public Domain</name>
+      <url>https://sqlite.org/copyright.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <organization>
+    <name>SQLite</name>
+    <url>https://sqlite.org</url>
+  </organization>
+  <developers>
+    <developer>
+      <id>bosborn</id>
+      <name>Brian Osborn</name>
+      <email>osbornb@bit-sys.com</email>
+      <organizationUrl>https://www.bit-sys.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>UTC-07</timezone>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:fossil:https://www.sqlite.org/src</connection>
+    <developerConnection>scm:fossil:https://www.sqlite.org/src</developerConnection>
+    <url>https://www.sqlite.org/src</url>
+  </scm>
+</project>
