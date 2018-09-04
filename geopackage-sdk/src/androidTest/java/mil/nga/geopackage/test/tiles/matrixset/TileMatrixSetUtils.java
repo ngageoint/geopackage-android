@@ -105,11 +105,11 @@ public class TileMatrixSetUtils {
 				TestCase.assertTrue(found);
 
 				// Query for field values
-				Map<String, Object> fieldValues = new HashMap<String, Object>();
-				fieldValues.put(TileMatrixSet.COLUMN_MIN_X,
-						tileMatrixSet.getMinX());
-				fieldValues.put(TileMatrixSet.COLUMN_MAX_X,
-						tileMatrixSet.getMaxX());
+				Map<String, Object> fieldValues = new HashMap<>();
+				fieldValues.put(TileMatrixSet.COLUMN_TABLE_NAME,
+						tileMatrixSet.getTableName());
+				fieldValues.put(TileMatrixSet.COLUMN_SRS_ID,
+						tileMatrixSet.getSrsId());
 
 				queryTileMatrixSetList = dao.queryForFieldValues(fieldValues);
 				TestCase.assertNotNull(queryTileMatrixSetList);
