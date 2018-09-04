@@ -193,9 +193,6 @@ public class GeoPackageGeometryDataUtils {
 
                             byte[] bytes = geometryData.getWkbBytes();
 
-                            if (geometry.getGeometryType() == GeometryType.CURVEPOLYGON) {
-                                continue; // TODO fix GeometryProjectionTransform
-                            }
                             Geometry projectedGeometry = transformTo
                                     .transform(geometry);
                             GeoPackageGeometryData projectedGeometryData = new GeoPackageGeometryData(
@@ -391,14 +388,11 @@ public class GeoPackageGeometryDataUtils {
      */
     private static void compareBaseGeometryAttributes(Geometry expected,
                                                       Geometry actual) {
-        TestCase.assertTrue(expected.getGeometryType() ==
-                actual.getGeometryType()
-                || (expected.getGeometryType() == GeometryType.CIRCULARSTRING
-                && actual.getGeometryType() == GeometryType.LINESTRING)); // TODO fix GeometryProjectionTransform
+        TestCase.assertEquals(expected.getGeometryType(),
+                actual.getGeometryType());
         TestCase.assertEquals(expected.hasZ(), actual.hasZ());
         TestCase.assertEquals(expected.hasM(), actual.hasM());
-        TestCase.assertTrue(GeometryCodes.getCode(expected) == GeometryCodes.getCode(actual)
-                || (GeometryCodes.getCode(expected) == 8 && GeometryCodes.getCode(actual) == 2)); // TODO fix GeometryProjectionTransform
+        TestCase.assertEquals(GeometryCodes.getCode(expected), GeometryCodes.getCode(actual));
     }
 
     /**

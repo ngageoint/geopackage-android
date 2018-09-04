@@ -50,7 +50,7 @@ public class FeatureIndexManagerUtils {
     public static void testIndex(Activity activity, GeoPackage geoPackage) throws SQLException {
         testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
         testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);
-        //testIndex(activity, geoPackage, FeatureIndexType.RTREE, true); // TODO RTree not supported
+        //testIndex(activity, geoPackage, FeatureIndexType.RTREE, true); // TODO RTree write not supported
     }
 
     private static void testIndex(Activity activity, GeoPackage geoPackage, FeatureIndexType type,
