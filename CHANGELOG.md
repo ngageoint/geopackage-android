@@ -6,7 +6,25 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 3.0.3 (TBD)
 
-* TBD
+* geopackage-core version 3.0.3
+* User Table DAO projected bounding box methods
+* GeoPackage Connection query improvements
+* Cursor Result interface implementation, utilized by UserCursor
+* Feature Indexer and Feature Table Index chunked limit queries when indexing
+* Feature Index Manager support for RTree and Manual queries
+* GeoPackage Database SQLite Android Bindings connection
+* Geometry Metadata Data Source bounding box methods
+* RTree Index Extension read support for querying geometries
+* Handling of SQLite Write Ahead Log and Share Memory files
+* Feature Index Results interface and implementations
+* Feature Row geometry value and envelope methods
+* Feature Table Reader ignore case of geometry column name
+* Manual Feature Queries for unindexed geometries
+* min SDK version updated to 16
+* compile SDK version 28
+* Android support library updated to 28.0.0-rc02
+* SQLite Android Bindings version 3240000
+* Android Manifest replace allowBackup as disabled and enable cleartext traffic
 
 ## [3.0.2](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.2) (07-27-2018)
 
