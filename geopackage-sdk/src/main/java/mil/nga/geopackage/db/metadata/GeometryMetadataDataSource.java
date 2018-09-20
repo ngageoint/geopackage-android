@@ -21,6 +21,11 @@ public class GeometryMetadataDataSource {
     private GeoPackageDatabase db;
 
     /**
+     * Query range tolerance
+     */
+    protected double tolerance = .00000000000001;
+
+    /**
      * Constructor
      *
      * @param db metadata db
@@ -36,6 +41,24 @@ public class GeometryMetadataDataSource {
      */
     GeometryMetadataDataSource(GeoPackageDatabase db) {
         this.db = db;
+    }
+
+    /**
+     * Get the query range tolerance
+     *
+     * @return query range tolerance
+     */
+    public double getTolerance() {
+        return tolerance;
+    }
+
+    /**
+     * Set the query range tolerance
+     *
+     * @param tolerance query range tolerance
+     */
+    public void setTolerance(double tolerance) {
+        this.tolerance = tolerance;
     }
 
     /**
@@ -540,21 +563,31 @@ public class GeometryMetadataDataSource {
             selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_M).append(" <= ?");
             selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_M).append(" >= ?");
         }
+
+        double minX = envelope.getMinX() - tolerance;
+        double maxX = envelope.getMaxX() + tolerance;
+        double minY = envelope.getMinY() - tolerance;
+        double maxY = envelope.getMaxY() + tolerance;
+
         String[] selectionArgs = new String[args];
         int argCount = 0;
         selectionArgs[argCount++] = String.valueOf(geoPackageId);
         selectionArgs[argCount++] = tableName;
-        selectionArgs[argCount++] = String.valueOf(envelope.getMaxX());
-        selectionArgs[argCount++] = String.valueOf(envelope.getMinX());
-        selectionArgs[argCount++] = String.valueOf(envelope.getMaxY());
-        selectionArgs[argCount++] = String.valueOf(envelope.getMinY());
+        selectionArgs[argCount++] = String.valueOf(maxX);
+        selectionArgs[argCount++] = String.valueOf(minX);
+        selectionArgs[argCount++] = String.valueOf(maxY);
+        selectionArgs[argCount++] = String.valueOf(minY);
         if (envelope.hasZ()) {
-            selectionArgs[argCount++] = String.valueOf(envelope.getMaxZ());
-            selectionArgs[argCount++] = String.valueOf(envelope.getMinZ());
+            double minZ = envelope.getMinZ() - tolerance;
+            double maxZ = envelope.getMaxZ() + tolerance;
+            selectionArgs[argCount++] = String.valueOf(maxZ);
+            selectionArgs[argCount++] = String.valueOf(minZ);
         }
         if (envelope.hasM()) {
-            selectionArgs[argCount++] = String.valueOf(envelope.getMaxM());
-            selectionArgs[argCount++] = String.valueOf(envelope.getMinM());
+            double minM = envelope.getMinM() - tolerance;
+            double maxM = envelope.getMaxM() + tolerance;
+            selectionArgs[argCount++] = String.valueOf(maxM);
+            selectionArgs[argCount++] = String.valueOf(minM);
         }
         Cursor cursor = db.query(
                 GeometryMetadata.TABLE_NAME,

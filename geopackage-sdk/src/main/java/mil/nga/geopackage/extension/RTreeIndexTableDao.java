@@ -45,6 +45,11 @@ public class RTreeIndexTableDao extends UserCustomDao {
     protected GeoPackageProgress progress;
 
     /**
+     * Query range tolerance
+     */
+    protected double tolerance = .00000000000001;
+
+    /**
      * SQLite Android Bindings connection
      */
     private final SQLiteDatabase database;
@@ -74,6 +79,25 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public void setProgress(GeoPackageProgress progress) {
         this.progress = progress;
+    }
+
+    /**
+     * Get the query range tolerance
+     *
+     * @return query range tolerance
+     */
+    public double getTolerance() {
+        return tolerance;
+    }
+
+    /**
+     * Set the query range tolerance
+     *
+     * @param tolerance
+     *            query range tolerance
+     */
+    public void setTolerance(double tolerance) {
+        this.tolerance = tolerance;
     }
 
     /**
@@ -440,6 +464,12 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     private String[] buildWhereArgs(double minX, double minY, double maxX,
                                     double maxY) {
+
+        minX -= tolerance;
+        maxX += tolerance;
+        minY -= tolerance;
+        maxY += tolerance;
+
         return buildWhereArgs(new Object[]{maxX, maxY, minX, minY});
     }
 

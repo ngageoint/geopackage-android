@@ -64,7 +64,7 @@ public class FeatureIndexer {
     /**
      * Query single chunk limit
      */
-    protected Integer chunkLimit = 1000;
+    protected int chunkLimit = 1000;
 
     /**
      * Constructor
@@ -104,7 +104,7 @@ public class FeatureIndexer {
      * @return chunk limit
      * @since 3.0.3
      */
-    public Integer getChunkLimit() {
+    public int getChunkLimit() {
         return chunkLimit;
     }
 
@@ -114,7 +114,7 @@ public class FeatureIndexer {
      * @param chunkLimit chunk limit
      * @since 3.0.3
      */
-    public void setChunkLimit(Integer chunkLimit) {
+    public void setChunkLimit(int chunkLimit) {
         this.chunkLimit = chunkLimit;
     }
 
@@ -574,6 +574,26 @@ public class FeatureIndexer {
         }
 
         return row;
+    }
+
+    /**
+     * Get the query range tolerance
+     *
+     * @return query range tolerance
+     * @since 3.0.3
+     */
+    public double getTolerance() {
+        return geometryMetadataDataSource.getTolerance();
+    }
+
+    /**
+     * Set the query range tolerance
+     *
+     * @param tolerance query range tolerance
+     * @since 3.0.3
+     */
+    public void setTolerance(double tolerance) {
+        geometryMetadataDataSource.setTolerance(tolerance);
     }
 
 }

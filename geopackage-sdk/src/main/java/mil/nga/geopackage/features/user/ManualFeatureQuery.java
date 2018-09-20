@@ -26,7 +26,12 @@ public class ManualFeatureQuery {
     /**
      * Query single chunk limit
      */
-    protected Integer chunkLimit = 1000;
+    protected int chunkLimit = 1000;
+
+    /**
+     * Query range tolerance
+     */
+    protected double tolerance = .00000000000001;
 
     /**
      * Constructor
@@ -51,7 +56,7 @@ public class ManualFeatureQuery {
      *
      * @return chunk limit
      */
-    public Integer getChunkLimit() {
+    public int getChunkLimit() {
         return chunkLimit;
     }
 
@@ -60,8 +65,26 @@ public class ManualFeatureQuery {
      *
      * @param chunkLimit chunk limit
      */
-    public void setChunkLimit(Integer chunkLimit) {
+    public void setChunkLimit(int chunkLimit) {
         this.chunkLimit = chunkLimit;
+    }
+
+    /**
+     * Get the query range tolerance
+     *
+     * @return query range tolerance
+     */
+    public double getTolerance() {
+        return tolerance;
+    }
+
+    /**
+     * Set the query range tolerance
+     *
+     * @param tolerance query range tolerance
+     */
+    public void setTolerance(double tolerance) {
+        this.tolerance = tolerance;
     }
 
     /**
@@ -235,6 +258,11 @@ public class ManualFeatureQuery {
 
         long offset = 0;
         boolean hasResults = true;
+
+        minX -= tolerance;
+        maxX += tolerance;
+        minY -= tolerance;
+        maxY += tolerance;
 
         while (hasResults) {
 

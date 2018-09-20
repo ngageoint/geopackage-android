@@ -437,20 +437,34 @@ public class FeatureIndexManagerUtils {
     private static FeatureIndexTestEnvelope createEnvelope(
             GeometryEnvelope envelope, int percentage) {
 
-        float percentageRatio = percentage / 100.0f;
-
         FeatureIndexTestEnvelope testEnvelope = new FeatureIndexTestEnvelope();
 
-        double width = envelope.getMaxX() - envelope.getMinX();
-        double height = envelope.getMaxY() - envelope.getMinY();
+        double minX;
+        double maxX;
+        double minY;
+        double maxY;
 
-        double minX = envelope.getMinX()
-                + (Math.random() * width * (1.0 - percentageRatio));
-        double minY = envelope.getMinY()
-                + (Math.random() * height * (1.0 - percentageRatio));
+        if (percentage < 100) {
 
-        double maxX = minX + (width * percentageRatio);
-        double maxY = minY + (height * percentageRatio);
+            float percentageRatio = percentage / 100.0f;
+
+            double width = envelope.getMaxX() - envelope.getMinX();
+            double height = envelope.getMaxY() - envelope.getMinY();
+
+            minX = envelope.getMinX()
+                    + (Math.random() * width * (1.0 - percentageRatio));
+            minY = envelope.getMinY()
+                    + (Math.random() * height * (1.0 - percentageRatio));
+
+            maxX = minX + (width * percentageRatio);
+            maxY = minY + (height * percentageRatio);
+
+        } else {
+            minX = envelope.getMinX();
+            maxX = envelope.getMaxX();
+            minY = envelope.getMinY();
+            maxY = envelope.getMaxY();
+        }
 
         testEnvelope.envelope = new GeometryEnvelope(minX, minY, maxX, maxY);
         testEnvelope.percentage = percentage;
