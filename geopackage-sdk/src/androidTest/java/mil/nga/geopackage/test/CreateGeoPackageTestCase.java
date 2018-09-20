@@ -29,7 +29,7 @@ public abstract class CreateGeoPackageTestCase extends GeoPackageTestCase {
 	 */
 	@Override
 	protected GeoPackage getGeoPackage() throws Exception {
-		return TestSetupTeardown.setUpCreate(activity, testContext, true, true);
+		return TestSetupTeardown.setUpCreate(activity, testContext, true, allowEmptyFeatures(), true);
 	}
 
 	@After
