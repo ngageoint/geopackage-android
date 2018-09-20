@@ -18,6 +18,7 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.FeatureIndexer;
+import mil.nga.geopackage.extension.FeatureIndexRTreeResults;
 import mil.nga.geopackage.extension.RTreeIndexExtension;
 import mil.nga.geopackage.extension.RTreeIndexTableDao;
 import mil.nga.geopackage.extension.index.FeatureTableIndex;
