@@ -6,7 +6,7 @@ import mil.nga.geopackage.user.custom.UserCustomRow;
  * RTree Index Table Row containing the values from a single result set row
  *
  * @author osbornb
- * @since 3.0.3
+ * @since 3.1.0
  */
 public class RTreeIndexTableRow extends UserCustomRow {
 

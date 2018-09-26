@@ -247,7 +247,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * @param sql           sql statement
      * @param selectionArgs selection arguments
      * @return result
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public CursorResult wrapQuery(String sql,
                                   String[] selectionArgs) {

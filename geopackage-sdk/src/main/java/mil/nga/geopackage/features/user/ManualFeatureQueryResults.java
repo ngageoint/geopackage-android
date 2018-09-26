@@ -9,7 +9,7 @@ import mil.nga.geopackage.features.index.FeatureIndexResults;
  * Manual Feature Query Results which includes the ids used to read each row
  *
  * @author osbornb
- * @since 3.0.3
+ * @since 3.1.0
  */
 public class ManualFeatureQueryResults implements FeatureIndexResults {
 

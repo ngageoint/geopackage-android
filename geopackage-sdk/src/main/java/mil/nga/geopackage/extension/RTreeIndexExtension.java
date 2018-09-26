@@ -52,7 +52,7 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      *
      * @param featureTable feature table
      * @return RTree Index Table DAO
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public RTreeIndexTableDao getTableDao(String featureTable) {
         return getTableDao(getGeoPackage().getFeatureDao(featureTable));
@@ -63,7 +63,7 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      *
      * @param featureDao feature DAO
      * @return RTree Index Table DAO
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public RTreeIndexTableDao getTableDao(FeatureDao featureDao) {
 

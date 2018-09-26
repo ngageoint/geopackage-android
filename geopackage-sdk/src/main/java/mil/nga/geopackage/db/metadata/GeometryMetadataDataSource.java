@@ -382,7 +382,7 @@ public class GeometryMetadataDataSource {
      * @param geoPackage GeoPackage name
      * @param tableName  table name
      * @return bounding box
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public BoundingBox getBoundingBox(String geoPackage, String tableName) {
         return getBoundingBox(getGeoPackageId(geoPackage), tableName);
@@ -394,7 +394,7 @@ public class GeometryMetadataDataSource {
      * @param geoPackageId GeoPackage id
      * @param tableName    table name
      * @return bounding box
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public BoundingBox getBoundingBox(long geoPackageId, String tableName) {
 

@@ -25,7 +25,7 @@ import mil.nga.sf.proj.ProjectionTransform;
  * RTree Index Table DAO for reading geometry index ranges
  *
  * @author osbornb
- * @since 3.0.3
+ * @since 3.1.0
  */
 public class RTreeIndexTableDao extends UserCustomDao {
 

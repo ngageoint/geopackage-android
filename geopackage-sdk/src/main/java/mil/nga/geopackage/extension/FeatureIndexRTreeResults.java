@@ -12,7 +12,7 @@ import mil.nga.geopackage.user.custom.UserCustomCursor;
  * RTree results
  *
  * @author osbornb
- * @since 3.0.3
+ * @since 3.1.0
  */
 public class FeatureIndexRTreeResults implements FeatureIndexResults {
 

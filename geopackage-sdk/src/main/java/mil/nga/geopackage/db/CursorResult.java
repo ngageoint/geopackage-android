@@ -7,7 +7,7 @@ import android.database.CursorWrapper;
  * Cursor result implementation
  *
  * @author osbornb
- * @since 3.0.3
+ * @since 3.1.0
  */
 public class CursorResult extends CursorWrapper implements Result {
 

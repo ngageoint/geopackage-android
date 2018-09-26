@@ -102,7 +102,7 @@ public class FeatureIndexer {
      * Get the SQL query chunk limit
      *
      * @return chunk limit
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public int getChunkLimit() {
         return chunkLimit;
@@ -112,7 +112,7 @@ public class FeatureIndexer {
      * Set the SQL query chunk limit
      *
      * @param chunkLimit chunk limit
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public void setChunkLimit(int chunkLimit) {
         this.chunkLimit = chunkLimit;
@@ -397,7 +397,7 @@ public class FeatureIndexer {
      * Query for the bounds of the feature table index
      *
      * @return bounding box
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public BoundingBox getBoundingBox() {
         return geometryMetadataDataSource.getBoundingBox(featureDao.getDatabase(), featureDao.getTableName());
@@ -408,7 +408,7 @@ public class FeatureIndexer {
      *
      * @param projection desired projection
      * @return bounding box
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public BoundingBox getBoundingBox(Projection projection) {
         BoundingBox boundingBox = getBoundingBox();
@@ -580,7 +580,7 @@ public class FeatureIndexer {
      * Get the query range tolerance
      *
      * @return query range tolerance
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public double getTolerance() {
         return geometryMetadataDataSource.getTolerance();
@@ -590,7 +590,7 @@ public class FeatureIndexer {
      * Set the query range tolerance
      *
      * @param tolerance query range tolerance
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public void setTolerance(double tolerance) {
         geometryMetadataDataSource.setTolerance(tolerance);

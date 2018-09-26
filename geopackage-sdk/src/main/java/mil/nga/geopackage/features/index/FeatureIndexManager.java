@@ -85,7 +85,7 @@ public class FeatureIndexManager {
      * @param context      context
      * @param geoPackage   GeoPackage
      * @param featureTable feature table
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public FeatureIndexManager(Context context, GeoPackage geoPackage, String featureTable) {
         this(context, geoPackage, geoPackage.getFeatureDao(featureTable));
@@ -153,7 +153,7 @@ public class FeatureIndexManager {
      * Get the RTree Index Table DAO
      *
      * @return RTree index table DAO
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public RTreeIndexTableDao getRTreeIndexTableDao() {
         return rTreeIndexTableDao;
@@ -163,7 +163,7 @@ public class FeatureIndexManager {
      * Get the ordered set of ordered index query locations
      *
      * @return set of ordered index types
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public Set<FeatureIndexType> getIndexLocationQueryOrder() {
         return Collections.unmodifiableSet(indexLocationQueryOrder);
@@ -183,7 +183,7 @@ public class FeatureIndexManager {
      * in the order they are given. Omitting a location leaves it at it's current priority location.
      *
      * @param types feature index types
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public void prioritizeQueryLocation(Collection<FeatureIndexType> types) {
         prioritizeQueryLocation(types.toArray(new FeatureIndexType[types.size()]));
@@ -213,7 +213,7 @@ public class FeatureIndexManager {
      * Set the index location order, overriding all previously set types
      *
      * @param types feature index types
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public void setIndexLocationOrder(Collection<FeatureIndexType> types) {
         setIndexLocationOrder(types.toArray(new FeatureIndexType[types.size()]));
@@ -223,7 +223,7 @@ public class FeatureIndexManager {
      * Set the index location order, overriding all previously set types
      *
      * @param types feature index types
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public void setIndexLocationOrder(FeatureIndexType... types) {
         // Create a new query order set
@@ -430,7 +430,7 @@ public class FeatureIndexManager {
      * Delete the feature index from all query order locations
      *
      * @return true if deleted
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public boolean deleteAllIndexes() {
         return deleteIndex(indexLocationQueryOrder);
@@ -582,7 +582,7 @@ public class FeatureIndexManager {
      *
      * @param type feature index type to retain
      * @return true if deleted from any type
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public boolean retainIndex(FeatureIndexType type) {
         List<FeatureIndexType> retain = new ArrayList<FeatureIndexType>();
@@ -595,7 +595,7 @@ public class FeatureIndexManager {
      *
      * @param types feature index types to retain
      * @return true if deleted from any type
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public boolean retainIndex(Collection<FeatureIndexType> types) {
         Set<FeatureIndexType> delete = new HashSet<>(indexLocationQueryOrder);

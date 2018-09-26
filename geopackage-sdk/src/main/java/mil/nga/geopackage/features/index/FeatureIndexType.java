@@ -21,14 +21,14 @@ public enum FeatureIndexType {
     /**
      * RTree Index extension
      *
-     * @since 3.0.3
+     * @since 3.1.0
      */
     RTREE,
 
     /**
      * No index
      *
-     * @since 3.0.3
+     * @since 3.1.0
      */
     NONE;
 

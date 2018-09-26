@@ -37,7 +37,7 @@ public class GeoPackageCache extends GeoPackageCoreCache<GeoPackage> {
      * @param name     GeoPackage name
      * @param writable writable true to open as writable, false as read only
      * @return GeoPackage
-     * @since 3.0.3
+     * @since 3.1.0
      */
     public GeoPackage getOrOpen(String name, boolean writable) {
         GeoPackage geoPackage = get(name);

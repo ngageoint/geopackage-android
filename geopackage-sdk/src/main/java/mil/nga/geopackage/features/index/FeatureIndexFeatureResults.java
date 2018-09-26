@@ -10,7 +10,7 @@ import mil.nga.geopackage.features.user.FeatureRow;
  * DAO
  *
  * @author osbornb
- * @since 3.0.3
+ * @since 3.1.0
  */
 public class FeatureIndexFeatureResults implements FeatureIndexResults {
 
