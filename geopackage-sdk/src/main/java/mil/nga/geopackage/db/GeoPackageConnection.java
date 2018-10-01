@@ -27,18 +27,13 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     private final GeoPackageDatabase db;
 
     /**
-     * Connection source
-     */
-    private final ConnectionSource connectionSource;
-
-    /**
      * Constructor
      *
      * @param db GeoPackage connection
      */
     public GeoPackageConnection(GeoPackageDatabase db) {
+        super(new AndroidConnectionSource(db.getDb()));
         this.db = db;
-        this.connectionSource = new AndroidConnectionSource(db.getDb());
     }
 
     /**
@@ -165,7 +160,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      */
     @Override
     public void close() {
-        connectionSource.closeQuietly();
+        super.close();
         db.close();
     }
 
