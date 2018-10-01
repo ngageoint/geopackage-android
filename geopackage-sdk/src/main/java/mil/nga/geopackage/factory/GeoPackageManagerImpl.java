@@ -825,6 +825,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite));
             GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
             db = new GeoPackageImpl(context, database, path, connection, cursorFactory, tableCreator, writable);
+
+            // Validate the GeoPackage has the minimum required tables
+            try {
+                GeoPackageValidate.validateMinimumTables(db);
+            } catch (RuntimeException e) {
+                db.close();
+                throw e;
+            }
         }
 
         return db;
