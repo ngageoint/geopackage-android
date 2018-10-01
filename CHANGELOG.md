@@ -22,7 +22,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Manual Feature Queries for unindexed geometries
 * min SDK version updated to 16
 * compile SDK version 28
-* Android support library updated to 28.0.0-rc02
+* Android support library updated to 28.0.0
 * SQLite Android Bindings version 3240000
 * Android Manifest replace allowBackup as disabled and enable cleartext traffic
 
