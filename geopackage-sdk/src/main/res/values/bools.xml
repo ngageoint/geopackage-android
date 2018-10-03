@@ -4,6 +4,7 @@
     <bool name="manager_validation_import_integrity">false</bool>
     <bool name="manager_validation_open_header">false</bool>
     <bool name="manager_validation_open_integrity">false</bool>
+    <bool name="sqlite_write_ahead_logging">false</bool>
 
     <bool name="feature_tiles_polygon_fill">false</bool>
 

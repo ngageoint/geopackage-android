@@ -73,6 +73,11 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     private boolean openIntegrityValidation;
 
     /**
+     * Write ahead logging state for SQLite connections
+     */
+    private boolean sqliteWriteAheadLogging;
+
+    /**
      * Constructor
      *
      * @param context
@@ -85,6 +90,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         importIntegrityValidation = resources.getBoolean(R.bool.manager_validation_import_integrity);
         openHeaderValidation = resources.getBoolean(R.bool.manager_validation_open_header);
         openIntegrityValidation = resources.getBoolean(R.bool.manager_validation_open_integrity);
+        sqliteWriteAheadLogging = resources.getBoolean(R.bool.sqlite_write_ahead_logging);
     }
 
     /**
@@ -818,6 +824,11 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                 sqlite = context.openOrCreateDatabase(database,
                         Context.MODE_PRIVATE, cursorFactory);
             }
+            if(sqliteWriteAheadLogging){
+                sqlite.enableWriteAheadLogging();
+            }else {
+                sqlite.disableWriteAheadLogging();
+            }
 
             // Validate the database if validation is enabled
             validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
@@ -900,6 +911,22 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     @Override
     public void setOpenIntegrityValidation(boolean enabled) {
         this.openIntegrityValidation = enabled;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSqliteWriteAheadLogging(){
+        return sqliteWriteAheadLogging;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSqliteWriteAheadLogging(boolean enabled){
+        this.sqliteWriteAheadLogging = enabled;
     }
 
     /**

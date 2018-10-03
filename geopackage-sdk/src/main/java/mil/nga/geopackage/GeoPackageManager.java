@@ -488,6 +488,24 @@ public interface GeoPackageManager {
     public void setOpenIntegrityValidation(boolean enabled);
 
     /**
+     * Is the SQLite write ahead logging setting enabled for connections.
+     * Off by default.
+     *
+     * @return write ahead logging state
+     * @since 3.1.0
+     */
+    public boolean isSqliteWriteAheadLogging();
+
+    /**
+     * Set the SQLite write ahead logging setting for connections.
+     * Off by default.
+     *
+     * @param enabled true to enable, false to disable
+     * @since 3.1.0
+     */
+    public void setSqliteWriteAheadLogging(boolean enabled);
+
+    /**
      * Validate the database header and integrity.
      *
      * @param database database name
