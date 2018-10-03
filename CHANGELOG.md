@@ -25,6 +25,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Android support library updated to 28.0.0
 * SQLite Android Bindings version 3240000
 * Android Manifest replace allowBackup as disabled and enable cleartext traffic
+* gradle plugin updated to 3.2.0
+* gradle version 4.6
 
 ## [3.0.2](https://github.com/ngageoint/geopackage-android/releases/tag/3.0.2) (07-27-2018)
 
