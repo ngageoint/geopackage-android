@@ -140,10 +140,8 @@ public class RelatedMediaUtils {
         TestCase.assertNotNull(extendedRelation);
         List<ExtendedRelation> extendedRelations = rte.getRelationships();
         TestCase.assertEquals(1, extendedRelations.size());
-        TestCase.assertTrue(geoPackage.getDatabase().tableExists(
-                mappingTableName));
-        TestCase.assertTrue(geoPackage.getDatabase().tableExists(
-                mediaTable.getTableName()));
+        TestCase.assertTrue(geoPackage.isTable(mappingTableName));
+        TestCase.assertTrue(geoPackage.isTable(mediaTable.getTableName()));
         TestCase.assertTrue(contentsDao.getTables().contains(
                 mediaTable.getTableName()));
         validateContents(mediaTable,
@@ -441,8 +439,7 @@ public class RelatedMediaUtils {
         TestCase.assertFalse(rte.has(userMappingTable.getTableName()));
         extendedRelations = rte.getRelationships();
         TestCase.assertEquals(0, extendedRelations.size());
-        TestCase.assertFalse(geoPackage.getDatabase().tableExists(
-                mappingTableName));
+        TestCase.assertFalse(geoPackage.isTable(mappingTableName));
 
         // Delete the media table and contents row
         TestCase.assertTrue(geoPackage.isTable(mediaTable.getTableName()));

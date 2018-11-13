@@ -79,13 +79,13 @@ public class TestUtils {
     /**
      * Get test context
      *
-     * @param activity
-     * @return
+     * @param context context
+     * @return test context
      * @throws NameNotFoundException
      */
-    public static Context getTestContext(Activity activity)
+    public static Context getTestContext(Context context)
             throws NameNotFoundException {
-        return activity.createPackageContext("mil.nga.geopackage.test",
+        return context.createPackageContext("mil.nga.geopackage.test",
                 Context.CONTEXT_IGNORE_SECURITY);
     }
 

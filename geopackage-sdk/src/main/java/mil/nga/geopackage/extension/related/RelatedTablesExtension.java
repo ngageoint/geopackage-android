@@ -241,4 +241,26 @@ public class RelatedTablesExtension extends RelatedTablesCoreExtension {
         return baseIds;
     }
 
+    /**
+     * Determine if the base id and related id mapping exists
+     *
+     * @param tableName mapping table name
+     * @param baseId    base id
+     * @param relatedId related id
+     * @return true if mapping exists
+     * @since 3.1.1
+     */
+    public boolean hasMapping(String tableName, long baseId, long relatedId) {
+        boolean has = false;
+        UserMappingDao userMappingDao = getMappingDao(tableName);
+        UserCustomCursor cursor = userMappingDao.queryByIds(baseId,
+                relatedId);
+        try {
+            has = cursor.getCount() > 0;
+        } finally {
+            cursor.close();
+        }
+        return has;
+    }
+
 }

@@ -1,5 +1,6 @@
 package mil.nga.geopackage;
 
+import android.content.Context;
 import android.database.Cursor;
 
 import mil.nga.geopackage.attributes.AttributesDao;
@@ -110,6 +111,14 @@ public interface GeoPackage extends GeoPackageCore {
      * @since 2.0.1
      */
     public GeoPackageConnection getConnection();
+
+    /**
+     * Get the application context
+     *
+     * @return context
+     * @since 3.1.1
+     */
+    public Context getContext();
 
     /**
      * Perform a foreign key check on the database

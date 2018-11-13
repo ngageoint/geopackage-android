@@ -5,11 +5,14 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
@@ -40,9 +43,16 @@ import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.CrsWktExtension;
+import mil.nga.geopackage.extension.ExtensionsDao;
+import mil.nga.geopackage.extension.GeoPackageExtensions;
 import mil.nga.geopackage.extension.GeometryExtensions;
+import mil.nga.geopackage.extension.MetadataExtension;
+import mil.nga.geopackage.extension.NGAExtensions;
 import mil.nga.geopackage.extension.RTreeIndexExtension;
+import mil.nga.geopackage.extension.SchemaExtension;
 import mil.nga.geopackage.extension.WebPExtension;
+import mil.nga.geopackage.extension.contents.ContentsIdExtension;
+import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.extension.coverage.CoverageDataPng;
 import mil.nga.geopackage.extension.coverage.CoverageDataTiff;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
@@ -51,6 +61,8 @@ import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
+import mil.nga.geopackage.extension.index.FeatureTableIndex;
+import mil.nga.geopackage.extension.link.FeatureTileTableLinker;
 import mil.nga.geopackage.extension.properties.PropertiesExtension;
 import mil.nga.geopackage.extension.properties.PropertyNames;
 import mil.nga.geopackage.extension.related.ExtendedRelation;
@@ -66,6 +78,13 @@ import mil.nga.geopackage.extension.related.media.MediaTable;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesDao;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesRow;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesTable;
+import mil.nga.geopackage.extension.scale.TileScaling;
+import mil.nga.geopackage.extension.scale.TileScalingType;
+import mil.nga.geopackage.extension.scale.TileTableScaling;
+import mil.nga.geopackage.extension.style.FeatureStyleExtension;
+import mil.nga.geopackage.extension.style.FeatureTableStyles;
+import mil.nga.geopackage.extension.style.IconRow;
+import mil.nga.geopackage.extension.style.StyleRow;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -89,6 +108,8 @@ import mil.nga.geopackage.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.schema.constraints.DataColumnConstraintType;
 import mil.nga.geopackage.schema.constraints.DataColumnConstraints;
 import mil.nga.geopackage.schema.constraints.DataColumnConstraintsDao;
+import mil.nga.geopackage.style.Color;
+import mil.nga.geopackage.style.ColorConstants;
 import mil.nga.geopackage.test.extension.related.RelatedTablesUtils;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
@@ -146,7 +167,10 @@ public class GeoPackageExample extends BaseTestCase {
     private static final boolean RELATED_TABLES_SIMPLE_ATTRIBUTES = true;
     private static final boolean GEOMETRY_INDEX = true;
     private static final boolean FEATURE_TILE_LINK = true;
+    private static final boolean TILE_SCALING = true;
     private static final boolean PROPERTIES = true;
+    private static final boolean CONTENTS_ID = true;
+    private static final boolean FEATURE_STYLE = true;
 
     private static final String ID_COLUMN = "id";
     private static final String GEOMETRY_COLUMN = "geometry";
@@ -163,13 +187,150 @@ public class GeoPackageExample extends BaseTestCase {
     private static final String LOG_NAME = GeoPackageExample.class.getSimpleName();
 
     /**
-     * Create the GeoPackage example file
+     * Test making the GeoPackage example
      *
      * @throws SQLException upon error
      * @throws IOException  upon error
      */
     @Test
-    public void testExample() throws SQLException, IOException {
+    public void testExample() throws SQLException, IOException, NameNotFoundException {
+
+        create();
+
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+        GeoPackage geoPackage = manager.open(GEOPACKAGE_NAME);
+        TestCase.assertNotNull(geoPackage);
+        geoPackage.close();
+
+        TestCase.assertTrue(manager.delete(GEOPACKAGE_NAME));
+    }
+
+    /**
+     * Test the GeoPackage example extensions
+     *
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
+    @Test
+    public void testExampleExtensions() throws SQLException, IOException, NameNotFoundException {
+
+        create();
+
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+        GeoPackage geoPackage = manager.open(GEOPACKAGE_NAME);
+
+        validateExtensions(geoPackage, true);
+        validateNGAExtensions(geoPackage, true);
+
+        GeoPackageExtensions.deleteExtensions(geoPackage);
+
+        validateExtensions(geoPackage, false);
+        validateNGAExtensions(geoPackage, false);
+
+        geoPackage.close();
+
+        TestCase.assertTrue(manager.delete(GEOPACKAGE_NAME));
+    }
+
+    /**
+     * Test the GeoPackage example NGA extensions
+     *
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
+    @Test
+    public void testExampleNGAExtensions() throws SQLException, IOException, NameNotFoundException {
+
+        create();
+
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+        GeoPackage geoPackage = manager.open(GEOPACKAGE_NAME);
+
+        validateExtensions(geoPackage, true);
+        validateNGAExtensions(geoPackage, true);
+
+        NGAExtensions.deleteExtensions(geoPackage);
+
+        validateExtensions(geoPackage, true);
+        validateNGAExtensions(geoPackage, false);
+
+        geoPackage.close();
+
+        TestCase.assertTrue(manager.delete(GEOPACKAGE_NAME));
+    }
+
+    private void validateExtensions(GeoPackage geoPackage, boolean has)
+            throws SQLException {
+
+        ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
+
+        TestCase.assertEquals(has && RTREE_SPATIAL_INDEX,
+                new RTreeIndexExtension(geoPackage).has());
+        TestCase.assertEquals(
+                has
+                        && (RELATED_TABLES_FEATURES || RELATED_TABLES_MEDIA || RELATED_TABLES_SIMPLE_ATTRIBUTES),
+                new RelatedTablesExtension(geoPackage).has());
+        TestCase.assertEquals(
+                has && COVERAGE_DATA,
+                extensionsDao.isTableExists()
+                        && !extensionsDao.queryByExtension(
+                        CoverageData.EXTENSION_NAME).isEmpty());
+
+        TestCase.assertEquals(has && SCHEMA,
+                new SchemaExtension(geoPackage).has());
+        TestCase.assertEquals(has && METADATA,
+                new MetadataExtension(geoPackage).has());
+        TestCase.assertEquals(
+                has && NON_LINEAR_GEOMETRY_TYPES,
+                extensionsDao.isTableExists()
+                        && !extensionsDao
+                        .queryByExtension(
+                                GeometryExtensions
+                                        .getExtensionName(GeometryType.CIRCULARSTRING))
+                        .isEmpty());
+        TestCase.assertEquals(has && WEBP, extensionsDao.isTableExists()
+                && !extensionsDao
+                .queryByExtension(WebPExtension.EXTENSION_NAME)
+                .isEmpty());
+        TestCase.assertEquals(has && CRS_WKT,
+                new CrsWktExtension(geoPackage).has());
+
+    }
+
+    private void validateNGAExtensions(GeoPackage geoPackage, boolean has)
+            throws SQLException {
+
+        ExtensionsDao extensionsDao = geoPackage.getExtensionsDao();
+
+        TestCase.assertEquals(
+                has && GEOMETRY_INDEX,
+                extensionsDao.isTableExists()
+                        && !extensionsDao.queryByExtension(
+                        FeatureTableIndex.EXTENSION_NAME).isEmpty());
+        TestCase.assertEquals(has && FEATURE_TILE_LINK,
+                new FeatureTileTableLinker(geoPackage).has());
+        TestCase.assertEquals(
+                has && TILE_SCALING,
+                extensionsDao.isTableExists()
+                        && !extensionsDao.queryByExtension(
+                        TileTableScaling.EXTENSION_NAME).isEmpty());
+        TestCase.assertEquals(has && PROPERTIES, new PropertiesExtension(
+                geoPackage).has());
+        TestCase.assertEquals(has && CONTENTS_ID, new ContentsIdExtension(
+                geoPackage).has());
+        TestCase.assertEquals(has && FEATURE_STYLE, new FeatureStyleExtension(
+                geoPackage).has());
+
+    }
+
+    /**
+     * Create the GeoPackage example file
+     *
+     * @throws SQLException          upon error
+     * @throws IOException           upon error
+     * @throws NameNotFoundException upon error
+     */
+    private void create() throws SQLException, IOException, NameNotFoundException {
 
         Log.i(LOG_NAME, "Creating: " + GEOPACKAGE_NAME);
         GeoPackage geoPackage = createGeoPackage(activity);
@@ -222,6 +383,11 @@ public class GeoPackageExample extends BaseTestCase {
                 createRelatedTablesFeaturesExtension(geoPackage);
             }
 
+            Log.i(LOG_NAME, "Feature Style Extension: " + FEATURE_STYLE);
+            if (FEATURE_STYLE) {
+                createFeatureStyleExtension(geoPackage);
+            }
+
         } else {
             Log.i(LOG_NAME, "Schema Extension: " + FEATURES);
             Log.i(LOG_NAME, "Geometry Index Extension: " + FEATURES);
@@ -232,6 +398,7 @@ public class GeoPackageExample extends BaseTestCase {
                     + FEATURES);
             Log.i(LOG_NAME, "Related Tables Media Extension: " + FEATURES);
             Log.i(LOG_NAME, "Related Tables Features Extension: " + FEATURES);
+            Log.i(LOG_NAME, "Feature Style Extension: " + FEATURES);
         }
 
         Log.i(LOG_NAME, "Tiles: " + TILES);
@@ -244,8 +411,14 @@ public class GeoPackageExample extends BaseTestCase {
                 createWebPExtension(activity, geoPackage);
             }
 
+            Log.i(LOG_NAME, "Tile Scaling Extension: " + TILE_SCALING);
+            if (TILE_SCALING) {
+                createTileScalingExtension(geoPackage);
+            }
+
         } else {
             Log.i(LOG_NAME, "WebP Extension: " + TILES);
+            Log.i(LOG_NAME, "Tile Scaling Extension: " + TILES);
         }
 
         Log.i(LOG_NAME, "Attributes: " + ATTRIBUTES);
@@ -273,6 +446,11 @@ public class GeoPackageExample extends BaseTestCase {
         Log.i(LOG_NAME, "Properties: " + PROPERTIES);
         if (PROPERTIES) {
             createPropertiesExtension(geoPackage);
+        }
+
+        Log.i(LOG_NAME, "Contents Id: " + CONTENTS_ID);
+        if (CONTENTS_ID) {
+            createContentsIdExtension(geoPackage);
         }
 
         geoPackage.close();
@@ -1615,6 +1793,22 @@ public class GeoPackageExample extends BaseTestCase {
 
     }
 
+    private static void createTileScalingExtension(GeoPackage geoPackage) {
+
+        for (String tileTable : geoPackage.getTileTables()) {
+
+            TileTableScaling tileTableScaling = new TileTableScaling(
+                    geoPackage, tileTable);
+            TileScaling tileScaling = new TileScaling();
+            tileScaling.setScalingType(TileScalingType.IN_OUT);
+            tileScaling.setZoomIn(2l);
+            tileScaling.setZoomOut(2l);
+            tileTableScaling.create(tileScaling);
+
+        }
+
+    }
+
     private static void createPropertiesExtension(GeoPackage geoPackage) {
 
         PropertiesExtension properties = new PropertiesExtension(geoPackage);
@@ -1649,6 +1843,95 @@ public class GeoPackageExample extends BaseTestCase {
         properties.addValue(PropertyNames.TAG, "Example");
         properties.addValue(PropertyNames.TAG, "BIT Systems");
 
+    }
+
+    private static void createContentsIdExtension(GeoPackage geoPackage) {
+
+        ContentsIdExtension contentsId = new ContentsIdExtension(geoPackage);
+        contentsId.createIds(ContentsDataType.FEATURES);
+
+    }
+
+    private static void createFeatureStyleExtension(GeoPackage geoPackage)
+            throws IOException, NameNotFoundException {
+
+        Color color1 = new Color(ColorConstants.BLUE);
+        Color color2 = new Color(255, 0, 0, .4f);
+        Color color3 = new Color(0x000000);
+
+        StyleRow style1 = new StyleRow();
+        style1.setName("Style 1");
+        style1.setDescription("Style 1");
+        style1.setColor(ColorConstants.GREEN);
+        style1.setWidth(2.0);
+
+        StyleRow style2 = new StyleRow();
+        style2.setName("Style 2");
+        style2.setDescription("Style 2");
+        style2.setColor(color1);
+        style2.setWidth(1.5);
+        style2.setFillColor(color2);
+
+        StyleRow style3 = new StyleRow();
+        style3.setName("Style 3");
+        style3.setDescription("Style 3");
+        style3.setColor(color3);
+
+        TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), TestConstants.ICON_POINT_IMAGE);
+        String iconImage = TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), TestConstants.ICON_POINT_IMAGE);
+        Bitmap iconBitmap = BitmapFactory.decodeFile(iconImage);
+        byte[] iconBytes = BitmapConverter.toBytes(iconBitmap, Bitmap.CompressFormat.PNG);
+
+        //File iconImageFile = TestUtils
+        //        .getTestFile(TestConstants.ICON_POINT_IMAGE);
+        //byte[] iconBytes = GeoPackageIOUtils.fileBytes(iconImageFile);
+        //BufferedImage iconImage = ImageUtils.getImage(iconBytes);
+        IconRow icon = new IconRow();
+        icon.setName("Icon 1");
+        icon.setDescription("Icon 1");
+        icon.setData(iconBytes);
+        icon.setContentType("image/png");
+        icon.setHeight(iconBitmap.getHeight() * .9);
+        icon.setWidth(iconBitmap.getWidth() * .9);
+        icon.setAnchorU(0.5);
+        icon.setAnchorV(1.0);
+
+        FeatureTableStyles geometry1Styles = new FeatureTableStyles(geoPackage,
+                "geometry1");
+
+        geometry1Styles.setTableStyleDefault(style1);
+        geometry1Styles.setTableStyle(GeometryType.POLYGON, style2);
+        geometry1Styles.setTableIconDefault(icon);
+
+        FeatureDao featureDao = geoPackage.getFeatureDao("geometry2");
+        FeatureTableStyles geometry2Styles = new FeatureTableStyles(geoPackage,
+                featureDao.getTable());
+
+        geometry2Styles.setTableStyle(GeometryType.POINT, style1);
+        geometry2Styles.setTableStyle(GeometryType.LINESTRING, style2);
+        geometry2Styles.setTableStyle(GeometryType.POLYGON, style1);
+        geometry2Styles.setTableStyle(GeometryType.GEOMETRY, style3);
+
+        geometry2Styles.createStyleRelationship();
+        geometry2Styles.createIconRelationship();
+
+        FeatureCursor features = featureDao.queryForAll();
+        while (features.moveToNext()) {
+            FeatureRow featureRow = features.getRow();
+            switch (featureRow.getGeometryType()) {
+                case POINT:
+                    geometry2Styles.setIcon(featureRow, icon);
+                    break;
+                case LINESTRING:
+                    geometry2Styles.setStyle(featureRow, style1);
+                    break;
+                case POLYGON:
+                    geometry2Styles.setStyle(featureRow, style2);
+                    break;
+                default:
+            }
+        }
+        features.close();
     }
 
 }

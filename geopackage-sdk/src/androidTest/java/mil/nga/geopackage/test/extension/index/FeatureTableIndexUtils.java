@@ -293,10 +293,7 @@ public class FeatureTableIndexUtils {
 
         TestCase.assertFalse(geometryIndexDao.isTableExists());
         TestCase.assertFalse(tableIndexDao.isTableExists());
-        TestCase.assertEquals(0,
-                extensionsDao
-                        .queryByExtension(FeatureTableIndex.EXTENSION_NAME)
-                        .size());
+        TestCase.assertFalse(extensionsDao.isTableExists());
 
     }
 

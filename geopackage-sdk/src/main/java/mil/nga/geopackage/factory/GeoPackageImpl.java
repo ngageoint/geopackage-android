@@ -134,6 +134,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         // Read the existing table and create the dao
         FeatureTableReader tableReader = new FeatureTableReader(geometryColumns);
         final FeatureTable featureTable = tableReader.readTable(new FeatureWrapperConnection(database));
+        featureTable.setContents(geometryColumns.getContents());
         FeatureConnection userDb = new FeatureConnection(database);
         FeatureDao dao = new FeatureDao(getName(), database, userDb, geometryColumns, featureTable);
 
@@ -247,6 +248,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         TileTableReader tableReader = new TileTableReader(
                 tileMatrixSet.getTableName());
         final TileTable tileTable = tableReader.readTable(new TileWrapperConnection(database));
+        tileTable.setContents(tileMatrixSet.getContents());
         TileConnection userDb = new TileConnection(database);
         TileDao dao = new TileDao(getName(), database, userDb, tileMatrixSet, tileMatrices,
                 tileTable);
@@ -402,6 +404,14 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
     @Override
     public GeoPackageConnection getConnection() {
         return database;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Context getContext() {
+        return context;
     }
 
     /**

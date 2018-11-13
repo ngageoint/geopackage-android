@@ -16,7 +16,7 @@ public class SimpleAttributesRow extends UserCustomRow {
      *
      * @param table simple attributes table
      */
-    SimpleAttributesRow(SimpleAttributesTable table) {
+    protected SimpleAttributesRow(SimpleAttributesTable table) {
         super(table);
     }
 

@@ -16,7 +16,7 @@ public class MediaRow extends UserCustomRow {
      *
      * @param table media table
      */
-    MediaRow(MediaTable table) {
+    protected MediaRow(MediaTable table) {
         super(table);
     }
 

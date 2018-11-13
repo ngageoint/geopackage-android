@@ -146,10 +146,8 @@ public class RelatedSimpleAttributesUtils {
         TestCase.assertNotNull(extendedRelation);
         List<ExtendedRelation> extendedRelations = rte.getRelationships();
         TestCase.assertEquals(1, extendedRelations.size());
-        TestCase.assertTrue(geoPackage.getDatabase().tableExists(
-                mappingTableName));
-        TestCase.assertTrue(geoPackage.getDatabase().tableExists(
-                simpleTable.getTableName()));
+        TestCase.assertTrue(geoPackage.isTable(mappingTableName));
+        TestCase.assertTrue(geoPackage.isTable(simpleTable.getTableName()));
         TestCase.assertTrue(contentsDao.getTables().contains(
                 simpleTable.getTableName()));
         validateContents(simpleTable,

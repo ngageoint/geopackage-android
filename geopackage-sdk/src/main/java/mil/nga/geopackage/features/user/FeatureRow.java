@@ -10,6 +10,7 @@ import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.user.UserRow;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.GeometryType;
 
 /**
  * Feature Row containing the values from a single cursor row
@@ -115,6 +116,21 @@ public class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
             geometry = data.getGeometry();
         }
         return geometry;
+    }
+
+    /**
+     * Get the simple features geometry type
+     *
+     * @return geometry type
+     * @since 3.1.1
+     */
+    public GeometryType getGeometryType() {
+        Geometry geometry = getGeometryValue();
+        GeometryType geometryType = null;
+        if (geometry != null) {
+            geometryType = geometry.getGeometryType();
+        }
+        return geometryType;
     }
 
     /**

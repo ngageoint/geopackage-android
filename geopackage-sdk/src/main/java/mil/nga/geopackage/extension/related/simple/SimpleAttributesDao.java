@@ -25,6 +25,17 @@ public class SimpleAttributesDao extends UserCustomDao {
     }
 
     /**
+     * Constructor
+     *
+     * @param dao                   user custom data access object
+     * @param simpleAttributesTable simple attributes table
+     */
+    protected SimpleAttributesDao(UserCustomDao dao,
+                                  SimpleAttributesTable simpleAttributesTable) {
+        super(dao, simpleAttributesTable);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

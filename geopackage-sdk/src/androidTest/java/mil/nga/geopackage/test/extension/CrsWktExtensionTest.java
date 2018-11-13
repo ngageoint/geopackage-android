@@ -116,7 +116,7 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
         newSrs = srsDao.queryForId(newSrs.getSrsId());
         assertNotNull(newSrs);
         assertNotNull(newSrs.getDefinition_12_063());
-        assertEquals(newSrs.getDefinition_12_063(), "undefined");
+        assertEquals(newSrs.getDefinition_12_063(), "");
 
         // Test the get or create auto set
         wgs84Srs = srsDao
@@ -186,7 +186,7 @@ public class CrsWktExtensionTest extends CreateGeoPackageTestCase {
         newSrs3 = srsDao.queryForId(newSrs3.getSrsId());
         assertNotNull(newSrs3);
         assertNotNull(newSrs3.getDefinition_12_063());
-        assertEquals(newSrs3.getDefinition_12_063(), "undefined");
+        assertEquals(newSrs3.getDefinition_12_063(), "");
 
     }
 

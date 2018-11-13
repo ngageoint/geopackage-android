@@ -24,9 +24,9 @@ public class AttributesRow extends UserRow<AttributesColumn, AttributesTable> {
     /**
      * Constructor to create an empty row
      *
-     * @param table
+     * @param table attributes table
      */
-    AttributesRow(AttributesTable table) {
+    protected AttributesRow(AttributesTable table) {
         super(table);
     }
 

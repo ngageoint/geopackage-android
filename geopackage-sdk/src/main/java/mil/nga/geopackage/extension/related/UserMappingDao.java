@@ -22,6 +22,17 @@ public class UserMappingDao extends UserCustomDao {
     }
 
     /**
+     * Constructor
+     *
+     * @param dao              user custom data access object
+     * @param userMappingTable user mapping table
+     */
+    protected UserMappingDao(UserCustomDao dao,
+                             UserMappingTable userMappingTable) {
+        super(dao, userMappingTable);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

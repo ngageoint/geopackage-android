@@ -28,6 +28,8 @@ public class TileTableScalingUtils {
      */
     public static void testScaling(GeoPackage geoPackage) throws SQLException {
 
+        GeoPackageExtensions.deleteExtensions(geoPackage);
+
         List<String> tileTables = geoPackage.getTileTables();
 
         if (!tileTables.isEmpty()) {

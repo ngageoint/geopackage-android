@@ -95,8 +95,7 @@ public class RelatedTablesWriteTest extends LoadGeoPackageTestCase {
         TestCase.assertNotNull(extendedRelation);
         extendedRelations = rte.getRelationships();
         TestCase.assertEquals(1, extendedRelations.size());
-        TestCase.assertTrue(geoPackage.getDatabase().tableExists(
-                mappingTableName));
+        TestCase.assertTrue(geoPackage.isTable(mappingTableName));
 
         // 7. Add mappings
         FeatureDao baseDao = geoPackage.getFeatureDao(baseTableName);
