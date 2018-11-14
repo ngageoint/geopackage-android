@@ -24,12 +24,37 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     protected final GeoPackageDatabase database;
 
     /**
+     * Table
+     */
+    protected TTable table;
+
+    /**
      * Constructor
      *
      * @param database GeoPackage connection
      */
     protected UserConnection(GeoPackageConnection database) {
         this.database = database.getDb();
+    }
+
+    /**
+     * Get the table
+     *
+     * @return table
+     * @since 3.1.1
+     */
+    public TTable getTable() {
+        return table;
+    }
+
+    /**
+     * Set the table
+     *
+     * @param table table
+     * @since 3.1.1
+     */
+    public void setTable(TTable table) {
+        this.table = table;
     }
 
     /**
@@ -157,6 +182,9 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     private TResult handleCursor(Cursor cursor, UserQuery query) {
         TResult result = convertCursor(cursor);
         result.setQuery(query);
+        if (table != null) {
+            result.setTable(table);
+        }
         return result;
     }
 

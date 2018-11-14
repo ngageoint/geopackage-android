@@ -25,7 +25,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     /**
      * Table
      */
-    private final TTable table;
+    private TTable table;
 
     /**
      * Invalid cursor positions due to large sized blobs
@@ -64,6 +64,16 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     @Override
     public Object getValue(TColumn column) {
         return getValue(column.getIndex(), column.getDataType());
+    }
+
+    /**
+     * Set the table
+     *
+     * @param table table
+     * @since 3.1.1
+     */
+    public void setTable(TTable table) {
+        this.table = table;
     }
 
     /**

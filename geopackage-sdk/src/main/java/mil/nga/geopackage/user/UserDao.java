@@ -46,6 +46,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
         super(database, db, userDb, table);
         this.db = db.getDb();
         this.userDb = userDb;
+        userDb.setTable(table);
     }
 
     /**
