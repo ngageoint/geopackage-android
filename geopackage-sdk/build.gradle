@@ -152,13 +152,13 @@ dependencies {
     api 'mil.nga.geopackage:geopackage-core:3.1.1'
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:2.0.0'
-    api 'mil.nga.sf:sf-geojson:2.0.0'
-    api 'mil.nga:sqlite-android:3240000'
+    api 'mil.nga.sf:sf-geojson:2.0.1'
+    api 'mil.nga:sqlite-android:3250300'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.1',
             'mil.nga.geopackage:geopackage-core:3.1.1',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:2.0.0',
-            'mil.nga.sf:sf-geojson:2.0.0'
+            'mil.nga.sf:sf-geojson:2.0.1'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
 }
