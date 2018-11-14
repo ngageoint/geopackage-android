@@ -29,7 +29,6 @@ import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
 import mil.nga.sf.PolyhedralSurface;
 import mil.nga.sf.proj.ProjectionTransform;
-import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**
  * Default Feature Tiles implementation using Android Graphics to draw tiles
