@@ -72,12 +72,7 @@ public class StyleMappingRow extends UserMappingRow {
      * @return geometry type name
      */
     public String getGeometryTypeName() {
-        String geometryTypeName = null;
-        Object value = getValue(getGeometryTypeNameColumnIndex());
-        if (value != null) {
-            geometryTypeName = value.toString();
-        }
-        return geometryTypeName;
+        return getValueString(getGeometryTypeNameColumnIndex());
     }
 
     /**

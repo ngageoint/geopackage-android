@@ -86,7 +86,7 @@ public class StyleRow extends AttributesRow {
      * @return name
      */
     public String getName() {
-        return getValue(getNameColumnIndex()).toString();
+        return getValueString(getNameColumnIndex());
     }
 
     /**
@@ -122,7 +122,7 @@ public class StyleRow extends AttributesRow {
      * @return description
      */
     public String getDescription() {
-        return getValue(getDescriptionColumnIndex()).toString();
+        return getValueString(getDescriptionColumnIndex());
     }
 
     /**
@@ -167,7 +167,7 @@ public class StyleRow extends AttributesRow {
      * @return color
      */
     public String getHexColor() {
-        return getValue(getColorColumnIndex()).toString();
+        return getValueString(getColorColumnIndex());
     }
 
     /**
@@ -308,7 +308,7 @@ public class StyleRow extends AttributesRow {
      * @return fill color
      */
     public String getFillHexColor() {
-        return getValue(getFillColorColumnIndex()).toString();
+        return getValueString(getFillColorColumnIndex());
     }
 
     /**

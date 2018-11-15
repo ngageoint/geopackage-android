@@ -594,6 +594,17 @@ public class FeatureStylesUtils {
 
         if (expectedStyleRow != null) {
             TestCase.assertEquals(expectedStyleRow.getId(), styleRow.getId());
+            TestCase.assertNotNull(styleRow.getTable());
+            TestCase.assertTrue(styleRow.getId() >= 0);
+            styleRow.getName();
+            styleRow.getDescription();
+            styleRow.getColor();
+            styleRow.getHexColor();
+            styleRow.getOpacity();
+            styleRow.getWidth();
+            styleRow.getFillColor();
+            styleRow.getFillHexColor();
+            styleRow.getFillOpacity();
         } else {
             TestCase.assertNull(styleRow);
         }
@@ -680,6 +691,14 @@ public class FeatureStylesUtils {
 
         if (expectedIconRow != null) {
             TestCase.assertEquals(expectedIconRow.getId(), iconRow.getId());
+            TestCase.assertNotNull(iconRow.getTable());
+            TestCase.assertTrue(iconRow.getId() >= 0);
+            iconRow.getName();
+            iconRow.getDescription();
+            iconRow.getWidth();
+            iconRow.getHeight();
+            iconRow.getAnchorU();
+            iconRow.getAnchorV();
         } else {
             TestCase.assertNull(iconRow);
         }
