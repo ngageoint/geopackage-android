@@ -10,7 +10,9 @@ import android.util.Log;
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
+import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.extension.style.FeatureStyle;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -21,6 +23,7 @@ import mil.nga.sf.CompoundCurve;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryCollection;
 import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.GeometryType;
 import mil.nga.sf.LineString;
 import mil.nga.sf.MultiLineString;
 import mil.nga.sf.MultiPoint;
@@ -42,11 +45,22 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Constructor
      *
-     * @param context context
+     * @param context    context
      * @param featureDao feature dao
      */
     public DefaultFeatureTiles(Context context, FeatureDao featureDao) {
         super(context, featureDao);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
+        super(context, geoPackage, featureDao);
     }
 
     /**
@@ -170,7 +184,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                     if (expandedBoundingBox.intersects(transformedBoundingBox, true)) {
 
                         double simplifyTolerance = TileBoundingBoxUtils.toleranceDistance(zoom, tileWidth, tileHeight);
-                        drawShape(simplifyTolerance, boundingBox, transform, canvas, geometry);
+                        drawShape(simplifyTolerance, boundingBox, transform, canvas, row, geometry);
 
                         drawn = true;
                     }
@@ -188,18 +202,22 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * Draw the geometry on the canvas
      *
      * @param simplifyTolerance simplify tolerance in meters
-     * @param boundingBox
-     * @param transform
-     * @param canvas
-     * @param geometry
+     * @param boundingBox       bounding box
+     * @param transform         projection transform
+     * @param canvas            draw canvas
+     * @param featureRow        feature row
+     * @param geometry          feature geometry
      */
-    private void drawShape(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Geometry geometry) {
+    private void drawShape(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow featureRow, Geometry geometry) {
 
-        switch (geometry.getGeometryType()) {
+        GeometryType geometryType = geometry.getGeometryType();
+        FeatureStyle featureStyle = getFeatureStyle(featureRow, geometryType);
+
+        switch (geometryType) {
 
             case POINT:
                 Point point = (Point) geometry;
-                drawPoint(boundingBox, transform, canvas, pointPaint, point);
+                drawPoint(boundingBox, transform, canvas, point);
                 break;
             case LINESTRING:
             case CIRCULARSTRING:
@@ -213,12 +231,12 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 Polygon polygon = (Polygon) geometry;
                 Path polygonPath = new Path();
                 addPolygon(simplifyTolerance, boundingBox, transform, polygonPath, polygon);
-                drawPolygonPath(canvas, polygonPath);
+                drawPolygonPath(canvas, polygonPath, featureStyle);
                 break;
             case MULTIPOINT:
                 MultiPoint multiPoint = (MultiPoint) geometry;
                 for (Point pointFromMulti : multiPoint.getPoints()) {
-                    drawPoint(boundingBox, transform, canvas, pointPaint, pointFromMulti);
+                    drawPoint(boundingBox, transform, canvas, pointFromMulti);
                 }
                 break;
             case MULTILINESTRING:
@@ -235,7 +253,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 for (Polygon polygonFromMulti : multiPolygon.getPolygons()) {
                     addPolygon(simplifyTolerance, boundingBox, transform, multiPolygonPath, polygonFromMulti);
                 }
-                drawPolygonPath(canvas, multiPolygonPath);
+                drawPolygonPath(canvas, multiPolygonPath, featureStyle);
                 break;
             case COMPOUNDCURVE:
                 CompoundCurve compoundCurve = (CompoundCurve) geometry;
@@ -252,13 +270,13 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 for (Polygon polygonFromPolyhedralSurface : polyhedralSurface.getPolygons()) {
                     addPolygon(simplifyTolerance, boundingBox, transform, polyhedralSurfacePath, polygonFromPolyhedralSurface);
                 }
-                drawPolygonPath(canvas, polyhedralSurfacePath);
+                drawPolygonPath(canvas, polyhedralSurfacePath, featureStyle);
                 break;
             case GEOMETRYCOLLECTION:
                 GeometryCollection<Geometry> geometryCollection = (GeometryCollection) geometry;
                 List<Geometry> geometries = geometryCollection.getGeometries();
                 for (Geometry geometryFromCollection : geometries) {
-                    drawShape(simplifyTolerance, boundingBox, transform, canvas, geometryFromCollection);
+                    drawShape(simplifyTolerance, boundingBox, transform, canvas, featureRow, geometryFromCollection);
                 }
                 break;
             default:
@@ -284,11 +302,15 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param canvas
      * @param path
      */
-    private void drawPolygonPath(Canvas canvas, Path path) {
-        canvas.drawPath(path, polygonPaint);
-        if (fillPolygon) {
+    private void drawPolygonPath(Canvas canvas, Path path, FeatureStyle featureStyle) {
+
+        Paint pathPaint = getPolygonPaint(featureStyle);
+        canvas.drawPath(path, pathPaint);
+
+        Paint fillPaint = getPolygonFillPaint(featureStyle);
+        if (fillPaint != null) {
             path.setFillType(Path.FillType.EVEN_ODD);
-            canvas.drawPath(path, polygonFillPaint);
+            canvas.drawPath(path, fillPaint);
         }
     }
 
@@ -390,13 +412,12 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Draw the point on the canvas
      *
-     * @param boundingBox
-     * @param transform
-     * @param canvas
-     * @param paint
-     * @param point
+     * @param boundingBox bounding box
+     * @param transform   projection transform
+     * @param canvas      draw canvas
+     * @param point       point
      */
-    private void drawPoint(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Paint paint, Point point) {
+    private void drawPoint(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Point point) {
 
         Point webMercatorPoint = getPoint(transform, point);
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
@@ -406,11 +427,11 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         if (pointIcon != null) {
             if (x >= 0 - pointIcon.getWidth() && x <= tileWidth + pointIcon.getWidth() && y >= 0 - pointIcon.getHeight() && y <= tileHeight + pointIcon.getHeight()) {
-                canvas.drawBitmap(pointIcon.getIcon(), x - pointIcon.getXOffset(), y - pointIcon.getYOffset(), paint);
+                canvas.drawBitmap(pointIcon.getIcon(), x - pointIcon.getXOffset(), y - pointIcon.getYOffset(), pointPaint);
             }
         } else {
             if (x >= 0 - pointRadius && x <= tileWidth + pointRadius && y >= 0 - pointRadius && y <= tileHeight + pointRadius) {
-                canvas.drawCircle(x, y, pointRadius, paint);
+                canvas.drawCircle(x, y, pointRadius, pointPaint);
             }
         }
 

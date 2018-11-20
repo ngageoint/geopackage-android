@@ -1,11 +1,14 @@
 package mil.nga.geopackage.tiles.features;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.util.Log;
+import android.util.LruCache;
 
 import org.osgeo.proj4j.units.Units;
 
@@ -13,7 +16,11 @@ import java.io.IOException;
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
+import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.R;
+import mil.nga.geopackage.extension.style.FeatureStyle;
+import mil.nga.geopackage.extension.style.FeatureTableStyles;
+import mil.nga.geopackage.extension.style.StyleRow;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.user.FeatureCursor;
@@ -21,6 +28,7 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.sf.GeometryType;
 import mil.nga.sf.Point;
 import mil.nga.sf.proj.Projection;
 import mil.nga.sf.proj.ProjectionConstants;
@@ -35,6 +43,13 @@ import mil.nga.sf.util.GeometryUtils;
  * @author osbornb
  */
 public abstract class FeatureTiles {
+
+    // TODO styles
+
+    /**
+     * Default max number of feature style paints to maintain
+     */
+    public static final int DEFAULT_STYLE_PAINT_CACHE_SIZE = 100;
 
     /**
      * WGS84 Projection
@@ -67,6 +82,11 @@ public abstract class FeatureTiles {
      * When not null, features are retrieved using a feature index
      */
     protected FeatureIndexManager indexManager;
+
+    /**
+     * Feature Style extension
+     */
+    protected FeatureTableStyles featureTableStyles;
 
     /**
      * Tile height
@@ -117,6 +137,11 @@ public abstract class FeatureTiles {
      * Polygon fill paint
      */
     protected Paint polygonFillPaint = new Paint();
+
+    /**
+     * Feature style paint, changed as needed
+     */
+    private LruCache<Long, Paint> stylePaintCache = new LruCache<>(DEFAULT_STYLE_PAINT_CACHE_SIZE);
 
     /**
      * Height overlapping pixels between tile images
@@ -184,6 +209,29 @@ public abstract class FeatureTiles {
         polygonFillPaint.setAlpha(resources.getInteger(R.integer.feature_tiles_polygon_fill_alpha));
 
         calculateDrawOverlap();
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
+        this(context, featureDao);
+
+        indexManager = new FeatureIndexManager(context, geoPackage, featureDao);
+        if (!indexManager.isIndexed()) {
+            indexManager.close();
+            indexManager = null;
+        }
+
+        featureTableStyles = new FeatureTableStyles(geoPackage, featureDao.getTable());
+        if (!featureTableStyles.has()) {
+            featureTableStyles = null;
+        }
+
     }
 
     /**
@@ -301,6 +349,44 @@ public abstract class FeatureTiles {
      */
     public void setIndexManager(FeatureIndexManager indexManager) {
         this.indexManager = indexManager;
+    }
+
+    /**
+     * Get the feature table styles
+     *
+     * @return feature table styles
+     */
+    public FeatureTableStyles getFeatureTableStyles() {
+        return featureTableStyles;
+    }
+
+    /**
+     * Set the feature table styles
+     *
+     * @param featureTableStyles feature table styles
+     */
+    public void setFeatureTableStyles(FeatureTableStyles featureTableStyles) {
+        this.featureTableStyles = featureTableStyles;
+    }
+
+    /**
+     * Clear the style paint cache
+     *
+     * @since 3.1.1
+     */
+    public void clearStylePaintCache() {
+        stylePaintCache.evictAll();
+    }
+
+    /**
+     * Set / resize the style paint cache size
+     *
+     * @param size new size
+     * @since 3.1.1
+     */
+    @TargetApi(21)
+    public void setStylePaintCacheSize(int size) {
+        stylePaintCache.resize(size);
     }
 
     /**
@@ -827,6 +913,172 @@ public abstract class FeatureTiles {
         }
 
         return simplifiedPoints;
+    }
+
+    /**
+     * Get the feature style for the feature row and geometry type
+     *
+     * @param featureRow feature row
+     * @return feature style
+     */
+    protected FeatureStyle getFeatureStyle(FeatureRow featureRow) {
+        FeatureStyle featureStyle = null;
+        if (featureTableStyles != null) {
+            featureStyle = featureTableStyles.getFeatureStyle(featureRow);
+        }
+        return featureStyle;
+    }
+
+    /**
+     * Get the feature style for the feature row and geometry type
+     *
+     * @param featureRow   feature row
+     * @param geometryType geometry type
+     * @return feature style
+     */
+    protected FeatureStyle getFeatureStyle(FeatureRow featureRow, GeometryType geometryType) {
+        FeatureStyle featureStyle = null;
+        if (featureTableStyles != null) {
+            featureStyle = featureTableStyles.getFeatureStyle(featureRow, geometryType);
+        }
+        return featureStyle;
+    }
+
+    /**
+     * Get the polygon paint for the feature style, or return the default paint
+     *
+     * @param featureStyle feature style
+     * @return paint
+     */
+    protected Paint getPolygonPaint(FeatureStyle featureStyle) {
+
+        Paint paint = null;
+
+        if (featureStyle != null) {
+
+            StyleRow style = featureStyle.getStyle();
+
+            if (style != null && style.hasColor()) {
+
+                paint = getStylePaint(style);
+
+            }
+        }
+
+        if (paint == null) {
+            paint = polygonPaint;
+        }
+
+        return paint;
+    }
+
+    /**
+     * Get the polygon fill paint for the feature style, or return the default paint
+     *
+     * @param featureStyle feature style
+     * @return paint
+     */
+    protected Paint getPolygonFillPaint(FeatureStyle featureStyle) {
+
+        Paint paint = null;
+
+        boolean hasStyleColor = false;
+
+        if (featureStyle != null) {
+
+            StyleRow style = featureStyle.getStyle();
+
+            if (style != null && style.hasFillColor()) {
+
+                paint = getStyleFillPaint(style);
+
+            } else {
+                hasStyleColor = style.hasColor();
+            }
+        }
+
+        if (paint == null && !hasStyleColor && fillPolygon) {
+            paint = polygonFillPaint;
+        }
+
+        return paint;
+    }
+
+    /**
+     * Get the style paint from cache, or create and cache it
+     *
+     * @param style style row
+     * @return style paint
+     */
+    private Paint getStylePaint(StyleRow style) {
+
+        long styleId = style.getId();
+        Paint paint = stylePaintCache.get(styleId);
+
+        if (paint == null) {
+
+            mil.nga.geopackage.style.Color color = style.getColor();
+
+            paint = getStylePaint(styleId, color, Paint.Style.STROKE);
+
+        }
+
+        return paint;
+    }
+
+    /**
+     * Get the style fill paint from cache, or create and cache it
+     *
+     * @param style style row
+     * @return style paint
+     */
+    private Paint getStyleFillPaint(StyleRow style) {
+
+        long styleId = style.getId();
+        styleId = -styleId;
+
+        Paint paint = stylePaintCache.get(styleId);
+
+        if (paint == null) {
+
+            mil.nga.geopackage.style.Color color = style.getFillColor();
+
+            paint = getStylePaint(styleId, color, Style.FILL_AND_STROKE);
+
+        }
+
+        return paint;
+    }
+
+    /**
+     * Get the style paint from cache, or create and cache it
+     *
+     * @param styleId    style id
+     * @param color      color
+     * @param paintStyle paint style
+     * @return paint
+     */
+    private Paint getStylePaint(long styleId, mil.nga.geopackage.style.Color color, Style paintStyle) {
+
+        Paint paint = null;
+
+        Paint stylePaint = new Paint();
+        stylePaint.setAntiAlias(true);
+        stylePaint.setStyle(paintStyle);
+        stylePaint.setColor(color.getColorWithAlpha());
+
+        synchronized (stylePaintCache) {
+
+            paint = stylePaintCache.get(styleId);
+
+            if (paint == null) {
+                stylePaintCache.put(styleId, stylePaint);
+                paint = stylePaint;
+            }
+
+        }
+
+        return paint;
     }
 
     /**
