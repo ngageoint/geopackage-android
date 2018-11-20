@@ -162,6 +162,15 @@ public class StyleRow extends AttributesRow {
     }
 
     /**
+     * Check if the style has a color
+     *
+     * @return true if has a color
+     */
+    public boolean hasColor() {
+        return hasColor(getHexColor(), getOpacity());
+    }
+
+    /**
      * Get the color
      *
      * @return color
@@ -303,6 +312,15 @@ public class StyleRow extends AttributesRow {
     }
 
     /**
+     * Check if the style has a fill color
+     *
+     * @return true if has a fill color
+     */
+    public boolean hasFillColor() {
+        return hasColor(getFillHexColor(), getFillOpacity());
+    }
+
+    /**
      * Get the fill color
      *
      * @return fill color
@@ -428,6 +446,17 @@ public class StyleRow extends AttributesRow {
             }
         }
         return color;
+    }
+
+    /**
+     * Determine if a color exists from the hex color and opacity
+     *
+     * @param hexColor hex color
+     * @param opacity  opacity
+     * @return true if has a color
+     */
+    private boolean hasColor(String hexColor, Double opacity) {
+        return hexColor != null || opacity != null;
     }
 
     /**

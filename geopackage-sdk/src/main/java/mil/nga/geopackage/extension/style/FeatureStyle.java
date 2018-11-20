@@ -90,4 +90,22 @@ public class FeatureStyle {
         this.icon = icon;
     }
 
+    /**
+     * Check if the feature style has a style row
+     *
+     * @return true if has style row
+     */
+    public boolean hasStyle() {
+        return style != null;
+    }
+
+    /**
+     * Check if the feature style has an icon row
+     *
+     * @return true if has icon row
+     */
+    public boolean hasIcon() {
+        return icon != null;
+    }
+
 }
