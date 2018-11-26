@@ -20,6 +20,8 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.R;
 import mil.nga.geopackage.extension.style.FeatureStyle;
 import mil.nga.geopackage.extension.style.FeatureTableStyles;
+import mil.nga.geopackage.extension.style.IconCache;
+import mil.nga.geopackage.extension.style.IconRow;
 import mil.nga.geopackage.extension.style.StyleRow;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
@@ -43,8 +45,6 @@ import mil.nga.sf.util.GeometryUtils;
  * @author osbornb
  */
 public abstract class FeatureTiles {
-
-    // TODO styles
 
     /**
      * Default max number of feature style paints to maintain
@@ -142,6 +142,11 @@ public abstract class FeatureTiles {
      * Feature style paint, changed as needed
      */
     private LruCache<Long, Paint> stylePaintCache = new LruCache<>(DEFAULT_STYLE_PAINT_CACHE_SIZE);
+
+    /**
+     * Icon Cache
+     */
+    private IconCache iconCache = new IconCache();
 
     /**
      * Height overlapping pixels between tile images
@@ -387,6 +392,26 @@ public abstract class FeatureTiles {
     @TargetApi(21)
     public void setStylePaintCacheSize(int size) {
         stylePaintCache.resize(size);
+    }
+
+    /**
+     * Clear the icon cache
+     *
+     * @since 3.1.1
+     */
+    public void clearIconCache() {
+        iconCache.clear();
+    }
+
+    /**
+     * Set / resize the icon cache size
+     *
+     * @param size new size
+     * @since 3.1.1
+     */
+    @TargetApi(21)
+    public void setIconCacheSize(int size) {
+        iconCache.resize(size);
     }
 
     /**
@@ -945,6 +970,50 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Get the icon bitmap from the icon row
+     *
+     * @param iconRow icon row
+     * @return icon bitmap
+     */
+    protected Bitmap getIcon(IconRow iconRow) {
+        return iconCache.createIcon(iconRow, 1.0f);
+    }
+
+    /**
+     * Get the point paint for the feature style, or return the default paint
+     *
+     * @param featureStyle feature style
+     * @return paint
+     */
+    protected Paint getPointPaint(FeatureStyle featureStyle) {
+
+        Paint paint = getFeatureStylePaint(featureStyle, Paint.Style.FILL);
+
+        if (paint == null) {
+            paint = pointPaint;
+        }
+
+        return paint;
+    }
+
+    /**
+     * Get the line paint for the feature style, or return the default paint
+     *
+     * @param featureStyle feature style
+     * @return paint
+     */
+    protected Paint getLinePaint(FeatureStyle featureStyle) {
+
+        Paint paint = getFeatureStylePaint(featureStyle, Paint.Style.STROKE);
+
+        if (paint == null) {
+            paint = linePaint;
+        }
+
+        return paint;
+    }
+
+    /**
      * Get the polygon paint for the feature style, or return the default paint
      *
      * @param featureStyle feature style
@@ -952,18 +1021,7 @@ public abstract class FeatureTiles {
      */
     protected Paint getPolygonPaint(FeatureStyle featureStyle) {
 
-        Paint paint = null;
-
-        if (featureStyle != null) {
-
-            StyleRow style = featureStyle.getStyle();
-
-            if (style != null && style.hasColor()) {
-
-                paint = getStylePaint(style);
-
-            }
-        }
+        Paint paint = getFeatureStylePaint(featureStyle, Paint.Style.STROKE);
 
         if (paint == null) {
             paint = polygonPaint;
@@ -1005,12 +1063,38 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Get the feature style paint from cache, or create and cache it
+     *
+     * @param featureStyle feature style
+     * @param paintStyle   paint style
+     * @return feature style paint
+     */
+    private Paint getFeatureStylePaint(FeatureStyle featureStyle, Paint.Style paintStyle) {
+
+        Paint paint = null;
+
+        if (featureStyle != null) {
+
+            StyleRow style = featureStyle.getStyle();
+
+            if (style != null && style.hasColor()) {
+
+                paint = getStylePaint(style, paintStyle);
+
+            }
+        }
+
+        return paint;
+    }
+
+    /**
      * Get the style paint from cache, or create and cache it
      *
-     * @param style style row
+     * @param style      style row
+     * @param paintStyle paint style
      * @return style paint
      */
-    private Paint getStylePaint(StyleRow style) {
+    private Paint getStylePaint(StyleRow style, Paint.Style paintStyle) {
 
         long styleId = style.getId();
         Paint paint = stylePaintCache.get(styleId);
@@ -1019,7 +1103,7 @@ public abstract class FeatureTiles {
 
             mil.nga.geopackage.style.Color color = style.getColor();
 
-            paint = getStylePaint(styleId, color, Paint.Style.STROKE);
+            paint = getStylePaint(styleId, color, paintStyle);
 
         }
 
