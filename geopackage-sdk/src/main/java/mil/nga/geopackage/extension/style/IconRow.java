@@ -249,6 +249,19 @@ public class IconRow extends MediaRow {
     }
 
     /**
+     * Get the anchor u value or the default value of 0.5
+     *
+     * @return anchor u value
+     */
+    public double getAnchorUOrDefault() {
+        Double anchorU = getAnchorU();
+        if (anchorU == null) {
+            anchorU = 0.5;
+        }
+        return anchorU;
+    }
+
+    /**
      * Get the anchor v column index
      *
      * @return anchor v column index
@@ -285,6 +298,19 @@ public class IconRow extends MediaRow {
     public void setAnchorV(Double anchor) {
         validateAnchor(anchor);
         setValue(getAnchorVColumnIndex(), anchor);
+    }
+
+    /**
+     * Get the anchor v value or the default value of 1.0
+     *
+     * @return anchor v value
+     */
+    public double getAnchorVOrDefault() {
+        Double anchorV = getAnchorV();
+        if (anchorV == null) {
+            anchorV = 1.0;
+        }
+        return anchorV;
     }
 
     /**
