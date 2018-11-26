@@ -1,5 +1,6 @@
 package mil.nga.geopackage.extension.style;
 
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
@@ -108,6 +109,16 @@ public class IconCache {
      */
     public void clear() {
         iconCache.evictAll();
+    }
+
+    /**
+     * Resize the cache
+     *
+     * @param maxSize max size
+     */
+    @TargetApi(21)
+    public void resize(int maxSize) {
+        iconCache.resize(maxSize);
     }
 
     /**
