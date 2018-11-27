@@ -1793,4 +1793,104 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
         }
     }
 
+    /**
+     * Get all the unique style row ids the table maps to
+     *
+     * @param featureTable feature table
+     * @return style row ids
+     */
+    public List<Long> getAllTableStyleIds(FeatureTable featureTable) {
+        return getAllTableStyleIds(featureTable.getTableName());
+    }
+
+    /**
+     * Get all the unique style row ids the table maps to
+     *
+     * @param featureTable feature table
+     * @return style row ids
+     */
+    public List<Long> getAllTableStyleIds(String featureTable) {
+        List<Long> styleIds = null;
+        StyleMappingDao mappingDao = getTableStyleMappingDao(featureTable);
+        if (mappingDao != null) {
+            styleIds = mappingDao.uniqueRelatedIds();
+        }
+        return styleIds;
+    }
+
+    /**
+     * Get all the unique icon row ids the table maps to
+     *
+     * @param featureTable feature table
+     * @return icon row ids
+     */
+    public List<Long> getAllTableIconIds(FeatureTable featureTable) {
+        return getAllTableIconIds(featureTable.getTableName());
+    }
+
+    /**
+     * Get all the unique icon row ids the table maps to
+     *
+     * @param featureTable feature table
+     * @return icon row ids
+     */
+    public List<Long> getAllTableIconIds(String featureTable) {
+        List<Long> iconIds = null;
+        StyleMappingDao mappingDao = getTableIconMappingDao(featureTable);
+        if (mappingDao != null) {
+            iconIds = mappingDao.uniqueRelatedIds();
+        }
+        return iconIds;
+    }
+
+    /**
+     * Get all the unique style row ids the features map to
+     *
+     * @param featureTable feature table
+     * @return style row ids
+     */
+    public List<Long> getAllStyleIds(FeatureTable featureTable) {
+        return getAllStyleIds(featureTable.getTableName());
+    }
+
+    /**
+     * Get all the unique style row ids the features map to
+     *
+     * @param featureTable feature table
+     * @return style row ids
+     */
+    public List<Long> getAllStyleIds(String featureTable) {
+        List<Long> styleIds = null;
+        StyleMappingDao mappingDao = getStyleMappingDao(featureTable);
+        if (mappingDao != null) {
+            styleIds = mappingDao.uniqueRelatedIds();
+        }
+        return styleIds;
+    }
+
+    /**
+     * Get all the unique icon row ids the features map to
+     *
+     * @param featureTable feature table
+     * @return icon row ids
+     */
+    public List<Long> getAllIconIds(FeatureTable featureTable) {
+        return getAllIconIds(featureTable.getTableName());
+    }
+
+    /**
+     * Get all the unique icon row ids the features map to
+     *
+     * @param featureTable feature table
+     * @return icon row ids
+     */
+    public List<Long> getAllIconIds(String featureTable) {
+        List<Long> iconIds = null;
+        StyleMappingDao mappingDao = getIconMappingDao(featureTable);
+        if (mappingDao != null) {
+            iconIds = mappingDao.uniqueRelatedIds();
+        }
+        return iconIds;
+    }
+
 }

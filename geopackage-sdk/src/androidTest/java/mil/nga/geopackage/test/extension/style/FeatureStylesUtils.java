@@ -495,8 +495,7 @@ public class FeatureStylesUtils {
                     TestCase.assertEquals("image/"
                                     + TestConstants.ICON_POINT_IMAGE_EXTENSION,
                             typeIconRow.getContentType());
-                    Bitmap iconImage = BitmapConverter.toBitmap(typeIconRow
-                            .getData());
+                    Bitmap iconImage = typeIconRow.getDataBitmap();
                     TestCase.assertNotNull(iconImage);
                     TestCase.assertTrue(iconImage.getWidth() > 0);
                     TestCase.assertTrue(iconImage.getHeight() > 0);
@@ -745,9 +744,8 @@ public class FeatureStylesUtils {
         TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), TestConstants.ICON_POINT_IMAGE);
         String iconImage = TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), TestConstants.ICON_POINT_IMAGE);
         Bitmap iconBitmap = BitmapFactory.decodeFile(iconImage);
-        byte[] iconBytes = BitmapConverter.toBytes(iconBitmap, Bitmap.CompressFormat.PNG);
 
-        iconRow.setData(iconBytes);
+        iconRow.setData(iconBitmap, Bitmap.CompressFormat.PNG);
         iconRow.setContentType("image/"
                 + TestConstants.ICON_POINT_IMAGE_EXTENSION);
         if (Math.random() < .5) {

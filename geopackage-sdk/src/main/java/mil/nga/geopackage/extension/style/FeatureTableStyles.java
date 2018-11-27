@@ -1,5 +1,7 @@
 package mil.nga.geopackage.extension.style;
 
+import java.util.List;
+
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
@@ -1247,6 +1249,42 @@ public class FeatureTableStyles {
      */
     public void deleteIcon(long featureId, GeometryType geometryType) {
         featureStyleExtension.deleteIcon(tableName, featureId, geometryType);
+    }
+
+    /**
+     * Get all the unique style row ids the table maps to
+     *
+     * @return style row ids
+     */
+    public List<Long> getAllTableStyleIds() {
+        return featureStyleExtension.getAllTableStyleIds(tableName);
+    }
+
+    /**
+     * Get all the unique icon row ids the table maps to
+     *
+     * @return icon row ids
+     */
+    public List<Long> getAllTableIconIds() {
+        return featureStyleExtension.getAllTableIconIds(tableName);
+    }
+
+    /**
+     * Get all the unique style row ids the features map to
+     *
+     * @return style row ids
+     */
+    public List<Long> getAllStyleIds() {
+        return featureStyleExtension.getAllStyleIds(tableName);
+    }
+
+    /**
+     * Get all the unique icon row ids the features map to
+     *
+     * @return icon row ids
+     */
+    public List<Long> getAllIconIds() {
+        return featureStyleExtension.getAllIconIds(tableName);
     }
 
 }

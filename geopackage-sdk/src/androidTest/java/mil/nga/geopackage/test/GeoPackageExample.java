@@ -1595,9 +1595,8 @@ public class GeoPackageExample extends BaseTestCase {
         TestUtils.copyAssetFileToInternalStorage(activity, testContext, file);
         String mediaImageName = TestUtils.getAssetFileInternalStorageLocation(activity, file);
         Bitmap mediaImage = BitmapFactory.decodeFile(mediaImageName);
-        byte[] mediaData = BitmapConverter.toBytes(mediaImage, Bitmap.CompressFormat.PNG);
 
-        mediaRow.setData(mediaData);
+        mediaRow.setData(mediaImage, Bitmap.CompressFormat.PNG);
         mediaRow.setContentType(contentType);
         RelatedTablesUtils.populateUserRow(mediaDao.getTable(), mediaRow,
                 MediaTable.requiredColumns());
@@ -1877,16 +1876,11 @@ public class GeoPackageExample extends BaseTestCase {
         TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), TestConstants.ICON_POINT_IMAGE);
         String iconImage = TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), TestConstants.ICON_POINT_IMAGE);
         Bitmap iconBitmap = BitmapFactory.decodeFile(iconImage);
-        byte[] iconBytes = BitmapConverter.toBytes(iconBitmap, Bitmap.CompressFormat.PNG);
 
-        //File iconImageFile = TestUtils
-        //        .getTestFile(TestConstants.ICON_POINT_IMAGE);
-        //byte[] iconBytes = GeoPackageIOUtils.fileBytes(iconImageFile);
-        //BufferedImage iconImage = ImageUtils.getImage(iconBytes);
         IconRow icon = new IconRow();
         icon.setName("Icon 1");
         icon.setDescription("Icon 1");
-        icon.setData(iconBytes);
+        icon.setData(iconBitmap, Bitmap.CompressFormat.PNG);
         icon.setContentType("image/png");
         icon.setHeight(iconBitmap.getHeight() * .9);
         icon.setWidth(iconBitmap.getWidth() * .9);

@@ -6,8 +6,6 @@ import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.util.LruCache;
 
-import mil.nga.geopackage.io.BitmapConverter;
-
 /**
  * Icon Cache of icon bitmaps
  *
@@ -163,9 +161,7 @@ public class IconCache {
 
             if (iconImage == null) {
 
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inJustDecodeBounds = true;
-                BitmapFactory.decodeByteArray(icon.getData(), 0, icon.getData().length, options);
+                BitmapFactory.Options options = icon.getDataBounds();
                 int dataWidth = options.outWidth;
                 int dataHeight = options.outHeight;
 
@@ -197,8 +193,7 @@ public class IconCache {
                 options.inDensity = (int) (Math.min(widthDensity, heightDensity) + 0.5f);
                 options.inTargetDensity = (int) (DisplayMetrics.DENSITY_DEFAULT * density + 0.5f);
 
-                iconImage = BitmapConverter.toBitmap(icon
-                        .getData(), options);
+                iconImage = icon.getDataBitmap(options);
 
                 if (widthDensity != heightDensity) {
 

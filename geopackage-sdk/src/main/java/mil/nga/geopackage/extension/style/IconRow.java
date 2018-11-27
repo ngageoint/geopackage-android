@@ -1,5 +1,7 @@
 package mil.nga.geopackage.extension.style;
 
+import android.graphics.BitmapFactory;
+
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.extension.related.media.MediaRow;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
@@ -169,6 +171,22 @@ public class IconRow extends MediaRow {
     }
 
     /**
+     * Get the width or derived width from the icon data and scaled as needed for the height
+     *
+     * @return derived width
+     */
+    public double getDerivedWidth() {
+
+        Double width = getWidth();
+
+        if (width == null) {
+            width = getDerivedDimensions()[0];
+        }
+
+        return width;
+    }
+
+    /**
      * Get the height column index
      *
      * @return height column index
@@ -207,6 +225,60 @@ public class IconRow extends MediaRow {
                             + height);
         }
         setValue(getHeightColumnIndex(), height);
+    }
+
+    /**
+     * Get the height or derived height from the icon data and scaled as needed for the width
+     *
+     * @return derived height
+     */
+    public double getDerivedHeight() {
+
+        Double height = getHeight();
+
+        if (height == null) {
+            height = getDerivedDimensions()[1];
+        }
+
+        return height;
+    }
+
+    /**
+     * Get the derived width and height from the values and icon data, scaled as
+     * needed
+     *
+     * @return derived dimensions array with two values, width at index 0, height at index 1
+     */
+    public double[] getDerivedDimensions() {
+
+        Double width = getWidth();
+        Double height = getHeight();
+
+        if (width == null || height == null) {
+
+            BitmapFactory.Options options = getDataBounds();
+            int dataWidth = options.outWidth;
+            int dataHeight = options.outHeight;
+
+            if (width == null) {
+                width = (double) dataWidth;
+
+                if (height != null) {
+                    width *= (height / dataHeight);
+                }
+            }
+
+            if (height == null) {
+                height = (double) dataHeight;
+
+                if (width != null) {
+                    height *= (width / dataWidth);
+                }
+            }
+
+        }
+
+        return new double[]{width, height};
     }
 
     /**

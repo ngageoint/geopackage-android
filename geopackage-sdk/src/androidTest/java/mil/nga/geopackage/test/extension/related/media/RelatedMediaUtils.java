@@ -321,8 +321,7 @@ public class RelatedMediaUtils {
                     RelatedTablesUtils.validateUserRow(mediaColumns, mediaRow);
                     RelatedTablesUtils.validateDublinCoreColumns(mediaRow);
                     validateDublinCoreColumns(mediaRow);
-                    Bitmap image = BitmapConverter.toBitmap(mediaRow
-                            .getData());
+                    Bitmap image = mediaRow.getDataBitmap();
                     TestCase.assertNotNull(image);
                     TestCase.assertEquals(imageWidth, image.getWidth());
                     TestCase.assertEquals(imageHeight, image.getHeight());

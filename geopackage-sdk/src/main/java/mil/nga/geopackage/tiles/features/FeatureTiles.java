@@ -13,7 +13,9 @@ import android.util.LruCache;
 import org.osgeo.proj4j.units.Units;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
@@ -21,7 +23,9 @@ import mil.nga.geopackage.R;
 import mil.nga.geopackage.extension.style.FeatureStyle;
 import mil.nga.geopackage.extension.style.FeatureTableStyles;
 import mil.nga.geopackage.extension.style.IconCache;
+import mil.nga.geopackage.extension.style.IconDao;
 import mil.nga.geopackage.extension.style.IconRow;
+import mil.nga.geopackage.extension.style.StyleDao;
 import mil.nga.geopackage.extension.style.StyleRow;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
@@ -255,6 +259,7 @@ public abstract class FeatureTiles {
      * Determines the pixel overlap between tiles
      */
     public void calculateDrawOverlap() {
+
         if (pointIcon != null) {
             heightOverlap = pointIcon.getHeight();
             widthOverlap = pointIcon.getWidth();
@@ -270,6 +275,53 @@ public abstract class FeatureTiles {
         float polygonPaintHalfStroke = polygonPaint.getStrokeWidth() / 2.0f;
         heightOverlap = Math.max(heightOverlap, polygonPaintHalfStroke);
         widthOverlap = Math.max(widthOverlap, polygonPaintHalfStroke);
+
+        if (featureTableStyles != null && featureTableStyles.has()) {
+
+            // Style Rows
+            Set<Long> styleRowIds = new HashSet<>();
+            List<Long> tableStyleIds = featureTableStyles.getAllTableStyleIds();
+            if (tableStyleIds != null) {
+                styleRowIds.addAll(tableStyleIds);
+            }
+            List<Long> styleIds = featureTableStyles.getAllStyleIds();
+            if (styleIds != null) {
+                styleRowIds.addAll(styleIds);
+            }
+
+            StyleDao styleDao = featureTableStyles.getStyleDao();
+            for (long styleRowId : styleRowIds) {
+                StyleRow styleRow = styleDao.getRow(styleDao.queryForIdRow(styleRowId));
+                if (styleRow.getWidth() != null) {
+                    float styleHalfWidth = (float) (styleRow.getWidth() / 2.0f);
+                    widthOverlap = Math.max(widthOverlap, styleHalfWidth);
+                    heightOverlap = Math.max(heightOverlap, styleHalfWidth);
+                }
+            }
+
+            // Icon Rows
+            Set<Long> iconRowIds = new HashSet<>();
+            List<Long> tableIconIds = featureTableStyles.getAllTableIconIds();
+            if (tableIconIds != null) {
+                iconRowIds.addAll(tableIconIds);
+            }
+            List<Long> iconIds = featureTableStyles.getAllIconIds();
+            if (iconIds != null) {
+                iconRowIds.addAll(iconIds);
+            }
+
+            IconDao iconDao = featureTableStyles.getIconDao();
+            for (long iconRowId : iconRowIds) {
+                IconRow iconRow = iconDao.getRow(iconDao.queryForIdRow(iconRowId));
+                double[] iconDimensions = iconRow.getDerivedDimensions();
+                float iconWidth = (float) Math.ceil(iconDimensions[0]);
+                float iconHeight = (float) Math.ceil(iconDimensions[1]);
+                widthOverlap = Math.max(widthOverlap, iconWidth);
+                heightOverlap = Math.max(heightOverlap, iconHeight);
+            }
+
+        }
+
     }
 
     /**
@@ -809,7 +861,7 @@ public abstract class FeatureTiles {
      * @param webMercatorBoundingBox web mercator bounding box
      * @return bounding box
      */
-    protected BoundingBox expandBoundingBox(BoundingBox webMercatorBoundingBox) {
+    public BoundingBox expandBoundingBox(BoundingBox webMercatorBoundingBox) {
 
         // Create an expanded bounding box to handle features outside the tile
         // that overlap
@@ -1103,7 +1155,7 @@ public abstract class FeatureTiles {
 
             mil.nga.geopackage.style.Color color = style.getColor();
 
-            paint = getStylePaint(styleId, color, paintStyle);
+            paint = getStylePaint(styleId, color, style.getWidth(), paintStyle);
 
         }
 
@@ -1143,6 +1195,19 @@ public abstract class FeatureTiles {
      * @return paint
      */
     private Paint getStylePaint(long styleId, mil.nga.geopackage.style.Color color, Style paintStyle) {
+        return getStylePaint(styleId, color, null, paintStyle);
+    }
+
+    /**
+     * Get the style paint from cache, or create and cache it
+     *
+     * @param styleId    style id
+     * @param color      color
+     * @param width      stroke width
+     * @param paintStyle paint style
+     * @return paint
+     */
+    private Paint getStylePaint(long styleId, mil.nga.geopackage.style.Color color, Double width, Style paintStyle) {
 
         Paint paint = null;
 
@@ -1150,6 +1215,9 @@ public abstract class FeatureTiles {
         stylePaint.setAntiAlias(true);
         stylePaint.setStyle(paintStyle);
         stylePaint.setColor(color.getColorWithAlpha());
+        if (width != null) {
+            stylePaint.setStrokeWidth(width.floatValue());
+        }
 
         synchronized (stylePaintCache) {
 
