@@ -1,5 +1,8 @@
 package mil.nga.geopackage.extension.related;
 
+import java.util.List;
+
+import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomRow;
@@ -169,6 +172,30 @@ public class UserMappingDao extends UserCustomDao {
     public UserCustomCursor queryByIds(long baseId, long relatedId) {
         return query(buildWhereIds(baseId, relatedId),
                 buildWhereIdsArgs(baseId, relatedId));
+    }
+
+    /**
+     * Get the unique base ids
+     *
+     * @return list of unique base ids
+     * @since 3.1.1
+     */
+    public List<Long> uniqueBaseIds() {
+        return querySingleColumnTypedResults(
+                "SELECT DISTINCT " + CoreSQLUtils.quoteWrap(UserMappingTable.COLUMN_BASE_ID) + " FROM "
+                        + CoreSQLUtils.quoteWrap(getTableName()), null);
+    }
+
+    /**
+     * Get the unique related ids
+     *
+     * @return list of unique related ids
+     * @since 3.1.1
+     */
+    public List<Long> uniqueRelatedIds() {
+        return querySingleColumnTypedResults(
+                "SELECT DISTINCT " + CoreSQLUtils.quoteWrap(UserMappingTable.COLUMN_RELATED_ID) + " FROM "
+                        + CoreSQLUtils.quoteWrap(getTableName()), null);
     }
 
     /**
