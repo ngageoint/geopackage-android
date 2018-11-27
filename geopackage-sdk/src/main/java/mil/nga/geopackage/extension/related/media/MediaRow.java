@@ -1,5 +1,11 @@
 package mil.nga.geopackage.extension.related.media;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.IOException;
+
+import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.user.custom.UserCustomRow;
 
@@ -108,6 +114,74 @@ public class MediaRow extends UserCustomRow {
      */
     public void setData(byte[] data) {
         setValue(getDataColumnIndex(), data);
+    }
+
+    /**
+     * Read the data bounds without allocating pixel memory.
+     * Access values using:
+     * {@link BitmapFactory.Options#outWidth},
+     * {@link BitmapFactory.Options#outHeight},
+     * {@link BitmapFactory.Options#outMimeType},
+     * {@link BitmapFactory.Options#outColorSpace},
+     * and {@link BitmapFactory.Options#outConfig}
+     *
+     * @return bounds options
+     * @since 3.1.1
+     */
+    public BitmapFactory.Options getDataBounds() {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        byte[] data = getData();
+        BitmapFactory.decodeByteArray(data, 0, data.length, options);
+        return options;
+    }
+
+    /**
+     * Get the data bitmap
+     *
+     * @return data bitmap
+     * @since 3.1.1
+     */
+    public Bitmap getDataBitmap() {
+        return getDataBitmap(null);
+    }
+
+    /**
+     * Get the data bitmap with decoding options
+     *
+     * @param options bitmap options
+     * @return data bitmap
+     * @since 3.1.1
+     */
+    public Bitmap getDataBitmap(BitmapFactory.Options options) {
+        return BitmapConverter.toBitmap(getData(), options);
+    }
+
+    /**
+     * Set the data from a full quality bitmap
+     *
+     * @param bitmap bitmap
+     * @param format compress format
+     * @throws IOException upon failure
+     * @since 3.1.1
+     */
+    public void setData(Bitmap bitmap, Bitmap.CompressFormat format)
+            throws IOException {
+        setData(bitmap, format, 100);
+    }
+
+    /**
+     * Set the data from a bitmap
+     *
+     * @param bitmap  bitmap
+     * @param format  compress format
+     * @param quality quality
+     * @throws IOException upon failure
+     * @since 3.1.1
+     */
+    public void setData(Bitmap bitmap, Bitmap.CompressFormat format, int quality)
+            throws IOException {
+        setData(BitmapConverter.toBytes(bitmap, format, quality));
     }
 
     /**
