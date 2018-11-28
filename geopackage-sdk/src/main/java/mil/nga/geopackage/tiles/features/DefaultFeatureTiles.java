@@ -81,9 +81,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
     @Override
     public Bitmap drawTile(int zoom, BoundingBox boundingBox, FeatureIndexResults results) {
 
-        // Create bitmap and canvas
-        Bitmap bitmap = createNewBitmap();
-        Canvas canvas = new Canvas(bitmap);
+        FeatureTileCanvas canvas = new FeatureTileCanvas(tileWidth, tileHeight);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
         BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
@@ -94,10 +92,13 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 drawn = true;
             }
         }
+        results.close();
 
-        if (!drawn) {
-            bitmap.recycle();
-            bitmap = null;
+        Bitmap bitmap = null;
+        if (drawn) {
+            bitmap = canvas.createBitmap();
+        } else {
+            canvas.recycle();
         }
 
         return bitmap;
@@ -109,8 +110,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
     @Override
     public Bitmap drawTile(int zoom, BoundingBox boundingBox, FeatureCursor cursor) {
 
-        Bitmap bitmap = createNewBitmap();
-        Canvas canvas = new Canvas(bitmap);
+        FeatureTileCanvas canvas = new FeatureTileCanvas(tileWidth, tileHeight);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
         BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
@@ -122,11 +122,13 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 drawn = true;
             }
         }
-
         cursor.close();
-        if (!drawn) {
-            bitmap.recycle();
-            bitmap = null;
+
+        Bitmap bitmap = null;
+        if (drawn) {
+            bitmap = canvas.createBitmap();
+        } else {
+            canvas.recycle();
         }
 
         return bitmap;
@@ -138,8 +140,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
     @Override
     public Bitmap drawTile(int zoom, BoundingBox boundingBox, List<FeatureRow> featureRow) {
 
-        Bitmap bitmap = createNewBitmap();
-        Canvas canvas = new Canvas(bitmap);
+        FeatureTileCanvas canvas = new FeatureTileCanvas(tileWidth, tileHeight);
 
         ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
         BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
@@ -151,9 +152,11 @@ public class DefaultFeatureTiles extends FeatureTiles {
             }
         }
 
-        if (!drawn) {
-            bitmap.recycle();
-            bitmap = null;
+        Bitmap bitmap = null;
+        if (drawn) {
+            bitmap = canvas.createBitmap();
+        } else {
+            canvas.recycle();
         }
 
         return bitmap;
@@ -166,11 +169,11 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param boundingBox         bounding box
      * @param expandedBoundingBox expanded bounding box
      * @param transform           projection transform
-     * @param canvas              canvas to draw on
+     * @param canvas              feature tile canvas
      * @param row                 feature row
      * @return true if at least one feature was drawn
      */
-    private boolean drawFeature(int zoom, BoundingBox boundingBox, BoundingBox expandedBoundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow row) {
+    private boolean drawFeature(int zoom, BoundingBox boundingBox, BoundingBox expandedBoundingBox, ProjectionTransform transform, FeatureTileCanvas canvas, FeatureRow row) {
 
         boolean drawn = false;
 
@@ -207,11 +210,11 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param simplifyTolerance simplify tolerance in meters
      * @param boundingBox       bounding box
      * @param transform         projection transform
-     * @param canvas            draw canvas
+     * @param canvas            feature tile canvas
      * @param featureRow        feature row
      * @param geometry          feature geometry
      */
-    private void drawShape(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, FeatureRow featureRow, Geometry geometry) {
+    private void drawShape(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, FeatureTileCanvas canvas, FeatureRow featureRow, Geometry geometry) {
 
         GeometryType geometryType = geometry.getGeometryType();
         FeatureStyle featureStyle = getFeatureStyle(featureRow, geometryType);
@@ -296,10 +299,12 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param path         path
      * @param featureStyle feature style
      */
-    private void drawLinePath(Canvas canvas, Path path, FeatureStyle featureStyle) {
+    private void drawLinePath(FeatureTileCanvas canvas, Path path, FeatureStyle featureStyle) {
+
+        Canvas lineCanvas = canvas.getLineCanvas();
 
         Paint pathPaint = getLinePaint(featureStyle);
-        canvas.drawPath(path, pathPaint);
+        lineCanvas.drawPath(path, pathPaint);
 
     }
 
@@ -310,15 +315,17 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param path         path
      * @param featureStyle feature style
      */
-    private void drawPolygonPath(Canvas canvas, Path path, FeatureStyle featureStyle) {
+    private void drawPolygonPath(FeatureTileCanvas canvas, Path path, FeatureStyle featureStyle) {
+
+        Canvas polygonCanvas = canvas.getPolygonCanvas();
 
         Paint pathPaint = getPolygonPaint(featureStyle);
-        canvas.drawPath(path, pathPaint);
+        polygonCanvas.drawPath(path, pathPaint);
 
         Paint fillPaint = getPolygonFillPaint(featureStyle);
         if (fillPaint != null) {
             path.setFillType(Path.FillType.EVEN_ODD);
-            canvas.drawPath(path, fillPaint);
+            polygonCanvas.drawPath(path, fillPaint);
         }
 
     }
@@ -427,7 +434,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param point        point
      * @param featureStyle feature style
      */
-    private void drawPoint(BoundingBox boundingBox, ProjectionTransform transform, Canvas canvas, Point point, FeatureStyle featureStyle) {
+    private void drawPoint(BoundingBox boundingBox, ProjectionTransform transform, FeatureTileCanvas canvas, Point point, FeatureStyle featureStyle) {
 
         Point webMercatorPoint = getPoint(transform, point);
         float x = TileBoundingBoxUtils.getXPixel(tileWidth, boundingBox,
@@ -455,14 +462,16 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
                 RectF destination = new RectF(left, top, right, bottom);
 
-                canvas.drawBitmap(icon, null, destination, pointPaint);
+                Canvas iconCanvas = canvas.getIconCanvas();
+                iconCanvas.drawBitmap(icon, null, destination, pointPaint);
 
             }
 
         } else if (pointIcon != null) {
 
             if (x >= 0 - pointIcon.getWidth() && x <= tileWidth + pointIcon.getWidth() && y >= 0 - pointIcon.getHeight() && y <= tileHeight + pointIcon.getHeight()) {
-                canvas.drawBitmap(pointIcon.getIcon(), x - pointIcon.getXOffset(), y - pointIcon.getYOffset(), pointPaint);
+                Canvas iconCanvas = canvas.getIconCanvas();
+                iconCanvas.drawBitmap(pointIcon.getIcon(), x - pointIcon.getXOffset(), y - pointIcon.getYOffset(), pointPaint);
             }
 
         } else {
@@ -479,7 +488,8 @@ public class DefaultFeatureTiles extends FeatureTiles {
             }
             if (x >= 0 - radius && x <= tileWidth + radius && y >= 0 - radius && y <= tileHeight + radius) {
                 Paint featurePointPaint = getPointPaint(featureStyle);
-                canvas.drawCircle(x, y, radius, featurePointPaint);
+                Canvas pointCanvas = canvas.getPointCanvas();
+                pointCanvas.drawCircle(x, y, radius, featurePointPaint);
             }
 
         }

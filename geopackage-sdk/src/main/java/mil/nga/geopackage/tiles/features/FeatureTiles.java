@@ -93,7 +93,7 @@ public abstract class FeatureTiles {
     protected FeatureTableStyles featureTableStyles;
 
     /**
-     * Tile height
+     * Tile width
      */
     protected int tileWidth;
 
