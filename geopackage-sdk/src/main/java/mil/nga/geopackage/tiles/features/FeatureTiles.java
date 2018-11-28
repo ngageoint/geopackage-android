@@ -292,11 +292,9 @@ public abstract class FeatureTiles {
             StyleDao styleDao = featureTableStyles.getStyleDao();
             for (long styleRowId : styleRowIds) {
                 StyleRow styleRow = styleDao.getRow(styleDao.queryForIdRow(styleRowId));
-                if (styleRow.getWidth() != null) {
-                    float styleHalfWidth = (float) (styleRow.getWidth() / 2.0f);
-                    widthOverlap = Math.max(widthOverlap, styleHalfWidth);
-                    heightOverlap = Math.max(heightOverlap, styleHalfWidth);
-                }
+                float styleHalfWidth = (float) (styleRow.getWidthOrDefault() / 2.0f);
+                widthOverlap = Math.max(widthOverlap, styleHalfWidth);
+                heightOverlap = Math.max(heightOverlap, styleHalfWidth);
             }
 
             // Icon Rows
@@ -1153,9 +1151,7 @@ public abstract class FeatureTiles {
 
         if (paint == null) {
 
-            mil.nga.geopackage.style.Color color = style.getColor();
-
-            paint = getStylePaint(styleId, color, style.getWidth(), paintStyle);
+            paint = getStylePaint(styleId, style.getColorOrDefault(), style.getWidthOrDefault(), paintStyle);
 
         }
 

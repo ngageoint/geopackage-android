@@ -471,10 +471,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
             if (featureStyle != null) {
                 StyleRow styleRow = featureStyle.getStyle();
                 if (styleRow != null) {
-                    Double styleWidth = styleRow.getWidth();
-                    if (styleWidth != null) {
-                        radius = styleWidth.floatValue() / 2.0f;
-                    }
+                    radius = (float) (styleRow.getWidthOrDefault() / 2.0f);
                 }
             }
             if (radius == null) {

@@ -206,6 +206,32 @@ public class StyleRow extends AttributesRow {
     }
 
     /**
+     * Get the color or default value
+     *
+     * @return color
+     */
+    public Color getColorOrDefault() {
+        Color color = getColor();
+        if (color == null) {
+            color = new Color();
+        }
+        return color;
+    }
+
+    /**
+     * Get the color or default value
+     *
+     * @return color
+     */
+    public String getHexColorOrDefault() {
+        String color = getHexColor();
+        if (color == null) {
+            color = "#000000";
+        }
+        return color;
+    }
+
+    /**
      * Get the opacity column index
      *
      * @return opacity column index
@@ -240,6 +266,19 @@ public class StyleRow extends AttributesRow {
     public void setOpacity(Double opacity) {
         validateOpacity(opacity);
         setValue(getOpacityColumnIndex(), opacity);
+    }
+
+    /**
+     * Get the opacity or default value
+     *
+     * @return opacity
+     */
+    public double getOpacityOrDefault() {
+        Double opacity = getOpacity();
+        if (opacity == null) {
+            opacity = 1.0;
+        }
+        return opacity;
     }
 
     /**
@@ -282,6 +321,19 @@ public class StyleRow extends AttributesRow {
                             + width);
         }
         setValue(getWidthColumnIndex(), width);
+    }
+
+    /**
+     * Get the width value or default width
+     *
+     * @return width
+     */
+    public double getWidthOrDefault() {
+        Double width = getWidth();
+        if (width == null) {
+            width = 1.0;
+        }
+        return width;
     }
 
     /**
@@ -391,6 +443,19 @@ public class StyleRow extends AttributesRow {
     public void setFillOpacity(Double fillOpacity) {
         validateOpacity(fillOpacity);
         setValue(getFillOpacityColumnIndex(), fillOpacity);
+    }
+
+    /**
+     * Get the fill opacity or default value
+     *
+     * @return fill opacity
+     */
+    public double getFillOpacityOrDefault() {
+        Double fillOpacity = getFillOpacity();
+        if (fillOpacity == null) {
+            fillOpacity = 1.0;
+        }
+        return fillOpacity;
     }
 
     /**
