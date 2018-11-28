@@ -515,45 +515,75 @@ public class GeoPackageExample extends BaseTestCase {
 
         geoPackage.createGeometryColumnsTable();
 
-        Point point1 = new Point(-104.801918, 39.720014);
-        String point1Name = "BIT Systems";
+        createFeatures1(geoPackage, srs);
+        createFeatures2(geoPackage, srs);
 
-        createFeatures(geoPackage, srs, "point1", GeometryType.POINT, point1,
-                point1Name);
+    }
 
-        Point point2 = new Point(-77.196736, 38.753370);
-        String point2Name = "NGA";
+    private static void createFeatures1(GeoPackage geoPackage,
+                                        SpatialReferenceSystem srs) throws SQLException {
 
-        createFeatures(geoPackage, srs, "point2", GeometryType.POINT, point2,
-                point2Name);
+        List<Geometry> points = new ArrayList<>();
+        List<String> pointNames = new ArrayList<>();
+
+        points.add(new Point(-104.801918, 39.720014));
+        pointNames.add("BIT Systems");
+
+        points.add(new Point(-104.802987, 39.717703));
+        pointNames.add("Community College of Aurora CentreTech Campus");
+
+        points.add(new Point(-104.807496, 39.714085));
+        pointNames.add("DeLaney Community Farm");
+
+        points.add(new Point(-104.799480, 39.714729));
+        pointNames.add("Centre Hills Disc Golf Course");
+
+        createFeatures(geoPackage, srs, "point1", GeometryType.POINT, points,
+                pointNames);
+
+        List<Geometry> lines = new ArrayList<>();
+        List<String> lineNames = new ArrayList<>();
 
         LineString line1 = new LineString();
-        String line1Name = "East Lockheed Drive";
         line1.addPoint(new Point(-104.800614, 39.720721));
         line1.addPoint(new Point(-104.802174, 39.720726));
         line1.addPoint(new Point(-104.802584, 39.720660));
         line1.addPoint(new Point(-104.803088, 39.720477));
         line1.addPoint(new Point(-104.803474, 39.720209));
 
-        createFeatures(geoPackage, srs, "line1", GeometryType.LINESTRING,
-                line1, line1Name);
+        lines.add(line1);
+        lineNames.add("East Lockheed Drive");
 
         LineString line2 = new LineString();
-        String line2Name = "NGA";
-        line2.addPoint(new Point(-77.196650, 38.756501));
-        line2.addPoint(new Point(-77.196414, 38.755979));
-        line2.addPoint(new Point(-77.195518, 38.755208));
-        line2.addPoint(new Point(-77.195303, 38.755272));
-        line2.addPoint(new Point(-77.195351, 38.755459));
-        line2.addPoint(new Point(-77.195863, 38.755697));
-        line2.addPoint(new Point(-77.196328, 38.756069));
-        line2.addPoint(new Point(-77.196568, 38.756526));
+        line2.addPoint(new Point(-104.809612, 39.718379));
+        line2.addPoint(new Point(-104.806638, 39.718372));
+        line2.addPoint(new Point(-104.806236, 39.718439));
+        line2.addPoint(new Point(-104.805939, 39.718536));
+        line2.addPoint(new Point(-104.805654, 39.718677));
+        line2.addPoint(new Point(-104.803652, 39.720095));
 
-        createFeatures(geoPackage, srs, "line2", GeometryType.LINESTRING,
-                line2, line2Name);
+        lines.add(line2);
+        lineNames.add("E 1st Ave");
+
+        LineString line3 = new LineString();
+        line3.addPoint(new Point(-104.806344, 39.722425));
+        line3.addPoint(new Point(-104.805854, 39.722634));
+        line3.addPoint(new Point(-104.805656, 39.722647));
+        line3.addPoint(new Point(-104.803749, 39.722641));
+        line3.addPoint(new Point(-104.803769, 39.721849));
+        line3.addPoint(new Point(-104.803806, 39.721725));
+        line3.addPoint(new Point(-104.804382, 39.720865));
+
+        lines.add(line3);
+        lineNames.add("E Centretech Cir");
+
+        createFeatures(geoPackage, srs, "line1", GeometryType.LINESTRING,
+                lines, lineNames);
+
+        List<Geometry> polygons = new ArrayList<>();
+        List<String> polygonNames = new ArrayList<>();
 
         Polygon polygon1 = new Polygon();
-        String polygon1Name = "BIT Systems";
         LineString ring1 = new LineString();
         ring1.addPoint(new Point(-104.802246, 39.720343));
         ring1.addPoint(new Point(-104.802246, 39.719753));
@@ -571,59 +601,163 @@ public class GeoPackageExample extends BaseTestCase {
         ring1.addPoint(new Point(-104.802246, 39.720343));
         polygon1.addRing(ring1);
 
-        createFeatures(geoPackage, srs, "polygon1", GeometryType.POLYGON,
-                polygon1, polygon1Name);
+        polygons.add(polygon1);
+        polygonNames.add("BIT Systems");
 
         Polygon polygon2 = new Polygon();
-        String polygon2Name = "NGA Visitor Center";
+
         LineString ring2 = new LineString();
-        ring2.addPoint(new Point(-77.195299, 38.755159));
-        ring2.addPoint(new Point(-77.195203, 38.755080));
-        ring2.addPoint(new Point(-77.195410, 38.754930));
-        ring2.addPoint(new Point(-77.195350, 38.754884));
-        ring2.addPoint(new Point(-77.195228, 38.754966));
-        ring2.addPoint(new Point(-77.195135, 38.754889));
-        ring2.addPoint(new Point(-77.195048, 38.754956));
-        ring2.addPoint(new Point(-77.194986, 38.754906));
-        ring2.addPoint(new Point(-77.194897, 38.754976));
-        ring2.addPoint(new Point(-77.194953, 38.755025));
-        ring2.addPoint(new Point(-77.194763, 38.755173));
-        ring2.addPoint(new Point(-77.194827, 38.755224));
-        ring2.addPoint(new Point(-77.195012, 38.755082));
-        ring2.addPoint(new Point(-77.195041, 38.755104));
-        ring2.addPoint(new Point(-77.195028, 38.755116));
-        ring2.addPoint(new Point(-77.195090, 38.755167));
-        ring2.addPoint(new Point(-77.195106, 38.755154));
-        ring2.addPoint(new Point(-77.195205, 38.755233));
-        ring2.addPoint(new Point(-77.195299, 38.755159));
+        ring2.addPoint(new Point(-104.802259, 39.719604));
+        ring2.addPoint(new Point(-104.802260, 39.719550));
+        ring2.addPoint(new Point(-104.802281, 39.719416));
+        ring2.addPoint(new Point(-104.802332, 39.719372));
+        ring2.addPoint(new Point(-104.802081, 39.719240));
+        ring2.addPoint(new Point(-104.802044, 39.719290));
+        ring2.addPoint(new Point(-104.802027, 39.719278));
+        ring2.addPoint(new Point(-104.802044, 39.719229));
+        ring2.addPoint(new Point(-104.801785, 39.719129));
+        ring2.addPoint(new Point(-104.801639, 39.719413));
+        ring2.addPoint(new Point(-104.801649, 39.719472));
+        ring2.addPoint(new Point(-104.801694, 39.719524));
+        ring2.addPoint(new Point(-104.801753, 39.719550));
+        ring2.addPoint(new Point(-104.801750, 39.719606));
+        ring2.addPoint(new Point(-104.801940, 39.719606));
+        ring2.addPoint(new Point(-104.801939, 39.719555));
+        ring2.addPoint(new Point(-104.801977, 39.719556));
+        ring2.addPoint(new Point(-104.801979, 39.719606));
+        ring2.addPoint(new Point(-104.802259, 39.719604));
         polygon2.addRing(ring2);
 
-        createFeatures(geoPackage, srs, "polygon2", GeometryType.POLYGON,
-                polygon2, polygon2Name);
+        LineString hole2 = new LineString();
+        hole2.addPoint(new Point(-104.802130, 39.719440));
+        hole2.addPoint(new Point(-104.802133, 39.719490));
+        hole2.addPoint(new Point(-104.802148, 39.719490));
+        hole2.addPoint(new Point(-104.802180, 39.719473));
+        hole2.addPoint(new Point(-104.802187, 39.719456));
+        hole2.addPoint(new Point(-104.802182, 39.719439));
+        hole2.addPoint(new Point(-104.802088, 39.719387));
+        hole2.addPoint(new Point(-104.802047, 39.719427));
+        hole2.addPoint(new Point(-104.801858, 39.719342));
+        hole2.addPoint(new Point(-104.801883, 39.719294));
+        hole2.addPoint(new Point(-104.801832, 39.719284));
+        hole2.addPoint(new Point(-104.801787, 39.719298));
+        hole2.addPoint(new Point(-104.801763, 39.719331));
+        hole2.addPoint(new Point(-104.801823, 39.719352));
+        hole2.addPoint(new Point(-104.801790, 39.719420));
+        hole2.addPoint(new Point(-104.801722, 39.719404));
+        hole2.addPoint(new Point(-104.801715, 39.719445));
+        hole2.addPoint(new Point(-104.801748, 39.719484));
+        hole2.addPoint(new Point(-104.801809, 39.719494));
+        hole2.addPoint(new Point(-104.801816, 39.719439));
+        hole2.addPoint(new Point(-104.802130, 39.719440));
+        polygon2.addRing(hole2);
 
-        List<Geometry> geometries1 = new ArrayList<>();
-        List<String> geometries1Names = new ArrayList<>();
-        geometries1.add(point1);
-        geometries1Names.add(point1Name);
-        geometries1.add(line1);
-        geometries1Names.add(line1Name);
-        geometries1.add(polygon1);
-        geometries1Names.add(polygon1Name);
+        polygons.add(polygon2);
+        polygonNames.add("BIT Systems Visitor Parking");
+
+        Polygon polygon3 = new Polygon();
+        LineString ring3 = new LineString();
+        ring3.addPoint(new Point(-104.802867, 39.718122));
+        ring3.addPoint(new Point(-104.802369, 39.717845));
+        ring3.addPoint(new Point(-104.802571, 39.717630));
+        ring3.addPoint(new Point(-104.803066, 39.717909));
+        ring3.addPoint(new Point(-104.802867, 39.718122));
+        polygon3.addRing(ring3);
+
+        polygons.add(polygon3);
+        polygonNames.add("CCA Administration Building");
+
+        createFeatures(geoPackage, srs, "polygon1", GeometryType.POLYGON,
+                polygons, polygonNames);
+
+        List<Geometry> geometries = new ArrayList<>();
+        List<String> geometryNames = new ArrayList<>();
+        geometries.addAll(points);
+        geometryNames.addAll(pointNames);
+        geometries.addAll(lines);
+        geometryNames.addAll(lineNames);
+        geometries.addAll(polygons);
+        geometryNames.addAll(polygonNames);
 
         createFeatures(geoPackage, srs, "geometry1", GeometryType.GEOMETRY,
-                geometries1, geometries1Names);
+                geometries, geometryNames);
 
-        List<Geometry> geometries2 = new ArrayList<>();
-        List<String> geometries2Names = new ArrayList<>();
-        geometries2.add(point2);
-        geometries2Names.add(point2Name);
-        geometries2.add(line2);
-        geometries2Names.add(line2Name);
-        geometries2.add(polygon2);
-        geometries2Names.add(polygon2Name);
+    }
+
+    private static void createFeatures2(GeoPackage geoPackage,
+                                        SpatialReferenceSystem srs) throws SQLException {
+
+        List<Geometry> points = new ArrayList<>();
+        List<String> pointNames = new ArrayList<>();
+
+        points.add(new Point(-77.196736, 38.753370));
+        pointNames.add("NGA");
+
+        createFeatures(geoPackage, srs, "point2", GeometryType.POINT, points,
+                pointNames);
+
+        List<Geometry> lines = new ArrayList<>();
+        List<String> lineNames = new ArrayList<>();
+
+        LineString line1 = new LineString();
+        line1.addPoint(new Point(-77.196650, 38.756501));
+        line1.addPoint(new Point(-77.196414, 38.755979));
+        line1.addPoint(new Point(-77.195518, 38.755208));
+        line1.addPoint(new Point(-77.195303, 38.755272));
+        line1.addPoint(new Point(-77.195351, 38.755459));
+        line1.addPoint(new Point(-77.195863, 38.755697));
+        line1.addPoint(new Point(-77.196328, 38.756069));
+        line1.addPoint(new Point(-77.196568, 38.756526));
+
+        lines.add(line1);
+        lineNames.add("NGA");
+
+        createFeatures(geoPackage, srs, "line2", GeometryType.LINESTRING,
+                lines, lineNames);
+
+        List<Geometry> polygons = new ArrayList<>();
+        List<String> polygonNames = new ArrayList<>();
+
+        Polygon polygon1 = new Polygon();
+        LineString ring1 = new LineString();
+        ring1.addPoint(new Point(-77.195299, 38.755159));
+        ring1.addPoint(new Point(-77.195203, 38.755080));
+        ring1.addPoint(new Point(-77.195410, 38.754930));
+        ring1.addPoint(new Point(-77.195350, 38.754884));
+        ring1.addPoint(new Point(-77.195228, 38.754966));
+        ring1.addPoint(new Point(-77.195135, 38.754889));
+        ring1.addPoint(new Point(-77.195048, 38.754956));
+        ring1.addPoint(new Point(-77.194986, 38.754906));
+        ring1.addPoint(new Point(-77.194897, 38.754976));
+        ring1.addPoint(new Point(-77.194953, 38.755025));
+        ring1.addPoint(new Point(-77.194763, 38.755173));
+        ring1.addPoint(new Point(-77.194827, 38.755224));
+        ring1.addPoint(new Point(-77.195012, 38.755082));
+        ring1.addPoint(new Point(-77.195041, 38.755104));
+        ring1.addPoint(new Point(-77.195028, 38.755116));
+        ring1.addPoint(new Point(-77.195090, 38.755167));
+        ring1.addPoint(new Point(-77.195106, 38.755154));
+        ring1.addPoint(new Point(-77.195205, 38.755233));
+        ring1.addPoint(new Point(-77.195299, 38.755159));
+        polygon1.addRing(ring1);
+
+        polygons.add(polygon1);
+        polygonNames.add("NGA Visitor Center");
+
+        createFeatures(geoPackage, srs, "polygon2", GeometryType.POLYGON,
+                polygons, polygonNames);
+
+        List<Geometry> geometries = new ArrayList<>();
+        List<String> geometryNames = new ArrayList<>();
+        geometries.addAll(points);
+        geometryNames.addAll(pointNames);
+        geometries.addAll(lines);
+        geometryNames.addAll(lineNames);
+        geometries.addAll(polygons);
+        geometryNames.addAll(polygonNames);
 
         createFeatures(geoPackage, srs, "geometry2", GeometryType.GEOMETRY,
-                geometries2, geometries2Names);
+                geometries, geometryNames);
 
     }
 
@@ -1851,57 +1985,155 @@ public class GeoPackageExample extends BaseTestCase {
     private static void createFeatureStyleExtension(GeoPackage geoPackage)
             throws IOException, NameNotFoundException {
 
-        Color color1 = new Color(ColorConstants.BLUE);
-        Color color2 = new Color(255, 0, 0, .4f);
-        Color color3 = new Color(0x000000);
+        List<StyleRow> styles = new ArrayList<>();
 
         StyleRow style1 = new StyleRow();
-        style1.setName("Style 1");
-        style1.setDescription("Style 1");
+        style1.setName("Green");
+        style1.setDescription("Green Style");
         style1.setColor(ColorConstants.GREEN);
         style1.setWidth(2.0);
+        styles.add(style1);
 
         StyleRow style2 = new StyleRow();
-        style2.setName("Style 2");
-        style2.setDescription("Style 2");
-        style2.setColor(color1);
-        style2.setWidth(1.5);
-        style2.setFillColor(color2);
+        style2.setName("Blue with Red Fill");
+        style2.setDescription("Blue with Red Fill Style");
+        style2.setColor(new Color(ColorConstants.BLUE));
+        style2.setFillColor(new Color(255, 0, 0, .4f));
+        styles.add(style2);
 
         StyleRow style3 = new StyleRow();
-        style3.setName("Style 3");
-        style3.setDescription("Style 3");
-        style3.setColor(color3);
+        style3.setName("Orange");
+        style3.setDescription("Orange Style");
+        style3.setColor(new Color(0xFFA500));
+        style3.setWidth(6.5);
+        styles.add(style3);
 
-        TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), TestConstants.ICON_POINT_IMAGE);
-        String iconImage = TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), TestConstants.ICON_POINT_IMAGE);
-        Bitmap iconBitmap = BitmapFactory.decodeFile(iconImage);
+        StyleRow style4 = new StyleRow();
+        style4.setName("Violet with Yellow Fill");
+        style4.setDescription("Violet with Yellow Fill Style");
+        style4.setColor(new Color(138, 43, 226));
+        style4.setWidth(4.1);
+        style4.setFillColor(new Color(new float[]{61, .89f, .72f}, .3f));
+        styles.add(style4);
 
-        IconRow icon = new IconRow();
-        icon.setName("Icon 1");
-        icon.setDescription("Icon 1");
-        icon.setData(iconBitmap, Bitmap.CompressFormat.PNG);
-        icon.setContentType("image/png");
-        icon.setHeight(iconBitmap.getHeight() * .9);
-        icon.setWidth(iconBitmap.getWidth() * .9);
-        icon.setAnchorU(0.5);
-        icon.setAnchorV(1.0);
+        List<IconRow> icons = new ArrayList<>();
 
+        TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), "building.png");
+        IconRow icon1 = new IconRow();
+        icon1.setName("Building");
+        icon1.setDescription("Building Icon");
+        icon1.setData(BitmapFactory.decodeFile(
+                TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "building.png")),
+                Bitmap.CompressFormat.PNG);
+        icon1.setContentType("image/png");
+        icon1.setWidth(32.0);
+        icon1.setAnchorU(0.5);
+        icon1.setAnchorV(1.0);
+        icons.add(icon1);
+
+        TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), "college.png");
+        IconRow icon2 = new IconRow();
+        icon2.setName("College");
+        icon2.setDescription("College Icon");
+        icon2.setData(BitmapFactory.decodeFile(
+                TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "college.png")),
+                Bitmap.CompressFormat.PNG);
+        icon2.setContentType("image/png");
+        icon2.setWidth(32.0);
+        icon2.setHeight(44.0);
+        icons.add(icon2);
+
+        TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), "tractor.png");
+        IconRow icon3 = new IconRow();
+        icon3.setName("Tractor");
+        icon3.setDescription("Tractor Icon");
+        icon3.setData(BitmapFactory.decodeFile(
+                TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "tractor.png")),
+                Bitmap.CompressFormat.PNG);
+        icon3.setContentType("image/png");
+        icon3.setAnchorV(1.0);
+        icons.add(icon3);
+
+        createFeatureStylesGeometry1(geoPackage, styles, icons);
+        createFeatureStylesGeometry2(geoPackage, styles, icons);
+    }
+
+    private static void createFeatureStylesGeometry1(GeoPackage geoPackage,
+                                                     List<StyleRow> styles, List<IconRow> icons) throws IOException {
+
+        FeatureDao featureDao = geoPackage.getFeatureDao("geometry1");
         FeatureTableStyles geometry1Styles = new FeatureTableStyles(geoPackage,
-                "geometry1");
+                featureDao.getTable());
 
-        geometry1Styles.setTableStyleDefault(style1);
-        geometry1Styles.setTableStyle(GeometryType.POLYGON, style2);
-        geometry1Styles.setTableIconDefault(icon);
+        geometry1Styles.setTableStyleDefault(styles.get(0));
+        geometry1Styles.setTableStyle(GeometryType.POLYGON, styles.get(1));
+        geometry1Styles.setTableStyle(GeometryType.POINT, styles.get(2));
+
+        geometry1Styles.createStyleRelationship();
+        geometry1Styles.createIconRelationship();
+
+        int pointCount = 0;
+        int lineCount = 0;
+        int polygonCount = 0;
+
+        FeatureCursor features = featureDao.queryForAll();
+        while (features.moveToNext()) {
+            FeatureRow featureRow = features.getRow();
+            switch (featureRow.getGeometryType()) {
+                case POINT:
+                    pointCount++;
+                    switch (pointCount) {
+                        case 1:
+                            geometry1Styles.setIcon(featureRow, icons.get(0));
+                            break;
+                        case 2:
+                            geometry1Styles.setIcon(featureRow, icons.get(1));
+                            break;
+                        case 3:
+                            geometry1Styles.setIcon(featureRow, icons.get(2));
+                            break;
+                    }
+                    break;
+                case LINESTRING:
+                    lineCount++;
+                    switch (lineCount) {
+                        case 2:
+                            geometry1Styles.setStyle(featureRow, styles.get(1));
+                            break;
+                        case 3:
+                            geometry1Styles.setStyle(featureRow, styles.get(2));
+                            break;
+                    }
+                    break;
+                case POLYGON:
+                    polygonCount++;
+                    switch (polygonCount) {
+                        case 2:
+                            geometry1Styles.setStyle(featureRow, styles.get(3));
+                            break;
+                        case 3:
+                            geometry1Styles.setStyle(featureRow, styles.get(2));
+                            break;
+                    }
+                    break;
+                default:
+            }
+        }
+        features.close();
+
+    }
+
+    private static void createFeatureStylesGeometry2(GeoPackage geoPackage,
+                                                     List<StyleRow> styles, List<IconRow> icons) throws IOException {
 
         FeatureDao featureDao = geoPackage.getFeatureDao("geometry2");
         FeatureTableStyles geometry2Styles = new FeatureTableStyles(geoPackage,
                 featureDao.getTable());
 
-        geometry2Styles.setTableStyle(GeometryType.POINT, style1);
-        geometry2Styles.setTableStyle(GeometryType.LINESTRING, style2);
-        geometry2Styles.setTableStyle(GeometryType.POLYGON, style1);
-        geometry2Styles.setTableStyle(GeometryType.GEOMETRY, style3);
+        geometry2Styles.setTableStyle(GeometryType.POINT, styles.get(0));
+        geometry2Styles.setTableStyle(GeometryType.LINESTRING, styles.get(1));
+        geometry2Styles.setTableStyle(GeometryType.POLYGON, styles.get(0));
+        geometry2Styles.setTableStyle(GeometryType.GEOMETRY, styles.get(2));
 
         geometry2Styles.createStyleRelationship();
         geometry2Styles.createIconRelationship();
@@ -1911,18 +2143,19 @@ public class GeoPackageExample extends BaseTestCase {
             FeatureRow featureRow = features.getRow();
             switch (featureRow.getGeometryType()) {
                 case POINT:
-                    geometry2Styles.setIcon(featureRow, icon);
+                    geometry2Styles.setIcon(featureRow, icons.get(0));
                     break;
                 case LINESTRING:
-                    geometry2Styles.setStyle(featureRow, style1);
+                    geometry2Styles.setStyle(featureRow, styles.get(0));
                     break;
                 case POLYGON:
-                    geometry2Styles.setStyle(featureRow, style2);
+                    geometry2Styles.setStyle(featureRow, styles.get(1));
                     break;
                 default:
             }
         }
         features.close();
+
     }
 
 }
