@@ -8,7 +8,6 @@ import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.Log;
-import android.util.LruCache;
 
 import org.osgeo.proj4j.units.Units;
 
@@ -19,6 +18,7 @@ import java.util.Set;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.R;
 import mil.nga.geopackage.extension.style.FeatureStyle;
 import mil.nga.geopackage.extension.style.FeatureTableStyles;
@@ -33,6 +33,7 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.io.BitmapConverter;
+import mil.nga.geopackage.style.Color;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.Point;
@@ -49,11 +50,6 @@ import mil.nga.sf.util.GeometryUtils;
  * @author osbornb
  */
 public abstract class FeatureTiles {
-
-    /**
-     * Default max number of feature style paints to maintain
-     */
-    public static final int DEFAULT_STYLE_PAINT_CACHE_SIZE = 100;
 
     /**
      * WGS84 Projection
@@ -143,9 +139,9 @@ public abstract class FeatureTiles {
     protected Paint polygonFillPaint = new Paint();
 
     /**
-     * Feature style paint, changed as needed
+     * Feature paint cache
      */
-    private LruCache<Long, Paint> stylePaintCache = new LruCache<>(DEFAULT_STYLE_PAINT_CACHE_SIZE);
+    private FeaturePaintCache featurePaintCache = new FeaturePaintCache();
 
     /**
      * Icon Cache
@@ -206,15 +202,15 @@ public abstract class FeatureTiles {
 
         linePaint.setAntiAlias(true);
         linePaint.setStrokeWidth(Float.valueOf(context.getString(R.string.feature_tiles_line_stroke_width)));
-        linePaint.setStyle(Paint.Style.STROKE);
+        linePaint.setStyle(Style.STROKE);
 
         polygonPaint.setAntiAlias(true);
         polygonPaint.setStrokeWidth(Float.valueOf(context.getString(R.string.feature_tiles_polygon_stroke_width)));
-        polygonPaint.setStyle(Paint.Style.STROKE);
+        polygonPaint.setStyle(Style.STROKE);
 
         fillPolygon = resources.getBoolean(R.bool.feature_tiles_polygon_fill);
         polygonFillPaint.setAntiAlias(true);
-        polygonFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        polygonFillPaint.setStyle(Style.FILL);
         polygonFillPaint.setAlpha(resources.getInteger(R.integer.feature_tiles_polygon_fill_alpha));
 
         calculateDrawOverlap();
@@ -430,7 +426,7 @@ public abstract class FeatureTiles {
      * @since 3.1.1
      */
     public void clearStylePaintCache() {
-        stylePaintCache.evictAll();
+        featurePaintCache.clear();
     }
 
     /**
@@ -441,7 +437,7 @@ public abstract class FeatureTiles {
      */
     @TargetApi(21)
     public void setStylePaintCacheSize(int size) {
-        stylePaintCache.resize(size);
+        featurePaintCache.resize(size);
     }
 
     /**
@@ -1037,7 +1033,7 @@ public abstract class FeatureTiles {
      */
     protected Paint getPointPaint(FeatureStyle featureStyle) {
 
-        Paint paint = getFeatureStylePaint(featureStyle, Paint.Style.FILL);
+        Paint paint = getFeatureStylePaint(featureStyle, FeatureDrawType.CIRCLE);
 
         if (paint == null) {
             paint = pointPaint;
@@ -1054,7 +1050,7 @@ public abstract class FeatureTiles {
      */
     protected Paint getLinePaint(FeatureStyle featureStyle) {
 
-        Paint paint = getFeatureStylePaint(featureStyle, Paint.Style.STROKE);
+        Paint paint = getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
 
         if (paint == null) {
             paint = linePaint;
@@ -1071,7 +1067,7 @@ public abstract class FeatureTiles {
      */
     protected Paint getPolygonPaint(FeatureStyle featureStyle) {
 
-        Paint paint = getFeatureStylePaint(featureStyle, Paint.Style.STROKE);
+        Paint paint = getFeatureStylePaint(featureStyle, FeatureDrawType.STROKE);
 
         if (paint == null) {
             paint = polygonPaint;
@@ -1096,13 +1092,16 @@ public abstract class FeatureTiles {
 
             StyleRow style = featureStyle.getStyle();
 
-            if (style != null && style.hasFillColor()) {
+            if (style != null) {
 
-                paint = getStyleFillPaint(style);
+                if (style.hasFillColor()) {
+                    paint = getStylePaint(style, FeatureDrawType.FILL);
+                } else {
+                    hasStyleColor = style.hasColor();
+                }
 
-            } else {
-                hasStyleColor = style.hasColor();
             }
+
         }
 
         if (paint == null && !hasStyleColor && fillPolygon) {
@@ -1116,10 +1115,10 @@ public abstract class FeatureTiles {
      * Get the feature style paint from cache, or create and cache it
      *
      * @param featureStyle feature style
-     * @param paintStyle   paint style
+     * @param drawType     draw type
      * @return feature style paint
      */
-    private Paint getFeatureStylePaint(FeatureStyle featureStyle, Paint.Style paintStyle) {
+    private Paint getFeatureStylePaint(FeatureStyle featureStyle, FeatureDrawType drawType) {
 
         Paint paint = null;
 
@@ -1129,7 +1128,7 @@ public abstract class FeatureTiles {
 
             if (style != null && style.hasColor()) {
 
-                paint = getStylePaint(style, paintStyle);
+                paint = getStylePaint(style, drawType);
 
             }
         }
@@ -1140,90 +1139,57 @@ public abstract class FeatureTiles {
     /**
      * Get the style paint from cache, or create and cache it
      *
-     * @param style      style row
-     * @param paintStyle paint style
-     * @return style paint
+     * @param style    style row
+     * @param drawType draw type
+     * @return paint
      */
-    private Paint getStylePaint(StyleRow style, Paint.Style paintStyle) {
+    private Paint getStylePaint(StyleRow style, FeatureDrawType drawType) {
 
-        long styleId = style.getId();
-        Paint paint = stylePaintCache.get(styleId);
+        Paint paint = featurePaintCache.getPaint(style, drawType);
 
         if (paint == null) {
 
-            paint = getStylePaint(styleId, style.getColorOrDefault(), style.getWidthOrDefault(), paintStyle);
+            Color color = null;
+            Style paintStyle = null;
+            Float strokeWidth = null;
 
-        }
-
-        return paint;
-    }
-
-    /**
-     * Get the style fill paint from cache, or create and cache it
-     *
-     * @param style style row
-     * @return style paint
-     */
-    private Paint getStyleFillPaint(StyleRow style) {
-
-        long styleId = style.getId();
-        styleId = -styleId;
-
-        Paint paint = stylePaintCache.get(styleId);
-
-        if (paint == null) {
-
-            mil.nga.geopackage.style.Color color = style.getFillColor();
-
-            paint = getStylePaint(styleId, color, Style.FILL_AND_STROKE);
-
-        }
-
-        return paint;
-    }
-
-    /**
-     * Get the style paint from cache, or create and cache it
-     *
-     * @param styleId    style id
-     * @param color      color
-     * @param paintStyle paint style
-     * @return paint
-     */
-    private Paint getStylePaint(long styleId, mil.nga.geopackage.style.Color color, Style paintStyle) {
-        return getStylePaint(styleId, color, null, paintStyle);
-    }
-
-    /**
-     * Get the style paint from cache, or create and cache it
-     *
-     * @param styleId    style id
-     * @param color      color
-     * @param width      stroke width
-     * @param paintStyle paint style
-     * @return paint
-     */
-    private Paint getStylePaint(long styleId, mil.nga.geopackage.style.Color color, Double width, Style paintStyle) {
-
-        Paint paint = null;
-
-        Paint stylePaint = new Paint();
-        stylePaint.setAntiAlias(true);
-        stylePaint.setStyle(paintStyle);
-        stylePaint.setColor(color.getColorWithAlpha());
-        if (width != null) {
-            stylePaint.setStrokeWidth(width.floatValue());
-        }
-
-        synchronized (stylePaintCache) {
-
-            paint = stylePaintCache.get(styleId);
-
-            if (paint == null) {
-                stylePaintCache.put(styleId, stylePaint);
-                paint = stylePaint;
+            switch (drawType) {
+                case CIRCLE:
+                    color = style.getColorOrDefault();
+                    paintStyle = Style.FILL;
+                    break;
+                case STROKE:
+                    color = style.getColorOrDefault();
+                    paintStyle = Style.STROKE;
+                    strokeWidth = (float) style.getWidthOrDefault();
+                    break;
+                case FILL:
+                    color = style.getFillColor();
+                    paintStyle = Style.FILL;
+                    strokeWidth = (float) style.getWidthOrDefault();
+                    break;
+                default:
+                    throw new GeoPackageException("Unsupported Draw Type: " + drawType);
             }
 
+            Paint stylePaint = new Paint();
+            stylePaint.setAntiAlias(true);
+            stylePaint.setStyle(paintStyle);
+            stylePaint.setColor(color.getColorWithAlpha());
+            if (strokeWidth != null) {
+                stylePaint.setStrokeWidth(strokeWidth);
+            }
+
+            synchronized (featurePaintCache) {
+
+                paint = featurePaintCache.getPaint(style, drawType);
+
+                if (paint == null) {
+                    featurePaintCache.setPaint(style, drawType, stylePaint);
+                    paint = stylePaint;
+                }
+
+            }
         }
 
         return paint;

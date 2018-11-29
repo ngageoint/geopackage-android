@@ -319,14 +319,14 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         Canvas polygonCanvas = canvas.getPolygonCanvas();
 
-        Paint pathPaint = getPolygonPaint(featureStyle);
-        polygonCanvas.drawPath(path, pathPaint);
-
         Paint fillPaint = getPolygonFillPaint(featureStyle);
         if (fillPaint != null) {
             path.setFillType(Path.FillType.EVEN_ODD);
             polygonCanvas.drawPath(path, fillPaint);
         }
+
+        Paint pathPaint = getPolygonPaint(featureStyle);
+        polygonCanvas.drawPath(path, pathPaint);
 
     }
 
@@ -487,9 +487,9 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 radius = pointRadius;
             }
             if (x >= 0 - radius && x <= tileWidth + radius && y >= 0 - radius && y <= tileHeight + radius) {
-                Paint featurePointPaint = getPointPaint(featureStyle);
+                Paint pointPaint = getPointPaint(featureStyle);
                 Canvas pointCanvas = canvas.getPointCanvas();
-                pointCanvas.drawCircle(x, y, radius, featurePointPaint);
+                pointCanvas.drawCircle(x, y, radius, pointPaint);
             }
 
         }
