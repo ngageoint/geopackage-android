@@ -222,6 +222,7 @@ public abstract class FeatureTiles {
      * @param context    context
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
+     * @since 3.1.1
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
         this(context, featureDao);
@@ -406,6 +407,7 @@ public abstract class FeatureTiles {
      * Get the feature table styles
      *
      * @return feature table styles
+     * @since 3.1.1
      */
     public FeatureTableStyles getFeatureTableStyles() {
         return featureTableStyles;
@@ -415,6 +417,7 @@ public abstract class FeatureTiles {
      * Set the feature table styles
      *
      * @param featureTableStyles feature table styles
+     * @since 3.1.1
      */
     public void setFeatureTableStyles(FeatureTableStyles featureTableStyles) {
         this.featureTableStyles = featureTableStyles;
@@ -854,6 +857,7 @@ public abstract class FeatureTiles {
      *
      * @param webMercatorBoundingBox web mercator bounding box
      * @return bounding box
+     * @since 3.1.1
      */
     public BoundingBox expandBoundingBox(BoundingBox webMercatorBoundingBox) {
 

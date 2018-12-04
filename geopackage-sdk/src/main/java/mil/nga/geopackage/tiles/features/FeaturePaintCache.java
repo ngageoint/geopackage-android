@@ -33,6 +33,8 @@ public class FeaturePaintCache {
 
     /**
      * Constructor
+     *
+     * @param size max paint objects to retain in the cache
      */
     public FeaturePaintCache(int size) {
         paintCache = new LruCache<>(DEFAULT_STYLE_PAINT_CACHE_SIZE);

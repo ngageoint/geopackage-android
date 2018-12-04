@@ -61,6 +61,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param context    context
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
+     * @since 3.1.1
      */
     public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
         super(context, geoPackage, featureDao);
