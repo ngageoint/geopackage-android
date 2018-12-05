@@ -203,6 +203,16 @@ public abstract class TileGenerator {
     }
 
     /**
+     * Get bounding box
+     *
+     * @return bounding box
+     * @since 3.1.1
+     */
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+
+    /**
      * Set the compress format
      *
      * @param compressFormat compression format

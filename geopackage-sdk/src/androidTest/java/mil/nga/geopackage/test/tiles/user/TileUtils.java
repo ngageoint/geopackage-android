@@ -1127,18 +1127,26 @@ public class TileUtils {
                         TestCase.assertNotNull(updatedTileGrid);
                         TestCase.assertNotNull(updatedBoundingBox);
 
-                        TestCase.assertEquals(
-                                minXDeleted ? tileGrid.getMinX() + 1 : tileGrid
-                                        .getMinX(), updatedTileGrid.getMinX());
-                        TestCase.assertEquals(
-                                maxXDeleted ? tileGrid.getMaxX() - 1 : tileGrid
-                                        .getMaxX(), updatedTileGrid.getMaxX());
-                        TestCase.assertEquals(
-                                minYDeleted ? tileGrid.getMinY() + 1 : tileGrid
-                                        .getMinY(), updatedTileGrid.getMinY());
-                        TestCase.assertEquals(
-                                maxYDeleted ? tileGrid.getMaxY() - 1 : tileGrid
-                                        .getMaxY(), updatedTileGrid.getMaxY());
+                        if (minXDeleted || minYDeleted || maxXDeleted
+                                || maxYDeleted) {
+                            TestCase.assertTrue(updatedTileGrid.getMinX() >= tileGrid
+                                    .getMinX());
+                            TestCase.assertTrue(updatedTileGrid.getMinY() >= tileGrid
+                                    .getMinY());
+                            TestCase.assertTrue(updatedTileGrid.getMaxX() <= tileGrid
+                                    .getMaxX());
+                            TestCase.assertTrue(updatedTileGrid.getMaxY() <= tileGrid
+                                    .getMaxY());
+                        } else {
+                            TestCase.assertEquals(tileGrid.getMinX(),
+                                    updatedTileGrid.getMinX());
+                            TestCase.assertEquals(tileGrid.getMinY(),
+                                    updatedTileGrid.getMinY());
+                            TestCase.assertEquals(tileGrid.getMaxX(),
+                                    updatedTileGrid.getMaxX());
+                            TestCase.assertEquals(tileGrid.getMaxY(),
+                                    updatedTileGrid.getMaxY());
+                        }
 
                         BoundingBox tileGridBoundingBox = TileBoundingBoxUtils.getBoundingBox(totalBoundingBox, tileMatrix, updatedTileGrid);
                         TestCase.assertEquals(tileGridBoundingBox, updatedBoundingBox);

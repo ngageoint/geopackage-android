@@ -185,6 +185,19 @@ public abstract class FeatureTiles {
      * @param featureDao feature dao
      */
     public FeatureTiles(Context context, FeatureDao featureDao) {
+        this(context, null, featureDao);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @since 3.1.1
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
+
         this.context = context;
         this.featureDao = featureDao;
         if (featureDao != null) {
@@ -213,31 +226,22 @@ public abstract class FeatureTiles {
         polygonFillPaint.setStyle(Style.FILL);
         polygonFillPaint.setAlpha(resources.getInteger(R.integer.feature_tiles_polygon_fill_alpha));
 
+        if (geoPackage != null) {
+
+            indexManager = new FeatureIndexManager(context, geoPackage, featureDao);
+            if (!indexManager.isIndexed()) {
+                indexManager.close();
+                indexManager = null;
+            }
+
+            featureTableStyles = new FeatureTableStyles(geoPackage, featureDao.getTable());
+            if (!featureTableStyles.has()) {
+                featureTableStyles = null;
+            }
+
+        }
+
         calculateDrawOverlap();
-    }
-
-    /**
-     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
-     *
-     * @param context    context
-     * @param geoPackage GeoPackage
-     * @param featureDao feature dao
-     * @since 3.1.1
-     */
-    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
-        this(context, featureDao);
-
-        indexManager = new FeatureIndexManager(context, geoPackage, featureDao);
-        if (!indexManager.isIndexed()) {
-            indexManager.close();
-            indexManager = null;
-        }
-
-        featureTableStyles = new FeatureTableStyles(geoPackage, featureDao.getTable());
-        if (!featureTableStyles.has()) {
-            featureTableStyles = null;
-        }
-
     }
 
     /**
@@ -421,6 +425,16 @@ public abstract class FeatureTiles {
      */
     public void setFeatureTableStyles(FeatureTableStyles featureTableStyles) {
         this.featureTableStyles = featureTableStyles;
+    }
+
+    /**
+     * Ignore the feature table styles within the GeoPackage
+     *
+     * @since 3.1.1
+     */
+    public void ignoreFeatureTableStyles() {
+        setFeatureTableStyles(null);
+        calculateDrawOverlap();
     }
 
     /**
@@ -804,7 +818,7 @@ public abstract class FeatureTiles {
     }
 
     /**
-     * Draw a tile bitmap from the x, y, and zoom level by querying features in the tile location
+     * Query for feature result count in the x, y, and zoom
      *
      * @param x    x coordinate
      * @param y    y coordinate
@@ -817,6 +831,21 @@ public abstract class FeatureTiles {
         // Get the web mercator bounding box
         BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
                 .getWebMercatorBoundingBox(x, y, zoom);
+
+        // Query for the count of geometries matching the bounds in the index
+        long count = queryIndexedFeaturesCount(webMercatorBoundingBox);
+
+        return count;
+    }
+
+    /**
+     * Query for feature result count in the bounding box
+     *
+     * @param webMercatorBoundingBox web mercator bounding box
+     * @return feature count
+     * @since 3.1.1
+     */
+    public long queryIndexedFeaturesCount(BoundingBox webMercatorBoundingBox) {
 
         // Query for geometries matching the bounds in the index
         FeatureIndexResults results = queryIndexedFeatures(webMercatorBoundingBox);
@@ -834,6 +863,25 @@ public abstract class FeatureTiles {
 
     /**
      * Query for feature results in the x, y, and zoom level by querying features in the tile location
+     *
+     * @param x    x coordinate
+     * @param y    y coordinate
+     * @param zoom zoom level
+     * @return feature index results
+     * @since 3.1.1
+     */
+    public FeatureIndexResults queryIndexedFeatures(int x, int y, int zoom) {
+
+        // Get the web mercator bounding box
+        BoundingBox webMercatorBoundingBox = TileBoundingBoxUtils
+                .getWebMercatorBoundingBox(x, y, zoom);
+
+        // Query for the geometries matching the bounds in the index
+        return queryIndexedFeatures(webMercatorBoundingBox);
+    }
+
+    /**
+     * Query for feature results in the bounding box
      *
      * @param webMercatorBoundingBox web mercator bounding box
      * @return feature index results

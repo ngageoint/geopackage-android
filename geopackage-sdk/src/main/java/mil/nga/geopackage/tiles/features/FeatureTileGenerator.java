@@ -45,6 +45,26 @@ public class FeatureTileGenerator extends TileGenerator {
     }
 
     /**
+     * Constructor, find the the bounding box from the feature table
+     *
+     * @param context      app context
+     * @param geoPackage   GeoPackage
+     * @param tableName    table name
+     * @param featureTiles feature tiles
+     * @param minZoom      min zoom
+     * @param maxZoom      max zoom
+     * @param projection   tiles projection
+     * @since 3.1.1
+     */
+    public FeatureTileGenerator(Context context, GeoPackage geoPackage, String tableName,
+                                FeatureTiles featureTiles, int minZoom, int maxZoom,
+                                Projection projection) {
+        this(context, geoPackage, tableName, featureTiles, minZoom, maxZoom, geoPackage
+                .getBoundingBox(projection, featureTiles.getFeatureDao()
+                        .getTableName(), true), projection);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

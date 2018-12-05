@@ -355,6 +355,11 @@ public class GeoPackageExample extends BaseTestCase {
                 createGeometryIndexExtension(activity, geoPackage);
             }
 
+            Log.i(LOG_NAME, "Feature Style Extension: " + FEATURE_STYLE);
+            if (FEATURE_STYLE) {
+                createFeatureStyleExtension(geoPackage);
+            }
+
             Log.i(LOG_NAME, "Feature Tile Link Extension: "
                     + FEATURE_TILE_LINK);
             if (FEATURE_TILE_LINK) {
@@ -383,14 +388,10 @@ public class GeoPackageExample extends BaseTestCase {
                 createRelatedTablesFeaturesExtension(geoPackage);
             }
 
-            Log.i(LOG_NAME, "Feature Style Extension: " + FEATURE_STYLE);
-            if (FEATURE_STYLE) {
-                createFeatureStyleExtension(geoPackage);
-            }
-
         } else {
             Log.i(LOG_NAME, "Schema Extension: " + FEATURES);
             Log.i(LOG_NAME, "Geometry Index Extension: " + FEATURES);
+            Log.i(LOG_NAME, "Feature Style Extension: " + FEATURES);
             Log.i(LOG_NAME, "Feature Tile Link Extension: " + FEATURES);
             Log.i(LOG_NAME, "Non-Linear Geometry Types Extension: "
                     + FEATURES);
@@ -398,7 +399,6 @@ public class GeoPackageExample extends BaseTestCase {
                     + FEATURES);
             Log.i(LOG_NAME, "Related Tables Media Extension: " + FEATURES);
             Log.i(LOG_NAME, "Related Tables Features Extension: " + FEATURES);
-            Log.i(LOG_NAME, "Feature Style Extension: " + FEATURES);
         }
 
         Log.i(LOG_NAME, "Tiles: " + TILES);
