@@ -99,6 +99,11 @@ public abstract class FeatureTiles {
     protected int tileHeight;
 
     /**
+     * Empty transparent image for testing
+     */
+    private Bitmap emptyImage;
+
+    /**
      * Compress format
      */
     protected CompressFormat compressFormat;
@@ -207,6 +212,7 @@ public abstract class FeatureTiles {
         Resources resources = context.getResources();
         tileWidth = resources.getInteger(R.integer.feature_tiles_width);
         tileHeight = resources.getInteger(R.integer.feature_tiles_height);
+        createEmptyImage();
 
         compressFormat = CompressFormat.valueOf(context.getString(R.string.feature_tiles_compress_format));
 
@@ -253,6 +259,7 @@ public abstract class FeatureTiles {
         if (indexManager != null) {
             indexManager.close();
         }
+        emptyImage.recycle();
     }
 
     /**
@@ -493,6 +500,7 @@ public abstract class FeatureTiles {
      */
     public void setTileWidth(int tileWidth) {
         this.tileWidth = tileWidth;
+        createEmptyImage();
     }
 
     /**
@@ -511,6 +519,7 @@ public abstract class FeatureTiles {
      */
     public void setTileHeight(int tileHeight) {
         this.tileHeight = tileHeight;
+        createEmptyImage();
     }
 
     /**
@@ -1245,6 +1254,40 @@ public abstract class FeatureTiles {
         }
 
         return paint;
+    }
+
+    /**
+     * Determine if the bitmap is a transparent image (must be in expected tile dimensions)
+     *
+     * @param bitmap bitmap
+     * @return true if transparent
+     */
+    protected boolean isTransparent(Bitmap bitmap) {
+        return bitmap != null && emptyImage.sameAs(bitmap);
+    }
+
+    /**
+     * Check if the bitmap was drawn upon (non null and not transparent). Return the same bitmap if drawn, else recycle non null bitmaps and return null
+     *
+     * @param bitmap bitmap
+     * @return drawn bitmap or null
+     */
+    protected Bitmap checkIfDrawn(Bitmap bitmap) {
+        if (isTransparent(bitmap)) {
+            bitmap.recycle();
+            bitmap = null;
+        }
+        return bitmap;
+    }
+
+    /**
+     * Create an empty image for transparent comparison
+     */
+    private void createEmptyImage() {
+        if (emptyImage != null) {
+            emptyImage.recycle();
+        }
+        emptyImage = createNewBitmap();
     }
 
     /**

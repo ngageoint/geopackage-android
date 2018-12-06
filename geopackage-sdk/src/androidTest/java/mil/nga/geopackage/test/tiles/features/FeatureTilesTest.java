@@ -15,7 +15,6 @@ import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.features.FeatureTiles;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -97,13 +96,14 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
         for (int i = 0; i < tilesPerSide; i++) {
             for (int j = 0; j < tilesPerSide; j++) {
                 Bitmap bitmap = featureTiles.drawTile(i, j, zoom);
-                long count = featureTiles.queryIndexedFeaturesCount(i, j, zoom);
-                if (count > 0) {
-                    assertTrue(bitmap.getByteCount() > 0);
-                    assertEquals(featureTiles.getTileWidth(), bitmap.getWidth());
-                    assertEquals(featureTiles.getTileHeight(), bitmap.getHeight());
-                } else {
-                    assertNull(bitmap);
+                if (bitmap != null) {
+                    long count = featureTiles.queryIndexedFeaturesCount(i, j,
+                            zoom);
+                    assertTrue(count > 0);
+                    assertEquals(featureTiles.getTileWidth(),
+                            bitmap.getWidth());
+                    assertEquals(featureTiles.getTileHeight(),
+                            bitmap.getHeight());
                 }
             }
         }
