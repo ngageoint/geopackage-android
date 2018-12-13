@@ -7,7 +7,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
 
-import org.osgeo.proj4j.ProjCoordinate;
+import org.locationtech.proj4j.ProjCoordinate;
 
 import java.io.IOException;
 import java.util.ArrayList;

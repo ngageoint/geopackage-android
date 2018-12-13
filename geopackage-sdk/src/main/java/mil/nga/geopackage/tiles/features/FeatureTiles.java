@@ -9,7 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.util.Log;
 
-import org.osgeo.proj4j.units.Units;
+import org.locationtech.proj4j.units.Units;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -1024,7 +1024,7 @@ public abstract class FeatureTiles {
         if (simplifyGeometries) {
 
             // Reproject to web mercator if not in meters
-            if (projection != null && projection.getUnit() != Units.METRES) {
+            if (projection != null && !projection.isUnit(Units.METRES)) {
                 ProjectionTransform toWebMercator = projection
                         .getTransformation(WEB_MERCATOR_PROJECTION);
                 points = toWebMercator.transform(points);
@@ -1035,7 +1035,7 @@ public abstract class FeatureTiles {
                     simplifyTolerance);
 
             // Reproject back to the original projection
-            if (projection != null && projection.getUnit() != Units.METRES) {
+            if (projection != null && !projection.isUnit(Units.METRES)) {
                 ProjectionTransform fromWebMercator = WEB_MERCATOR_PROJECTION
                         .getTransformation(projection);
                 simplifiedPoints = fromWebMercator.transform(simplifiedPoints);

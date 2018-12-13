@@ -7,7 +7,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory.Options;
 import android.util.SparseArray;
 
-import org.osgeo.proj4j.units.DegreeUnit;
+import org.locationtech.proj4j.units.Units;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -333,7 +333,7 @@ public abstract class TileGenerator {
         if (tileCount == null) {
             long count = 0;
             BoundingBox requestBoundingBox = null;
-            if (projection.getUnit() instanceof DegreeUnit) {
+            if (projection.isUnit(Units.DEGREES)) {
                 requestBoundingBox = boundingBox;
             } else {
                 ProjectionTransform transform = projection.getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
@@ -345,7 +345,7 @@ public abstract class TileGenerator {
             for (int zoom = minZoom; zoom <= maxZoom; zoom++) {
                 // Get the tile grid that includes the entire bounding box
                 TileGrid tileGrid = null;
-                if (projection.getUnit() instanceof DegreeUnit) {
+                if (projection.isUnit(Units.DEGREES)) {
                     tileGrid = TileBoundingBoxUtils.getTileGridWGS84(requestBoundingBox, zoom);
                 } else {
                     tileGrid = TileBoundingBoxUtils.getTileGrid(requestBoundingBox, zoom);
@@ -489,7 +489,7 @@ public abstract class TileGenerator {
         // Google Tile Format
         if (googleTiles) {
             adjustGoogleBounds();
-        } else if (projection.getUnit() instanceof DegreeUnit) {
+        } else if (projection.isUnit(Units.DEGREES)) {
             adjustGeoPackageBoundsWGS84(boundingBox, zoom);
         } else {
             adjustGeoPackageBounds(boundingBox, zoom);
