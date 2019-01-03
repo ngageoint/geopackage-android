@@ -2,7 +2,6 @@ package mil.nga.geopackage.extension;
 
 import java.util.Iterator;
 
-import mil.nga.geopackage.extension.RTreeIndexTableDao;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.user.custom.UserCustomCursor;
@@ -43,7 +42,7 @@ public class FeatureIndexRTreeResults implements FeatureIndexResults {
      */
     @Override
     public Iterator<FeatureRow> iterator() {
-        Iterator<FeatureRow> iterator = new Iterator<FeatureRow>() {
+        return new Iterator<FeatureRow>() {
 
             /**
              * {@inheritDoc}
@@ -60,16 +59,7 @@ public class FeatureIndexRTreeResults implements FeatureIndexResults {
             public FeatureRow next() {
                 return dao.getFeatureRow(cursor);
             }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
         };
-        return iterator;
     }
 
     /**
@@ -86,6 +76,41 @@ public class FeatureIndexRTreeResults implements FeatureIndexResults {
     @Override
     public void close() {
         cursor.close();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Long> ids() {
+        return new Iterable<Long>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> iterator() {
+                return new Iterator<Long>() {
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public boolean hasNext() {
+                        return cursor.moveToNext();
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public Long next() {
+                        return dao.getRow(cursor).getId();
+                    }
+
+                };
+            }
+        };
     }
 
 }

@@ -84,4 +84,41 @@ public class FeatureIndexListResults implements FeatureIndexResults {
         return rows.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Long> ids() {
+        return new Iterable<Long>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> iterator() {
+                return new Iterator<Long>() {
+
+                    int index = 0;
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public boolean hasNext() {
+                        return index <= rows.size();
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public Long next() {
+                        return rows.get(index++).getId();
+                    }
+
+                };
+            }
+        };
+    }
+
 }

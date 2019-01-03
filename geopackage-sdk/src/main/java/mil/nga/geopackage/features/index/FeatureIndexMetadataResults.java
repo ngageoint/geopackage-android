@@ -42,7 +42,7 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
      */
     @Override
     public Iterator<FeatureRow> iterator() {
-        Iterator<FeatureRow> iterator = new Iterator<FeatureRow>() {
+        return new Iterator<FeatureRow>() {
 
             @Override
             public boolean hasNext() {
@@ -55,13 +55,7 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
                 FeatureRow featureRow = featureIndexer.getFeatureRow(geometryMetadata);
                 return featureRow;
             }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
         };
-        return iterator;
     }
 
     /**
@@ -78,6 +72,42 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
     @Override
     public void close() {
         geometryMetadata.close();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Long> ids() {
+        return new Iterable<Long>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> iterator() {
+                return new Iterator<Long>() {
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public boolean hasNext() {
+                        return !geometryMetadata.isLast();
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public Long next() {
+                        geometryMetadata.moveToNext();
+                        return featureIndexer.getGeometryMetadata(geometryMetadata).getId();
+                    }
+
+                };
+            }
+        };
     }
 
 }

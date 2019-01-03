@@ -33,7 +33,7 @@ public class FeatureIndexFeatureResults implements FeatureIndexResults {
      */
     @Override
     public Iterator<FeatureRow> iterator() {
-        Iterator<FeatureRow> iterator = new Iterator<FeatureRow>() {
+        return new Iterator<FeatureRow>() {
 
             /**
              * {@inheritDoc}
@@ -50,16 +50,7 @@ public class FeatureIndexFeatureResults implements FeatureIndexResults {
             public FeatureRow next() {
                 return cursor.getRow();
             }
-
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
         };
-        return iterator;
     }
 
     /**
@@ -76,6 +67,41 @@ public class FeatureIndexFeatureResults implements FeatureIndexResults {
     @Override
     public void close() {
         cursor.close();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Long> ids() {
+        return new Iterable<Long>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> iterator() {
+                return new Iterator<Long>() {
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public boolean hasNext() {
+                        return cursor.moveToNext();
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public Long next() {
+                        return cursor.getRow().getId();
+                    }
+
+                };
+            }
+        };
     }
 
 }

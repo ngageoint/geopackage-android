@@ -155,6 +155,24 @@ public class FeatureIndexManagerUtils {
             TestCase.assertTrue(featureFound);
             TestCase.assertTrue(resultCount >= 1);
 
+            // Test the query by envelope with id iteration
+            resultCount = 0;
+            featureFound = false;
+            TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);
+            featureIndexResults = featureIndexManager.query(envelope);
+            for (long featureRowId : featureIndexResults.ids()) {
+                FeatureRow featureRow = featureDao.queryForIdRow(featureRowId);
+                validateFeatureRow(featureIndexManager, featureRow, envelope,
+                        includeEmpty);
+                if (featureRowId == testFeatureRow.getId()) {
+                    featureFound = true;
+                }
+                resultCount++;
+            }
+            featureIndexResults.close();
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+
             // Pick a projection different from the feature dao and project the
             // bounding box
             BoundingBox boundingBox = new BoundingBox(envelope.getMinX() - 1,

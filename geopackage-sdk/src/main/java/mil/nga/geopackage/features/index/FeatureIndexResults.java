@@ -22,4 +22,12 @@ public interface FeatureIndexResults extends Iterable<FeatureRow> {
      */
     public void close();
 
+    /**
+     * Iterable for iterating over feature ids in place of feature rows
+     *
+     * @return iterable ids
+     * @since 3.1.1
+     */
+    public Iterable<Long> ids();
+
 }
