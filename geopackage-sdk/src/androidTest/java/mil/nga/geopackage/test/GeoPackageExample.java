@@ -1946,8 +1946,8 @@ public class GeoPackageExample extends BaseTestCase {
         String dateTime = DateConverter.dateTimeConverter().stringValue(
                 new Date());
 
-        properties.addValue(PropertyNames.TITLE, "GeoPackage Java Example");
-        properties.addValue(PropertyNames.VERSION, "3.0.2");
+        properties.addValue(PropertyNames.TITLE, "GeoPackage Android Example");
+        properties.addValue(PropertyNames.VERSION, "3.1.1");
         properties.addValue(PropertyNames.CREATOR, "NGA");
         properties.addValue(PropertyNames.PUBLISHER, "NGA");
         properties.addValue(PropertyNames.CONTRIBUTOR, "Brian Osborn");
