@@ -1958,17 +1958,17 @@ public class GeoPackageExample extends BaseTestCase {
         properties
                 .addValue(
                         PropertyNames.DESCRIPTION,
-                        "GeoPackage example created by http://github.com/ngageoint/geopackage-java/blob/master/src/test/java/mil/nga/geopackage/test/GeoPackageExample.java");
-        properties.addValue(PropertyNames.IDENTIFIER, "geopackage-java");
+                        "GeoPackage example created by https://github.com/ngageoint/geopackage-android/blob/master/geopackage-sdk/src/androidTest/java/mil/nga/geopackage/test/GeoPackageExample.java");
+        properties.addValue(PropertyNames.IDENTIFIER, "geopackage-android");
         properties.addValue(PropertyNames.LICENSE, "MIT");
         properties
                 .addValue(
                         PropertyNames.SOURCE,
-                        "http://github.com/ngageoint/GeoPackage/blob/master/docs/examples/java/example.gpkg");
+                        "http://github.com/ngageoint/GeoPackage/blob/master/docs/examples/android/example.gpkg");
         properties.addValue(PropertyNames.SUBJECT, "Examples");
         properties.addValue(PropertyNames.TYPE, "Examples");
         properties.addValue(PropertyNames.URI,
-                "http://github.com/ngageoint/geopackage-java");
+                "http://github.com/ngageoint/geopackage-android");
         properties.addValue(PropertyNames.TAG, "NGA");
         properties.addValue(PropertyNames.TAG, "Example");
         properties.addValue(PropertyNames.TAG, "BIT Systems");
