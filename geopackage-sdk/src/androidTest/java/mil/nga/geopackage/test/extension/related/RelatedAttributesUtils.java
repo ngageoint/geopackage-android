@@ -298,8 +298,7 @@ public class RelatedAttributesUtils {
         TestCase.assertFalse(rte.has(userMappingTable.getTableName()));
         extendedRelations = rte.getRelationships();
         TestCase.assertEquals(0, extendedRelations.size());
-        TestCase.assertFalse(geoPackage.getDatabase().tableExists(
-                mappingTableName));
+        TestCase.assertFalse(geoPackage.isTable(mappingTableName));
 
         // Delete the related tables extension
         rte.removeExtension();

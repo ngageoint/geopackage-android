@@ -430,7 +430,7 @@ public class RelatedSimpleAttributesUtils {
         TestCase.assertFalse(rte.has(userMappingTable.getTableName()));
         extendedRelations = rte.getRelationships();
         TestCase.assertEquals(0, extendedRelations.size());
-        TestCase.assertFalse(geoPackage.getDatabase().tableExists(
+        TestCase.assertFalse(geoPackage.isTable(
                 mappingTableName));
 
         // Delete the simple attributes table and contents row
