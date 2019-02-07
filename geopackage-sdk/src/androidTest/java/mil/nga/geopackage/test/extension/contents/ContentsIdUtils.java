@@ -127,12 +127,13 @@ public class ContentsIdUtils {
 
             TestCase.assertTrue(contentsIdExtension.getMissing().contains(
                     tableName));
-            TestCase.assertFalse(contentsIdExtension.getIds().contains(
-                    tableName));
+            TestCase.assertFalse(containsTable(contentsIdExtension.getIds(),
+                    tableName, contentsIdExtension));
             TestCase.assertTrue(contentsIdExtension.getMissing(
                     contents.getDataTypeString()).contains(tableName));
-            TestCase.assertFalse(contentsIdExtension.getIds(
-                    contents.getDataTypeString()).contains(tableName));
+            TestCase.assertFalse(containsTable(
+                    contentsIdExtension.getIds(contents.getDataTypeString()),
+                    tableName, contentsIdExtension));
 
             ContentsId contentsId = null;
             Long contentsIdNumber = null;
@@ -181,8 +182,13 @@ public class ContentsIdUtils {
 
             TestCase.assertFalse(contentsIdExtension.getMissing().contains(
                     tableName));
+            TestCase.assertTrue(containsTable(contentsIdExtension.getIds(),
+                    tableName, contentsIdExtension));
             TestCase.assertFalse(contentsIdExtension.getMissing(
                     contents.getDataTypeString()).contains(tableName));
+            TestCase.assertTrue(containsTable(
+                    contentsIdExtension.getIds(contents.getDataTypeString()),
+                    tableName, contentsIdExtension));
 
             TestCase.assertEquals(contentsIdNumber,
                     contentsIdExtension.getId(tableName));
@@ -209,12 +215,14 @@ public class ContentsIdUtils {
 
             TestCase.assertTrue(contentsIdExtension.getMissing().contains(
                     tableName));
-            TestCase.assertFalse(contentsIdExtension.getIds().contains(
-                    tableName));
+            TestCase.assertFalse(containsTable(contentsIdExtension.getIds(),
+                    tableName, contentsIdExtension));
             TestCase.assertTrue(contentsIdExtension.getMissing(
                     contents.getDataTypeString()).contains(tableName));
-            TestCase.assertFalse(contentsIdExtension.getIds(
-                    contents.getDataTypeString()).contains(tableName));
+            TestCase.assertFalse(containsTable(
+                    contentsIdExtension.getIds(contents.getDataTypeString()),
+                    tableName, contentsIdExtension));
+
         }
 
         TestCase.assertEquals(0, contentsIdExtension.getIds().size());
@@ -224,6 +232,29 @@ public class ContentsIdUtils {
         contentsIdExtension.removeExtension();
         TestCase.assertFalse(contentsIdExtension.has());
         TestCase.assertNull(contentsIdExtension.getExtension());
+    }
+
+    /**
+     * Check if the contents ids contain the table
+     *
+     * @param contentsIds         contents ids
+     * @param tableName           table name
+     * @param contentsIdExtension contents id extension
+     * @return true if contains
+     */
+    private static boolean containsTable(List<ContentsId> contentsIds,
+                                         String tableName, ContentsIdExtension contentsIdExtension) {
+
+        boolean contains = false;
+
+        for (ContentsId contentsId : contentsIds) {
+            contains = contentsId.getTableName().equals(tableName);
+            if (contains) {
+                break;
+            }
+        }
+
+        return contains;
     }
 
 }
