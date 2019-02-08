@@ -124,10 +124,8 @@ public class RelatedTablesWriteTest extends LoadGeoPackageTestCase {
         UserMappingRow userMappingRow = null;
         for (inx = 0; inx < 10; inx++) {
             userMappingRow = dao.newRow();
-            userMappingRow.setBaseId(((int) Math.floor(Math.random()
-                    * baseCount)));
-            userMappingRow.setRelatedId(((int) Math.floor(Math.random()
-                    * relatedCount)));
+            userMappingRow.setBaseId(baseIds[(int) (Math.random() * baseCount)]);
+            userMappingRow.setRelatedId(relatedIds[(int) (Math.random() * relatedCount)]);
             RelatedTablesUtils.populateUserRow(userMappingTable,
                     userMappingRow, UserMappingTable.requiredColumns());
             TestCase.assertTrue(dao.create(userMappingRow) > 0);
@@ -256,10 +254,8 @@ public class RelatedTablesWriteTest extends LoadGeoPackageTestCase {
         UserMappingRow userMappingRow = null;
         for (inx = 0; inx < 10; inx++) {
             userMappingRow = dao.newRow();
-            userMappingRow.setBaseId(((int) Math.floor(Math.random()
-                    * baseCount)));
-            userMappingRow.setRelatedId(((int) Math.floor(Math.random()
-                    * relatedCount)));
+            userMappingRow.setBaseId(baseIds[(int) (Math.random() * baseCount)]);
+            userMappingRow.setRelatedId(relatedIds[(int) (Math.random() * relatedCount)]);
             RelatedTablesUtils.populateUserRow(userMappingTable,
                     userMappingRow, UserMappingTable.requiredColumns());
             TestCase.assertTrue(dao.create(userMappingRow) > 0);
@@ -387,10 +383,8 @@ public class RelatedTablesWriteTest extends LoadGeoPackageTestCase {
         UserMappingRow userMappingRow = null;
         for (inx = 0; inx < 10; inx++) {
             userMappingRow = dao.newRow();
-            userMappingRow.setBaseId(((int) Math.floor(Math.random()
-                    * baseCount)));
-            userMappingRow.setRelatedId(((int) Math.floor(Math.random()
-                    * relatedCount)));
+            userMappingRow.setBaseId(baseIds[(int) (Math.random() * baseCount)]);
+            userMappingRow.setRelatedId(relatedIds[(int) (Math.random() * relatedCount)]);
             RelatedTablesUtils.populateUserRow(userMappingTable,
                     userMappingRow, UserMappingTable.requiredColumns());
             TestCase.assertTrue(dao.create(userMappingRow) > 0);
