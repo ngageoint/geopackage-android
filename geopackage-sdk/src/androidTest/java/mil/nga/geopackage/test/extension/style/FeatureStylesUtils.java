@@ -664,11 +664,11 @@ public class FeatureStylesUtils {
         geometryTypes.add(null);
 
         IconRow expectedIconRow = null;
-        Map<GeometryType, IconRow> geometryTypeRowStyles = featureResultsIcons
+        Map<GeometryType, IconRow> geometryTypeRowIcons = featureResultsIcons
                 .get(featureRow.getId());
-        if (geometryTypeRowStyles != null) {
+        if (geometryTypeRowIcons != null) {
             for (GeometryType type : geometryTypes) {
-                expectedIconRow = geometryTypeRowStyles.get(type);
+                expectedIconRow = geometryTypeRowIcons.get(type);
                 if (expectedIconRow != null) {
                     break;
                 }
@@ -739,7 +739,6 @@ public class FeatureStylesUtils {
 
     private static IconRow randomIcon(GeoPackage geoPackage) throws IOException, NameNotFoundException {
         IconRow iconRow = new IconRow();
-
 
         TestUtils.copyAssetFileToInternalStorage(geoPackage.getContext(), TestUtils.getTestContext(geoPackage.getContext()), TestConstants.ICON_POINT_IMAGE);
         String iconImage = TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), TestConstants.ICON_POINT_IMAGE);
