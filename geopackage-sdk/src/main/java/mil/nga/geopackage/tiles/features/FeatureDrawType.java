@@ -14,7 +14,7 @@ public enum FeatureDrawType {
     CIRCLE,
 
     /**
-     * Stroke for a line of polygon
+     * Stroke for a line or polygon
      */
     STROKE,
 
