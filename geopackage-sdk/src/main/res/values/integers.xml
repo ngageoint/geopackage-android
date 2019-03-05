@@ -1,7 +1,5 @@
 <resources>
 
-    <integer name="feature_tiles_width">512</integer>
-    <integer name="feature_tiles_height">512</integer>
     <integer name="feature_tiles_polygon_fill_alpha">25</integer>
 
 </resources>

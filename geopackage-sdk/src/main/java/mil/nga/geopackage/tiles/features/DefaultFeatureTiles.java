@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
 
@@ -56,6 +57,31 @@ public class DefaultFeatureTiles extends FeatureTiles {
     }
 
     /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @since 3.1.1
+     */
+    public DefaultFeatureTiles(Context context, FeatureDao featureDao, float density) {
+        super(context, featureDao, density);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @since 3.1.1
+     */
+    public DefaultFeatureTiles(Context context, FeatureDao featureDao, int width, int height) {
+        super(context, featureDao, width, height);
+    }
+
+    /**
      * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
      *
      * @param context    context
@@ -65,6 +91,48 @@ public class DefaultFeatureTiles extends FeatureTiles {
      */
     public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
         super(context, geoPackage, featureDao);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @since 3.1.1
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density) {
+        super(context, geoPackage, featureDao, density);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @since 3.1.1
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width, int height) {
+        super(context, geoPackage, featureDao, width, height);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @since 3.1.1
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density, int width, int height) {
+        super(context, geoPackage, featureDao, density, width, height);
     }
 
     /**
@@ -483,9 +551,15 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         } else if (pointIcon != null) {
 
-            if (x >= 0 - pointIcon.getWidth() && x <= tileWidth + pointIcon.getWidth() && y >= 0 - pointIcon.getHeight() && y <= tileHeight + pointIcon.getHeight()) {
+            int width = Math.round(this.density * pointIcon.getWidth());
+            int height = Math.round(this.density * pointIcon.getHeight());
+            if (x >= 0 - width && x <= tileWidth + width && y >= 0 - height && y <= tileHeight + height) {
                 Canvas iconCanvas = canvas.getIconCanvas();
-                iconCanvas.drawBitmap(pointIcon.getIcon(), x - pointIcon.getXOffset(), y - pointIcon.getYOffset(), pointPaint);
+                float left = x - this.density * pointIcon.getXOffset();
+                float top = y - this.density * pointIcon.getYOffset();
+                // TODO test this
+                RectF rect = new RectF(left, top, left + width, top - height);
+                iconCanvas.drawBitmap(pointIcon.getIcon(), null, rect, pointPaint);
                 drawn = true;
             }
 
@@ -495,11 +569,11 @@ public class DefaultFeatureTiles extends FeatureTiles {
             if (featureStyle != null) {
                 StyleRow styleRow = featureStyle.getStyle();
                 if (styleRow != null) {
-                    radius = (float) (styleRow.getWidthOrDefault() / 2.0f);
+                    radius = this.density * (float) (styleRow.getWidthOrDefault() / 2.0f);
                 }
             }
             if (radius == null) {
-                radius = pointRadius;
+                radius = this.density * pointRadius;
             }
             if (x >= 0 - radius && x <= tileWidth + radius && y >= 0 - radius && y <= tileHeight + radius) {
                 Paint pointPaint = getPointPaint(featureStyle);

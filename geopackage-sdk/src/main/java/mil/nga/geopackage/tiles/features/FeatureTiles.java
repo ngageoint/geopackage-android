@@ -35,6 +35,7 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.style.Color;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
+import mil.nga.geopackage.tiles.TileUtils;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.Point;
 import mil.nga.sf.proj.Projection;
@@ -184,6 +185,11 @@ public abstract class FeatureTiles {
     protected boolean simplifyGeometries = true;
 
     /**
+     * Tile density based upon the device-independent pixels {@link TileUtils#TILE_DP}
+     */
+    protected float density = 1.0f;
+
+    /**
      * Constructor
      *
      * @param context    context
@@ -191,6 +197,31 @@ public abstract class FeatureTiles {
      */
     public FeatureTiles(Context context, FeatureDao featureDao) {
         this(context, null, featureDao);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @since 3.1.1
+     */
+    public FeatureTiles(Context context, FeatureDao featureDao, float density) {
+        this(context, null, featureDao, density);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @since 3.1.1
+     */
+    public FeatureTiles(Context context, FeatureDao featureDao, int width, int height) {
+        this(context, null, featureDao, width, height);
     }
 
     /**
@@ -202,6 +233,48 @@ public abstract class FeatureTiles {
      * @since 3.1.1
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
+        this(context, geoPackage, featureDao, 1.0f);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @since 3.1.1
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density) {
+        this(context, geoPackage, featureDao, density, TileUtils.tileLength(density), TileUtils.tileLength(density));
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @since 3.1.1
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width, int height) {
+        this(context, geoPackage, featureDao, 1.0f, width, height);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @since 3.1.1
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density, int width, int height) {
 
         this.context = context;
         this.featureDao = featureDao;
@@ -209,9 +282,11 @@ public abstract class FeatureTiles {
             this.projection = featureDao.getProjection();
         }
 
-        Resources resources = context.getResources();
-        tileWidth = resources.getInteger(R.integer.feature_tiles_width);
-        tileHeight = resources.getInteger(R.integer.feature_tiles_height);
+        this.density = TileUtils.tileDensity(density, width, height);
+
+        tileWidth = width;
+        tileHeight = height;
+
         createEmptyImage();
 
         compressFormat = CompressFormat.valueOf(context.getString(R.string.feature_tiles_compress_format));
@@ -219,14 +294,17 @@ public abstract class FeatureTiles {
         pointPaint.setAntiAlias(true);
         pointRadius = Float.valueOf(context.getString(R.string.feature_tiles_point_radius));
 
+        // TODO figure out not setting density until use
         linePaint.setAntiAlias(true);
-        linePaint.setStrokeWidth(Float.valueOf(context.getString(R.string.feature_tiles_line_stroke_width)));
+        linePaint.setStrokeWidth(this.density * Float.valueOf(context.getString(R.string.feature_tiles_line_stroke_width)));
         linePaint.setStyle(Style.STROKE);
 
+        // TODO figure out not setting density until use
         polygonPaint.setAntiAlias(true);
-        polygonPaint.setStrokeWidth(Float.valueOf(context.getString(R.string.feature_tiles_polygon_stroke_width)));
+        polygonPaint.setStrokeWidth(this.density * Float.valueOf(context.getString(R.string.feature_tiles_polygon_stroke_width)));
         polygonPaint.setStyle(Style.STROKE);
 
+        Resources resources = context.getResources();
         fillPolygon = resources.getBoolean(R.bool.feature_tiles_polygon_fill);
         polygonFillPaint.setAntiAlias(true);
         polygonFillPaint.setStyle(Style.FILL);
@@ -269,11 +347,11 @@ public abstract class FeatureTiles {
     public void calculateDrawOverlap() {
 
         if (pointIcon != null) {
-            heightOverlap = pointIcon.getHeight();
-            widthOverlap = pointIcon.getWidth();
+            heightOverlap = this.density * pointIcon.getHeight();
+            widthOverlap = this.density * pointIcon.getWidth();
         } else {
-            heightOverlap = pointRadius;
-            widthOverlap = pointRadius;
+            heightOverlap = this.density * pointRadius;
+            widthOverlap = this.density * pointRadius;
         }
 
         float linePaintHalfStroke = linePaint.getStrokeWidth() / 2.0f;
@@ -320,8 +398,8 @@ public abstract class FeatureTiles {
             for (long iconRowId : iconRowIds) {
                 IconRow iconRow = iconDao.getRow(iconDao.queryForIdRow(iconRowId));
                 double[] iconDimensions = iconRow.getDerivedDimensions();
-                float iconWidth = (float) Math.ceil(iconDimensions[0]);
-                float iconHeight = (float) Math.ceil(iconDimensions[1]);
+                float iconWidth = this.density * (float) Math.ceil(iconDimensions[0]);
+                float iconHeight = this.density * (float) Math.ceil(iconDimensions[1]);
                 widthOverlap = Math.max(widthOverlap, iconWidth);
                 heightOverlap = Math.max(heightOverlap, iconHeight);
             }
@@ -1083,7 +1161,7 @@ public abstract class FeatureTiles {
      * @return icon bitmap
      */
     protected Bitmap getIcon(IconRow iconRow) {
-        return iconCache.createIcon(iconRow, 1.0f);
+        return iconCache.createIcon(iconRow, density);
     }
 
     /**
@@ -1222,12 +1300,12 @@ public abstract class FeatureTiles {
                 case STROKE:
                     color = style.getColorOrDefault();
                     paintStyle = Style.STROKE;
-                    strokeWidth = (float) style.getWidthOrDefault();
+                    strokeWidth = this.density * (float) style.getWidthOrDefault();
                     break;
                 case FILL:
                     color = style.getFillColor();
                     paintStyle = Style.FILL;
-                    strokeWidth = (float) style.getWidthOrDefault();
+                    strokeWidth = this.density * (float) style.getWidthOrDefault();
                     break;
                 default:
                     throw new GeoPackageException("Unsupported Draw Type: " + drawType);
