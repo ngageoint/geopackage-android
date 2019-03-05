@@ -486,7 +486,8 @@ public class TileCreator {
         List<TileMatrix> tileMatrices = new ArrayList<>();
 
         // Check if the request overlaps the tile matrix set
-        if (projectedRequestBoundingBox.intersects(
+        if (!tileDao.getTileMatrices().isEmpty()
+                && projectedRequestBoundingBox.intersects(
                 tileSetBoundingBox)) {
 
             // Get the tile distance
