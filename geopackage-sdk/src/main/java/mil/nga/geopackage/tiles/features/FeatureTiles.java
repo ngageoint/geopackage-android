@@ -233,7 +233,7 @@ public abstract class FeatureTiles {
      * @since 3.1.1
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
-        this(context, geoPackage, featureDao, TileUtils.TILE_PIXELS_DEFAULT, TileUtils.TILE_PIXELS_DEFAULT);
+        this(context, geoPackage, featureDao, TileUtils.TILE_PIXELS_HIGH, TileUtils.TILE_PIXELS_HIGH);
     }
 
     /**
