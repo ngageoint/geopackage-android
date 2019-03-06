@@ -551,14 +551,13 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         } else if (pointIcon != null) {
 
-            int width = Math.round(this.density * pointIcon.getWidth());
-            int height = Math.round(this.density * pointIcon.getHeight());
+            float width = this.density * pointIcon.getWidth();
+            float height = this.density * pointIcon.getHeight();
             if (x >= 0 - width && x <= tileWidth + width && y >= 0 - height && y <= tileHeight + height) {
                 Canvas iconCanvas = canvas.getIconCanvas();
                 float left = x - this.density * pointIcon.getXOffset();
                 float top = y - this.density * pointIcon.getYOffset();
-                // TODO test this
-                RectF rect = new RectF(left, top, left + width, top - height);
+                RectF rect = new RectF(left, top, left + width, top + height);
                 iconCanvas.drawBitmap(pointIcon.getIcon(), null, rect, pointPaint);
                 drawn = true;
             }
