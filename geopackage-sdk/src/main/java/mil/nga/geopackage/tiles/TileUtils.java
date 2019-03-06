@@ -87,7 +87,7 @@ public class TileUtils {
      * @return density
      */
     public static float density(int tileLength) {
-        return tileLength / TILE_DP;
+        return ((float) tileLength) / TILE_DP;
     }
 
 }
