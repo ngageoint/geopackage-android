@@ -108,16 +108,19 @@ public class FeatureTileUtils {
             pointPaint.setColor(Color.BLUE);
         }
 
-        Paint linePaint = featureTiles.getLinePaint();
+        Paint linePaint = featureTiles.getLinePaintCopy();
         linePaint.setColor(Color.GREEN);
+        featureTiles.setLinePaint(linePaint);
 
-        Paint polygonPaint = featureTiles.getPolygonPaint();
+        Paint polygonPaint = featureTiles.getPolygonPaintCopy();
         polygonPaint.setColor(Color.RED);
+        featureTiles.setPolygonPaint(polygonPaint);
 
         featureTiles.setFillPolygon(true);
-        Paint polygonFillPaint = featureTiles.getPolygonFillPaint();
+        Paint polygonFillPaint = featureTiles.getPolygonFillPaintCopy();
         polygonFillPaint.setColor(Color.RED);
         polygonFillPaint.setAlpha(50);
+        featureTiles.setPolygonFillPaint(polygonFillPaint);
 
         featureTiles.calculateDrawOverlap();
 

@@ -294,12 +294,10 @@ public abstract class FeatureTiles {
         pointPaint.setAntiAlias(true);
         pointRadius = Float.valueOf(context.getString(R.string.feature_tiles_point_radius));
 
-        // TODO figure out not setting density until use
         linePaint.setAntiAlias(true);
         linePaint.setStrokeWidth(this.density * Float.valueOf(context.getString(R.string.feature_tiles_line_stroke_width)));
         linePaint.setStyle(Style.STROKE);
 
-        // TODO figure out not setting density until use
         polygonPaint.setAntiAlias(true);
         polygonPaint.setStrokeWidth(this.density * Float.valueOf(context.getString(R.string.feature_tiles_polygon_stroke_width)));
         polygonPaint.setStyle(Style.STROKE);
@@ -673,12 +671,13 @@ public abstract class FeatureTiles {
     }
 
     /**
-     * Get the line paint
+     * Get a copy of the line paint, must call {@link #setLinePaint(Paint)} to update the paint
      *
      * @return line paint
+     * @since 3.1.1
      */
-    public Paint getLinePaint() {
-        return linePaint;
+    public Paint getLinePaintCopy() {
+        return new Paint(linePaint);
     }
 
     /**
@@ -687,16 +686,18 @@ public abstract class FeatureTiles {
      * @param linePaint line paint
      */
     public void setLinePaint(Paint linePaint) {
+        linePaint.setStrokeWidth(this.density * linePaint.getStrokeWidth());
         this.linePaint = linePaint;
     }
 
     /**
-     * Get the polygon paint
+     * Get a copy of the polygon paint, must call {@link #setPolygonPaint(Paint)} to update the paint
      *
      * @return polygon paint
+     * @since 3.1.1
      */
-    public Paint getPolygonPaint() {
-        return polygonPaint;
+    public Paint getPolygonPaintCopy() {
+        return new Paint(polygonPaint);
     }
 
     /**
@@ -705,6 +706,7 @@ public abstract class FeatureTiles {
      * @param polygonPaint polygon paint
      */
     public void setPolygonPaint(Paint polygonPaint) {
+        polygonPaint.setStrokeWidth(this.density * polygonPaint.getStrokeWidth());
         this.polygonPaint = polygonPaint;
     }
 
@@ -730,9 +732,10 @@ public abstract class FeatureTiles {
      * Get the polygon fill paint
      *
      * @return polygon fill paint
+     * @since 3.1.1
      */
-    public Paint getPolygonFillPaint() {
-        return polygonFillPaint;
+    public Paint getPolygonFillPaintCopy() {
+        return new Paint(polygonFillPaint);
     }
 
     /**

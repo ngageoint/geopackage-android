@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
 
@@ -353,6 +352,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 drawn = drawPolygonPath(canvas, polyhedralSurfacePath, featureStyle);
                 break;
             case GEOMETRYCOLLECTION:
+                @SuppressWarnings("unchecked")
                 GeometryCollection<Geometry> geometryCollection = (GeometryCollection) geometry;
                 List<Geometry> geometries = geometryCollection.getGeometries();
                 for (Geometry geometryFromCollection : geometries) {
