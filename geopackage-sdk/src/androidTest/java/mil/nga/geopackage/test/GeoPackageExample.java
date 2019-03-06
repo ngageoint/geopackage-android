@@ -1100,7 +1100,7 @@ public class GeoPackageExample extends BaseTestCase {
 
             FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
             FeatureTiles featureTiles = new DefaultFeatureTiles(context, geoPackage, featureDao,
-                    context.getResources().getDisplayMetrics().density); // TODO test this
+                    context.getResources().getDisplayMetrics().density);
 
             BoundingBox boundingBox = featureDao.getBoundingBox();
             Projection projection = featureDao.getProjection();
