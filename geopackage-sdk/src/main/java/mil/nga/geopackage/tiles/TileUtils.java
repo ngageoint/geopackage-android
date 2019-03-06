@@ -69,4 +69,25 @@ public class TileUtils {
         return density * TILE_DP / tileLength;
     }
 
+    /**
+     * Get the density based upon the tile dimensions
+     *
+     * @param tileWidth  tile width
+     * @param tileHeight tile height
+     * @return density
+     */
+    public static float density(int tileWidth, int tileHeight) {
+        return density(Math.min(tileWidth, tileHeight));
+    }
+
+    /**
+     * Get the density based upon the tile length (width or height)
+     *
+     * @param tileLength tile length (width or height)
+     * @return density
+     */
+    public static float density(int tileLength) {
+        return tileLength / TILE_DP;
+    }
+
 }

@@ -187,7 +187,7 @@ public abstract class FeatureTiles {
     /**
      * Tile density based upon the device-independent pixels {@link TileUtils#TILE_DP}
      */
-    protected float density = 1.0f;
+    protected final float density;
 
     /**
      * Constructor
@@ -233,7 +233,7 @@ public abstract class FeatureTiles {
      * @since 3.1.1
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
-        this(context, geoPackage, featureDao, 1.0f);
+        this(context, geoPackage, featureDao, TileUtils.TILE_PIXELS_DEFAULT, TileUtils.TILE_PIXELS_DEFAULT);
     }
 
     /**
@@ -260,7 +260,7 @@ public abstract class FeatureTiles {
      * @since 3.1.1
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width, int height) {
-        this(context, geoPackage, featureDao, 1.0f, width, height);
+        this(context, geoPackage, featureDao, TileUtils.density(width, height), width, height);
     }
 
     /**
