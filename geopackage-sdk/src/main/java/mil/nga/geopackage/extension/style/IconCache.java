@@ -122,6 +122,16 @@ public class IconCache {
     /**
      * Create or retrieve from cache an icon bitmap for the icon row
      *
+     * @param icon icon row
+     * @return icon bitmap
+     */
+    public Bitmap createIcon(IconRow icon) {
+        return createIcon(icon, this);
+    }
+
+    /**
+     * Create or retrieve from cache an icon bitmap for the icon row
+     *
      * @param icon    icon row
      * @param density display density: {@link android.util.DisplayMetrics#density}
      * @return icon bitmap
@@ -133,12 +143,33 @@ public class IconCache {
     /**
      * Create an icon bitmap for the icon row without caching
      *
+     * @param icon icon row
+     * @return icon bitmap
+     */
+    public static Bitmap createIconNoCache(IconRow icon) {
+        return createIcon(icon, null);
+    }
+
+    /**
+     * Create an icon bitmap for the icon row without caching
+     *
      * @param icon    icon row
      * @param density display density: {@link android.util.DisplayMetrics#density}
      * @return icon bitmap
      */
     public static Bitmap createIconNoCache(IconRow icon, float density) {
         return createIcon(icon, density, null);
+    }
+
+    /**
+     * Create or retrieve from cache an icon bitmap for the icon row
+     *
+     * @param icon      icon row
+     * @param iconCache icon cache
+     * @return icon bitmap
+     */
+    public static Bitmap createIcon(IconRow icon, IconCache iconCache) {
+        return createIcon(icon, 1.0f, iconCache);
     }
 
     /**
