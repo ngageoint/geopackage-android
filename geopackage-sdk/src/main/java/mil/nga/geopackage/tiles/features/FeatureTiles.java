@@ -130,9 +130,19 @@ public abstract class FeatureTiles {
     protected Paint linePaint = new Paint();
 
     /**
+     * Line stroke width
+     */
+    protected float lineStrokeWidth;
+
+    /**
      * Polygon paint
      */
     protected Paint polygonPaint = new Paint();
+
+    /**
+     * Polygon stroke width
+     */
+    protected float polygonStrokeWidth;
 
     /**
      * Fill polygon flag
@@ -187,7 +197,7 @@ public abstract class FeatureTiles {
     /**
      * Tile density based upon the device-independent pixels {@link TileUtils#TILE_DP}
      */
-    protected final float density;
+    protected float density = 1.0f;
 
     /**
      * Constructor
@@ -295,11 +305,13 @@ public abstract class FeatureTiles {
         pointRadius = Float.valueOf(context.getString(R.string.feature_tiles_point_radius));
 
         linePaint.setAntiAlias(true);
-        linePaint.setStrokeWidth(this.density * Float.valueOf(context.getString(R.string.feature_tiles_line_stroke_width)));
+        lineStrokeWidth = Float.valueOf(context.getString(R.string.feature_tiles_line_stroke_width));
+        linePaint.setStrokeWidth(this.density * lineStrokeWidth);
         linePaint.setStyle(Style.STROKE);
 
         polygonPaint.setAntiAlias(true);
-        polygonPaint.setStrokeWidth(this.density * Float.valueOf(context.getString(R.string.feature_tiles_polygon_stroke_width)));
+        polygonStrokeWidth = Float.valueOf(context.getString(R.string.feature_tiles_polygon_stroke_width));
+        polygonPaint.setStrokeWidth(this.density * polygonStrokeWidth);
         polygonPaint.setStyle(Style.STROKE);
 
         Resources resources = context.getResources();
@@ -352,11 +364,11 @@ public abstract class FeatureTiles {
             widthOverlap = this.density * pointRadius;
         }
 
-        float linePaintHalfStroke = linePaint.getStrokeWidth() / 2.0f;
+        float linePaintHalfStroke = this.density * lineStrokeWidth / 2.0f;
         heightOverlap = Math.max(heightOverlap, linePaintHalfStroke);
         widthOverlap = Math.max(widthOverlap, linePaintHalfStroke);
 
-        float polygonPaintHalfStroke = polygonPaint.getStrokeWidth() / 2.0f;
+        float polygonPaintHalfStroke = this.density * polygonStrokeWidth / 2.0f;
         heightOverlap = Math.max(heightOverlap, polygonPaintHalfStroke);
         widthOverlap = Math.max(widthOverlap, polygonPaintHalfStroke);
 
@@ -376,7 +388,7 @@ public abstract class FeatureTiles {
             StyleDao styleDao = featureTableStyles.getStyleDao();
             for (long styleRowId : styleRowIds) {
                 StyleRow styleRow = styleDao.getRow(styleDao.queryForIdRow(styleRowId));
-                float styleHalfWidth = (float) (styleRow.getWidthOrDefault() / 2.0f);
+                float styleHalfWidth = this.density * (float) (styleRow.getWidthOrDefault() / 2.0f);
                 widthOverlap = Math.max(widthOverlap, styleHalfWidth);
                 heightOverlap = Math.max(heightOverlap, styleHalfWidth);
             }
@@ -404,6 +416,29 @@ public abstract class FeatureTiles {
 
         }
 
+    }
+
+    /**
+     * Set the density
+     *
+     * @param density density
+     * @since 3.1.1
+     */
+    public void setDensity(float density) {
+        this.density = density;
+        linePaint.setStrokeWidth(this.density * lineStrokeWidth);
+        polygonPaint.setStrokeWidth(this.density * polygonStrokeWidth);
+        featurePaintCache.clear();
+    }
+
+    /**
+     * Get the density
+     *
+     * @return density
+     * @since 3.1.1
+     */
+    public float getDensity() {
+        return density;
     }
 
     /**
@@ -649,6 +684,9 @@ public abstract class FeatureTiles {
      * @param pointPaint point paint
      */
     public void setPointPaint(Paint pointPaint) {
+        if (pointPaint == null) {
+            throw new AssertionError("Point Paint can not be null");
+        }
         this.pointPaint = pointPaint;
     }
 
@@ -686,8 +724,72 @@ public abstract class FeatureTiles {
      * @param linePaint line paint
      */
     public void setLinePaint(Paint linePaint) {
-        linePaint.setStrokeWidth(this.density * linePaint.getStrokeWidth());
+        if (linePaint == null) {
+            throw new AssertionError("Line Paint can not be null");
+        }
         this.linePaint = linePaint;
+        setLineStrokeWidth(linePaint.getStrokeWidth());
+    }
+
+    /**
+     * Get line stroke width
+     *
+     * @return width
+     * @since 3.1.1
+     */
+    public float getLineStrokeWidth() {
+        return lineStrokeWidth;
+    }
+
+    /**
+     * Set line stroke width
+     *
+     * @param lineStrokeWidth line stroke width
+     * @since 3.1.1
+     */
+    public void setLineStrokeWidth(float lineStrokeWidth) {
+        this.lineStrokeWidth = lineStrokeWidth;
+        linePaint.setStrokeWidth(this.density * lineStrokeWidth);
+    }
+
+    /**
+     * Get line color
+     *
+     * @return color
+     * @since 3.1.1
+     */
+    public int getLineColor() {
+        return linePaint.getColor();
+    }
+
+    /**
+     * Set line color
+     *
+     * @param lineColor line color
+     * @since 3.1.1
+     */
+    public void setLineColor(int lineColor) {
+        linePaint.setColor(lineColor);
+    }
+
+    /**
+     * Get line alpha
+     *
+     * @return alpha
+     * @since 3.1.1
+     */
+    public int getLineAlpha() {
+        return linePaint.getAlpha();
+    }
+
+    /**
+     * Set line alpha
+     *
+     * @param lineAlpha line alpha
+     * @since 3.1.1
+     */
+    public void setLineAlpha(int lineAlpha) {
+        linePaint.setAlpha(lineAlpha);
     }
 
     /**
@@ -706,8 +808,72 @@ public abstract class FeatureTiles {
      * @param polygonPaint polygon paint
      */
     public void setPolygonPaint(Paint polygonPaint) {
-        polygonPaint.setStrokeWidth(this.density * polygonPaint.getStrokeWidth());
+        if (polygonPaint == null) {
+            throw new AssertionError("Polygon Paint can not be null");
+        }
         this.polygonPaint = polygonPaint;
+        setPolygonStrokeWidth(polygonPaint.getStrokeWidth());
+    }
+
+    /**
+     * Get polygon stroke width
+     *
+     * @return width
+     * @since 3.1.1
+     */
+    public float getPolygonStrokeWidth() {
+        return polygonStrokeWidth;
+    }
+
+    /**
+     * Set polygon stroke width
+     *
+     * @param polygonStrokeWidth polygon stroke width
+     * @since 3.1.1
+     */
+    public void setPolygonStrokeWidth(float polygonStrokeWidth) {
+        this.polygonStrokeWidth = polygonStrokeWidth;
+        polygonPaint.setStrokeWidth(this.density * polygonStrokeWidth);
+    }
+
+    /**
+     * Get polygon color
+     *
+     * @return color
+     * @since 3.1.1
+     */
+    public int getPolygonColor() {
+        return polygonPaint.getColor();
+    }
+
+    /**
+     * Set polygon color
+     *
+     * @param polygonColor polygon color
+     * @since 3.1.1
+     */
+    public void setPolygonColor(int polygonColor) {
+        polygonPaint.setColor(polygonColor);
+    }
+
+    /**
+     * Get polygon alpha
+     *
+     * @return alpha
+     * @since 3.1.1
+     */
+    public int getPolygonAlpha() {
+        return polygonPaint.getAlpha();
+    }
+
+    /**
+     * Set polygon alpha
+     *
+     * @param polygonAlpha polygon alpha
+     * @since 3.1.1
+     */
+    public void setPolygonAlpha(int polygonAlpha) {
+        polygonPaint.setAlpha(polygonAlpha);
     }
 
     /**
@@ -744,7 +910,50 @@ public abstract class FeatureTiles {
      * @param polygonFillPaint polygon fill paint
      */
     public void setPolygonFillPaint(Paint polygonFillPaint) {
+        if (polygonFillPaint == null) {
+            throw new AssertionError("Polygon Fill Paint can not be null");
+        }
         this.polygonFillPaint = polygonFillPaint;
+    }
+
+    /**
+     * Get polygon fill color
+     *
+     * @return color
+     * @since 3.1.1
+     */
+    public int getPolygonFillColor() {
+        return polygonFillPaint.getColor();
+    }
+
+    /**
+     * Set polygon fill color
+     *
+     * @param polygonFillColor polygon fill color
+     * @since 3.1.1
+     */
+    public void setPolygonFillColor(int polygonFillColor) {
+        polygonFillPaint.setColor(polygonFillColor);
+    }
+
+    /**
+     * Get polygon fill alpha
+     *
+     * @return alpha
+     * @since 3.1.1
+     */
+    public int getPolygonFillAlpha() {
+        return polygonFillPaint.getAlpha();
+    }
+
+    /**
+     * Set polygon fill alpha
+     *
+     * @param polygonFillAlpha polygon fill alpha
+     * @since 3.1.1
+     */
+    public void setPolygonFillAlpha(int polygonFillAlpha) {
+        polygonFillPaint.setAlpha(polygonFillAlpha);
     }
 
     /**
