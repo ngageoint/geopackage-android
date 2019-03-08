@@ -1202,6 +1202,40 @@ public abstract class FeatureTiles {
      * Create an expanded bounding box to handle features outside the tile that
      * overlap
      *
+     * @param boundingBox
+     *            bounding box
+     * @param projection
+     *            bounding box projection
+     * @return bounding box
+     * @since 3.1.1
+     */
+    public BoundingBox expandBoundingBox(BoundingBox boundingBox,
+                                         Projection projection) {
+
+        BoundingBox expandedBoundingBox = boundingBox;
+
+        ProjectionTransform toWebMercator = projection
+                .getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+        if (!toWebMercator.isSameProjection()) {
+            expandedBoundingBox = expandedBoundingBox.transform(toWebMercator);
+        }
+
+        expandedBoundingBox = expandBoundingBox(expandedBoundingBox);
+
+        if (!toWebMercator.isSameProjection()) {
+            ProjectionTransform fromWebMercator = toWebMercator
+                    .getInverseTransformation();
+            expandedBoundingBox = expandedBoundingBox
+                    .transform(fromWebMercator);
+        }
+
+        return expandedBoundingBox;
+    }
+
+    /**
+     * Create an expanded bounding box to handle features outside the tile that
+     * overlap
+     *
      * @param webMercatorBoundingBox web mercator bounding box
      * @return bounding box
      * @since 3.1.1
@@ -1218,10 +1252,10 @@ public abstract class FeatureTiles {
                 tileHeight, webMercatorBoundingBox, 0 - heightOverlap);
         double minLatitude = TileBoundingBoxUtils.getLatitudeFromPixel(
                 tileHeight, webMercatorBoundingBox, tileHeight + heightOverlap);
-        BoundingBox expandedQueryBoundingBox = new BoundingBox(minLongitude,
+        BoundingBox expandedBoundingBox = new BoundingBox(minLongitude,
                 minLatitude, maxLongitude, maxLatitude);
 
-        return expandedQueryBoundingBox;
+        return expandedBoundingBox;
     }
 
     /**
