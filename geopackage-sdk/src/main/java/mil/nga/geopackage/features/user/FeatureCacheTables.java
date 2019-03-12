@@ -10,7 +10,7 @@ import java.util.Set;
  * Feature Row Cache for multiple feature tables in a single GeoPackage
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class FeatureCacheTables {
 

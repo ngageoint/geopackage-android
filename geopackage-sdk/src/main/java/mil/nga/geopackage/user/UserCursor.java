@@ -70,7 +70,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Set the table
      *
      * @param table table
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setTable(TTable table) {
         this.table = table;

@@ -178,7 +178,7 @@ public class UserMappingDao extends UserCustomDao {
      * Get the unique base ids
      *
      * @return list of unique base ids
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public List<Long> uniqueBaseIds() {
         return querySingleColumnTypedResults(
@@ -190,7 +190,7 @@ public class UserMappingDao extends UserCustomDao {
      * Get the unique related ids
      *
      * @return list of unique related ids
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public List<Long> uniqueRelatedIds() {
         return querySingleColumnTypedResults(

@@ -4,7 +4,7 @@ package mil.nga.geopackage.extension.style;
  * Feature Style, including a style and icon, for a single feature geometry
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class FeatureStyle {
 

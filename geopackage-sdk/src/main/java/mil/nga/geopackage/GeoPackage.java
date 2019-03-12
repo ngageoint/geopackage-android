@@ -116,7 +116,7 @@ public interface GeoPackage extends GeoPackageCore {
      * Get the application context
      *
      * @return context
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public Context getContext();
 

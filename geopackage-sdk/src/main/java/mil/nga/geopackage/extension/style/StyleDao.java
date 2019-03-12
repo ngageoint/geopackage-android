@@ -8,7 +8,7 @@ import mil.nga.geopackage.attributes.AttributesRow;
  * Style DAO for reading style tables
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class StyleDao extends AttributesDao {
 

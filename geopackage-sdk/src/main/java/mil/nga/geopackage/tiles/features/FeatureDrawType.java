@@ -4,7 +4,7 @@ package mil.nga.geopackage.tiles.features;
  * Feature Draw Types when drawing feature tiles
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public enum FeatureDrawType {
 

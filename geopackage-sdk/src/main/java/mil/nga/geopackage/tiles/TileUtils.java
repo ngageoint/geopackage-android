@@ -6,7 +6,7 @@ import android.util.DisplayMetrics;
  * Tile utilities and constants
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class TileUtils {
 

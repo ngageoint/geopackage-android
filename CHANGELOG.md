@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 3.1.1 (TBD)
+## 3.2.0 (TBD)
 
 * geopackage-core version 3.2.0
 * tiff version 2.0.1

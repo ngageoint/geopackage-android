@@ -10,7 +10,7 @@ import mil.nga.geopackage.extension.style.StyleRow;
  * Feature Paint Cache of Paint objects for each feature id and draw type
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class FeaturePaintCache {
 

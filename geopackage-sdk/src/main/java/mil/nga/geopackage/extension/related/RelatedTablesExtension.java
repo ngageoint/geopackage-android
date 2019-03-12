@@ -248,7 +248,7 @@ public class RelatedTablesExtension extends RelatedTablesCoreExtension {
      * @param baseId    base id
      * @param relatedId related id
      * @return true if mapping exists
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public boolean hasMapping(String tableName, long baseId, long relatedId) {
         boolean has = false;

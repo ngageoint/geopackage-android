@@ -126,7 +126,7 @@ public class MediaRow extends UserCustomRow {
      * and {@link BitmapFactory.Options#outConfig}
      *
      * @return bounds options
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public BitmapFactory.Options getDataBounds() {
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -140,7 +140,7 @@ public class MediaRow extends UserCustomRow {
      * Get the data bitmap
      *
      * @return data bitmap
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public Bitmap getDataBitmap() {
         return getDataBitmap(null);
@@ -151,7 +151,7 @@ public class MediaRow extends UserCustomRow {
      *
      * @param options bitmap options
      * @return data bitmap
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public Bitmap getDataBitmap(BitmapFactory.Options options) {
         return BitmapConverter.toBitmap(getData(), options);
@@ -163,7 +163,7 @@ public class MediaRow extends UserCustomRow {
      * @param bitmap bitmap
      * @param format compress format
      * @throws IOException upon failure
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setData(Bitmap bitmap, Bitmap.CompressFormat format)
             throws IOException {
@@ -177,7 +177,7 @@ public class MediaRow extends UserCustomRow {
      * @param format  compress format
      * @param quality quality
      * @throws IOException upon failure
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setData(Bitmap bitmap, Bitmap.CompressFormat format, int quality)
             throws IOException {

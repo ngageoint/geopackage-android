@@ -9,7 +9,7 @@ import java.util.Map;
  * Paint objects for drawing the different types for a single feature
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class FeaturePaint {
 

@@ -56,7 +56,7 @@ public class FeatureTileGenerator extends TileGenerator {
      * @param maxZoom           max zoom
      * @param boundingBox       tiles bounding box
      * @param projection        tiles projection
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTileGenerator(Context context, GeoPackage geoPackage, String tableName,
                                 FeatureTiles featureTiles, GeoPackage featureGeoPackage,
@@ -78,7 +78,7 @@ public class FeatureTileGenerator extends TileGenerator {
      * @param minZoom      min zoom
      * @param maxZoom      max zoom
      * @param projection   tiles projection
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTileGenerator(Context context, GeoPackage geoPackage, String tableName,
                                 FeatureTiles featureTiles, int minZoom, int maxZoom,
@@ -98,7 +98,7 @@ public class FeatureTileGenerator extends TileGenerator {
      * @param minZoom           min zoom
      * @param maxZoom           max zoom
      * @param projection        tiles projection
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTileGenerator(Context context, GeoPackage geoPackage, String tableName,
                                 FeatureTiles featureTiles, GeoPackage featureGeoPackage,

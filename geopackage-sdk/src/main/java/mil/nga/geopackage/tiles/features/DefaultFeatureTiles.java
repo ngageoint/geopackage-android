@@ -61,7 +61,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param context    context
      * @param featureDao feature dao
      * @param density    display density: {@link android.util.DisplayMetrics#density}
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public DefaultFeatureTiles(Context context, FeatureDao featureDao, float density) {
         super(context, featureDao, density);
@@ -74,7 +74,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param featureDao feature dao
      * @param width      drawn tile width
      * @param height     drawn tile height
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public DefaultFeatureTiles(Context context, FeatureDao featureDao, int width, int height) {
         super(context, featureDao, width, height);
@@ -86,7 +86,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param context    context
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
         super(context, geoPackage, featureDao);
@@ -99,7 +99,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
      * @param density    display density: {@link android.util.DisplayMetrics#density}
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density) {
         super(context, geoPackage, featureDao, density);
@@ -113,7 +113,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param featureDao feature dao
      * @param width      drawn tile width
      * @param height     drawn tile height
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width, int height) {
         super(context, geoPackage, featureDao, width, height);
@@ -128,7 +128,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param density    display density: {@link android.util.DisplayMetrics#density}
      * @param width      drawn tile width
      * @param height     drawn tile height
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density, int width, int height) {
         super(context, geoPackage, featureDao, density, width, height);

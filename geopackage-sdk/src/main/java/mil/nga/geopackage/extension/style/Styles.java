@@ -12,7 +12,7 @@ import mil.nga.sf.util.GeometryUtils;
  * Styles for a single feature geometry or feature table default
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class Styles {
 

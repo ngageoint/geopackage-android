@@ -10,7 +10,7 @@ import android.util.LruCache;
  * Icon Cache of icon bitmaps
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class IconCache {
 

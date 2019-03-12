@@ -1956,7 +1956,7 @@ public class GeoPackageExample extends BaseTestCase {
                 new Date());
 
         properties.addValue(PropertyNames.TITLE, "GeoPackage Android Example");
-        properties.addValue(PropertyNames.VERSION, "3.1.1");
+        properties.addValue(PropertyNames.VERSION, "3.2.0");
         properties.addValue(PropertyNames.CREATOR, "NGA");
         properties.addValue(PropertyNames.PUBLISHER, "NGA");
         properties.addValue(PropertyNames.CONTRIBUTOR, "Brian Osborn");

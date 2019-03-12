@@ -41,7 +41,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      * Get the table
      *
      * @return table
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public TTable getTable() {
         return table;
@@ -51,7 +51,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      * Set the table
      *
      * @param table table
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setTable(TTable table) {
         this.table = table;

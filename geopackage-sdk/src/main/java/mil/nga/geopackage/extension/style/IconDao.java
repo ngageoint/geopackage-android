@@ -9,7 +9,7 @@ import mil.nga.geopackage.user.custom.UserCustomRow;
  * Icon DAO for reading icon tables
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class IconDao extends MediaDao {
 

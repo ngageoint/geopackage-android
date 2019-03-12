@@ -215,7 +215,7 @@ public abstract class FeatureTiles {
      * @param context    context
      * @param featureDao feature dao
      * @param density    display density: {@link android.util.DisplayMetrics#density}
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTiles(Context context, FeatureDao featureDao, float density) {
         this(context, null, featureDao, density);
@@ -228,7 +228,7 @@ public abstract class FeatureTiles {
      * @param featureDao feature dao
      * @param width      drawn tile width
      * @param height     drawn tile height
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTiles(Context context, FeatureDao featureDao, int width, int height) {
         this(context, null, featureDao, width, height);
@@ -240,7 +240,7 @@ public abstract class FeatureTiles {
      * @param context    context
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
         this(context, geoPackage, featureDao, TileUtils.TILE_PIXELS_HIGH, TileUtils.TILE_PIXELS_HIGH);
@@ -253,7 +253,7 @@ public abstract class FeatureTiles {
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
      * @param density    display density: {@link android.util.DisplayMetrics#density}
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density) {
         this(context, geoPackage, featureDao, density, TileUtils.tileLength(density), TileUtils.tileLength(density));
@@ -267,7 +267,7 @@ public abstract class FeatureTiles {
      * @param featureDao feature dao
      * @param width      drawn tile width
      * @param height     drawn tile height
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width, int height) {
         this(context, geoPackage, featureDao, TileUtils.density(width, height), width, height);
@@ -282,7 +282,7 @@ public abstract class FeatureTiles {
      * @param density    display density: {@link android.util.DisplayMetrics#density}
      * @param width      drawn tile width
      * @param height     drawn tile height
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density, int width, int height) {
 
@@ -422,7 +422,7 @@ public abstract class FeatureTiles {
      * Set the density
      *
      * @param density density
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setDensity(float density) {
         this.density = density;
@@ -435,7 +435,7 @@ public abstract class FeatureTiles {
      * Get the density
      *
      * @return density
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public float getDensity() {
         return density;
@@ -529,7 +529,7 @@ public abstract class FeatureTiles {
      * Get the feature table styles
      *
      * @return feature table styles
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureTableStyles getFeatureTableStyles() {
         return featureTableStyles;
@@ -539,7 +539,7 @@ public abstract class FeatureTiles {
      * Set the feature table styles
      *
      * @param featureTableStyles feature table styles
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setFeatureTableStyles(FeatureTableStyles featureTableStyles) {
         this.featureTableStyles = featureTableStyles;
@@ -548,7 +548,7 @@ public abstract class FeatureTiles {
     /**
      * Ignore the feature table styles within the GeoPackage
      *
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void ignoreFeatureTableStyles() {
         setFeatureTableStyles(null);
@@ -558,7 +558,7 @@ public abstract class FeatureTiles {
     /**
      * Clear the style paint cache
      *
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void clearStylePaintCache() {
         featurePaintCache.clear();
@@ -568,7 +568,7 @@ public abstract class FeatureTiles {
      * Set / resize the style paint cache size
      *
      * @param size new size
-     * @since 3.1.1
+     * @since 3.2.0
      */
     @TargetApi(21)
     public void setStylePaintCacheSize(int size) {
@@ -578,7 +578,7 @@ public abstract class FeatureTiles {
     /**
      * Clear the icon cache
      *
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void clearIconCache() {
         iconCache.clear();
@@ -588,7 +588,7 @@ public abstract class FeatureTiles {
      * Set / resize the icon cache size
      *
      * @param size new size
-     * @since 3.1.1
+     * @since 3.2.0
      */
     @TargetApi(21)
     public void setIconCacheSize(int size) {
@@ -712,7 +712,7 @@ public abstract class FeatureTiles {
      * Get a copy of the line paint, must call {@link #setLinePaint(Paint)} to update the paint
      *
      * @return line paint
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public Paint getLinePaintCopy() {
         return new Paint(linePaint);
@@ -735,7 +735,7 @@ public abstract class FeatureTiles {
      * Get line stroke width
      *
      * @return width
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public float getLineStrokeWidth() {
         return lineStrokeWidth;
@@ -745,7 +745,7 @@ public abstract class FeatureTiles {
      * Set line stroke width
      *
      * @param lineStrokeWidth line stroke width
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setLineStrokeWidth(float lineStrokeWidth) {
         this.lineStrokeWidth = lineStrokeWidth;
@@ -756,7 +756,7 @@ public abstract class FeatureTiles {
      * Get line color
      *
      * @return color
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public int getLineColor() {
         return linePaint.getColor();
@@ -766,7 +766,7 @@ public abstract class FeatureTiles {
      * Set line color
      *
      * @param lineColor line color
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setLineColor(int lineColor) {
         linePaint.setColor(lineColor);
@@ -776,7 +776,7 @@ public abstract class FeatureTiles {
      * Get line alpha
      *
      * @return alpha
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public int getLineAlpha() {
         return linePaint.getAlpha();
@@ -786,7 +786,7 @@ public abstract class FeatureTiles {
      * Set line alpha
      *
      * @param lineAlpha line alpha
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setLineAlpha(int lineAlpha) {
         linePaint.setAlpha(lineAlpha);
@@ -796,7 +796,7 @@ public abstract class FeatureTiles {
      * Get a copy of the polygon paint, must call {@link #setPolygonPaint(Paint)} to update the paint
      *
      * @return polygon paint
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public Paint getPolygonPaintCopy() {
         return new Paint(polygonPaint);
@@ -819,7 +819,7 @@ public abstract class FeatureTiles {
      * Get polygon stroke width
      *
      * @return width
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public float getPolygonStrokeWidth() {
         return polygonStrokeWidth;
@@ -829,7 +829,7 @@ public abstract class FeatureTiles {
      * Set polygon stroke width
      *
      * @param polygonStrokeWidth polygon stroke width
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setPolygonStrokeWidth(float polygonStrokeWidth) {
         this.polygonStrokeWidth = polygonStrokeWidth;
@@ -840,7 +840,7 @@ public abstract class FeatureTiles {
      * Get polygon color
      *
      * @return color
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public int getPolygonColor() {
         return polygonPaint.getColor();
@@ -850,7 +850,7 @@ public abstract class FeatureTiles {
      * Set polygon color
      *
      * @param polygonColor polygon color
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setPolygonColor(int polygonColor) {
         polygonPaint.setColor(polygonColor);
@@ -860,7 +860,7 @@ public abstract class FeatureTiles {
      * Get polygon alpha
      *
      * @return alpha
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public int getPolygonAlpha() {
         return polygonPaint.getAlpha();
@@ -870,7 +870,7 @@ public abstract class FeatureTiles {
      * Set polygon alpha
      *
      * @param polygonAlpha polygon alpha
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setPolygonAlpha(int polygonAlpha) {
         polygonPaint.setAlpha(polygonAlpha);
@@ -898,7 +898,7 @@ public abstract class FeatureTiles {
      * Get the polygon fill paint
      *
      * @return polygon fill paint
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public Paint getPolygonFillPaintCopy() {
         return new Paint(polygonFillPaint);
@@ -920,7 +920,7 @@ public abstract class FeatureTiles {
      * Get polygon fill color
      *
      * @return color
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public int getPolygonFillColor() {
         return polygonFillPaint.getColor();
@@ -930,7 +930,7 @@ public abstract class FeatureTiles {
      * Set polygon fill color
      *
      * @param polygonFillColor polygon fill color
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setPolygonFillColor(int polygonFillColor) {
         polygonFillPaint.setColor(polygonFillColor);
@@ -940,7 +940,7 @@ public abstract class FeatureTiles {
      * Get polygon fill alpha
      *
      * @return alpha
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public int getPolygonFillAlpha() {
         return polygonFillPaint.getAlpha();
@@ -950,7 +950,7 @@ public abstract class FeatureTiles {
      * Set polygon fill alpha
      *
      * @param polygonFillAlpha polygon fill alpha
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public void setPolygonFillAlpha(int polygonFillAlpha) {
         polygonFillPaint.setAlpha(polygonFillAlpha);
@@ -1142,7 +1142,7 @@ public abstract class FeatureTiles {
      *
      * @param webMercatorBoundingBox web mercator bounding box
      * @return feature count
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public long queryIndexedFeaturesCount(BoundingBox webMercatorBoundingBox) {
 
@@ -1167,7 +1167,7 @@ public abstract class FeatureTiles {
      * @param y    y coordinate
      * @param zoom zoom level
      * @return feature index results
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public FeatureIndexResults queryIndexedFeatures(int x, int y, int zoom) {
 
@@ -1207,7 +1207,7 @@ public abstract class FeatureTiles {
      * @param projection
      *            bounding box projection
      * @return bounding box
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public BoundingBox expandBoundingBox(BoundingBox boundingBox,
                                          Projection projection) {
@@ -1238,7 +1238,7 @@ public abstract class FeatureTiles {
      *
      * @param webMercatorBoundingBox web mercator bounding box
      * @return bounding box
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public BoundingBox expandBoundingBox(BoundingBox webMercatorBoundingBox) {
 

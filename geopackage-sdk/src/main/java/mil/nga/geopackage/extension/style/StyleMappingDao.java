@@ -13,7 +13,7 @@ import mil.nga.sf.GeometryType;
  * Style Mapping DAO for reading style mapping data tables
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class StyleMappingDao extends UserMappingDao {
 

@@ -11,7 +11,7 @@ import mil.nga.geopackage.user.custom.UserCustomRow;
  * Icon Row containing the values from a single result set row
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class IconRow extends MediaRow {
 

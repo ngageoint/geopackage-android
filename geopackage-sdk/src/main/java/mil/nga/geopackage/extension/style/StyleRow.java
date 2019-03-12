@@ -11,7 +11,7 @@ import mil.nga.geopackage.style.Color;
  * Style Row containing the values from a single result set row
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class StyleRow extends AttributesRow {
 

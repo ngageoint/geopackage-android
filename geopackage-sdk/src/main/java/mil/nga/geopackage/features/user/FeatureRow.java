@@ -122,7 +122,7 @@ public class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
      * Get the simple features geometry type
      *
      * @return geometry type
-     * @since 3.1.1
+     * @since 3.2.0
      */
     public GeometryType getGeometryType() {
         Geometry geometry = getGeometryValue();

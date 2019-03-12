@@ -14,7 +14,7 @@ import mil.nga.sf.GeometryType;
  * Feature Style extension for styling features
  *
  * @author osbornb
- * @since 3.1.1
+ * @since 3.2.0
  */
 public class FeatureStyleExtension extends FeatureCoreStyleExtension {
 
