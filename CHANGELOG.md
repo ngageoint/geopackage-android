@@ -6,7 +6,22 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 3.1.1 (TBD)
 
-* TBD
+* geopackage-core version 3.2.0
+* tiff version 2.0.1
+* sf-geojson version 2.0.1
+* sqlite-android version 3250300
+* NGA [Contents Id](http://ngageoint.github.io/GeoPackage/docs/extensions/contents-id.html) Extension
+* NGA [Feature Style](http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html) Extension
+* OGC [Related Tables](http://www.geopackage.org/18-000.html) Extension improvements
+* Feature Tile drawing and generator improvements including scaling, styles, and layering
+* FeatureIndexResults id iteration option in place of reading full feature rows
+* Feature Cache for memory caching feature rows in a single table
+* Feature Cache Tables for memory caching feature rows from multiple single GeoPackage tables
+* GeoPackage app context accessor
+* Feature Row geometry type accessor
+* GeoPackage creation example updates
+* gradle plugin updated to 3.3.2
+* gradle version 4.10.1
 
 ## [3.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.1.0) (10-04-2018)
 
