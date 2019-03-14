@@ -20,6 +20,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * GeoPackage app context accessor
 * Feature Row geometry type accessor
 * GeoPackage creation example updates
+* Upgrade to AndroidX support libraries
 * gradle plugin updated to 3.3.2
 * gradle version 4.10.1
 

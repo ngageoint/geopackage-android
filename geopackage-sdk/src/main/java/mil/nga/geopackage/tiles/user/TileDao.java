@@ -1,6 +1,6 @@
 package mil.nga.geopackage.tiles.user;
 
-import android.support.v4.util.LongSparseArray;
+import androidx.collection.LongSparseArray;
 
 import java.util.HashMap;
 import java.util.List;
