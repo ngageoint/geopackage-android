@@ -9,7 +9,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * geopackage-core version 3.2.0
 * tiff version 2.0.1
 * sf-geojson version 2.0.1
-* sqlite-android version 3250300
+* sqlite-android version 3270200
 * NGA [Contents Id](http://ngageoint.github.io/GeoPackage/docs/extensions/contents-id.html) Extension
 * NGA [Feature Style](http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html) Extension
 * OGC [Related Tables](http://www.geopackage.org/18-000.html) Extension improvements
