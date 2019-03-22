@@ -5,8 +5,12 @@ import android.content.Context;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.extension.link.FeatureTileTableLinker;
+import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
+import mil.nga.geopackage.tiles.TileGrid;
 import mil.nga.sf.proj.Projection;
+import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Creates a set of tiles within a GeoPackage by generating tiles from features
@@ -139,6 +143,28 @@ public class FeatureTileGenerator extends TileGenerator {
         }
 
         return boundingBox;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BoundingBox getBoundingBox(int zoom) {
+
+        ProjectionTransform projectionToWebMercator = projection
+                .getTransformation(ProjectionConstants.EPSG_WEB_MERCATOR);
+        BoundingBox webMercatorBoundingBox = boundingBox
+                .transform(projectionToWebMercator);
+
+        TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(webMercatorBoundingBox, zoom);
+        BoundingBox tileBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(
+                tileGrid.getMinX(), tileGrid.getMinY(), zoom);
+
+        BoundingBox expandedBoundingBox = featureTiles.expandBoundingBox(webMercatorBoundingBox, tileBoundingBox);
+
+        BoundingBox zoomBoundingBox = expandedBoundingBox.transform(projectionToWebMercator.getInverseTransformation());
+
+        return zoomBoundingBox;
     }
 
     /**

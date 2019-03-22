@@ -169,7 +169,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
                 for (int z = minZoom; z <= maxZoom; z++) {
 
                     TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
-                            tileGenerator.getBoundingBox(), z);
+                            tileGenerator.getBoundingBox(z), z);
 
                     for (long x = tileGrid.getMinX(); x <= tileGrid.getMaxX(); x++) {
                         for (long y = tileGrid.getMinY(); y <= tileGrid.getMaxY(); y++) {
