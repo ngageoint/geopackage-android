@@ -1113,9 +1113,10 @@ public class GeoPackageExample extends BaseTestCase {
 
             int zoomLevel = TileBoundingBoxUtils
                     .getZoomLevel(requestBoundingBox);
+            zoomLevel = Math.max(zoomLevel, 8);
             zoomLevel = Math.min(zoomLevel, 19);
 
-            int minZoom = zoomLevel - 2;
+            int minZoom = zoomLevel - 8;
             int maxZoom = zoomLevel + 2;
 
             TileGenerator tileGenerator = new FeatureTileGenerator(context, geoPackage,
