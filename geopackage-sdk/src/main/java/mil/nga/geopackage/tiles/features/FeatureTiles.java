@@ -556,6 +556,16 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Clear all caches
+     *
+     * @since 3.2.1
+     */
+    public void clearCache() {
+        clearStylePaintCache();
+        clearIconCache();
+    }
+
+    /**
      * Clear the style paint cache
      *
      * @since 3.2.0
