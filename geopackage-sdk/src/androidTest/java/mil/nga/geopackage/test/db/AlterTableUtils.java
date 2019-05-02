@@ -202,11 +202,11 @@ public class AlterTableUtils {
                         newerColumnName + 5, GeoPackageDataType.FLOAT, true,
                         1.5f));
                 alterColumns.add(FeatureColumn.createColumn(
-                        newerColumnName + 6, GeoPackageDataType.DATETIME, true,
-                        "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))"));
-                alterColumns.add(FeatureColumn.createColumn(
                         newerColumnName + 8, GeoPackageDataType.TEXT, true,
                         "date_to_text"));
+                alterColumns.add(FeatureColumn.createColumn(
+                        newerColumnName + 9, GeoPackageDataType.DATETIME, true,
+                        "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))"));
                 dao.alterColumns(alterColumns);
 
                 for (int index = existingColumns + 1; index < table
