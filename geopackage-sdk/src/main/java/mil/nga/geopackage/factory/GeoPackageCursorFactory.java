@@ -44,9 +44,6 @@ class GeoPackageCursorFactory implements CursorFactory {
     public void registerTable(String tableName,
                               GeoPackageCursorWrapper cursorWrapper) {
 
-        // Remove an existing cursor wrapper
-        tableCursors.remove(tableName);
-
         // Add the wrapper
         tableCursors.put(tableName, cursorWrapper);
         String quotedTableName = CoreSQLUtils.quoteWrap(tableName);
