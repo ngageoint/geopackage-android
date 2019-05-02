@@ -65,6 +65,22 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * {@inheritDoc}
      */
     @Override
+    public void beginTransaction() {
+        db.beginTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void endTransaction(boolean successful) {
+        db.endTransaction(successful);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int delete(String table, String whereClause, String[] whereArgs) {
         return db.delete(table, whereClause, whereArgs);
     }

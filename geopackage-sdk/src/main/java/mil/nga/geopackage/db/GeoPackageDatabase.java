@@ -67,6 +67,28 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * Begin a transaction
+     *
+     * @since 3.2.1
+     */
+    public void beginTransaction() {
+        db.beginTransaction();
+    }
+
+    /**
+     * End a transaction
+     *
+     * @param successful true to commit, false to rollback
+     * @since 3.2.1
+     */
+    public void endTransaction(boolean successful) {
+        if (successful) {
+            db.setTransactionSuccessful();
+        }
+        db.endTransaction();
+    }
+
+    /**
      * @param table       table name
      * @param whereClause where clause
      * @param whereArgs   where arguments

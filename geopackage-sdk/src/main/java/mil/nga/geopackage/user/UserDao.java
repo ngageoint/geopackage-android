@@ -2,6 +2,8 @@ package mil.nga.geopackage.user;
 
 import android.content.ContentValues;
 
+import mil.nga.geopackage.db.AlterTable;
+import mil.nga.geopackage.db.ColumnMapping;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageDatabase;
 
@@ -102,6 +104,22 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
 
     /**
      * {@inheritDoc}
+     */
+    @Override
+    public void beginTransaction() {
+        db.beginTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void endTransaction(boolean successful) {
+        db.endTransaction(successful);
+    }
+
+    /**
+     * {@inheritDoc}
      * Handles requery of invalid id row
      */
     @Override
@@ -197,6 +215,24 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      */
     public long insertOrThrow(ContentValues values) {
         return db.insertOrThrow(getTableName(), null, values);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Alter Table in SQLite does not support renaming columns until version 3.25.0
+     * Once Android supports column rename alter table statements, this method override can be removed.
+     */
+    @Override
+    protected void renameTableColumn(String columnName, String newColumnName) {
+
+        UserTable<? extends UserColumn> newTable = getTable().copy();
+
+        newTable.renameColumn(columnName, newColumnName);
+
+        ColumnMapping columnMapping = new ColumnMapping(newTable);
+        columnMapping.getColumn(newColumnName).setFromColumn(columnName);
+
+        AlterTable.alterTable(getDb(), getTableName(), newTable, columnMapping);
     }
 
 }
