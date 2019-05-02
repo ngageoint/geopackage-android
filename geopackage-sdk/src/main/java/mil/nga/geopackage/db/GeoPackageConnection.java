@@ -78,6 +78,15 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     }
 
     /**
+     * End a transaction as successful and begin a new transaction
+     *
+     * @since 3.2.1
+     */
+    public void endAndBeginTransaction() {
+        db.endAndBeginTransaction();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

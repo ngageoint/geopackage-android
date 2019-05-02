@@ -76,6 +76,15 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * End a transaction as successful
+     *
+     * @since 3.2.1
+     */
+    public void endTransaction() {
+        endTransaction(true);
+    }
+
+    /**
      * End a transaction
      *
      * @param successful true to commit, false to rollback
@@ -84,8 +93,20 @@ public class GeoPackageDatabase {
     public void endTransaction(boolean successful) {
         if (successful) {
             db.setTransactionSuccessful();
+            db.endTransaction();
+        } else if (db.inTransaction()) {
+            db.endTransaction();
         }
-        db.endTransaction();
+    }
+
+    /**
+     * End a transaction as successful and begin a new transaction
+     *
+     * @since 3.2.1
+     */
+    public void endAndBeginTransaction() {
+        endTransaction();
+        beginTransaction();
     }
 
     /**

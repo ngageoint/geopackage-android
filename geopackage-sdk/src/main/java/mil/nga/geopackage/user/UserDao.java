@@ -119,6 +119,15 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     }
 
     /**
+     * End a transaction as successful and begin a new transaction
+     *
+     * @since 3.2.1
+     */
+    public void endAndBeginTransaction() {
+        db.endAndBeginTransaction();
+    }
+
+    /**
      * {@inheritDoc}
      * Handles requery of invalid id row
      */
