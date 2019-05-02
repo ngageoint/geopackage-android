@@ -175,7 +175,7 @@ public class GeoPackagePerformance extends BaseTestCase {
 
         } catch (Exception e) {
             if (transactions) {
-                dao.endTransaction(false);
+                dao.failTransaction();
             }
             throw e;
         }
