@@ -23,7 +23,7 @@ public class AttributesCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test reading
      *
-     * @throws SQLException
+     * @throws SQLException upon error
      */
     @Test
     public void testRead() throws SQLException {
@@ -35,7 +35,7 @@ public class AttributesCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test updating
      *
-     * @throws SQLException
+     * @throws SQLException upon error
      */
     @Test
     public void testUpdate() throws SQLException {
@@ -45,9 +45,21 @@ public class AttributesCreateTest extends CreateGeoPackageTestCase {
     }
 
     /**
+     * Test updating with added columns
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testUpdateAddColumns() throws SQLException {
+
+        AttributesUtils.testUpdateAddColumns(geoPackage);
+
+    }
+
+    /**
      * Test creating
      *
-     * @throws SQLException
+     * @throws SQLException upon error
      */
     @Test
     public void testCreate() throws SQLException {
@@ -59,7 +71,7 @@ public class AttributesCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test deleting
      *
-     * @throws SQLException
+     * @throws SQLException upon error
      */
     @Test
     public void testDelete() throws SQLException {

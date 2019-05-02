@@ -27,6 +27,7 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
+import mil.nga.geopackage.db.ResultUtils;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
@@ -57,8 +58,8 @@ public class TileUtils {
     /**
      * Test read
      *
-     * @param geoPackage
-     * @throws SQLException
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
      */
     public static void testRead(GeoPackage geoPackage) throws SQLException {
 
@@ -289,7 +290,7 @@ public class TileUtils {
 
         if (testBitmap) {
             Bitmap bitmap = tileRow.getTileDataBitmap();
-            if(dao.getTileMatrixSet().getContents().getDataType() != ContentsDataType.GRIDDED_COVERAGE) {
+            if (dao.getTileMatrixSet().getContents().getDataType() != ContentsDataType.GRIDDED_COVERAGE) {
                 TestCase.assertNotNull(bitmap);
                 TestCase.assertEquals(tileMatrix.getTileWidth(), bitmap.getWidth());
                 TestCase.assertEquals(tileMatrix.getTileHeight(),
@@ -301,12 +302,13 @@ public class TileUtils {
     /**
      * Test update
      *
-     * @param geoPackage
-     * @throws SQLException
-     * @throws IOException
+     * @param testContext test context
+     * @param geoPackage  GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
      */
-    public static void testUpdate(Context testContext, GeoPackage geoPackage)
-            throws SQLException, IOException {
+    public static void testUpdate(Context testContext, GeoPackage geoPackage) throws SQLException,
+            IOException {
 
         TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
 
@@ -316,314 +318,315 @@ public class TileUtils {
             for (TileMatrixSet tileMatrixSet : results) {
 
                 TileDao dao = geoPackage.getTileDao(tileMatrixSet);
-                TestCase.assertNotNull(dao);
+                testUpdate(testContext, dao);
 
-                TileCursor cursor = dao.queryForAll();
-                int count = cursor.getCount();
-                if (count > 0) {
-
-                    // Choose random tile
-                    int random = (int) (Math.random() * count);
-                    cursor.moveToPosition(random);
-
-                    String updatedString = null;
-                    String updatedLimitedString = null;
-                    Boolean updatedBoolean = null;
-                    Byte updatedByte = null;
-                    Short updatedShort = null;
-                    Integer updatedInteger = null;
-                    Long updatedLong = null;
-                    Float updatedFloat = null;
-                    Double updatedDouble = null;
-                    byte[] updatedBytes = null;
-                    byte[] updatedLimitedBytes = null;
-                    Integer updatedBitmapWidth = null;
-                    Integer updatedBitmapHeight = null;
-
-                    TileRow originalRow = cursor.getRow();
-                    TileRow tileRow = cursor.getRow();
-
-                    try {
-                        tileRow.setValue(tileRow.getPkColumnIndex(), 9);
-                        TestCase.fail("Updated the primary key value");
-                    } catch (GeoPackageException e) {
-                        // expected
-                    }
-
-                    for (TileColumn tileColumn : dao.getTable().getColumns()) {
-                        if (!tileColumn.isPrimaryKey()) {
-
-                            switch (tileRow.getRowColumnType(tileColumn
-                                    .getIndex())) {
-
-                                case Cursor.FIELD_TYPE_STRING:
-                                    if (updatedString == null) {
-                                        updatedString = UUID.randomUUID()
-                                                .toString();
-                                    }
-                                    if (tileColumn.getMax() != null) {
-                                        if (updatedLimitedString == null) {
-                                            if (updatedString.length() > tileColumn
-                                                    .getMax()) {
-                                                updatedLimitedString = updatedString
-                                                        .substring(0, tileColumn
-                                                                .getMax()
-                                                                .intValue());
-                                            } else {
-                                                updatedLimitedString = updatedString;
-                                            }
-                                        }
-                                        tileRow.setValue(tileColumn.getIndex(),
-                                                updatedLimitedString);
-                                    } else {
-                                        tileRow.setValue(tileColumn.getIndex(),
-                                                updatedString);
-                                    }
-                                    break;
-                                case Cursor.FIELD_TYPE_INTEGER:
-                                    switch (tileColumn.getDataType()) {
-                                        case BOOLEAN:
-                                            if (updatedBoolean == null) {
-                                                updatedBoolean = !((Boolean) tileRow
-                                                        .getValue(tileColumn.getIndex()));
-                                            }
-                                            tileRow.setValue(tileColumn.getIndex(),
-                                                    updatedBoolean);
-                                            break;
-                                        case TINYINT:
-                                            if (updatedByte == null) {
-                                                updatedByte = (byte) (((int) (Math
-                                                        .random() * (Byte.MAX_VALUE + 1))) * (Math
-                                                        .random() < .5 ? 1 : -1));
-                                            }
-                                            tileRow.setValue(tileColumn.getIndex(),
-                                                    updatedByte);
-                                            break;
-                                        case SMALLINT:
-                                            if (updatedShort == null) {
-                                                updatedShort = (short) (((int) (Math
-                                                        .random() * (Short.MAX_VALUE + 1))) * (Math
-                                                        .random() < .5 ? 1 : -1));
-                                            }
-                                            tileRow.setValue(tileColumn.getIndex(),
-                                                    updatedShort);
-                                            break;
-                                        case MEDIUMINT:
-                                            if (updatedInteger == null) {
-                                                updatedInteger = (int) (((int) (Math
-                                                        .random() * (Integer.MAX_VALUE + 1))) * (Math
-                                                        .random() < .5 ? 1 : -1));
-                                            }
-                                            tileRow.setValue(tileColumn.getIndex(),
-                                                    updatedInteger);
-                                            break;
-                                        case INT:
-                                        case INTEGER:
-                                            if (updatedLong == null) {
-                                                updatedLong = (long) (((int) (Math
-                                                        .random() * (Long.MAX_VALUE + 1))) * (Math
-                                                        .random() < .5 ? 1 : -1));
-                                            }
-                                            tileRow.setValue(tileColumn.getIndex(),
-                                                    updatedLong);
-                                            break;
-                                        default:
-                                            TestCase.fail("Unexpected integer type: "
-                                                    + tileColumn.getDataType());
-                                    }
-                                    break;
-                                case Cursor.FIELD_TYPE_FLOAT:
-                                    switch (tileColumn.getDataType()) {
-                                        case FLOAT:
-                                            if (updatedFloat == null) {
-                                                updatedFloat = (float) Math.random()
-                                                        * Float.MAX_VALUE;
-                                            }
-                                            tileRow.setValue(tileColumn.getIndex(),
-                                                    updatedFloat);
-                                            break;
-                                        case DOUBLE:
-                                        case REAL:
-                                            if (updatedDouble == null) {
-                                                updatedDouble = Math.random()
-                                                        * Double.MAX_VALUE;
-                                            }
-                                            tileRow.setValue(tileColumn.getIndex(),
-                                                    updatedDouble);
-                                            break;
-                                        default:
-                                            TestCase.fail("Unexpected float type: "
-                                                    + tileColumn.getDataType());
-                                    }
-                                    break;
-                                case Cursor.FIELD_TYPE_BLOB:
-                                    if (updatedBytes == null) {
-                                        updatedBytes = TestUtils.getAssetFileBytes(
-                                                testContext,
-                                                TestConstants.TILE_FILE_NAME);
-                                        Bitmap bitmap = BitmapConverter
-                                                .toBitmap(updatedBytes);
-                                        updatedBitmapWidth = bitmap.getWidth();
-                                        updatedBitmapHeight = bitmap.getHeight();
-                                    }
-                                    if (tileColumn.getMax() != null) {
-                                        if (updatedLimitedBytes == null) {
-                                            if (updatedBytes.length > tileColumn
-                                                    .getMax()) {
-                                                updatedLimitedBytes = new byte[tileColumn
-                                                        .getMax().intValue()];
-                                                ByteBuffer.wrap(
-                                                        updatedBytes,
-                                                        0,
-                                                        tileColumn.getMax()
-                                                                .intValue()).get(
-                                                        updatedLimitedBytes);
-                                            } else {
-                                                updatedLimitedBytes = updatedBytes;
-                                            }
-                                        }
-                                        tileRow.setValue(tileColumn.getIndex(),
-                                                updatedLimitedBytes);
-                                    } else {
-                                        tileRow.setValue(tileColumn.getIndex(),
-                                                updatedBytes);
-                                    }
-                                    break;
-                                default:
-                            }
-
-                        }
-                    }
-
-                    cursor.close();
-                    try {
-                        TestCase.assertEquals(1, dao.update(tileRow));
-                    } catch (SQLiteException e) {
-                        if (TestUtils.isFutureSQLiteException(e)) {
-                            continue;
-                        } else {
-                            throw e;
-                        }
-                    }
-
-                    long id = tileRow.getId();
-                    TileRow readRow = dao.queryForIdRow(id);
-                    TestCase.assertNotNull(readRow);
-                    TestCase.assertEquals(originalRow.getId(), readRow.getId());
-
-                    for (String readColumnName : readRow.getColumnNames()) {
-
-                        TileColumn readTileColumn = readRow
-                                .getColumn(readColumnName);
-                        if (!readTileColumn.isPrimaryKey()) {
-                            switch (readRow.getRowColumnType(readColumnName)) {
-                                case Cursor.FIELD_TYPE_STRING:
-                                    if (readTileColumn.getMax() != null) {
-                                        TestCase.assertEquals(updatedLimitedString,
-                                                readRow.getValue(readTileColumn
-                                                        .getIndex()));
-                                    } else {
-                                        TestCase.assertEquals(updatedString,
-                                                readRow.getValue(readTileColumn
-                                                        .getIndex()));
-                                    }
-                                    break;
-                                case Cursor.FIELD_TYPE_INTEGER:
-                                    switch (readTileColumn.getDataType()) {
-                                        case BOOLEAN:
-                                            TestCase.assertEquals(updatedBoolean,
-                                                    readRow.getValue(readTileColumn
-                                                            .getIndex()));
-                                            break;
-                                        case TINYINT:
-                                            TestCase.assertEquals(updatedByte,
-                                                    readRow.getValue(readTileColumn
-                                                            .getIndex()));
-                                            break;
-                                        case SMALLINT:
-                                            TestCase.assertEquals(updatedShort,
-                                                    readRow.getValue(readTileColumn
-                                                            .getIndex()));
-                                            break;
-                                        case MEDIUMINT:
-                                            TestCase.assertEquals(updatedInteger,
-                                                    readRow.getValue(readTileColumn
-                                                            .getIndex()));
-                                            break;
-                                        case INT:
-                                        case INTEGER:
-                                            TestCase.assertEquals(updatedLong,
-                                                    readRow.getValue(readTileColumn
-                                                            .getIndex()));
-                                            break;
-                                        default:
-                                            TestCase.fail("Unexpected integer type: "
-                                                    + readTileColumn.getDataType());
-                                    }
-                                    break;
-                                case Cursor.FIELD_TYPE_FLOAT:
-                                    switch (readTileColumn.getDataType()) {
-                                        case FLOAT:
-                                            TestCase.assertEquals(updatedFloat,
-                                                    readRow.getValue(readTileColumn
-                                                            .getIndex()));
-                                            break;
-                                        case DOUBLE:
-                                        case REAL:
-                                            TestCase.assertEquals(updatedDouble,
-                                                    readRow.getValue(readTileColumn
-                                                            .getIndex()));
-                                            break;
-                                        default:
-                                            TestCase.fail("Unexpected float type: "
-                                                    + readTileColumn.getDataType());
-                                    }
-                                    break;
-                                case Cursor.FIELD_TYPE_BLOB:
-                                    if (readTileColumn.getMax() != null) {
-                                        GeoPackageGeometryDataUtils
-                                                .compareByteArrays(
-                                                        updatedLimitedBytes,
-                                                        (byte[]) readRow
-                                                                .getValue(readTileColumn
-                                                                        .getIndex()));
-                                    } else {
-                                        byte[] readBytes = (byte[]) readRow
-                                                .getValue(readTileColumn.getIndex());
-                                        GeoPackageGeometryDataUtils
-                                                .compareByteArrays(updatedBytes,
-                                                        readBytes);
-                                        Bitmap bitmap = BitmapConverter
-                                                .toBitmap(readBytes);
-                                        TestCase.assertTrue(bitmap.getWidth() > 0);
-                                        TestCase.assertTrue(bitmap.getHeight() > 0);
-                                    }
-                                    break;
-                                default:
-                            }
-                        }
-
-                    }
-
-                    // Explicitly validate the bitmap
-                    Bitmap bitmap = readRow.getTileDataBitmap();
-                    TestCase.assertNotNull(bitmap);
-                    TestCase.assertEquals(updatedBitmapWidth.intValue(),
-                            bitmap.getWidth());
-                    TestCase.assertEquals(updatedBitmapHeight.intValue(),
-                            bitmap.getHeight());
-                }
-                cursor.close();
             }
         }
 
     }
 
     /**
+     * Test updates for the tile table
+     *
+     * @param testContext test context
+     * @param dao         tile dao
+     * @throws IOException upon error
+     */
+    private static void testUpdate(Context testContext, TileDao dao) throws IOException {
+
+        TestCase.assertNotNull(dao);
+
+        TileCursor cursor = dao.queryForAll();
+        int count = cursor.getCount();
+        if (count > 0) {
+
+            // Choose random tile
+            int random = (int) (Math.random() * count);
+            cursor.moveToPosition(random);
+
+            String updatedString = null;
+            String updatedLimitedString = null;
+            Boolean updatedBoolean = null;
+            Byte updatedByte = null;
+            Short updatedShort = null;
+            Integer updatedInteger = null;
+            Long updatedLong = null;
+            Float updatedFloat = null;
+            Double updatedDouble = null;
+            byte[] updatedBytes = null;
+            byte[] updatedLimitedBytes = null;
+            Integer updatedBitmapWidth = null;
+            Integer updatedBitmapHeight = null;
+
+            TileRow originalRow = cursor.getRow();
+            TileRow tileRow = cursor.getRow();
+
+            try {
+                tileRow.setValue(tileRow.getPkColumnIndex(), 9);
+                TestCase.fail("Updated the primary key value");
+            } catch (GeoPackageException e) {
+                // expected
+            }
+
+            for (TileColumn tileColumn : dao.getTable().getColumns()) {
+                if (!tileColumn.isPrimaryKey()) {
+
+                    int rowColumnType = tileRow.getRowColumnType(tileColumn
+                            .getIndex());
+
+                    switch (tileColumn.getDataType()) {
+                        case TEXT:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_STRING);
+                            if (updatedString == null) {
+                                updatedString = UUID.randomUUID().toString();
+                            }
+                            if (tileColumn.getMax() != null) {
+                                if (updatedLimitedString == null) {
+                                    if (updatedString.length() > tileColumn
+                                            .getMax()) {
+                                        updatedLimitedString = updatedString
+                                                .substring(0, tileColumn.getMax()
+                                                        .intValue());
+                                    } else {
+                                        updatedLimitedString = updatedString;
+                                    }
+                                }
+                                tileRow.setValue(tileColumn.getIndex(),
+                                        updatedLimitedString);
+                            } else {
+                                tileRow.setValue(tileColumn.getIndex(),
+                                        updatedString);
+                            }
+                            break;
+                        case BOOLEAN:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_INTEGER);
+                            if (updatedBoolean == null) {
+                                Boolean existingValue = (Boolean) tileRow
+                                        .getValue(tileColumn.getIndex());
+                                if (existingValue == null) {
+                                    updatedBoolean = true;
+                                } else {
+                                    updatedBoolean = !existingValue;
+                                }
+                            }
+                            tileRow.setValue(tileColumn.getIndex(), updatedBoolean);
+                            break;
+                        case TINYINT:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_INTEGER);
+                            if (updatedByte == null) {
+                                updatedByte = (byte) (((int) (Math.random() * (Byte.MAX_VALUE + 1))) * (Math
+                                        .random() < .5 ? 1 : -1));
+                            }
+                            tileRow.setValue(tileColumn.getIndex(), updatedByte);
+                            break;
+                        case SMALLINT:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_INTEGER);
+                            if (updatedShort == null) {
+                                updatedShort = (short) (((int) (Math.random() * (Short.MAX_VALUE + 1))) * (Math
+                                        .random() < .5 ? 1 : -1));
+                            }
+                            tileRow.setValue(tileColumn.getIndex(), updatedShort);
+                            break;
+                        case MEDIUMINT:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_INTEGER);
+                            if (updatedInteger == null) {
+                                updatedInteger = (int) (((int) (Math.random() * (Integer.MAX_VALUE + 1))) * (Math
+                                        .random() < .5 ? 1 : -1));
+                            }
+                            tileRow.setValue(tileColumn.getIndex(), updatedInteger);
+                            break;
+                        case INT:
+                        case INTEGER:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_INTEGER);
+                            if (updatedLong == null) {
+                                updatedLong = (long) (((int) (Math.random() * (Long.MAX_VALUE + 1))) * (Math
+                                        .random() < .5 ? 1 : -1));
+                            }
+                            tileRow.setValue(tileColumn.getIndex(), updatedLong);
+                            break;
+                        case FLOAT:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_FLOAT);
+                            if (updatedFloat == null) {
+                                updatedFloat = (float) Math.random()
+                                        * Float.MAX_VALUE;
+                            }
+                            tileRow.setValue(tileColumn.getIndex(), updatedFloat);
+                            break;
+                        case DOUBLE:
+                        case REAL:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_FLOAT);
+                            if (updatedDouble == null) {
+                                updatedDouble = Math.random() * Double.MAX_VALUE;
+                            }
+                            tileRow.setValue(tileColumn.getIndex(), updatedDouble);
+                            break;
+                        case BLOB:
+                            validateRowColumnType(rowColumnType,
+                                    ResultUtils.FIELD_TYPE_BLOB);
+                            if (updatedBytes == null) {
+                                updatedBytes = TestUtils.getAssetFileBytes(
+                                        testContext,
+                                        TestConstants.TILE_FILE_NAME);
+                                Bitmap bitmap = BitmapConverter
+                                        .toBitmap(updatedBytes);
+                                updatedBitmapWidth = bitmap.getWidth();
+                                updatedBitmapHeight = bitmap.getHeight();
+                            }
+                            if (tileColumn.getMax() != null) {
+                                if (updatedLimitedBytes == null) {
+                                    if (updatedBytes.length > tileColumn.getMax()) {
+                                        updatedLimitedBytes = new byte[tileColumn
+                                                .getMax().intValue()];
+                                        ByteBuffer.wrap(updatedBytes, 0,
+                                                tileColumn.getMax().intValue())
+                                                .get(updatedLimitedBytes);
+                                    } else {
+                                        updatedLimitedBytes = updatedBytes;
+                                    }
+                                }
+                                tileRow.setValue(tileColumn.getIndex(),
+                                        updatedLimitedBytes);
+                            } else {
+                                tileRow.setValue(tileColumn.getIndex(),
+                                        updatedBytes);
+                            }
+                            break;
+                        default:
+                    }
+
+                }
+            }
+
+            cursor.close();
+            TestCase.assertEquals(1, dao.update(tileRow));
+
+            long id = tileRow.getId();
+            TileRow readRow = dao.queryForIdRow(id);
+            TestCase.assertNotNull(readRow);
+            TestCase.assertEquals(originalRow.getId(), readRow.getId());
+
+            for (String readColumnName : readRow.getColumnNames()) {
+
+                TileColumn readTileColumn = readRow.getColumn(readColumnName);
+                if (!readTileColumn.isPrimaryKey()) {
+                    switch (readRow.getRowColumnType(readColumnName)) {
+                        case ResultUtils.FIELD_TYPE_STRING:
+                            if (readTileColumn.getMax() != null) {
+                                TestCase.assertEquals(updatedLimitedString,
+                                        readRow.getValue(readTileColumn.getIndex()));
+                            } else {
+                                TestCase.assertEquals(updatedString,
+                                        readRow.getValue(readTileColumn.getIndex()));
+                            }
+                            break;
+                        case ResultUtils.FIELD_TYPE_INTEGER:
+                            switch (readTileColumn.getDataType()) {
+                                case BOOLEAN:
+                                    TestCase.assertEquals(updatedBoolean,
+                                            readRow.getValue(readTileColumn.getIndex()));
+                                    break;
+                                case TINYINT:
+                                    TestCase.assertEquals(updatedByte,
+                                            readRow.getValue(readTileColumn.getIndex()));
+                                    break;
+                                case SMALLINT:
+                                    TestCase.assertEquals(updatedShort,
+                                            readRow.getValue(readTileColumn.getIndex()));
+                                    break;
+                                case MEDIUMINT:
+                                    TestCase.assertEquals(updatedInteger,
+                                            readRow.getValue(readTileColumn.getIndex()));
+                                    break;
+                                case INT:
+                                case INTEGER:
+                                    TestCase.assertEquals(updatedLong,
+                                            readRow.getValue(readTileColumn.getIndex()));
+                                    break;
+                                default:
+                                    TestCase.fail("Unexpected integer type: "
+                                            + readTileColumn.getDataType());
+                            }
+                            break;
+                        case ResultUtils.FIELD_TYPE_FLOAT:
+                            switch (readTileColumn.getDataType()) {
+                                case FLOAT:
+                                    TestCase.assertEquals(updatedFloat,
+                                            readRow.getValue(readTileColumn.getIndex()));
+                                    break;
+                                case DOUBLE:
+                                case REAL:
+                                    TestCase.assertEquals(updatedDouble,
+                                            readRow.getValue(readTileColumn.getIndex()));
+                                    break;
+                                default:
+                                    TestCase.fail("Unexpected integer type: "
+                                            + readTileColumn.getDataType());
+                            }
+                            break;
+                        case ResultUtils.FIELD_TYPE_BLOB:
+                            if (readTileColumn.getMax() != null) {
+                                GeoPackageGeometryDataUtils.compareByteArrays(
+                                        updatedLimitedBytes,
+                                        (byte[]) readRow.getValue(readTileColumn
+                                                .getIndex()));
+                            } else {
+                                byte[] readBytes = (byte[]) readRow
+                                        .getValue(readTileColumn.getIndex());
+                                GeoPackageGeometryDataUtils.compareByteArrays(
+                                        updatedBytes, readBytes);
+                                Bitmap bitmap = BitmapConverter
+                                        .toBitmap(readBytes);
+                                TestCase.assertTrue(bitmap.getWidth() > 0);
+                                TestCase.assertTrue(bitmap.getHeight() > 0);
+                            }
+                            break;
+                        default:
+                    }
+                }
+
+            }
+
+            // Explicitly validate the bitmap
+            Bitmap bitmap = readRow.getTileDataBitmap();
+            TestCase.assertNotNull(bitmap);
+            TestCase.assertEquals(updatedBitmapWidth.intValue(),
+                    bitmap.getWidth());
+            TestCase.assertEquals(updatedBitmapHeight.intValue(),
+                    bitmap.getHeight());
+        }
+        cursor.close();
+
+    }
+
+    /**
+     * Validate the row type
+     *
+     * @param rowColumnType      row column type
+     * @param expectedColumnType expected column type
+     */
+    private static void validateRowColumnType(int rowColumnType,
+                                              int expectedColumnType) {
+        if (rowColumnType == ResultUtils.FIELD_TYPE_NULL) {
+            TestCase.fail("Tile columns should all non nullable. Expected Column Type: "
+                    + expectedColumnType);
+        } else {
+            TestCase.assertEquals(expectedColumnType, rowColumnType);
+        }
+    }
+
+    /**
      * Test create
      *
-     * @param geoPackage
-     * @throws SQLException
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
      */
     public static void testCreate(GeoPackage geoPackage) throws SQLException {
 
@@ -782,8 +785,8 @@ public class TileUtils {
     /**
      * Test delete
      *
-     * @param geoPackage
-     * @throws SQLException
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
      */
     public static void testDelete(GeoPackage geoPackage) throws SQLException {
 
@@ -835,8 +838,8 @@ public class TileUtils {
     /**
      * Test getZoomLevel
      *
-     * @param geoPackage
-     * @throws SQLException
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
      */
     public static void testGetZoomLevel(GeoPackage geoPackage)
             throws SQLException {
@@ -888,8 +891,8 @@ public class TileUtils {
     /**
      * Test queryByRange
      *
-     * @param geoPackage
-     * @throws SQLException
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
      */
     public static void testQueryByRange(GeoPackage geoPackage)
             throws SQLException {
@@ -1000,8 +1003,8 @@ public class TileUtils {
     /**
      * Test querying for the bounding box at a tile matrix zoom level
      *
-     * @param geoPackage
-     * @throws SQLException
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
      */
     public static void testTileMatrixBoundingBox(GeoPackage geoPackage)
             throws SQLException {
@@ -1160,6 +1163,12 @@ public class TileUtils {
 
     static boolean threadedTileDaoError = false;
 
+    /**
+     * Test threaded tile dao
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     */
     public static void testThreadedTileDao(final GeoPackage geoPackage)
             throws SQLException {
 

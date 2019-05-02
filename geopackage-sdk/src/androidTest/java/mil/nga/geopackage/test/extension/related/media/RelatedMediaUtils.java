@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.core.contents.Contents;
@@ -69,7 +70,7 @@ public class RelatedMediaUtils {
 
         // Populate and validate a media table
         List<UserCustomColumn> additionalMediaColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(MediaTable.numRequiredColumns());
+                .createAdditionalUserColumns();
         MediaTable mediaTable = MediaTable.create("media_table",
                 additionalMediaColumns);
         String[] mediaColumns = mediaTable.getColumnNames();
@@ -99,8 +100,7 @@ public class RelatedMediaUtils {
 
         // Create and validate a mapping table
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(UserMappingTable
-                        .numRequiredColumns());
+                .createAdditionalUserColumns();
         final String mappingTableName = "features_media";
         UserMappingTable userMappingTable = UserMappingTable.create(
                 mappingTableName, additionalMappingColumns);
@@ -427,6 +427,60 @@ public class RelatedMediaUtils {
             mediaCursor.close();
             TestCase.assertEquals(totalMappedCount, totalMapped);
         }
+
+        // Add more columns to the media table
+        int existingColumns = mediaTable.getColumns().size();
+        UserCustomColumn mediaIdColumn = mediaTable.getIdColumn();
+        UserCustomColumn mediaDataColumn = mediaTable.getDataColumn();
+        UserCustomColumn mediaContentTypeColumn = mediaTable
+                .getContentTypeColumn();
+        int newColumns = 0;
+        String newColumnName = "new_column";
+        mediaDao.addColumn(UserCustomColumn.createColumn(newColumnName
+                + ++newColumns, GeoPackageDataType.TEXT));
+        mediaDao.addColumn(UserCustomColumn.createColumn(newColumnName
+                + ++newColumns, GeoPackageDataType.BLOB));
+        TestCase.assertEquals(existingColumns + 2, mediaTable.getColumns()
+                .size());
+        for (int index = existingColumns; index < mediaTable.getColumns()
+                .size(); index++) {
+            String name = newColumnName + (index - existingColumns + 1);
+            TestCase.assertEquals(name, mediaTable.getColumnName(index));
+            TestCase.assertEquals(index, mediaTable.getColumnIndex(name));
+            TestCase.assertEquals(name, mediaTable.getColumn(index).getName());
+            TestCase.assertEquals(index, mediaTable.getColumn(index).getIndex());
+            TestCase.assertEquals(name, mediaTable.getColumnNames()[index]);
+            TestCase.assertEquals(name, mediaTable.getColumns().get(index)
+                    .getName());
+            try {
+                mediaTable.getColumn(index).setIndex(index - 1);
+                TestCase.fail("Changed index on a created table column");
+            } catch (Exception e) {
+            }
+            mediaTable.getColumn(index).setIndex(index);
+        }
+        TestCase.assertEquals(mediaIdColumn, mediaTable.getIdColumn());
+        TestCase.assertEquals(mediaDataColumn, mediaTable.getDataColumn());
+        TestCase.assertEquals(mediaContentTypeColumn,
+                mediaTable.getContentTypeColumn());
+
+        // Add another row with the new columns and read it
+        MediaRow mediaRow = mediaDao.newRow();
+        mediaRow.setData(mediaData);
+        mediaRow.setContentType(contentType);
+        RelatedTablesUtils.populateUserRow(mediaTable, mediaRow,
+                MediaTable.requiredColumns());
+        String newValue = UUID.randomUUID().toString();
+        mediaRow.setValue(existingColumns, newValue);
+        mediaRow.setValue(existingColumns + 1, mediaRow.getData());
+        mediaRowId = mediaDao.create(mediaRow);
+        TestCase.assertTrue(mediaRowId > 0);
+        MediaRow newMediaRow = mediaDao.getRow(mediaDao
+                .queryForIdRow(mediaRowId));
+        TestCase.assertNotNull(newMediaRow);
+        TestCase.assertEquals(newValue, newMediaRow.getValue(existingColumns));
+        GeoPackageGeometryDataUtils.compareByteArrays(mediaRow.getData(),
+                (byte[]) newMediaRow.getValue(existingColumns + 1));
 
         // Delete a single mapping
         int countOfIds = dao.countByIds(userMappingRow);

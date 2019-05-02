@@ -1,6 +1,5 @@
 package mil.nga.geopackage.test;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteException;
@@ -247,25 +246,25 @@ public class TestUtils {
 
         columns.add(FeatureColumn.createPrimaryKeyColumn(0, "id"));
         columns.add(FeatureColumn.createColumn(7, "test_text_limited",
-                GeoPackageDataType.TEXT, 5L, false, null));
+                GeoPackageDataType.TEXT, 5L));
         columns.add(FeatureColumn.createColumn(8, "test_blob_limited",
-                GeoPackageDataType.BLOB, 7L, false, null));
+                GeoPackageDataType.BLOB, 7L));
         columns.add(FeatureColumn.createColumn(9, "test_date",
-                GeoPackageDataType.DATE, false, null));
+                GeoPackageDataType.DATE));
         columns.add(FeatureColumn.createColumn(10, "test_datetime",
-                GeoPackageDataType.DATETIME, false, null));
+                GeoPackageDataType.DATETIME));
         columns.add(FeatureColumn.createGeometryColumn(1, geometryColumn,
-                geometryType, false, null));
+                geometryType));
         columns.add(FeatureColumn.createColumn(2, "test_text",
                 GeoPackageDataType.TEXT, false, ""));
         columns.add(FeatureColumn.createColumn(3, "test_real",
-                GeoPackageDataType.REAL, false, null));
+                GeoPackageDataType.REAL));
         columns.add(FeatureColumn.createColumn(4, "test_boolean",
-                GeoPackageDataType.BOOLEAN, false, null));
+                GeoPackageDataType.BOOLEAN));
         columns.add(FeatureColumn.createColumn(5, "test_blob",
-                GeoPackageDataType.BLOB, false, null));
+                GeoPackageDataType.BLOB));
         columns.add(FeatureColumn.createColumn(6, TEST_INTEGER_COLUMN,
-                GeoPackageDataType.INTEGER, false, null));
+                GeoPackageDataType.INTEGER));
 
         FeatureTable table = new FeatureTable(tableName, columns);
 

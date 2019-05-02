@@ -65,8 +65,7 @@ public class RelatedTilesUtils {
 
         // Create and validate a mapping table
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(UserMappingTable
-                        .numRequiredColumns());
+                .createAdditionalUserColumns();
         final String mappingTableName = "features_tiles";
         UserMappingTable userMappingTable = UserMappingTable.create(
                 mappingTableName, additionalMappingColumns);

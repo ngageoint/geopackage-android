@@ -31,85 +31,85 @@ public class RelatedTablesUtils {
     /**
      * Create additional user table columns
      *
-     * @param startingIndex starting index
      * @return additional user table columns
      */
-    public static List<UserCustomColumn> createAdditionalUserColumns(
-            int startingIndex) {
-        return createAdditionalUserColumns(startingIndex, false);
+    public static List<UserCustomColumn> createAdditionalUserColumns() {
+        return createAdditionalUserColumns(false);
     }
 
     /**
      * Create additional user table columns
      *
-     * @param startingIndex starting index
-     * @param notNull       columns not null value
+     * @param notNull columns not null value
      * @return additional user table columns
      */
     public static List<UserCustomColumn> createAdditionalUserColumns(
-            int startingIndex, boolean notNull) {
+            boolean notNull) {
 
         List<UserCustomColumn> columns = new ArrayList<>();
 
-        int columnIndex = startingIndex;
-
         // Add Dublin Core Metadata term columns
-        columns.add(UserCustomColumn.createColumn(columnIndex++,
+        columns.add(UserCustomColumn.createColumn(
                 DublinCoreType.DATE.getName(), GeoPackageDataType.DATETIME,
-                notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++,
+                notNull));
+        columns.add(UserCustomColumn.createColumn(
                 DublinCoreType.DESCRIPTION.getName(), GeoPackageDataType.TEXT,
-                notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++,
+                notNull));
+        columns.add(UserCustomColumn.createColumn(
                 DublinCoreType.SOURCE.getName(), GeoPackageDataType.TEXT,
-                notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++,
+                notNull));
+        columns.add(UserCustomColumn.createColumn(
                 DublinCoreType.TITLE.getName(), GeoPackageDataType.TEXT,
-                notNull, null));
+                notNull));
 
         // Add test columns for common data types, some with limits
-        columns.add(UserCustomColumn.createColumn(columnIndex++, "test_text",
+        columns.add(UserCustomColumn.createColumn("test_text",
                 GeoPackageDataType.TEXT, notNull, ""));
-        columns.add(UserCustomColumn.createColumn(columnIndex++, "test_real",
-                GeoPackageDataType.REAL, notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++,
-                "test_boolean", GeoPackageDataType.BOOLEAN, notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++, "test_blob",
-                GeoPackageDataType.BLOB, notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++,
-                "test_integer", GeoPackageDataType.INTEGER, notNull, null));
-        columns.add(UserCustomColumn
-                .createColumn(columnIndex++, "test_text_limited",
-                        GeoPackageDataType.TEXT, 5L, notNull, null));
-        columns.add(UserCustomColumn
-                .createColumn(columnIndex++, "test_blob_limited",
-                        GeoPackageDataType.BLOB, 7L, notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++, "test_date",
-                GeoPackageDataType.DATE, notNull, null));
-        columns.add(UserCustomColumn.createColumn(columnIndex++,
-                "test_datetime", GeoPackageDataType.DATETIME, notNull, null));
+        columns.add(UserCustomColumn.createColumn("test_real",
+                GeoPackageDataType.REAL, notNull));
+        columns.add(UserCustomColumn.createColumn("test_boolean",
+                GeoPackageDataType.BOOLEAN, notNull));
+        columns.add(UserCustomColumn.createColumn("test_blob",
+                GeoPackageDataType.BLOB, notNull));
+        columns.add(UserCustomColumn.createColumn("test_integer",
+                GeoPackageDataType.INTEGER, notNull));
+        columns.add(UserCustomColumn.createColumn("test_text_limited",
+                GeoPackageDataType.TEXT, 5L, notNull, null));
+        columns.add(UserCustomColumn.createColumn("test_blob_limited",
+                GeoPackageDataType.BLOB, 7L, notNull, null));
+        columns.add(UserCustomColumn.createColumn("test_date",
+                GeoPackageDataType.DATE, notNull));
+        columns.add(UserCustomColumn.createColumn("test_datetime",
+                GeoPackageDataType.DATETIME, notNull));
 
         return columns;
     }
 
-    public static List<UserCustomColumn> creatSimpleUserColumns(
-            int startingIndex) {
-        return creatSimpleUserColumns(startingIndex, true);
+    /**
+     * Create simple user columns
+     *
+     * @return columns
+     */
+    public static List<UserCustomColumn> createSimpleUserColumns() {
+        return createSimpleUserColumns(true);
     }
 
-    public static List<UserCustomColumn> creatSimpleUserColumns(
-            int startingIndex, boolean notNull) {
+    /**
+     * Create simple user columns
+     *
+     * @param notNull not null flag
+     * @return columns
+     */
+    public static List<UserCustomColumn> createSimpleUserColumns(boolean notNull) {
 
         List<UserCustomColumn> simpleUserColumns = new ArrayList<>();
-        int columnIndex = startingIndex;
 
-        List<UserCustomColumn> allAdditionalColumns = createAdditionalUserColumns(
-                startingIndex, notNull);
+        List<UserCustomColumn> allAdditionalColumns = createAdditionalUserColumns(notNull);
 
         for (UserCustomColumn column : allAdditionalColumns) {
             if (SimpleAttributesTable.isSimple(column)) {
                 simpleUserColumns.add(UserCustomColumn.createColumn(
-                        columnIndex++, column.getName(), column.getDataType(),
+                        column.getName(), column.getDataType(),
                         column.getMax(), column.isNotNull(),
                         column.getDefaultValue()));
             }

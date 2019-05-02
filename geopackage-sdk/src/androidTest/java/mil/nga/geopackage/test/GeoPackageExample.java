@@ -9,8 +9,9 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import androidx.core.content.ContextCompat;
 import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 import junit.framework.TestCase;
 
@@ -801,32 +802,28 @@ public class GeoPackageExample extends BaseTestCase {
 
         List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
 
-        int columnNumber = 0;
-        columns.add(FeatureColumn.createPrimaryKeyColumn(columnNumber++,
-                ID_COLUMN));
-        columns.add(FeatureColumn.createGeometryColumn(columnNumber++,
-                GEOMETRY_COLUMN, type, false, null));
-        columns.add(FeatureColumn.createColumn(columnNumber++, TEXT_COLUMN,
+        columns.add(FeatureColumn.createPrimaryKeyColumn(ID_COLUMN));
+        columns.add(FeatureColumn.createGeometryColumn(GEOMETRY_COLUMN, type));
+        columns.add(FeatureColumn.createColumn(TEXT_COLUMN,
                 GeoPackageDataType.TEXT, false, ""));
-        columns.add(FeatureColumn.createColumn(columnNumber++, REAL_COLUMN,
-                GeoPackageDataType.REAL, false, null));
-        columns.add(FeatureColumn.createColumn(columnNumber++, BOOLEAN_COLUMN,
-                GeoPackageDataType.BOOLEAN, false, null));
-        columns.add(FeatureColumn.createColumn(columnNumber++, BLOB_COLUMN,
-                GeoPackageDataType.BLOB, false, null));
-        columns.add(FeatureColumn.createColumn(columnNumber++, INTEGER_COLUMN,
-                GeoPackageDataType.INTEGER, false, null));
-        columns.add(FeatureColumn.createColumn(columnNumber++,
-                TEXT_LIMITED_COLUMN, GeoPackageDataType.TEXT, (long) UUID
-                        .randomUUID().toString().length(), false, null));
-        columns.add(FeatureColumn
-                .createColumn(columnNumber++, BLOB_LIMITED_COLUMN,
-                        GeoPackageDataType.BLOB, (long) UUID.randomUUID()
-                                .toString().getBytes().length, false, null));
-        columns.add(FeatureColumn.createColumn(columnNumber++, DATE_COLUMN,
-                GeoPackageDataType.DATE, false, null));
-        columns.add(FeatureColumn.createColumn(columnNumber++, DATETIME_COLUMN,
-                GeoPackageDataType.DATETIME, false, null));
+        columns.add(FeatureColumn.createColumn(REAL_COLUMN,
+                GeoPackageDataType.REAL));
+        columns.add(FeatureColumn.createColumn(BOOLEAN_COLUMN,
+                GeoPackageDataType.BOOLEAN));
+        columns.add(FeatureColumn.createColumn(BLOB_COLUMN,
+                GeoPackageDataType.BLOB));
+        columns.add(FeatureColumn.createColumn(INTEGER_COLUMN,
+                GeoPackageDataType.INTEGER));
+        columns.add(FeatureColumn.createColumn(TEXT_LIMITED_COLUMN,
+                GeoPackageDataType.TEXT, (long) UUID.randomUUID().toString()
+                        .length()));
+        columns.add(FeatureColumn.createColumn(BLOB_LIMITED_COLUMN,
+                GeoPackageDataType.BLOB, (long) UUID.randomUUID().toString()
+                        .getBytes().length));
+        columns.add(FeatureColumn.createColumn(DATE_COLUMN,
+                GeoPackageDataType.DATE));
+        columns.add(FeatureColumn.createColumn(DATETIME_COLUMN,
+                GeoPackageDataType.DATETIME));
 
         FeatureTable table = new FeatureTable(tableName, columns);
         geoPackage.createFeatureTable(table);
@@ -1028,28 +1025,26 @@ public class GeoPackageExample extends BaseTestCase {
 
         List<AttributesColumn> columns = new ArrayList<AttributesColumn>();
 
-        int columnNumber = 1;
-        columns.add(AttributesColumn.createColumn(columnNumber++, TEXT_COLUMN,
+        columns.add(AttributesColumn.createColumn(TEXT_COLUMN,
                 GeoPackageDataType.TEXT, false, ""));
-        columns.add(AttributesColumn.createColumn(columnNumber++, REAL_COLUMN,
-                GeoPackageDataType.REAL, false, null));
-        columns.add(AttributesColumn.createColumn(columnNumber++,
-                BOOLEAN_COLUMN, GeoPackageDataType.BOOLEAN, false, null));
-        columns.add(AttributesColumn.createColumn(columnNumber++, BLOB_COLUMN,
-                GeoPackageDataType.BLOB, false, null));
-        columns.add(AttributesColumn.createColumn(columnNumber++,
-                INTEGER_COLUMN, GeoPackageDataType.INTEGER, false, null));
-        columns.add(AttributesColumn.createColumn(columnNumber++,
-                TEXT_LIMITED_COLUMN, GeoPackageDataType.TEXT, (long) UUID
-                        .randomUUID().toString().length(), false, null));
-        columns.add(AttributesColumn
-                .createColumn(columnNumber++, BLOB_LIMITED_COLUMN,
-                        GeoPackageDataType.BLOB, (long) UUID.randomUUID()
-                                .toString().getBytes().length, false, null));
-        columns.add(AttributesColumn.createColumn(columnNumber++, DATE_COLUMN,
-                GeoPackageDataType.DATE, false, null));
-        columns.add(AttributesColumn.createColumn(columnNumber++,
-                DATETIME_COLUMN, GeoPackageDataType.DATETIME, false, null));
+        columns.add(AttributesColumn.createColumn(REAL_COLUMN,
+                GeoPackageDataType.REAL));
+        columns.add(AttributesColumn.createColumn(BOOLEAN_COLUMN,
+                GeoPackageDataType.BOOLEAN));
+        columns.add(AttributesColumn.createColumn(BLOB_COLUMN,
+                GeoPackageDataType.BLOB));
+        columns.add(AttributesColumn.createColumn(INTEGER_COLUMN,
+                GeoPackageDataType.INTEGER));
+        columns.add(AttributesColumn.createColumn(TEXT_LIMITED_COLUMN,
+                GeoPackageDataType.TEXT, (long) UUID.randomUUID().toString()
+                        .length()));
+        columns.add(AttributesColumn.createColumn(BLOB_LIMITED_COLUMN,
+                GeoPackageDataType.BLOB, (long) UUID.randomUUID().toString()
+                        .getBytes().length));
+        columns.add(AttributesColumn.createColumn(DATE_COLUMN,
+                GeoPackageDataType.DATE));
+        columns.add(AttributesColumn.createColumn(DATETIME_COLUMN,
+                GeoPackageDataType.DATETIME));
 
         AttributesTable attributesTable = geoPackage
                 .createAttributesTableWithId("attributes", columns);
@@ -1680,13 +1675,12 @@ public class GeoPackageExample extends BaseTestCase {
                 geoPackage);
 
         List<UserCustomColumn> additionalMediaColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(MediaTable.numRequiredColumns());
+                .createAdditionalUserColumns();
         MediaTable mediaTable = MediaTable.create("media",
                 additionalMediaColumns);
 
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(UserMappingTable
-                        .numRequiredColumns());
+                .createAdditionalUserColumns();
 
         String tableName1 = "geometry1";
         UserMappingTable userMappingTable1 = UserMappingTable.create(tableName1
@@ -1780,8 +1774,7 @@ public class GeoPackageExample extends BaseTestCase {
                 geoPackage);
 
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(UserMappingTable
-                        .numRequiredColumns());
+                .createAdditionalUserColumns();
 
         UserMappingTable userMappingTable = UserMappingTable.create(tableName1
                 + "_" + tableName2, additionalMappingColumns);
@@ -1841,16 +1834,14 @@ public class GeoPackageExample extends BaseTestCase {
                 geoPackage);
 
         List<UserCustomColumn> simpleUserColumns = RelatedTablesUtils
-                .creatSimpleUserColumns(SimpleAttributesTable
-                        .numRequiredColumns());
+                .createSimpleUserColumns();
         SimpleAttributesTable simpleTable = SimpleAttributesTable.create(
                 "simple_attributes", simpleUserColumns);
 
         String tableName = "attributes";
 
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(UserMappingTable
-                        .numRequiredColumns());
+                .createAdditionalUserColumns();
         UserMappingTable userMappingTable = UserMappingTable.create(tableName
                 + "_" + simpleTable.getTableName(), additionalMappingColumns);
         ExtendedRelation relation = relatedTables

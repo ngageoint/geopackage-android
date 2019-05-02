@@ -42,7 +42,7 @@ public class RelatedSimpleAttributesUtils {
         // Create a related tables extension
         RelatedTablesExtension rte = new RelatedTablesExtension(geoPackage);
 
-        if(rte.has()){
+        if (rte.has()) {
             rte.removeExtension();
         }
 
@@ -60,8 +60,7 @@ public class RelatedSimpleAttributesUtils {
         // Validate nullable non simple columns
         try {
             SimpleAttributesTable.create("simple_table", RelatedTablesUtils
-                    .createAdditionalUserColumns(SimpleAttributesTable
-                            .numRequiredColumns()));
+                    .createAdditionalUserColumns());
             TestCase.fail("Simple Attributes Table created with nullable non simple columns");
         } catch (Exception e) {
             // pass
@@ -69,8 +68,7 @@ public class RelatedSimpleAttributesUtils {
         // Validate non nullable non simple columns
         try {
             SimpleAttributesTable.create("simple_table", RelatedTablesUtils
-                    .createAdditionalUserColumns(
-                            SimpleAttributesTable.numRequiredColumns(), true));
+                    .createAdditionalUserColumns(true));
             TestCase.fail("Simple Attributes Table created with non nullable non simple columns");
         } catch (Exception e) {
             // pass
@@ -78,8 +76,7 @@ public class RelatedSimpleAttributesUtils {
         // Validate nullable simple columns
         try {
             SimpleAttributesTable.create("simple_table", RelatedTablesUtils
-                    .creatSimpleUserColumns(
-                            SimpleAttributesTable.numRequiredColumns(), false));
+                    .createSimpleUserColumns(false));
             TestCase.fail("Simple Attributes Table created with nullable simple columns");
         } catch (Exception e) {
             // pass
@@ -87,8 +84,7 @@ public class RelatedSimpleAttributesUtils {
 
         // Populate and validate a simple attributes table
         List<UserCustomColumn> simpleUserColumns = RelatedTablesUtils
-                .creatSimpleUserColumns(SimpleAttributesTable
-                        .numRequiredColumns());
+                .createSimpleUserColumns();
         SimpleAttributesTable simpleTable = SimpleAttributesTable.create(
                 "simple_table", simpleUserColumns);
         String[] simpleColumns = simpleTable.getColumnNames();
@@ -104,8 +100,7 @@ public class RelatedSimpleAttributesUtils {
 
         // Create and validate a mapping table
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
-                .createAdditionalUserColumns(UserMappingTable
-                        .numRequiredColumns());
+                .createAdditionalUserColumns();
         final String mappingTableName = "attributes_simple_attributes";
         UserMappingTable userMappingTable = UserMappingTable.create(
                 mappingTableName, additionalMappingColumns);

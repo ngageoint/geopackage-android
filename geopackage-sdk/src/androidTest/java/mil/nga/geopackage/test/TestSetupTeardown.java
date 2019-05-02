@@ -264,23 +264,23 @@ public class TestSetupTeardown {
         List<AttributesColumn> columns = new ArrayList<AttributesColumn>();
 
         columns.add(AttributesColumn.createColumn(6, "test_text_limited",
-                GeoPackageDataType.TEXT, 5L, false, null));
+                GeoPackageDataType.TEXT, 5L));
         columns.add(AttributesColumn.createColumn(7, "test_blob_limited",
-                GeoPackageDataType.BLOB, 7L, false, null));
+                GeoPackageDataType.BLOB, 7L));
         columns.add(AttributesColumn.createColumn(8, "test_date",
-                GeoPackageDataType.DATE, false, null));
+                GeoPackageDataType.DATE));
         columns.add(AttributesColumn.createColumn(9, "test_datetime",
-                GeoPackageDataType.DATETIME, false, null));
+                GeoPackageDataType.DATETIME));
         columns.add(AttributesColumn.createColumn(1, "test_text",
                 GeoPackageDataType.TEXT, false, ""));
         columns.add(AttributesColumn.createColumn(2, "test_real",
-                GeoPackageDataType.REAL, false, null));
+                GeoPackageDataType.REAL));
         columns.add(AttributesColumn.createColumn(3, "test_boolean",
-                GeoPackageDataType.BOOLEAN, false, null));
+                GeoPackageDataType.BOOLEAN));
         columns.add(AttributesColumn.createColumn(4, "test_blob",
-                GeoPackageDataType.BLOB, false, null));
+                GeoPackageDataType.BLOB));
         columns.add(AttributesColumn.createColumn(5, "test_integer",
-                GeoPackageDataType.INTEGER, false, null));
+                GeoPackageDataType.INTEGER));
 
         AttributesTable attributesTable = geoPackage
                 .createAttributesTableWithId("test_attributes", columns);

@@ -8,64 +8,76 @@ import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 
 /**
  * Test Features from a created database
- * 
+ *
  * @author osbornb
  */
 public class FeatureCreateTest extends CreateGeoPackageTestCase {
 
-	/**
-	 * Constructor
-	 */
-	public FeatureCreateTest() {
+    /**
+     * Constructor
+     */
+    public FeatureCreateTest() {
 
-	}
+    }
 
-	/**
-	 * Test reading
-	 * 
-	 * @throws SQLException
-	 */
-	@Test
-	public void testRead() throws SQLException {
+    /**
+     * Test reading
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testRead() throws SQLException {
 
-		FeatureUtils.testRead(geoPackage);
+        FeatureUtils.testRead(geoPackage);
 
-	}
+    }
 
-	/**
-	 * Test updating
-	 * 
-	 * @throws SQLException
-	 */
-	@Test
-	public void testUpdate() throws SQLException {
+    /**
+     * Test updating
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testUpdate() throws SQLException {
 
-		FeatureUtils.testUpdate(geoPackage);
+        FeatureUtils.testUpdate(geoPackage);
 
-	}
+    }
 
-	/**
-	 * Test creating
-	 * 
-	 * @throws SQLException
-	 */
-	@Test
-	public void testCreate() throws SQLException {
+    /**
+     * Test updating with added columns
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testUpdateAddColumns() throws SQLException {
 
-		FeatureUtils.testCreate(geoPackage);
+        FeatureUtils.testUpdateAddColumns(geoPackage);
 
-	}
+    }
 
-	/**
-	 * Test deleting
-	 * 
-	 * @throws SQLException
-	 */
-	@Test
-	public void testDelete() throws SQLException {
+    /**
+     * Test creating
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testCreate() throws SQLException {
 
-		FeatureUtils.testDelete(geoPackage);
+        FeatureUtils.testCreate(geoPackage);
 
-	}
+    }
+
+    /**
+     * Test deleting
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testDelete() throws SQLException {
+
+        FeatureUtils.testDelete(geoPackage);
+
+    }
 
 }
