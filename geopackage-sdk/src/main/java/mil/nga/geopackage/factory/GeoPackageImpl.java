@@ -394,6 +394,30 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
+    public void beginTransaction() {
+        database.beginTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void endTransaction(boolean successful) {
+        database.endTransaction(successful);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void endAndBeginTransaction() {
+        database.endAndBeginTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Cursor rawQuery(String sql, String[] args) {
         return database.rawQuery(sql, args);
     }

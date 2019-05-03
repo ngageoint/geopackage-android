@@ -6,6 +6,16 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import java.sql.SQLException;
+import java.util.concurrent.Callable;
+
+import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.core.contents.ContentsDao;
+import mil.nga.geopackage.core.contents.ContentsDataType;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.geopackage.db.master.SQLiteMaster;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
@@ -20,10 +30,10 @@ import mil.nga.sf.Point;
 public class TransactionTest extends CreateGeoPackageTestCase {
 
     /**
-     * Test transactions
+     * Test transactions on the User DAO
      */
     @Test
-    public void testTransactions() {
+    public void testUserDao() {
 
         final int rows = 500;
         final int chunkSize = 150;
@@ -32,19 +42,43 @@ public class TransactionTest extends CreateGeoPackageTestCase {
 
             FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
 
-            testTransaction(featureDao, rows, false);
-            testTransaction(featureDao, rows, true);
+            testUserDao(featureDao, rows, false);
+            testUserDao(featureDao, rows, true);
 
-            testTransactionShortcuts(featureDao, rows, false);
-            testTransactionShortcuts(featureDao, rows, true);
+            testUserDaoShortcuts(featureDao, rows, false);
+            testUserDaoShortcuts(featureDao, rows, true);
 
-            testTransactionShortcuts2(featureDao, rows, false);
-            testTransactionShortcuts2(featureDao, rows, true);
+            testUserDaoShortcuts2(featureDao, rows, false);
+            testUserDaoShortcuts2(featureDao, rows, true);
 
-            testTransactionChunks(featureDao, rows, chunkSize, false);
-            testTransactionChunks(featureDao, rows, chunkSize, true);
+            testUserDaoChunks(featureDao, rows, chunkSize, false);
+            testUserDaoChunks(featureDao, rows, chunkSize, true);
 
         }
+
+    }
+
+    /**
+     * Test transactions on the GeoPackage
+     */
+    @Test
+    public void testGeoPackage() {
+
+        testGeoPackage(geoPackage, false);
+        testGeoPackage(geoPackage, true);
+
+    }
+
+    /**
+     * Test ORMLite transactions
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testORMLite() throws SQLException {
+
+        testORMLite(geoPackage, false);
+        testORMLite(geoPackage, true);
 
     }
 
@@ -55,7 +89,7 @@ public class TransactionTest extends CreateGeoPackageTestCase {
      * @param rows       rows to insert
      * @param successful true for a successful transaction
      */
-    private void testTransaction(FeatureDao featureDao, int rows, boolean successful) {
+    private void testUserDao(FeatureDao featureDao, int rows, boolean successful) {
 
         int countBefore = featureDao.count();
 
@@ -92,7 +126,7 @@ public class TransactionTest extends CreateGeoPackageTestCase {
      * @param rows       rows to insert
      * @param successful true for a successful transaction
      */
-    private void testTransactionShortcuts(FeatureDao featureDao, int rows, boolean successful) {
+    private void testUserDaoShortcuts(FeatureDao featureDao, int rows, boolean successful) {
 
         int countBefore = featureDao.count();
 
@@ -128,7 +162,7 @@ public class TransactionTest extends CreateGeoPackageTestCase {
      * @param rows       rows to insert
      * @param successful true for a successful transaction
      */
-    private void testTransactionShortcuts2(FeatureDao featureDao, int rows, boolean successful) {
+    private void testUserDaoShortcuts2(FeatureDao featureDao, int rows, boolean successful) {
 
         int countBefore = featureDao.count();
 
@@ -161,7 +195,7 @@ public class TransactionTest extends CreateGeoPackageTestCase {
      * @param chunkSize  chunk size
      * @param successful true for a successful transaction
      */
-    private void testTransactionChunks(FeatureDao featureDao, int rows, int chunkSize, boolean successful) {
+    private void testUserDaoChunks(FeatureDao featureDao, int rows, int chunkSize, boolean successful) {
 
         int countBefore = featureDao.count();
 
@@ -229,6 +263,107 @@ public class TransactionTest extends CreateGeoPackageTestCase {
         geometry.setGeometry(new Point(0, 0));
         row.setGeometry(geometry);
         featureDao.insert(row);
+
+    }
+
+    /**
+     * Test a transaction on the GeoPackage
+     *
+     * @param geoPackage GeoPackage
+     * @param successful true for a successful transaction
+     */
+    private void testGeoPackage(GeoPackage geoPackage, boolean successful) {
+
+        int count = SQLiteMaster.countViewsOnTable(geoPackage.getConnection(),
+                Contents.TABLE_NAME);
+
+        geoPackage.beginTransaction();
+
+        try {
+
+            geoPackage.execSQL("CREATE VIEW " + Contents.TABLE_NAME
+                    + "_view AS SELECT table_name AS tableName FROM "
+                    + Contents.TABLE_NAME);
+
+        } catch (Exception e) {
+
+            geoPackage.failTransaction();
+            TestCase.fail(e.getMessage());
+
+        } finally {
+
+            if (successful) {
+                geoPackage.endTransaction();
+            } else {
+                geoPackage.failTransaction();
+            }
+
+        }
+
+        TestCase.assertEquals(successful ? count + 1 : count, SQLiteMaster
+                .countViewsOnTable(geoPackage.getConnection(),
+                        Contents.TABLE_NAME));
+    }
+
+    /**
+     * Test an ORMLite transaction
+     *
+     * @param geoPackage GeoPackage
+     * @param successful true for a successful transaction
+     * @throws SQLException upon error
+     */
+    private void testORMLite(final GeoPackage geoPackage,
+                             final boolean successful) throws SQLException {
+
+        final String tableName = "test_table";
+
+        final Contents contents = new Contents();
+        contents.setTableName(tableName);
+        contents.setDataType(ContentsDataType.ATTRIBUTES);
+
+        if (!geoPackage.isTable(tableName)) {
+            geoPackage.execSQL("CREATE TABLE " + tableName
+                    + " (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)");
+        }
+
+        final SpatialReferenceSystemDao srsDao = geoPackage
+                .getSpatialReferenceSystemDao();
+        final ContentsDao contentsDao = geoPackage.getContentsDao();
+
+        long srsCount = srsDao.countOf();
+        long contentsCount = contentsDao.countOf();
+
+        Callable<Void> callable = new Callable<Void>() {
+            public Void call() throws Exception {
+
+                SpatialReferenceSystem srs = srsDao.createWgs84Geographical3D();
+
+                contents.setSrs(srs);
+                contentsDao.create(contents);
+
+                if (!successful) {
+                    throw new SQLException();
+                }
+
+                return null;
+            }
+        };
+
+        try {
+            geoPackage.callInTransaction(callable);
+        } catch (SQLException e) {
+            if (successful) {
+                TestCase.fail(e.getMessage());
+            }
+        }
+
+        TestCase.assertEquals(successful ? srsCount + 1 : srsCount,
+                srsDao.countOf());
+        TestCase.assertEquals(successful ? contentsCount + 1 : contentsCount,
+                contentsDao.countOf());
+
+        TestCase.assertEquals(successful,
+                geoPackage.isAttributeTable(tableName));
 
     }
 

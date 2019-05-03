@@ -113,6 +113,13 @@ public interface GeoPackage extends GeoPackageCore {
     public GeoPackageConnection getConnection();
 
     /**
+     * End a transaction as successful and begin a new transaction
+     *
+     * @since 3.2.1
+     */
+    public void endAndBeginTransaction();
+
+    /**
      * Get the application context
      *
      * @return context

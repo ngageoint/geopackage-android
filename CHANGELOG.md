@@ -7,7 +7,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 3.2.1 (TBD)
 
 * geopackage-core version 3.2.1
-* Transaction shortcut methods for connections and User DAOs
+* Transaction shortcut methods for the GeoPackages, connections, and User DAOs
 * Feature Tiles geometry caching
 * gradle plugin updated to 3.4.0
 * gradle version 5.1.1
