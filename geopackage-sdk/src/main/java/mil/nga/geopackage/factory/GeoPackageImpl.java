@@ -12,12 +12,10 @@ import java.util.List;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.attributes.AttributesConnection;
 import mil.nga.geopackage.attributes.AttributesCursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.attributes.AttributesTable;
 import mil.nga.geopackage.attributes.AttributesTableReader;
-import mil.nga.geopackage.attributes.AttributesWrapperConnection;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
@@ -27,23 +25,19 @@ import mil.nga.geopackage.extension.RTreeIndexExtension;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
-import mil.nga.geopackage.features.user.FeatureConnection;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.features.user.FeatureTableReader;
-import mil.nga.geopackage.features.user.FeatureWrapperConnection;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrix.TileMatrixKey;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
-import mil.nga.geopackage.tiles.user.TileConnection;
 import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.geopackage.tiles.user.TileTableReader;
-import mil.nga.geopackage.tiles.user.TileWrapperConnection;
 import mil.nga.sf.proj.Projection;
 
 /**
@@ -133,10 +127,9 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
         // Read the existing table and create the dao
         FeatureTableReader tableReader = new FeatureTableReader(geometryColumns);
-        final FeatureTable featureTable = tableReader.readTable(new FeatureWrapperConnection(database));
+        final FeatureTable featureTable = tableReader.readTable(database);
         featureTable.setContents(geometryColumns.getContents());
-        FeatureConnection userDb = new FeatureConnection(database);
-        FeatureDao dao = new FeatureDao(getName(), database, userDb, geometryColumns, featureTable);
+        FeatureDao dao = new FeatureDao(getName(), database, geometryColumns, featureTable);
 
         // Register the table name (with and without quotes) to wrap cursors with the feature cursor
         registerCursorWrapper(geometryColumns.getTableName(),
@@ -247,10 +240,9 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         // Read the existing table and create the dao
         TileTableReader tableReader = new TileTableReader(
                 tileMatrixSet.getTableName());
-        final TileTable tileTable = tableReader.readTable(new TileWrapperConnection(database));
+        final TileTable tileTable = tableReader.readTable(database);
         tileTable.setContents(tileMatrixSet.getContents());
-        TileConnection userDb = new TileConnection(database);
-        TileDao dao = new TileDao(getName(), database, userDb, tileMatrixSet, tileMatrices,
+        TileDao dao = new TileDao(getName(), database, tileMatrixSet, tileMatrices,
                 tileTable);
 
         // Register the table name (with and without quotes) to wrap cursors with the tile cursor
@@ -341,10 +333,9 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
         // Read the existing table and create the dao
         AttributesTableReader tableReader = new AttributesTableReader(
                 contents.getTableName());
-        final AttributesTable attributesTable = tableReader.readTable(new AttributesWrapperConnection(database));
+        final AttributesTable attributesTable = tableReader.readTable(database);
         attributesTable.setContents(contents);
-        AttributesConnection userDb = new AttributesConnection(database);
-        AttributesDao dao = new AttributesDao(getName(), database, userDb,
+        AttributesDao dao = new AttributesDao(getName(), database,
                 attributesTable);
 
         // Register the table name (with and without quotes) to wrap cursors with the attributes cursor

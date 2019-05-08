@@ -3,9 +3,9 @@ package mil.nga.geopackage.user;
 import android.content.ContentValues;
 
 import mil.nga.geopackage.db.AlterTable;
-import mil.nga.geopackage.db.ColumnMapping;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageDatabase;
+import mil.nga.geopackage.db.TableMapping;
 
 /**
  * Abstract User DAO for reading user tables
@@ -238,10 +238,10 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
 
         newTable.renameColumn(columnName, newColumnName);
 
-        ColumnMapping columnMapping = new ColumnMapping(newTable);
-        columnMapping.getColumn(newColumnName).setFromColumn(columnName);
+        TableMapping tableMapping = new TableMapping(newTable);
+        tableMapping.getColumn(newColumnName).setFromColumn(columnName);
 
-        AlterTable.alterTable(getDb(), getTableName(), newTable, columnMapping);
+        AlterTable.alterTable(getDb(), newTable, tableMapping);
     }
 
 }

@@ -71,16 +71,15 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      *
      * @param database      database name
      * @param db            GeoPackage connection
-     * @param tileDb        tile connection
      * @param tileMatrixSet tile matrix set
      * @param tileMatrices  tile matrices
      * @param table         tile table
      */
-    public TileDao(String database, GeoPackageConnection db, TileConnection tileDb, TileMatrixSet tileMatrixSet,
+    public TileDao(String database, GeoPackageConnection db, TileMatrixSet tileMatrixSet,
                    List<TileMatrix> tileMatrices, TileTable table) {
-        super(database, db, tileDb, table);
+        super(database, db, new TileConnection(db), table);
 
-        this.tileDb = tileDb;
+        this.tileDb = (TileConnection) getUserDb();
         this.tileMatrixSet = tileMatrixSet;
         this.tileMatrices = tileMatrices;
         this.widths = new double[tileMatrices.size()];

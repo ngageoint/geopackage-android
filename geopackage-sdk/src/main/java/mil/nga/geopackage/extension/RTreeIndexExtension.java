@@ -5,7 +5,6 @@ import org.sqlite.database.sqlite.SQLiteDatabase;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.features.user.FeatureDao;
-import mil.nga.geopackage.user.custom.UserCustomConnection;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomTable;
 
@@ -68,10 +67,9 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
     public RTreeIndexTableDao getTableDao(FeatureDao featureDao) {
 
         GeoPackageConnection connection = getGeoPackage().getConnection();
-        UserCustomConnection userDb = new UserCustomConnection(connection);
         UserCustomTable userCustomTable = getRTreeTable(featureDao.getTable());
         UserCustomDao userCustomDao = new UserCustomDao(geoPackage.getName(),
-                connection, userDb, userCustomTable);
+                connection, userCustomTable);
 
         return new RTreeIndexTableDao(this, userCustomDao, featureDao);
     }

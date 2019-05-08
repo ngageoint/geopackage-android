@@ -193,31 +193,6 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * {@inheritDoc}
      */
     @Override
-    public boolean columnExists(String tableName, String columnName) {
-
-        boolean exists = false;
-
-        Cursor cursor = rawQuery("PRAGMA table_info(" + CoreSQLUtils.quoteWrap(tableName) + ")", null);
-        try {
-            int nameIndex = cursor.getColumnIndex(NAME_COLUMN);
-            while (cursor.moveToNext()) {
-                String name = cursor.getString(nameIndex);
-                if (columnName.equals(name)) {
-                    exists = true;
-                    break;
-                }
-            }
-        } finally {
-            cursor.close();
-        }
-
-        return exists;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Object querySingleResult(String sql, String[] args, int column,
                                     GeoPackageDataType dataType) {
         CursorResult result = wrapQuery(sql, args);

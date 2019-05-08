@@ -18,8 +18,7 @@ public class StyleDao extends AttributesDao {
      * @param dao user custom data access object
      */
     public StyleDao(AttributesDao dao) {
-        super(dao.getDatabase(), dao.getDb(), dao.getAttributesDb(),
-                new StyleTable(dao.getTable()));
+        super(dao.getDatabase(), dao.getDb(), new StyleTable(dao.getTable()));
     }
 
     /**

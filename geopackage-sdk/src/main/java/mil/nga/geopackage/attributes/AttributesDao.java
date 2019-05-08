@@ -25,16 +25,15 @@ public class AttributesDao
     /**
      * Constructor
      *
-     * @param database     database
-     * @param db           db connection
-     * @param attributesDb attributes connection
-     * @param table        attributes table
+     * @param database database
+     * @param db       db connection
+     * @param table    attributes table
      */
     public AttributesDao(String database, GeoPackageConnection db,
-                         AttributesConnection attributesDb, AttributesTable table) {
-        super(database, db, attributesDb, table);
+                         AttributesTable table) {
+        super(database, db, new AttributesConnection(db), table);
 
-        this.attributesDb = attributesDb;
+        this.attributesDb = (AttributesConnection) getUserDb();
         if (table.getContents() == null) {
             throw new GeoPackageException(AttributesTable.class.getSimpleName()
                     + " " + table.getTableName() + " has null "
