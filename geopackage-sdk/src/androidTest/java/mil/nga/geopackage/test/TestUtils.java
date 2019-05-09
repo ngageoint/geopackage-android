@@ -266,7 +266,7 @@ public class TestUtils {
         columns.add(FeatureColumn.createColumn(6, TEST_INTEGER_COLUMN,
                 GeoPackageDataType.INTEGER));
 
-        FeatureTable table = new FeatureTable(tableName, columns);
+        FeatureTable table = new FeatureTable(tableName, geometryColumn, columns);
 
         return table;
     }
