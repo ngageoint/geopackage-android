@@ -78,7 +78,7 @@ public class TestSetupTeardown {
 
     public static final int CREATE_METADATA_REFERENCE_COUNT = 13;
 
-    public static final int CREATE_EXTENSIONS_COUNT = 5;
+    public static final int CREATE_EXTENSIONS_COUNT = 7;
 
     /**
      * Set up the create database
