@@ -332,7 +332,7 @@ public class TileUtils {
      * @param dao         tile dao
      * @throws IOException upon error
      */
-    private static void testUpdate(Context testContext, TileDao dao) throws IOException {
+    public static void testUpdate(Context testContext, TileDao dao) throws IOException {
 
         TestCase.assertNotNull(dao);
 

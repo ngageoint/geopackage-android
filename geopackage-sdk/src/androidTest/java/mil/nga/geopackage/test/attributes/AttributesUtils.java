@@ -443,7 +443,7 @@ public class AttributesUtils {
      *
      * @param dao attributes dao
      */
-    private static void testUpdate(AttributesDao dao) {
+    public static void testUpdate(AttributesDao dao) {
 
         TestCase.assertNotNull(dao);
 
