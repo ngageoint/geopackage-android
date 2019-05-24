@@ -1227,16 +1227,21 @@ public class AlterTableUtils {
         List<UserCustomColumn> columns = new ArrayList<>();
         columns.add(UserCustomColumn
                 .createPrimaryKeyColumn(columnName + ++countCount));
-        columns.add(UserCustomColumn.createColumn(columnName + ++countCount,
-                GeoPackageDataType.TEXT, true));
+        UserCustomColumn column2 = UserCustomColumn.createColumn(
+                columnName + ++countCount, GeoPackageDataType.TEXT, true);
+        column2.addUniqueConstraint();
+        columns.add(column2);
         columns.add(UserCustomColumn.createColumn(columnName + ++countCount,
                 GeoPackageDataType.TEXT, true, "default_value"));
         columns.add(UserCustomColumn.createColumn(columnName + ++countCount,
                 GeoPackageDataType.BOOLEAN));
         columns.add(UserCustomColumn.createColumn(columnName + ++countCount,
                 GeoPackageDataType.DOUBLE));
-        columns.add(UserCustomColumn.createColumn(columnName + ++countCount,
-                GeoPackageDataType.INTEGER, true));
+        UserCustomColumn column6 = UserCustomColumn.createColumn(
+                columnName + ++countCount, GeoPackageDataType.INTEGER, true);
+        column6.addConstraint("CONSTRAINT check_" + tableName + " CHECK ("
+                + (columnName + countCount) + " >= 0)");
+        columns.add(column6);
 
         UserCustomTable table = new UserCustomTable(tableName, columns);
 
@@ -1318,6 +1323,27 @@ public class AlterTableUtils {
         TestCase.assertEquals("CONSTRAINT fk_" + copyTableName
                         + " FOREIGN KEY (column6) REFERENCES gpkg_spatial_ref_sys(srs_id)",
                 copyConstraints.get(3).buildSql());
+
+        TestCase.assertEquals("NOT NULL",
+                copyTable.getColumn(0).getConstraints().get(0).buildSql());
+        TestCase.assertEquals("PRIMARY KEY AUTOINCREMENT",
+                copyTable.getColumn(0).getConstraints().get(1).buildSql());
+        TestCase.assertEquals("NOT NULL",
+                copyTable.getColumn(1).getConstraints().get(0).buildSql());
+        TestCase.assertEquals("UNIQUE",
+                copyTable.getColumn(1).getConstraints().get(1).buildSql());
+        TestCase.assertEquals("NOT NULL",
+                copyTable.getColumn(2).getConstraints().get(0).buildSql());
+        TestCase.assertEquals("DEFAULT 'default_value'",
+                copyTable.getColumn(2).getConstraints().get(1).buildSql());
+        TestCase.assertEquals("NOT NULL",
+                copyTable.getColumn(5).getConstraints().get(0).buildSql());
+        TestCase.assertEquals(
+                "CONSTRAINT check_" + copyTableName + " CHECK ("
+                        + column6.getName() + " >= 0)",
+                copyTable.getColumn(5).getConstraints().get(1).buildSql());
+        TestCase.assertEquals("check_" + copyTableName,
+                copyTable.getColumn(5).getConstraints().get(1).getName());
 
         geoPackage.copyTableAsEmpty(tableName, copyTableName2);
 
