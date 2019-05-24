@@ -7,8 +7,12 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 3.3.0 (TBD)
 
 * geopackage-core version 3.3.0
+* sf-geojson version 2.0.2
 * Transaction shortcut methods for the GeoPackages, connections, and User DAOs
 * Feature Tiles geometry caching
+* GeoPackage User Custom DAO retrieval
+* Table Readers moved to geopackage-core
+* Android Q fix for SQL Utils quote wrap
 * gradle plugin updated to 3.4.0
 * gradle version 5.1.1
 
