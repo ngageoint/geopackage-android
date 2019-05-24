@@ -50,7 +50,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Default max number of feature geometries to retain in cache
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public static final int DEFAULT_GEOMETRY_CACHE_SIZE = 1000;
 
@@ -166,7 +166,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * Is caching geometries enabled?
      *
      * @return true if caching geometries
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public boolean isCacheGeometries() {
         return cacheGeometries;
@@ -176,7 +176,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * Set the cache geometries flag
      *
      * @param cacheGeometries true to cache geometries
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void setCacheGeometries(boolean cacheGeometries) {
         this.cacheGeometries = cacheGeometries;
@@ -194,7 +194,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
     /**
      * Clear the geometry cache
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void clearGeometryCache() {
         geometryCache.evictAll();
@@ -204,7 +204,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * Set / resize the geometry cache size
      *
      * @param size new size
-     * @since 3.2.1
+     * @since 3.3.0
      */
     @TargetApi(21)
     public void setGeometryCacheSize(int size) {

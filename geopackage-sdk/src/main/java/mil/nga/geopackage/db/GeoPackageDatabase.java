@@ -69,7 +69,7 @@ public class GeoPackageDatabase {
     /**
      * Begin a transaction
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void beginTransaction() {
         db.beginTransaction();
@@ -78,7 +78,7 @@ public class GeoPackageDatabase {
     /**
      * End a transaction as successful
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void endTransaction() {
         endTransaction(true);
@@ -88,7 +88,7 @@ public class GeoPackageDatabase {
      * End a transaction
      *
      * @param successful true to commit, false to rollback
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void endTransaction(boolean successful) {
         if (successful) {
@@ -102,7 +102,7 @@ public class GeoPackageDatabase {
     /**
      * End a transaction as successful and begin a new transaction
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void endAndBeginTransaction() {
         endTransaction();

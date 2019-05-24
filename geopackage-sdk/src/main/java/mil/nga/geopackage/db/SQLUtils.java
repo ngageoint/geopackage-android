@@ -41,7 +41,7 @@ public class SQLUtils {
      * @param contentValues content values
      * @param key           key
      * @param value         object value
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public static void setContentValue(ContentValues contentValues, String key, Object value) {
 

@@ -80,7 +80,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     /**
      * End a transaction as successful and begin a new transaction
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void endAndBeginTransaction() {
         db.endAndBeginTransaction();

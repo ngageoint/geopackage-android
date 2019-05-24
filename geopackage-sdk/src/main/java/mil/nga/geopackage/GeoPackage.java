@@ -100,7 +100,7 @@ public interface GeoPackage extends GeoPackageCore {
      *
      * @param tableName table name
      * @return user custom dao
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public UserCustomDao getUserCustomDao(String tableName);
 
@@ -125,7 +125,7 @@ public interface GeoPackage extends GeoPackageCore {
     /**
      * End a transaction as successful and begin a new transaction
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void endAndBeginTransaction();
 

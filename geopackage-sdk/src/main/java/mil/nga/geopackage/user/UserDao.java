@@ -121,7 +121,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     /**
      * End a transaction as successful and begin a new transaction
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void endAndBeginTransaction() {
         db.endAndBeginTransaction();

@@ -558,7 +558,7 @@ public abstract class FeatureTiles {
     /**
      * Clear all caches
      *
-     * @since 3.2.1
+     * @since 3.3.0
      */
     public void clearCache() {
         clearStylePaintCache();
