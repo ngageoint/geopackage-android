@@ -269,6 +269,7 @@ public class MetadataUtils {
 				int referenceParentCount = metadataReferenceList.size();
 
 				// Delete the metadata
+				geoPackage.foreignKeys(false);
 				if (cascade) {
 					dao.deleteCascade(metadata);
 				} else {
