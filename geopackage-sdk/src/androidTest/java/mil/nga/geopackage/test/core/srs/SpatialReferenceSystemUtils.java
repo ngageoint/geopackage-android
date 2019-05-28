@@ -458,6 +458,7 @@ public class SpatialReferenceSystemUtils {
 			}
 
 			// Delete the srs
+			geoPackage.foreignKeys(false);
 			if (cascade) {
 				dao.deleteCascade(srs);
 			} else {

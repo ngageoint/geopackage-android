@@ -98,4 +98,14 @@ public class GeoPackageImportTest extends ImportGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test vacuum
+	 */
+	@Test
+	public void testVacuum() {
+
+		GeoPackageTestUtils.testVacuum(activity, geoPackage);
+
+	}
+
 }

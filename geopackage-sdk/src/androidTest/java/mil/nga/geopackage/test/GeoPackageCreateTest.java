@@ -98,4 +98,14 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test vacuum
+	 */
+	@Test
+	public void testVacuum() {
+
+		GeoPackageTestUtils.testVacuum(activity, geoPackage);
+
+	}
+
 }

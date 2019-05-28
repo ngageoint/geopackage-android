@@ -10,11 +10,13 @@ import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.db.GeoPackageDataType;
+import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -251,6 +253,8 @@ public class GeoPackageTestUtils {
 
         TestCase.assertTrue(geometryColumnsDao.isTableExists()
                 || tileMatrixSetDao.isTableExists());
+
+        geoPackage.foreignKeys(false);
 
         if (geometryColumnsDao.isTableExists()) {
 
@@ -523,6 +527,31 @@ public class GeoPackageTestUtils {
         TestCase.assertEquals(expectedBoundingBox, geoPackageBoundingBox);
         TestCase.assertEquals(expectedManualBoundingBox,
                 geoPackageManualBoundingBox);
+
+    }
+
+    /**
+     * Test the GeoPackage vacuum
+     *
+     * @param activity   activity
+     * @param geoPackage GeoPackage
+     */
+    public static void testVacuum(Activity activity, GeoPackage geoPackage) {
+
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+        long size = manager.size(geoPackage.getName());
+
+        for (String table : geoPackage.getTables()) {
+
+            geoPackage.deleteTable(table);
+
+            geoPackage.vacuum();
+
+            long newSize = manager.size(geoPackage.getName());
+            TestCase.assertTrue(size > newSize);
+            size = newSize;
+
+        }
 
     }
 

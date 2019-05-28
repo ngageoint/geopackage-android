@@ -834,6 +834,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
 
             GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite));
+            connection.enableForeignKeys();
+
             GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
             db = new GeoPackageImpl(context, database, path, connection, cursorFactory, tableCreator, writable);
 

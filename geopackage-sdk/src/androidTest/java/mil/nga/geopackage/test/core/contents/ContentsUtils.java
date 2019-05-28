@@ -435,6 +435,7 @@ public class ContentsUtils {
 			}
 
 			// Delete the contents
+			geoPackage.foreignKeys(false);
 			if (cascade) {
 				dao.deleteCascade(contents);
 			} else {

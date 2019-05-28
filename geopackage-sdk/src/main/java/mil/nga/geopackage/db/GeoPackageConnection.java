@@ -17,11 +17,6 @@ import mil.nga.geopackage.GeoPackageException;
 public class GeoPackageConnection extends GeoPackageCoreConnection {
 
     /**
-     * Name column
-     */
-    private static final String NAME_COLUMN = "name";
-
-    /**
      * Database connection
      */
     private final GeoPackageDatabase db;

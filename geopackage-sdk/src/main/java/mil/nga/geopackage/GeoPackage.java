@@ -146,6 +146,15 @@ public interface GeoPackage extends GeoPackageCore {
     public Cursor foreignKeyCheck();
 
     /**
+     * Perform a foreign key check on the database table
+     *
+     * @param tableName table name
+     * @return null if check passed, open cursor with results if failed
+     * @since 3.3.0
+     */
+    public Cursor foreignKeyCheck(String tableName);
+
+    /**
      * Perform an integrity check on the database
      *
      * @return null if check passed, open cursor with results if failed

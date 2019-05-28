@@ -12,6 +12,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Feature Tiles geometry caching
 * GeoPackage User Custom DAO retrieval
 * Table Readers moved to geopackage-core
+* Automatically enable foreign key checks for new connections without preexisting violations
+* GeoPackage table foreign key check
 * Android Q fix for SQL Utils quote wrap
 * gradle plugin updated to 3.4.0
 * gradle version 5.1.1

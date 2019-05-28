@@ -19,6 +19,7 @@ import mil.nga.geopackage.attributes.AttributesTableReader;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
+import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageTableCreator;
 import mil.nga.geopackage.extension.RTreeIndexExtension;
@@ -448,7 +449,15 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      */
     @Override
     public Cursor foreignKeyCheck() {
-        Cursor cursor = rawQuery("PRAGMA foreign_key_check", null);
+        return foreignKeyCheck(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cursor foreignKeyCheck(String tableName) {
+        Cursor cursor = rawQuery(CoreSQLUtils.foreignKeyCheckSQL(tableName), null);
         if (!cursor.moveToNext()) {
             cursor.close();
             cursor = null;
@@ -461,7 +470,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      */
     @Override
     public Cursor integrityCheck() {
-        return integrityCheck(rawQuery("PRAGMA integrity_check", null));
+        return integrityCheck(rawQuery(CoreSQLUtils.integrityCheckSQL(), null));
     }
 
     /**
@@ -469,7 +478,7 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      */
     @Override
     public Cursor quickCheck() {
-        return integrityCheck(rawQuery("PRAGMA quick_check", null));
+        return integrityCheck(rawQuery(CoreSQLUtils.quickCheckSQL(), null));
     }
 
     /**
