@@ -15,7 +15,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Automatically enable foreign key checks for new connections without preexisting violations
 * GeoPackage table foreign key check
 * Android Q fix for SQL Utils quote wrap
-* gradle plugin updated to 3.4.0
+* gradle plugin updated to 3.4.1
 * gradle version 5.1.1
 
 ## [3.2.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.2.0) (04-02-2019)
