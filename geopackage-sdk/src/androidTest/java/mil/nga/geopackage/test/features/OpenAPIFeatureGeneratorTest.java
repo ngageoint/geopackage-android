@@ -2,6 +2,7 @@ package mil.nga.geopackage.test.features;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -18,16 +19,12 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 
 /**
- * WFS Feature Generator Test
+ * OGC OpenAPI Feature Generator Test
  *
  * @author osbornb
  */
+@Ignore // remove to run
 public class OpenAPIFeatureGeneratorTest extends CreateGeoPackageTestCase {
-
-    /**
-     * GeoPackage save path
-     */
-    private static final String PATH = "/Users/osbornb/ogc/";
 
     /**
      * Test opendata_1h
@@ -81,7 +78,20 @@ public class OpenAPIFeatureGeneratorTest extends CreateGeoPackageTestCase {
 
         testServer(
                 "https://beta-paikkatieto.maanmittauslaitos.fi/maastotiedot/wfs3/v1",
-                "rakennus", 100, 1000, null, null, null);
+                "rakennus", 1000, 10000, null, null, null);
+
+    }
+
+    /**
+     * Test mage
+     *
+     * @throws SQLException upon failure
+     */
+    @Test
+    public void testMAGE() throws SQLException {
+
+        testServer("https://mageogc.geointservices.io/api/ogc/features",
+                "event:1:observations", "mage", null, null, null, null, null);
 
     }
 
@@ -97,9 +107,29 @@ public class OpenAPIFeatureGeneratorTest extends CreateGeoPackageTestCase {
      * @param period      period or end time
      * @throws SQLException upon error
      */
-    private void testServer(String server, String collection, int limit,
-                            int totalLimit, BoundingBox boundingBox, String time, String period)
-            throws SQLException {
+    private void testServer(String server, String collection, Integer limit,
+                            Integer totalLimit, BoundingBox boundingBox, String time,
+                            String period) throws SQLException {
+        testServer(server, collection, collection, limit, totalLimit,
+                boundingBox, time, period);
+    }
+
+    /**
+     * Test a WFS server and create a GeoPackage
+     *
+     * @param server      server url
+     * @param collection  collection name
+     * @param name        geoPackage and table name
+     * @param limit       request limit
+     * @param totalLimit  total limit
+     * @param boundingBox bounding box
+     * @param time        time
+     * @param period      period or end time
+     * @throws SQLException upon error
+     */
+    private void testServer(String server, String collection, String name,
+                            Integer limit, Integer totalLimit, BoundingBox boundingBox,
+                            String time, String period) throws SQLException {
 
         GeoPackageManager geoPackageManager = GeoPackageFactory.getManager(activity);
 
@@ -109,8 +139,8 @@ public class OpenAPIFeatureGeneratorTest extends CreateGeoPackageTestCase {
 
         GeoPackage geoPackage = geoPackageManager.open(collection);
 
-        OpenAPIFeatureGenerator generator = new OpenAPIFeatureGenerator(geoPackage,
-                collection, server, collection);
+        OpenAPIFeatureGenerator generator = new OpenAPIFeatureGenerator(
+                geoPackage, name, server, collection);
         generator.setLimit(limit);
         generator.setTotalLimit(totalLimit);
         generator.setBoundingBox(boundingBox);
@@ -119,10 +149,14 @@ public class OpenAPIFeatureGeneratorTest extends CreateGeoPackageTestCase {
         generator.setDownloadAttempts(3);
 
         int count = generator.generateFeatures();
-        TestCase.assertEquals(totalLimit, count);
+        if (totalLimit != null) {
+            TestCase.assertEquals(totalLimit.intValue(), count);
+        }
 
         FeatureDao featureDao = generator.getFeatureDao();
-        TestCase.assertEquals(totalLimit, featureDao.count());
+        if (totalLimit != null) {
+            TestCase.assertEquals(totalLimit.intValue(), featureDao.count());
+        }
 
         FeatureIndexManager indexer = new FeatureIndexManager(activity, geoPackage, featureDao);
         indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
