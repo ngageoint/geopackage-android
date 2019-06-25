@@ -7,14 +7,14 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 3.3.0 (TBD)
 
 * geopackage-core version 3.3.0
-* sf-geojson version 2.0.2
+* Removed sf-geojson, inherit the dependency
 * Transaction shortcut methods for the GeoPackages, connections, and User DAOs
 * Feature Tiles geometry caching
 * GeoPackage User Custom DAO retrieval
 * Table Readers moved to geopackage-core
 * Automatically enable foreign key checks for new connections without preexisting violations
 * GeoPackage table foreign key check
-* OGC OpenAPI Features download to GeoPackage support
+* OGC API Features download to GeoPackage support
 * Android Q fix for SQL Utils quote wrap
 * gradle plugin updated to 3.4.1
 * gradle version 5.1.1
