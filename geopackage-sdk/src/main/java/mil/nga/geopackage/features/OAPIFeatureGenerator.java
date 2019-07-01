@@ -1,12 +1,9 @@
 package mil.nga.geopackage.features;
 
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
@@ -66,25 +63,15 @@ public class OAPIFeatureGenerator extends OAPIFeatureCoreGenerator {
      * {@inheritDoc}
      */
     @Override
-    protected void createFeature(Geometry geometry,
-                                 Map<String, Object> properties) throws SQLException {
+    protected void initializeTable() {
+        featureDao = getGeoPackage().getFeatureDao(geometryColumns);
+    }
 
-        if (srs == null) {
-            createSrs();
-        }
-
-        if (featureDao == null) {
-            GeometryColumns geometryColumns = createTable(properties);
-            featureDao = getGeoPackage().getFeatureDao(geometryColumns);
-        }
-
-        Map<String, Object> values = new HashMap<>();
-
-        for (Entry<String, Object> property : properties.entrySet()) {
-            String column = property.getKey();
-            Object value = getValue(column, property.getValue());
-            values.put(column, value);
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveFeature(Geometry geometry, Map<String, Object> values) {
 
         FeatureRow featureRow = featureDao.newRow();
 
