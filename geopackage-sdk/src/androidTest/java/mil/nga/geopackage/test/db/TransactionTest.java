@@ -210,7 +210,7 @@ public class TransactionTest extends CreateGeoPackageTestCase {
                 if (count % chunkSize == 0) {
 
                     if (successful) {
-                        featureDao.endAndBeginTransaction();
+                        featureDao.commit();
                     } else {
                         featureDao.failTransaction();
                         featureDao.beginTransaction();

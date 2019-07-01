@@ -146,7 +146,7 @@ public class GeoPackagePerformance extends BaseTestCase {
                 dao.create(newRow);
 
                 if (transactions && count % commitChunk == 0) {
-                    dao.endAndBeginTransaction();
+                    dao.commit();
                 }
 
                 if (logChunk > 0 && count % logChunk == 0) {

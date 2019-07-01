@@ -416,8 +416,8 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
-    public void endAndBeginTransaction() {
-        database.endAndBeginTransaction();
+    public void commit() {
+        database.commit();
     }
 
     /**
