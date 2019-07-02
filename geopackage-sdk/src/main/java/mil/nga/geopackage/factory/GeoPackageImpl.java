@@ -424,6 +424,14 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
+    public boolean inTransaction() {
+        return database.inTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Cursor rawQuery(String sql, String[] args) {
         return database.rawQuery(sql, args);
     }

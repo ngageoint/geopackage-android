@@ -110,6 +110,16 @@ public class GeoPackageDatabase {
     }
 
     /**
+     * Determine if currently within a transaction
+     *
+     * @return true if in transaction
+     * @since 3.3.0
+     */
+    public boolean inTransaction() {
+        return db.inTransaction();
+    }
+
+    /**
      * @param table       table name
      * @param whereClause where clause
      * @param whereArgs   where arguments

@@ -128,6 +128,14 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
 
     /**
      * {@inheritDoc}
+     */
+    @Override
+    public boolean inTransaction() {
+        return db.inTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
      * Handles requery of invalid id row
      */
     @Override
