@@ -27,11 +27,11 @@ public class OAPIFeatureGenerator extends OAPIFeatureCoreGenerator {
      * @param geoPackage GeoPackage
      * @param tableName  table name
      * @param server     server url
-     * @param name       collection identifier
+     * @param id       collection identifier
      */
     public OAPIFeatureGenerator(GeoPackage geoPackage, String tableName,
-                                String server, String name) {
-        super(geoPackage, tableName, server, name);
+                                String server, String id) {
+        super(geoPackage, tableName, server, id);
     }
 
     /**
