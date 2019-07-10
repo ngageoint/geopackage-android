@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 3.3.0 (TBD)
+## [3.3.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.3.0) (07-10-2019)
 
 * geopackage-core version 3.3.0
 * Removed sf-geojson, inherit the dependency
