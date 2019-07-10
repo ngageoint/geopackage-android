@@ -16,7 +16,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * GeoPackage table foreign key check
 * OGC API Features download to GeoPackage support
 * Android Q fix for SQL Utils quote wrap
-* gradle plugin updated to 3.4.1
+* gradle plugin updated to 3.4.2
 * gradle version 5.1.1
 
 ## [3.2.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.2.0) (04-02-2019)
