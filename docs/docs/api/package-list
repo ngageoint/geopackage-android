@@ -12,6 +12,7 @@ mil.nga.geopackage.extension.related.media
 mil.nga.geopackage.extension.related.simple
 mil.nga.geopackage.extension.style
 mil.nga.geopackage.factory
+mil.nga.geopackage.features
 mil.nga.geopackage.features.index
 mil.nga.geopackage.features.user
 mil.nga.geopackage.io
