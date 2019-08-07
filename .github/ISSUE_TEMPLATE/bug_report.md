@@ -1,15 +1,24 @@
+---
+name: Bug report
+about: Report an issue
+title: ''
+labels: bug
+assignees: ''
+
+---
+
 Please fill out as much known and relevant information as possible.
 
 #### Version Information:
 
-  * GeoPackage Android Version: 
+  * GeoPackage Android Version:
   * GeoPackage Android Source: (e.g. Central Repository / Bintray, Release, Source Code Build)
-  * Device or Emulator: 
-  * Android Studio Version: 
-  * Android Version Number: 
-  * Android SDK Version: 
-  * Platform & OS: 
-  * Other Relevant Libraries: 
+  * Device or Emulator:
+  * Android Studio Version:
+  * Android Version Number:
+  * Android SDK Version:
+  * Platform & OS:
+  * Other Relevant Libraries:
 
 #### Expected Results:
 
