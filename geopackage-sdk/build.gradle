@@ -8,11 +8,11 @@ version = "3.3.1"
 def remotePublish = false
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
 
         testApplicationId 'mil.nga.geopackage.test'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -20,6 +20,11 @@ android {
 
     configurations {
         javadocDeps
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -52,7 +57,7 @@ android {
         options.links("http://ngageoint.github.io/tiff-java/docs/api/")
         options.links("http://ormlite.com/javadoc/ormlite-core/")
         options.links("http://ormlite.com/javadoc/ormlite-android/")
-        options.links("http://docs.oracle.com/javase/7/docs/api/")
+        options.links("http://docs.oracle.com/javase/8/docs/api/")
         options.links("http://hjg.com.ar/pngj/apidocs/")
         options.linksOffline("http://d.android.com/reference","${android.sdkDirectory}/docs/reference")
         destinationDir = file("../javadoc/")
@@ -148,14 +153,14 @@ android {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.0.2'
+    api 'androidx.appcompat:appcompat:1.1.0'
     api 'com.j256.ormlite:ormlite-android:5.1'
-    api 'mil.nga.geopackage:geopackage-core:3.3.0'
+    api 'mil.nga.geopackage:geopackage-core:3.3.1'
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:2.0.1'
     api 'mil.nga:sqlite-android:3270200'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.1',
-            'mil.nga.geopackage:geopackage-core:3.3.0',
+            'mil.nga.geopackage:geopackage-core:3.3.1',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:2.0.1'
     androidTestImplementation 'androidx.test:runner:1.2.0'

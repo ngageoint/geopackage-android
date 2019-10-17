@@ -32,6 +32,7 @@ public class FeatureDao extends
      * Constructor
      *
      * @param database        database name
+     * @param db              connection
      * @param geometryColumns geometry columns
      * @param table           feature table
      */
