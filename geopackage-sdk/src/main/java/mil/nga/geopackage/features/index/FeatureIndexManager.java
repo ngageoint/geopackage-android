@@ -2,6 +2,7 @@ package mil.nga.geopackage.features.index;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.j256.ormlite.dao.CloseableIterator;
 
@@ -717,24 +718,34 @@ public class FeatureIndexManager {
      */
     public FeatureIndexResults query() {
         FeatureIndexResults results = null;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                long count = featureTableIndex.count();
-                CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query();
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        long count = featureTableIndex.count();
+                        CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query();
+                        results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+                        break;
+                    case METADATA:
+                        Cursor geometryMetadata = featureIndexer.query();
+                        results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
+                        break;
+                    case RTREE:
+                        UserCustomCursor cursor = rTreeIndexTableDao.queryForAll();
+                        results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                                cursor);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                Cursor geometryMetadata = featureIndexer.query();
-                results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
-                break;
-            case RTREE:
-                UserCustomCursor cursor = rTreeIndexTableDao.queryForAll();
-                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
-                        cursor);
-                break;
-            default:
-                FeatureCursor featureCursor = featureDao.queryForAll();
-                results = new FeatureIndexFeatureResults(featureCursor);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+            }
+        }
+        if (results == null) {
+            FeatureCursor featureCursor = featureDao.queryForAll();
+            results = new FeatureIndexFeatureResults(featureCursor);
         }
         return results;
     }
@@ -745,19 +756,29 @@ public class FeatureIndexManager {
      * @return count
      */
     public long count() {
-        long count = 0;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                count = featureTableIndex.count();
+        Long count = null;
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        count = featureTableIndex.count();
+                        break;
+                    case METADATA:
+                        count = (long) featureIndexer.count();
+                        break;
+                    case RTREE:
+                        count = (long) rTreeIndexTableDao.count();
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                count = featureIndexer.count();
-                break;
-            case RTREE:
-                count = rTreeIndexTableDao.count();
-                break;
-            default:
-                count = manualFeatureQuery.countWithGeometries();
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+            }
+        }
+        if (count == null) {
+            count = (long) manualFeatureQuery.countWithGeometries();
         }
         return count;
     }
@@ -769,18 +790,30 @@ public class FeatureIndexManager {
      */
     public BoundingBox getBoundingBox() {
         BoundingBox bounds = null;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                bounds = featureTableIndex.getBoundingBox();
+        boolean success = false;
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        bounds = featureTableIndex.getBoundingBox();
+                        break;
+                    case METADATA:
+                        bounds = featureIndexer.getBoundingBox();
+                        break;
+                    case RTREE:
+                        bounds = rTreeIndexTableDao.getBoundingBox();
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
+                success = true;
                 break;
-            case METADATA:
-                bounds = featureIndexer.getBoundingBox();
-                break;
-            case RTREE:
-                bounds = rTreeIndexTableDao.getBoundingBox();
-                break;
-            default:
-                bounds = manualFeatureQuery.getBoundingBox();
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to get bounding box from feature index: " + type, e);
+            }
+        }
+        if (!success) {
+            bounds = manualFeatureQuery.getBoundingBox();
         }
         return bounds;
     }
@@ -793,18 +826,30 @@ public class FeatureIndexManager {
      */
     public BoundingBox getBoundingBox(Projection projection) {
         BoundingBox bounds = null;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                bounds = featureTableIndex.getBoundingBox(projection);
+        boolean success = false;
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        bounds = featureTableIndex.getBoundingBox(projection);
+                        break;
+                    case METADATA:
+                        bounds = featureIndexer.getBoundingBox(projection);
+                        break;
+                    case RTREE:
+                        bounds = rTreeIndexTableDao.getBoundingBox(projection);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
+                success = true;
                 break;
-            case METADATA:
-                bounds = featureIndexer.getBoundingBox(projection);
-                break;
-            case RTREE:
-                bounds = rTreeIndexTableDao.getBoundingBox(projection);
-                break;
-            default:
-                bounds = manualFeatureQuery.getBoundingBox(projection);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to get bounding box from feature index: " + type, e);
+            }
+        }
+        if (!success) {
+            bounds = manualFeatureQuery.getBoundingBox(projection);
         }
         return bounds;
     }
@@ -818,24 +863,34 @@ public class FeatureIndexManager {
      */
     public FeatureIndexResults query(BoundingBox boundingBox) {
         FeatureIndexResults results = null;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                long count = featureTableIndex.count(boundingBox);
-                CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(boundingBox);
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        long count = featureTableIndex.count(boundingBox);
+                        CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(boundingBox);
+                        results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+                        break;
+                    case METADATA:
+                        Cursor geometryMetadata = featureIndexer.query(boundingBox);
+                        results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
+                        break;
+                    case RTREE:
+                        UserCustomCursor cursor = rTreeIndexTableDao
+                                .query(boundingBox);
+                        results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                                cursor);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                Cursor geometryMetadata = featureIndexer.query(boundingBox);
-                results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
-                break;
-            case RTREE:
-                UserCustomCursor cursor = rTreeIndexTableDao
-                        .query(boundingBox);
-                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
-                        cursor);
-                break;
-            default:
-                results = manualFeatureQuery.query(boundingBox);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+            }
+        }
+        if (results == null) {
+            results = manualFeatureQuery.query(boundingBox);
         }
         return results;
     }
@@ -848,19 +903,29 @@ public class FeatureIndexManager {
      * @return count
      */
     public long count(BoundingBox boundingBox) {
-        long count = 0;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                count = featureTableIndex.count(boundingBox);
+        Long count = null;
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        count = featureTableIndex.count(boundingBox);
+                        break;
+                    case METADATA:
+                        count = (long) featureIndexer.count(boundingBox);
+                        break;
+                    case RTREE:
+                        count = rTreeIndexTableDao.count(boundingBox);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                count = featureIndexer.count(boundingBox);
-                break;
-            case RTREE:
-                count = rTreeIndexTableDao.count(boundingBox);
-                break;
-            default:
-                count = manualFeatureQuery.count(boundingBox);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+            }
+        }
+        if (count == null) {
+            count = manualFeatureQuery.count(boundingBox);
         }
         return count;
     }
@@ -873,23 +938,33 @@ public class FeatureIndexManager {
      */
     public FeatureIndexResults query(GeometryEnvelope envelope) {
         FeatureIndexResults results = null;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                long count = featureTableIndex.count(envelope);
-                CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(envelope);
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        long count = featureTableIndex.count(envelope);
+                        CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(envelope);
+                        results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+                        break;
+                    case METADATA:
+                        Cursor geometryMetadata = featureIndexer.query(envelope);
+                        results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
+                        break;
+                    case RTREE:
+                        UserCustomCursor cursor = rTreeIndexTableDao.query(envelope);
+                        results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                                cursor);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                Cursor geometryMetadata = featureIndexer.query(envelope);
-                results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
-                break;
-            case RTREE:
-                UserCustomCursor cursor = rTreeIndexTableDao.query(envelope);
-                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
-                        cursor);
-                break;
-            default:
-                results = manualFeatureQuery.query(envelope);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+            }
+        }
+        if (results == null) {
+            results = manualFeatureQuery.query(envelope);
         }
         return results;
     }
@@ -901,19 +976,29 @@ public class FeatureIndexManager {
      * @return count
      */
     public long count(GeometryEnvelope envelope) {
-        long count = 0;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                count = featureTableIndex.count(envelope);
+        Long count = null;
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        count = featureTableIndex.count(envelope);
+                        break;
+                    case METADATA:
+                        count = (long) featureIndexer.count(envelope);
+                        break;
+                    case RTREE:
+                        count = rTreeIndexTableDao.count(envelope);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                count = featureIndexer.count(envelope);
-                break;
-            case RTREE:
-                count = rTreeIndexTableDao.count(envelope);
-                break;
-            default:
-                count = manualFeatureQuery.count(envelope);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+            }
+        }
+        if (count == null) {
+            count = manualFeatureQuery.count(envelope);
         }
         return count;
     }
@@ -928,24 +1013,34 @@ public class FeatureIndexManager {
      */
     public FeatureIndexResults query(BoundingBox boundingBox, Projection projection) {
         FeatureIndexResults results = null;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                long count = featureTableIndex.count(boundingBox, projection);
-                CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(boundingBox, projection);
-                results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        long count = featureTableIndex.count(boundingBox, projection);
+                        CloseableIterator<GeometryIndex> geometryIndices = featureTableIndex.query(boundingBox, projection);
+                        results = new FeatureIndexGeoPackageResults(featureTableIndex, count, geometryIndices);
+                        break;
+                    case METADATA:
+                        Cursor geometryMetadata = featureIndexer.query(boundingBox, projection);
+                        results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
+                        break;
+                    case RTREE:
+                        UserCustomCursor cursor = rTreeIndexTableDao.query(
+                                boundingBox, projection);
+                        results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
+                                cursor);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                Cursor geometryMetadata = featureIndexer.query(boundingBox, projection);
-                results = new FeatureIndexMetadataResults(featureIndexer, geometryMetadata);
-                break;
-            case RTREE:
-                UserCustomCursor cursor = rTreeIndexTableDao.query(
-                        boundingBox, projection);
-                results = new FeatureIndexRTreeResults(rTreeIndexTableDao,
-                        cursor);
-                break;
-            default:
-                results = manualFeatureQuery.query(boundingBox, projection);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+            }
+        }
+        if (results == null) {
+            results = manualFeatureQuery.query(boundingBox, projection);
         }
         return results;
     }
@@ -959,39 +1054,50 @@ public class FeatureIndexManager {
      * @return count
      */
     public long count(BoundingBox boundingBox, Projection projection) {
-        long count = 0;
-        switch (getIndexedType()) {
-            case GEOPACKAGE:
-                count = featureTableIndex.count(boundingBox, projection);
+        Long count = null;
+        for (FeatureIndexType type : getLocation()) {
+            try {
+                switch (type) {
+                    case GEOPACKAGE:
+                        count = featureTableIndex.count(boundingBox, projection);
+                        break;
+                    case METADATA:
+                        count = featureIndexer.count(boundingBox, projection);
+                        break;
+                    case RTREE:
+                        count = rTreeIndexTableDao.count(boundingBox, projection);
+                        break;
+                    default:
+                        throw new GeoPackageException("Unsupported feature index type: " + type);
+                }
                 break;
-            case METADATA:
-                count = featureIndexer.count(boundingBox, projection);
-                break;
-            case RTREE:
-                count = rTreeIndexTableDao.count(boundingBox, projection);
-                break;
-            default:
-                count = manualFeatureQuery.count(boundingBox, projection);
+            } catch (Exception e) {
+                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+            }
+        }
+        if (count == null) {
+            count = manualFeatureQuery.count(boundingBox, projection);
         }
         return count;
     }
 
     /**
-     * Verify the index location is set
+     * Get a feature index location to iterate over indexed types
      *
-     * @return feature index type
+     * @return feature index location
+     * @since 3.3.1
      */
-    private FeatureIndexType verifyIndexLocation() {
-        if (indexLocation == null) {
-            throw new GeoPackageException("Index Location is not set, set the location or call an index method specifying the location");
-        }
-        return indexLocation;
+    public FeatureIndexLocation getLocation() {
+        return new FeatureIndexLocation(this);
     }
 
     /**
-     * Get the indexed type or throw an error if not indexed
+     * Get the first ordered indexed type
+     *
+     * @return feature index type
+     * @since 3.3.1
      */
-    private FeatureIndexType getIndexedType() {
+    public FeatureIndexType getIndexedType() {
 
         FeatureIndexType indexType = FeatureIndexType.NONE;
 
@@ -1004,6 +1110,18 @@ public class FeatureIndexManager {
         }
 
         return indexType;
+    }
+
+    /**
+     * Verify the index location is set
+     *
+     * @return feature index type
+     */
+    private FeatureIndexType verifyIndexLocation() {
+        if (indexLocation == null) {
+            throw new GeoPackageException("Index Location is not set, set the location or call an index method specifying the location");
+        }
+        return indexLocation;
     }
 
 }

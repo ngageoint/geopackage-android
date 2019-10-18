@@ -9,6 +9,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * compile SDK version 29
 * geopackage-core version 3.3.1
 * Java 8
+* Feature Index Manager catches and logs index type errors, attempts next index type
 * appcompat version 1.1.0
 * gradle plugin updated to 3.5.1
 * gradle version 5.4.1
