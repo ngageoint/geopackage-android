@@ -105,7 +105,7 @@ public class FeatureIndexListResults implements FeatureIndexResults {
                      */
                     @Override
                     public boolean hasNext() {
-                        return index <= rows.size();
+                        return index < rows.size();
                     }
 
                     /**

@@ -67,7 +67,7 @@ public class ManualFeatureQueryResults implements FeatureIndexResults {
              */
             @Override
             public boolean hasNext() {
-                return index <= featureIds.size();
+                return index < featureIds.size();
             }
 
             /**
