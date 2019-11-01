@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.CursorResult;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
@@ -64,6 +65,49 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     @Override
     public Object getValue(TColumn column) {
         return getValue(column.getIndex(), column.getDataType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getValue(int index) {
+        return getValue(table.getColumn(index));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getValue(String columnName) {
+        return getValue(table.getColumn(columnName));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getId() {
+        long id = -1;
+
+        TColumn pkColumn = table.getPkColumn();
+        if (pkColumn == null) {
+            throw new GeoPackageException(
+                    "No primary key column for table: " + table.getTableName());
+        }
+
+        Object objectValue = getValue(pkColumn);
+        if (objectValue instanceof Number) {
+            id = ((Number) objectValue).longValue();
+        } else {
+            throw new GeoPackageException(
+                    "Primary Key value was not a number. Table: "
+                            + table.getTableName() + ", Column Index: "
+                            + pkColumn.getIndex() + ", Column Name: "
+                            + pkColumn.getName() + ", Value: " + objectValue);
+        }
+
+        return id;
     }
 
     /**

@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageDataType;
 
@@ -223,8 +224,44 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      */
     @Override
     public Object getValue(int index) {
-        return cursor.getValue(index);
+        return getValue(getTable().getColumn(index));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getValue(String columnName) {
+        return getValue(getTable().getColumn(columnName));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getId() {
+        long id = -1;
+
+        TColumn pkColumn = getTable().getPkColumn();
+        if (pkColumn == null) {
+            throw new GeoPackageException(
+                    "No primary key column for table: " + getTable().getTableName());
+        }
+
+        Object objectValue = getValue(pkColumn);
+        if (objectValue instanceof Number) {
+            id = ((Number) objectValue).longValue();
+        } else {
+            throw new GeoPackageException(
+                    "Primary Key value was not a number. Table: "
+                            + getTable().getTableName() + ", Column Index: "
+                            + pkColumn.getIndex() + ", Column Name: "
+                            + pkColumn.getName() + ", Value: " + objectValue);
+        }
+
+        return id;
+    }
+
 
     /**
      * {@inheritDoc}
