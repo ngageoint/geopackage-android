@@ -51,6 +51,7 @@ public class ContentsIdUtils {
         }
 
         // Create all content ids
+        contentsIdExtension.getOrCreateExtension();
         TestCase.assertEquals(geoPackage.getTables().size(),
                 contentsIdExtension.createIds());
         TestCase.assertTrue(contentsIdExtension.has());
@@ -116,6 +117,7 @@ public class ContentsIdUtils {
 
         // Create contents id's for each table one by one
         uniqueIds.clear();
+        contentsIdExtension.getOrCreateExtension();
         for (String tableName : geoPackage.getTables()) {
 
             Contents contents = geoPackage.getTableContents(tableName);
