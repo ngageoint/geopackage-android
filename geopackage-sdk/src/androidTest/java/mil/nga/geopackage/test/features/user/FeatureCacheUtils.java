@@ -48,6 +48,7 @@ public class FeatureCacheUtils {
             FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
+            featureIndexManager.setContinueOnError(false);
             featureIndexManager.prioritizeQueryLocation(type);
 
             FeatureIndexResults featureIndexResults = featureIndexManager
@@ -75,6 +76,7 @@ public class FeatureCacheUtils {
             FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
+            featureIndexManager.setContinueOnError(false);
             featureIndexManager.prioritizeQueryLocation(type);
 
             FeatureIndexResults featureIndexResults = featureIndexManager
@@ -106,6 +108,7 @@ public class FeatureCacheUtils {
             FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
+            featureIndexManager.setContinueOnError(false);
             featureIndexManager.prioritizeQueryLocation(type);
 
             FeatureIndexResults featureIndexResults = featureIndexManager
@@ -131,6 +134,7 @@ public class FeatureCacheUtils {
             FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
+            featureIndexManager.setContinueOnError(false);
             featureIndexManager.prioritizeQueryLocation(type);
 
             FeatureIndexResults featureIndexResults = featureIndexManager
