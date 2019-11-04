@@ -95,6 +95,7 @@ public class AlterTableUtils {
 
                 FeatureIndexManager indexManager = new FeatureIndexManager(context,
                         geoPackage, dao);
+                indexManager.setContinueOnError(false);
                 int indexGeoPackageCount;
                 if (indexManager.isIndexed(FeatureIndexType.GEOPACKAGE)) {
                     indexManager.prioritizeQueryLocation(
@@ -334,12 +335,9 @@ public class AlterTableUtils {
     /**
      * Create a table view
      *
-     * @param db
-     *            connection
-     * @param featureTable
-     *            feature column
-     * @param namePrefix
-     *            view name prefix
+     * @param db           connection
+     * @param featureTable feature column
+     * @param namePrefix   view name prefix
      * @param quoteWrap
      */
     private static void createViewWithPrefix(GeoPackageConnection db,
@@ -351,12 +349,9 @@ public class AlterTableUtils {
     /**
      * Create a table view
      *
-     * @param db
-     *            connection
-     * @param featureTable
-     *            feature column
-     * @param viewName
-     *            view name
+     * @param db           connection
+     * @param featureTable feature column
+     * @param viewName     view name
      * @param quoteWrap
      */
     private static void createViewWithName(GeoPackageConnection db,
@@ -483,6 +478,7 @@ public class AlterTableUtils {
 
                 FeatureIndexManager indexManager = new FeatureIndexManager(context,
                         geoPackage, dao);
+                indexManager.setContinueOnError(false);
 
                 int indexGeoPackageCount = 0;
                 if (indexManager.isIndexed(FeatureIndexType.GEOPACKAGE)) {
@@ -597,6 +593,7 @@ public class AlterTableUtils {
 
                 FeatureIndexManager copyIndexManager = new FeatureIndexManager(context,
                         geoPackage, copyDao);
+                copyIndexManager.setContinueOnError(false);
 
                 if (indexManager.isIndexed(FeatureIndexType.GEOPACKAGE)) {
                     indexManager.prioritizeQueryLocation(

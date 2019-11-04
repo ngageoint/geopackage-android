@@ -81,6 +81,12 @@ public class FeatureIndexManager {
     private FeatureIndexType indexLocation;
 
     /**
+     * When an exception occurs on a certain index, continue to other index
+     * types to attempt to retrieve the value
+     */
+    private boolean continueOnError = true;
+
+    /**
      * Constructor
      *
      * @param context      context
@@ -177,6 +183,26 @@ public class FeatureIndexManager {
      */
     public FeatureIndexType getIndexLocation() {
         return indexLocation;
+    }
+
+    /**
+     * Is the continue on error flag enabled
+     *
+     * @return continue on error
+     * @since 3.3.1
+     */
+    public boolean isContinueOnError() {
+        return continueOnError;
+    }
+
+    /**
+     * Set the continue on error flag
+     *
+     * @param continueOnError continue on error
+     * @since 3.3.1
+     */
+    public void setContinueOnError(boolean continueOnError) {
+        this.continueOnError = continueOnError;
     }
 
     /**
@@ -740,7 +766,11 @@ public class FeatureIndexManager {
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (results == null) {
@@ -774,7 +804,11 @@ public class FeatureIndexManager {
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (count == null) {
@@ -809,7 +843,11 @@ public class FeatureIndexManager {
                 success = true;
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to get bounding box from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to get bounding box from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (!success) {
@@ -845,7 +883,11 @@ public class FeatureIndexManager {
                 success = true;
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to get bounding box from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to get bounding box from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (!success) {
@@ -886,7 +928,11 @@ public class FeatureIndexManager {
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (results == null) {
@@ -914,14 +960,18 @@ public class FeatureIndexManager {
                         count = (long) featureIndexer.count(boundingBox);
                         break;
                     case RTREE:
-                        count = rTreeIndexTableDao.count(boundingBox);
+                        count = (long) rTreeIndexTableDao.count(boundingBox);
                         break;
                     default:
                         throw new GeoPackageException("Unsupported feature index type: " + type);
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (count == null) {
@@ -960,7 +1010,11 @@ public class FeatureIndexManager {
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (results == null) {
@@ -987,14 +1041,18 @@ public class FeatureIndexManager {
                         count = (long) featureIndexer.count(envelope);
                         break;
                     case RTREE:
-                        count = rTreeIndexTableDao.count(envelope);
+                        count = (long) rTreeIndexTableDao.count(envelope);
                         break;
                     default:
                         throw new GeoPackageException("Unsupported feature index type: " + type);
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (count == null) {
@@ -1036,7 +1094,11 @@ public class FeatureIndexManager {
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to query from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (results == null) {
@@ -1065,14 +1127,18 @@ public class FeatureIndexManager {
                         count = featureIndexer.count(boundingBox, projection);
                         break;
                     case RTREE:
-                        count = rTreeIndexTableDao.count(boundingBox, projection);
+                        count = (long) rTreeIndexTableDao.count(boundingBox, projection);
                         break;
                     default:
                         throw new GeoPackageException("Unsupported feature index type: " + type);
                 }
                 break;
             } catch (Exception e) {
-                Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                if (continueOnError) {
+                    Log.e(FeatureIndexManager.class.getSimpleName(), "Failed to count from feature index: " + type, e);
+                } else {
+                    throw e;
+                }
             }
         }
         if (count == null) {

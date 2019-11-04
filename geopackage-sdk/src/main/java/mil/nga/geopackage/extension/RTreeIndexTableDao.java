@@ -5,12 +5,14 @@ import android.database.Cursor;
 import org.sqlite.database.sqlite.SQLiteDatabase;
 
 import java.util.List;
+import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
+import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.io.GeoPackageProgress;
@@ -93,8 +95,7 @@ public class RTreeIndexTableDao extends UserCustomDao {
     /**
      * Set the query range tolerance
      *
-     * @param tolerance
-     *            query range tolerance
+     * @param tolerance query range tolerance
      */
     public void setTolerance(double tolerance) {
         this.tolerance = tolerance;
@@ -229,6 +230,7 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     @Override
     public UserCustomCursor query(String where, String[] whereArgs) {
+        validateRTree();
 
         StringBuilder query = new StringBuilder();
         query.append("select * from ").append(CoreSQLUtils.quoteWrap(getTableName()));
@@ -246,15 +248,8 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * {@inheritDoc}
      */
     @Override
-    public int count() {
-        return count(null, new String[]{});
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public int count(String where, String[] args) {
+        validateRTree();
 
         int count = 0;
 
@@ -273,6 +268,89 @@ public class RTreeIndexTableDao extends UserCustomDao {
         }
 
         return count;
+    }
+
+    /**
+     * Query for all features
+     *
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures() {
+        validateRTree();
+        return featureDao.queryIn(queryIdsSQL());
+    }
+
+    /**
+     * Query for features
+     *
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(Map<String, Object> fieldValues) {
+        validateRTree();
+        return featureDao.queryIn(queryIdsSQL(), fieldValues);
+    }
+
+    /**
+     * Count features
+     *
+     * @param fieldValues field values
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(Map<String, Object> fieldValues) {
+        validateRTree();
+        return featureDao.countIn(queryIdsSQL(), fieldValues);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param where where clause
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(String where) {
+        return queryFeatures(where, null);
+    }
+
+    /**
+     * Count features
+     *
+     * @param where where clause
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(String where) {
+        return countFeatures(where, null);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(String where, String[] whereArgs) {
+        validateRTree();
+        return featureDao.queryIn(queryIdsSQL(), where, whereArgs);
+    }
+
+    /**
+     * Count features
+     *
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(String where, String[] whereArgs) {
+        validateRTree();
+        return featureDao.countIn(queryIdsSQL(), where, whereArgs);
     }
 
     /**
@@ -329,6 +407,117 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Count the rows within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @return count
+     */
+    public int count(BoundingBox boundingBox) {
+        return count(boundingBox.buildEnvelope());
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox) {
+        return queryFeatures(boundingBox.buildEnvelope());
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox) {
+        return countFeatures(boundingBox.buildEnvelope());
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox,
+                                       Map<String, Object> fieldValues) {
+        return queryFeatures(boundingBox.buildEnvelope(), fieldValues);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox,
+                             Map<String, Object> fieldValues) {
+        return countFeatures(boundingBox.buildEnvelope(), fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox,
+                                       String where) {
+        return queryFeatures(boundingBox, where, null);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox, String where) {
+        return countFeatures(boundingBox, where, null);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox, String where,
+                                       String[] whereArgs) {
+        return queryFeatures(boundingBox.buildEnvelope(), where, whereArgs);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox, String where,
+                             String[] whereArgs) {
+        return countFeatures(boundingBox.buildEnvelope(), where, whereArgs);
+    }
+
+    /**
      * Query for rows within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
@@ -343,26 +532,139 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
-     * Count the rows within the bounding box
-     *
-     * @param boundingBox bounding box
-     * @return count
-     */
-    public long count(BoundingBox boundingBox) {
-        return count(boundingBox.buildEnvelope());
-    }
-
-    /**
      * Count the rows within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
      * @param projection  projection
      * @return count
      */
-    public long count(BoundingBox boundingBox, Projection projection) {
+    public int count(BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
         return count(featureBoundingBox);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox,
+                                       Projection projection) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(featureBoundingBox);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox, Projection projection) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return countFeatures(featureBoundingBox);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox,
+                                       Projection projection, Map<String, Object> fieldValues) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(featureBoundingBox, fieldValues);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox, Projection projection,
+                             Map<String, Object> fieldValues) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return countFeatures(featureBoundingBox, fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox,
+                                       Projection projection, String where) {
+        return queryFeatures(boundingBox, projection, where, null);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox, Projection projection,
+                             String where) {
+        return countFeatures(boundingBox, projection, where, null);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(BoundingBox boundingBox,
+                                       Projection projection, String where, String[] whereArgs) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(featureBoundingBox, where, whereArgs);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(BoundingBox boundingBox, Projection projection,
+                             String where, String[] whereArgs) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return countFeatures(featureBoundingBox, where, whereArgs);
     }
 
     /**
@@ -382,9 +684,116 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param envelope geometry envelope
      * @return count
      */
-    public long count(GeometryEnvelope envelope) {
+    public int count(GeometryEnvelope envelope) {
         return count(envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param envelope geometry envelope
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(GeometryEnvelope envelope) {
+        return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY());
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param envelope geometry envelope
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(GeometryEnvelope envelope) {
+        return countFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY());
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(GeometryEnvelope envelope,
+                                       Map<String, Object> fieldValues) {
+        return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), fieldValues);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(GeometryEnvelope envelope,
+                             Map<String, Object> fieldValues) {
+        return countFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), fieldValues);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(GeometryEnvelope envelope,
+                                       String where) {
+        return queryFeatures(envelope, where, null);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(GeometryEnvelope envelope, String where) {
+        return countFeatures(envelope, where, null);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(GeometryEnvelope envelope,
+                                       String where, String[] whereArgs) {
+        return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.3.1
+     */
+    public int countFeatures(GeometryEnvelope envelope, String where,
+                             String[] whereArgs) {
+        return countFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
     }
 
     /**
@@ -412,10 +821,158 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param maxY max y
      * @return count
      */
-    public long count(double minX, double minY, double maxX, double maxY) {
+    public int count(double minX, double minY, double maxX, double maxY) {
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
         return count(where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param minX min x
+     * @param minY min y
+     * @param maxX max x
+     * @param maxY max y
+     * @return cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(double minX, double minY, double maxX,
+                                       double maxY) {
+        validateRTree();
+        String where = buildWhere(minX, minY, maxX, maxY);
+        String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.queryIn(queryIdsSQL(where), whereArgs);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param minX min x
+     * @param minY min y
+     * @param maxX max x
+     * @param maxY max y
+     * @return results
+     * @since 3.3.1
+     */
+    public int countFeatures(double minX, double minY, double maxX,
+                             double maxY) {
+        validateRTree();
+        String where = buildWhere(minX, minY, maxX, maxY);
+        String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.countIn(queryIdsSQL(where), whereArgs);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(double minX, double minY, double maxX,
+                                       double maxY, Map<String, Object> fieldValues) {
+        validateRTree();
+        String where = buildWhere(minX, minY, maxX, maxY);
+        String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.queryIn(queryIdsSQL(where), whereArgs, fieldValues);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return results
+     * @since 3.3.1
+     */
+    public int countFeatures(double minX, double minY, double maxX, double maxY,
+                             Map<String, Object> fieldValues) {
+        validateRTree();
+        String where = buildWhere(minX, minY, maxX, maxY);
+        String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.countIn(queryIdsSQL(where), whereArgs, fieldValues);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param minX  min x
+     * @param minY  min y
+     * @param maxX  max x
+     * @param maxY  max y
+     * @param where where clause
+     * @return cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(double minX, double minY, double maxX,
+                                       double maxY, String where) {
+        return queryFeatures(minX, minY, maxX, maxY, where, null);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param minX  min x
+     * @param minY  min y
+     * @param maxX  max x
+     * @param maxY  max y
+     * @param where where clause
+     * @return results
+     * @since 3.3.1
+     */
+    public int countFeatures(double minX, double minY, double maxX, double maxY,
+                             String where) {
+        return countFeatures(minX, minY, maxX, maxY, where, null);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return cursor
+     * @since 3.3.1
+     */
+    public FeatureCursor queryFeatures(double minX, double minY, double maxX,
+                                       double maxY, String where, String[] whereArgs) {
+        validateRTree();
+        String whereBounds = buildWhere(minX, minY, maxX, maxY);
+        String[] whereBoundsArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.queryIn(queryIdsSQL(whereBounds), whereBoundsArgs,
+                where, whereArgs);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return results
+     * @since 3.3.1
+     */
+    public int countFeatures(double minX, double minY, double maxX, double maxY,
+                             String where, String[] whereArgs) {
+        validateRTree();
+        String whereBounds = buildWhere(minX, minY, maxX, maxY);
+        String[] whereBoundsArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.countIn(queryIdsSQL(whereBounds), whereBoundsArgs,
+                where, whereArgs);
     }
 
     /**

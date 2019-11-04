@@ -63,6 +63,7 @@ public class FeatureIndexManagerUtils {
             FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
+            featureIndexManager.setContinueOnError(false);
             featureIndexManager.setIndexLocation(type);
             featureIndexManager.deleteAllIndexes();
 
