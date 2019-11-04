@@ -833,7 +833,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             // Validate the database if validation is enabled
             validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
 
-            GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite));
+            GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite, cursorFactory));
             connection.enableForeignKeys();
 
             GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);

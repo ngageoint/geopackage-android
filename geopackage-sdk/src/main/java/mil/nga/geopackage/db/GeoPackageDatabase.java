@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import mil.nga.geopackage.factory.GeoPackageCursorFactory;
+
 /**
  * GeoPackage database wrapper around SQLiteDatabase to quote table and column names
  *
@@ -24,12 +26,29 @@ public class GeoPackageDatabase {
     private org.sqlite.database.sqlite.SQLiteDatabase bindingsDb;
 
     /**
+     * Cursor factory
+     */
+    private GeoPackageCursorFactory cursorFactory;
+
+    /**
      * Constructor
      *
      * @param db database
      */
     public GeoPackageDatabase(SQLiteDatabase db) {
+        this(db, null);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param db            database
+     * @param cursorFactory cursor factory
+     * @since 3.3.1
+     */
+    public GeoPackageDatabase(SQLiteDatabase db, GeoPackageCursorFactory cursorFactory) {
         this.db = db;
+        this.cursorFactory = cursorFactory;
     }
 
     /**
@@ -51,7 +70,14 @@ public class GeoPackageDatabase {
             synchronized (db) {
                 if (bindingsDb == null) {
                     System.loadLibrary("sqliteX");
-                    bindingsDb = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(db.getPath(), null, org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
+                    org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory bindingsCursorFactory = null;
+                    if (cursorFactory != null) {
+                        bindingsCursorFactory = cursorFactory.getBindingsCursorFactory();
+                    }
+                    bindingsDb = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(
+                            db.getPath(),
+                            bindingsCursorFactory,
+                            org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
                 }
             }
         }

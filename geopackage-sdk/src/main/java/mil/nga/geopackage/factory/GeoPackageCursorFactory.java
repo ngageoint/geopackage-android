@@ -20,7 +20,7 @@ import mil.nga.geopackage.db.CoreSQLUtils;
  *
  * @author osbornb
  */
-class GeoPackageCursorFactory implements CursorFactory {
+public class GeoPackageCursorFactory implements CursorFactory {
 
     /**
      * Mapping between table names and their cursor wrapper
@@ -70,6 +70,22 @@ class GeoPackageCursorFactory implements CursorFactory {
         // Create a standard cursor
         Cursor cursor = new SQLiteCursor(driver, editTable, query);
 
+        // Wrap the cursor
+        Cursor wrappedCursor = wrapCursor(cursor, editTable);
+
+        return wrappedCursor;
+    }
+
+    /**
+     * Wrap the cursor
+     *
+     * @param cursor    cursor
+     * @param editTable edit table
+     * @return cursor
+     * @since 3.3.1
+     */
+    public Cursor wrapCursor(Cursor cursor, String editTable) {
+
         // Check if there is an edit table
         if (editTable != null) {
             // Check if the table has a cursor wrapper
@@ -80,6 +96,33 @@ class GeoPackageCursorFactory implements CursorFactory {
         }
 
         return cursor;
+    }
+
+    /**
+     * Get the SQLite Android Bindings cursor factory
+     *
+     * @return bindings cursor factory
+     * @since 3.3.1
+     */
+    public org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory getBindingsCursorFactory() {
+        return new org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Cursor newCursor(org.sqlite.database.sqlite.SQLiteDatabase db, org.sqlite.database.sqlite.SQLiteCursorDriver driver, String editTable, org.sqlite.database.sqlite.SQLiteQuery query) {
+
+                // Create a standard cursor
+                Cursor cursor = new org.sqlite.database.sqlite.SQLiteCursor(driver, editTable, query);
+
+                // Wrap the cursor
+                Cursor wrappedCursor = wrapCursor(cursor, editTable);
+
+                return wrappedCursor;
+            }
+
+        };
     }
 
 }
