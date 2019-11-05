@@ -45,8 +45,8 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     protected UserDao(String database, GeoPackageConnection db,
                       UserConnection<TColumn, TTable, TRow, TResult> userDb,
                       TTable table) {
-        super(database, db, userDb, table);
-        this.db = db.getDb();
+        super(database, db.copy(userDb.getDatabase()), userDb, table);
+        this.db = userDb.getDatabase();
         this.userDb = userDb;
         userDb.setTable(table);
     }
@@ -67,6 +67,17 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      */
     public GeoPackageDatabase getDatabaseConnection() {
         return db;
+    }
+
+    /**
+     * Set the active SQLite connection as the bindings or standard
+     *
+     * @param useBindings true to use bindings connection, false for standard
+     * @return previous bindings value
+     * @since 3.3.1
+     */
+    public boolean setUseBindings(boolean useBindings) {
+        return db.setUseBindings(useBindings);
     }
 
     /**

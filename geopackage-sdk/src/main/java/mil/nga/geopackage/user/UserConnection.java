@@ -35,7 +35,17 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      * @param database GeoPackage connection
      */
     protected UserConnection(GeoPackageConnection database) {
-        this.database = database.getDb();
+        this.database = database.getDb().copy();
+    }
+
+    /**
+     * Get the database
+     *
+     * @return database
+     * @since 3.3.1
+     */
+    public GeoPackageDatabase getDatabase() {
+        return database;
     }
 
     /**

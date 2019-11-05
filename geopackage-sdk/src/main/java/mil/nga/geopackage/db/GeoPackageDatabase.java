@@ -13,22 +13,27 @@ import mil.nga.geopackage.factory.GeoPackageCursorFactory;
  * @author osbornb
  * @since 1.3.1
  */
-public class GeoPackageDatabase {
+public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
 
     /**
      * Database connection
      */
-    private final SQLiteDatabase db;
+    private final AndroidSQLiteDatabase db;
 
     /**
      * SQLite Android Bindings connection
      */
-    private org.sqlite.database.sqlite.SQLiteDatabase bindingsDb;
+    private final AndroidBindingsSQLiteDatabase bindingsDb;
+
+    /**
+     * Active connection
+     */
+    private GeoPackageSQLiteDatabase active;
 
     /**
      * Cursor factory
      */
-    private GeoPackageCursorFactory cursorFactory;
+    private final GeoPackageCursorFactory cursorFactory;
 
     /**
      * Constructor
@@ -47,8 +52,69 @@ public class GeoPackageDatabase {
      * @since 3.3.1
      */
     public GeoPackageDatabase(SQLiteDatabase db, GeoPackageCursorFactory cursorFactory) {
-        this.db = db;
+        this.db = new AndroidSQLiteDatabase(db);
+        this.bindingsDb = new AndroidBindingsSQLiteDatabase();
         this.cursorFactory = cursorFactory;
+        active = this.db;
+    }
+
+    /**
+     * Copy constructor
+     *
+     * @param database GeoPackage database
+     * @since 3.3.1
+     */
+    public GeoPackageDatabase(GeoPackageDatabase database) {
+        this.db = database.db;
+        this.bindingsDb = database.bindingsDb;
+        this.cursorFactory = database.cursorFactory;
+        this.active = database.active;
+    }
+
+    /**
+     * Get the active connection
+     *
+     * @return active connection
+     * @since 3.3.1
+     */
+    public GeoPackageSQLiteDatabase getActive() {
+        return active;
+    }
+
+    /**
+     * Get the Android SQLite Database connection
+     *
+     * @return connection
+     * @since 3.3.1
+     */
+    public AndroidSQLiteDatabase getAndroidSQLiteDatabase() {
+        return db;
+    }
+
+    /**
+     * Get the Android Bindings SQLite Database connection
+     *
+     * @return connection
+     * @since 3.3.1
+     */
+    public AndroidBindingsSQLiteDatabase getAndroidBindingsSQLiteDatabase() {
+        if (bindingsDb.getDb() == null) {
+            synchronized (db) {
+                if (bindingsDb.getDb() == null) {
+                    System.loadLibrary("sqliteX");
+                    org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory bindingsCursorFactory = null;
+                    if (cursorFactory != null) {
+                        bindingsCursorFactory = cursorFactory.getBindingsCursorFactory();
+                    }
+                    org.sqlite.database.sqlite.SQLiteDatabase sqLiteDatabase = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(
+                            getDb().getPath(),
+                            bindingsCursorFactory,
+                            org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
+                    bindingsDb.setDb(sqLiteDatabase);
+                }
+            }
+        }
+        return bindingsDb;
     }
 
     /**
@@ -57,235 +123,191 @@ public class GeoPackageDatabase {
      * @return connection
      */
     public SQLiteDatabase getDb() {
-        return db;
+        return getAndroidSQLiteDatabase().getDb();
     }
 
     /**
-     * Open or get a connection using the SQLite Android Bindings connection
+     * Get the SQLite bindings database connection
      *
-     * @return bindings connection
+     * @return connection
+     * @since 3.3.1
      */
-    public org.sqlite.database.sqlite.SQLiteDatabase openOrGetBindingsDb() {
-        if (bindingsDb == null) {
-            synchronized (db) {
-                if (bindingsDb == null) {
-                    System.loadLibrary("sqliteX");
-                    org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory bindingsCursorFactory = null;
-                    if (cursorFactory != null) {
-                        bindingsCursorFactory = cursorFactory.getBindingsCursorFactory();
-                    }
-                    bindingsDb = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(
-                            db.getPath(),
-                            bindingsCursorFactory,
-                            org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
-                }
-            }
-        }
-        return bindingsDb;
+    public org.sqlite.database.sqlite.SQLiteDatabase getBindingsDb() {
+        return getAndroidBindingsSQLiteDatabase().getDb();
     }
 
     /**
-     * @param sql sql command
-     * @see SQLiteDatabase#execSQL(String)
+     * Is SQLite Android Bindings connection enabled
+     *
+     * @return true if using bindings
+     * @since 3.3.1
      */
+    public boolean isUseBindings() {
+        return active == bindingsDb;
+    }
+
+    /**
+     * Set the active SQLite connection as the bindings or standard
+     *
+     * @param useBindings true to use bindings connection, false for standard
+     * @return previous bindings value
+     * @since 3.3.1
+     */
+    public boolean setUseBindings(boolean useBindings) {
+        boolean previous = isUseBindings();
+        if (useBindings) {
+            active = getAndroidBindingsSQLiteDatabase();
+        } else {
+            active = getAndroidSQLiteDatabase();
+        }
+        return previous;
+    }
+
+    /**
+     * Copy the database, maintaining the same connections but with the ability to change the active used connection
+     *
+     * @return database
+     * @since 3.3.1
+     */
+    public GeoPackageDatabase copy() {
+        return new GeoPackageDatabase(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void execSQL(String sql) throws SQLException {
-        db.execSQL(sql);
+        active.execSQL(sql);
     }
 
     /**
-     * Begin a transaction
-     *
-     * @since 3.3.0
+     * {@inheritDoc}
      */
+    @Override
     public void beginTransaction() {
-        db.beginTransaction();
+        active.beginTransaction();
     }
 
     /**
-     * End a transaction as successful
-     *
-     * @since 3.3.0
+     * {@inheritDoc}
      */
+    @Override
     public void endTransaction() {
-        endTransaction(true);
+        active.endTransaction();
     }
 
     /**
-     * End a transaction
-     *
-     * @param successful true to commit, false to rollback
-     * @since 3.3.0
+     * {@inheritDoc}
      */
+    @Override
     public void endTransaction(boolean successful) {
-        if (successful) {
-            db.setTransactionSuccessful();
-            db.endTransaction();
-        } else if (db.inTransaction()) {
-            db.endTransaction();
-        }
+        active.endTransaction(successful);
     }
 
     /**
-     * End a transaction as successful and begin a new transaction
-     *
-     * @since 3.3.0
+     * {@inheritDoc}
      */
+    @Override
     public void endAndBeginTransaction() {
-        endTransaction();
-        beginTransaction();
+        active.endAndBeginTransaction();
     }
 
     /**
-     * Determine if currently within a transaction
-     *
-     * @return true if in transaction
-     * @since 3.3.0
+     * {@inheritDoc}
      */
+    @Override
     public boolean inTransaction() {
-        return db.inTransaction();
+        return active.inTransaction();
     }
 
     /**
-     * @param table       table name
-     * @param whereClause where clause
-     * @param whereArgs   where arguments
-     * @return deleted rows
-     * @see SQLiteDatabase#delete(String, String, String[])
+     * {@inheritDoc}
      */
+    @Override
     public int delete(String table, String whereClause, String[] whereArgs) {
-        return db.delete(CoreSQLUtils.quoteWrap(table), whereClause, whereArgs);
+        return active.delete(table, whereClause, whereArgs);
     }
 
     /**
-     * @param sql           sql command
-     * @param selectionArgs selection arguments
-     * @return cursor
-     * @see SQLiteDatabase#rawQuery(String, String[])
+     * {@inheritDoc}
      */
+    @Override
     public Cursor rawQuery(String sql, String[] selectionArgs) {
-        return db.rawQuery(sql, selectionArgs);
+        return active.rawQuery(sql, selectionArgs);
     }
 
     /**
-     * @see SQLiteDatabase#close()
+     * {@inheritDoc}
      */
+    @Override
     public void close() {
         db.close();
-        if (bindingsDb != null) {
-            bindingsDb.close();
-        }
+        bindingsDb.close();
     }
 
     /**
-     * @param table         table name
-     * @param columns       columns
-     * @param selection     selection
-     * @param selectionArgs selection arguments
-     * @param groupBy       group by
-     * @param having        having
-     * @param orderBy       order by
-     * @return cursor
-     * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String)
+     * {@inheritDoc}
      */
+    @Override
     public Cursor query(String table, String[] columns, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy) {
-        return db.query(CoreSQLUtils.quoteWrap(table), CoreSQLUtils.quoteWrap(columns), selection, selectionArgs, groupBy, having, orderBy);
+        return active.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
     }
 
     /**
-     * @param table         table name
-     * @param columns       columns
-     * @param columnsAs     columns as
-     * @param selection     selection
-     * @param selectionArgs selection arguments
-     * @param groupBy       group by
-     * @param having        having
-     * @param orderBy       order by
-     * @return cursor
-     * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String)
-     * @since 2.0.0
+     * {@inheritDoc}
      */
+    @Override
     public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy) {
-        String[] wrappedColumns = CoreSQLUtils.quoteWrap(columns);
-        String[] wrappedColumnsAs = CoreSQLUtils.buildColumnsAs(wrappedColumns, columnsAs);
-        return db.query(CoreSQLUtils.quoteWrap(table), wrappedColumnsAs, selection, selectionArgs, groupBy, having, orderBy);
+        return active.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
     }
 
     /**
-     * @param table         table name
-     * @param columns       columns
-     * @param selection     selection
-     * @param selectionArgs selection arguments
-     * @param groupBy       group by
-     * @param having        having
-     * @param orderBy       order by
-     * @param limit         limit
-     * @return cursor
-     * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String, String)
+     * {@inheritDoc}
      */
+    @Override
     public Cursor query(String table, String[] columns, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy, String limit) {
-        return db.query(CoreSQLUtils.quoteWrap(table), CoreSQLUtils.quoteWrap(columns), selection, selectionArgs, groupBy, having, orderBy, limit);
+        return active.query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
     /**
-     * @param table         table name
-     * @param columns       columns
-     * @param columnsAs     columns as
-     * @param selection     selection
-     * @param selectionArgs selection arguments
-     * @param groupBy       group by
-     * @param having        having
-     * @param orderBy       order by
-     * @param limit         limit
-     * @return cursor
-     * @see SQLiteDatabase#query(String, String[], String, String[], String, String, String, String)
-     * @since 2.0.0
+     * {@inheritDoc}
      */
+    @Override
     public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy, String limit) {
-        String[] wrappedColumns = CoreSQLUtils.quoteWrap(columns);
-        String[] wrappedColumnsAs = CoreSQLUtils.buildColumnsAs(wrappedColumns, columnsAs);
-        return db.query(CoreSQLUtils.quoteWrap(table), wrappedColumnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
+        return active.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
     /**
-     * @param table       table name
-     * @param values      content values
-     * @param whereClause where clause
-     * @param whereArgs   where arguments
-     * @return updated rows
-     * @see SQLiteDatabase#update(String, ContentValues, String, String[])
+     * {@inheritDoc}
      */
+    @Override
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
-        return db.update(CoreSQLUtils.quoteWrap(table), SQLUtils.quoteWrap(values), whereClause, whereArgs);
+        return active.update(table, values, whereClause, whereArgs);
     }
 
     /**
-     * @param table          table name
-     * @param nullColumnHack null column hack
-     * @param values         content values
-     * @return row id
-     * @see SQLiteDatabase#insertOrThrow(String, String, ContentValues)
+     * {@inheritDoc}
      */
+    @Override
     public long insertOrThrow(String table, String nullColumnHack, ContentValues values) throws SQLException {
-        return db.insertOrThrow(CoreSQLUtils.quoteWrap(table), nullColumnHack, SQLUtils.quoteWrap(values));
+        return active.insertOrThrow(table, nullColumnHack, values);
     }
 
     /**
-     * @param table          table name
-     * @param nullColumnHack null column hack
-     * @param values         content values
-     * @return row id
-     * @see SQLiteDatabase#insert(String, String, ContentValues)
+     * {@inheritDoc}
      */
+    @Override
     public long insert(String table, String nullColumnHack, ContentValues values) {
-        return db.insert(CoreSQLUtils.quoteWrap(table), nullColumnHack, SQLUtils.quoteWrap(values));
+        return active.insert(table, nullColumnHack, values);
     }
 
 }

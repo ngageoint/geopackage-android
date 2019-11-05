@@ -39,6 +39,7 @@ import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.geopackage.tiles.user.TileTableReader;
+import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomTable;
 import mil.nga.geopackage.user.custom.UserCustomTableReader;
@@ -384,7 +385,27 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
     public UserCustomDao getUserCustomDao(String tableName) {
         UserCustomTable table = UserCustomTableReader.readTable(database,
                 tableName);
+        return getUserCustomDao(table);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserCustomDao getUserCustomDao(UserCustomTable table) {
         UserCustomDao dao = new UserCustomDao(getName(), database, table);
+
+        // Register the table name (with and without quotes) to wrap cursors with the user custom cursor
+        final UserCustomTable userCustomTable = table;
+        registerCursorWrapper(table.getTableName(),
+                new GeoPackageCursorWrapper() {
+
+                    @Override
+                    public Cursor wrapCursor(Cursor cursor) {
+                        return new UserCustomCursor(userCustomTable, cursor);
+                    }
+                });
+
         return dao;
     }
 

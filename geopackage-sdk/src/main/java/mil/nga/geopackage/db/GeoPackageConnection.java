@@ -32,12 +32,64 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     }
 
     /**
+     * Copy Constructor
+     *
+     * @param connection GeoPackage connection
+     * @since 3.3.1
+     */
+    public GeoPackageConnection(GeoPackageConnection connection) {
+        this(connection, connection.db);
+    }
+
+    /**
+     * Copy Constructor
+     *
+     * @param connection GeoPackage connection
+     * @param db         database
+     * @since 3.3.1
+     */
+    public GeoPackageConnection(GeoPackageConnection connection, GeoPackageDatabase db) {
+        super(connection);
+        this.db = db;
+    }
+
+    /**
+     * Copy method
+     *
+     * @since 3.3.1
+     */
+    public GeoPackageConnection copy() {
+        return new GeoPackageConnection(this);
+    }
+
+    /**
+     * Copy method with provided database
+     *
+     * @param db database
+     * @since 3.3.1
+     */
+    public GeoPackageConnection copy(GeoPackageDatabase db) {
+        return new GeoPackageConnection(this, db);
+    }
+
+    /**
      * Get the database connection
      *
      * @return GeoPackage database
      */
     public GeoPackageDatabase getDb() {
         return db;
+    }
+
+    /**
+     * Set the active SQLite connection as the bindings or standard
+     *
+     * @param useBindings true to use bindings connection, false for standard
+     * @return previous bindings value
+     * @since 3.3.1
+     */
+    public boolean setUseBindings(boolean useBindings) {
+        return db.setUseBindings(useBindings);
     }
 
     /**

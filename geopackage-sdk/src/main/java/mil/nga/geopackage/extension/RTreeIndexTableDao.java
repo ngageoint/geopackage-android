@@ -1,17 +1,11 @@
 package mil.nga.geopackage.extension;
 
-import android.database.Cursor;
-
-import org.sqlite.database.sqlite.SQLiteDatabase;
-
 import java.util.List;
 import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.CoreSQLUtils;
-import mil.nga.geopackage.db.GeoPackageDataType;
-import mil.nga.geopackage.db.ResultUtils;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
@@ -52,11 +46,6 @@ public class RTreeIndexTableDao extends UserCustomDao {
     protected double tolerance = .00000000000001;
 
     /**
-     * SQLite Android Bindings connection
-     */
-    private final SQLiteDatabase database;
-
-    /**
      * Constructor
      *
      * @param rTree      RTree extension
@@ -69,9 +58,8 @@ public class RTreeIndexTableDao extends UserCustomDao {
         this.rTree = rTree;
         this.featureDao = featureDao;
         this.projection = featureDao.getProjection();
-
-        // Connect to the GeoPackage using the SQLite Android Bindings
-        database = dao.getDatabaseConnection().openOrGetBindingsDb();
+        setUseBindings(true);
+        featureDao.setUseBindings(true);
     }
 
     /**
@@ -203,26 +191,12 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
-     * Perform a raw query
-     *
-     * @param sql           sql statement
-     * @param selectionArgs selection arguments
-     * @return result cursor
-     */
-    public UserCustomCursor rawQuery(String sql, String[] selectionArgs) {
-        validateRTree();
-
-        Cursor cursor = database.rawQuery(sql, selectionArgs);
-        UserCustomCursor customCursor = new UserCustomCursor(getTable(), cursor);
-        return customCursor;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public UserCustomCursor queryForAll() {
-        return query(null, new String[]{});
+        validateRTree();
+        return super.queryForAll();
     }
 
     /**
@@ -231,17 +205,7 @@ public class RTreeIndexTableDao extends UserCustomDao {
     @Override
     public UserCustomCursor query(String where, String[] whereArgs) {
         validateRTree();
-
-        StringBuilder query = new StringBuilder();
-        query.append("select * from ").append(CoreSQLUtils.quoteWrap(getTableName()));
-        if (where != null) {
-            query.append(" where ").append(where);
-        }
-        String sql = query.toString();
-
-        UserCustomCursor customCursor = rawQuery(sql, whereArgs);
-
-        return customCursor;
+        return super.query(where, whereArgs);
     }
 
     /**
@@ -250,24 +214,7 @@ public class RTreeIndexTableDao extends UserCustomDao {
     @Override
     public int count(String where, String[] args) {
         validateRTree();
-
-        int count = 0;
-
-        StringBuilder countQuery = new StringBuilder();
-        countQuery.append("select count(*) from ").append(CoreSQLUtils.quoteWrap(getTableName()));
-        if (where != null) {
-            countQuery.append(" where ").append(where);
-        }
-        String sql = countQuery.toString();
-
-        UserCustomCursor customCursor = rawQuery(sql, args);
-
-        Object value = ResultUtils.buildSingleResult(customCursor, 0, GeoPackageDataType.MEDIUMINT);
-        if (value != null) {
-            count = ((Number) value).intValue();
-        }
-
-        return count;
+        return super.count(where, args);
     }
 
     /**
@@ -358,27 +305,15 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     @Override
     public BoundingBox getBoundingBox() {
-
-        BoundingBox boundingBox = null;
-
-        String sql = "SELECT MIN(" + RTreeIndexExtension.COLUMN_MIN_X + "), MIN("
-                + RTreeIndexExtension.COLUMN_MIN_Y + "), MAX("
-                + RTreeIndexExtension.COLUMN_MAX_X + "), MAX("
-                + RTreeIndexExtension.COLUMN_MAX_Y + ") FROM "
-                + CoreSQLUtils.quoteWrap(getTableName());
-        UserCustomCursor customCursor = rawQuery(sql, null);
-
-        List<List<Object>> results = ResultUtils.buildResults(customCursor,
-                new GeoPackageDataType[]{
-                        GeoPackageDataType.DOUBLE, GeoPackageDataType.DOUBLE, GeoPackageDataType.DOUBLE, GeoPackageDataType.DOUBLE},
-                1);
-
-        if (!results.isEmpty()) {
-            List<Object> resultRow = results.get(0);
-            boundingBox = new BoundingBox((Double) resultRow.get(0), (Double) resultRow.get(1),
-                    (Double) resultRow.get(2), (Double) resultRow.get(3));
-        }
-
+        List<Double> values = querySingleRowTypedResults(
+                "SELECT MIN(" + RTreeIndexExtension.COLUMN_MIN_X + "), MIN("
+                        + RTreeIndexExtension.COLUMN_MIN_Y + "), MAX("
+                        + RTreeIndexExtension.COLUMN_MAX_X + "), MAX("
+                        + RTreeIndexExtension.COLUMN_MAX_Y + ") FROM "
+                        + CoreSQLUtils.quoteWrap(getTableName()),
+                null);
+        BoundingBox boundingBox = new BoundingBox(values.get(0), values.get(1),
+                values.get(2), values.get(3));
         return boundingBox;
     }
 

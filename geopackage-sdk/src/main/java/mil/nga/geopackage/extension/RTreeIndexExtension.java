@@ -1,9 +1,8 @@
 package mil.nga.geopackage.extension;
 
-import org.sqlite.database.sqlite.SQLiteDatabase;
-
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.db.GeoPackageDatabase;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomTable;
@@ -23,9 +22,9 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
     private GeoPackageConnection connection;
 
     /**
-     * SQLite Android Bindings connection
+     * SQLite Android connection
      */
-    private final SQLiteDatabase database;
+    private final GeoPackageDatabase database;
 
     /**
      * Constructor
@@ -35,7 +34,7 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
     public RTreeIndexExtension(GeoPackage geoPackage) {
         super(geoPackage);
         connection = geoPackage.getConnection();
-        database = connection.getDb().openOrGetBindingsDb();
+        database = connection.getDb().copy();
     }
 
     /**
@@ -66,10 +65,8 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     public RTreeIndexTableDao getTableDao(FeatureDao featureDao) {
 
-        GeoPackageConnection connection = getGeoPackage().getConnection();
         UserCustomTable userCustomTable = getRTreeTable(featureDao.getTable());
-        UserCustomDao userCustomDao = new UserCustomDao(geoPackage.getName(),
-                connection, userCustomTable);
+        UserCustomDao userCustomDao = getGeoPackage().getUserCustomDao(userCustomTable);
 
         return new RTreeIndexTableDao(this, userCustomDao, featureDao);
     }
@@ -128,11 +125,8 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     @Override
     protected void executeSQL(String sql, boolean trigger) {
-        if (trigger) {
-            connection.execSQL(sql);
-        } else {
-            database.execSQL(sql);
-        }
+        database.setUseBindings(!trigger);
+        database.execSQL(sql);
     }
 
 }
