@@ -27,6 +27,11 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
     private final Cursor geometryMetadata;
 
     /**
+     * Id only results
+     */
+    private boolean idOnly = false;
+
+    /**
      * Constructor
      *
      * @param featureIndexer   feature indexer
@@ -35,6 +40,7 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
     public FeatureIndexMetadataResults(FeatureIndexer featureIndexer, Cursor geometryMetadata) {
         this.featureIndexer = featureIndexer;
         this.geometryMetadata = geometryMetadata;
+        this.idOnly = geometryMetadata.getColumnCount() == 1;
     }
 
     /**
@@ -102,7 +108,13 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
                     @Override
                     public Long next() {
                         geometryMetadata.moveToNext();
-                        return featureIndexer.getGeometryMetadata(geometryMetadata).getId();
+                        long id;
+                        if (idOnly) {
+                            id = geometryMetadata.getLong(0);
+                        } else {
+                            id = featureIndexer.getGeometryId(geometryMetadata);
+                        }
+                        return id;
                     }
 
                 };

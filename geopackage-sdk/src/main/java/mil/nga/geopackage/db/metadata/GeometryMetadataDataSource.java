@@ -365,6 +365,31 @@ public class GeometryMetadataDataSource {
     }
 
     /**
+     * Query for all table geometry metadata geometry ids
+     *
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor queryIds(String geoPackage, String tableName) {
+        return queryIds(getGeoPackageId(geoPackage), tableName);
+    }
+
+    /**
+     * Query for all table geometry metadata
+     *
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param columns    queried columns
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor query(String geoPackage, String tableName, String[] columns) {
+        return query(getGeoPackageId(geoPackage), tableName, columns);
+    }
+
+    /**
      * Query for all table geometry metadata count
      *
      * @param geoPackage GeoPackage name
@@ -429,12 +454,37 @@ public class GeometryMetadataDataSource {
      * @return cursor that must be closed
      */
     public Cursor query(long geoPackageId, String tableName) {
+        return query(geoPackageId, tableName, GeometryMetadata.COLUMNS);
+    }
+
+    /**
+     * Query for all table geometry metadata geometry ids
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor queryIds(long geoPackageId, String tableName) {
+        return query(geoPackageId, tableName, new String[]{GeometryMetadata.COLUMN_ID});
+    }
+
+    /**
+     * Query for all table geometry metadata
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param columns      queried columns
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor query(long geoPackageId, String tableName, String[] columns) {
         String selection = GeometryMetadata.COLUMN_GEOPACKAGE_ID
                 + " = ? AND " + GeometryMetadata.COLUMN_TABLE_NAME + " = ?";
         String[] selectionArgs = new String[]{String.valueOf(geoPackageId), tableName};
         Cursor cursor = db.query(
                 GeometryMetadata.TABLE_NAME,
-                GeometryMetadata.COLUMNS, selection, selectionArgs, null, null, null);
+                columns, selection, selectionArgs, null, null, null);
         return cursor;
     }
 
@@ -447,7 +497,7 @@ public class GeometryMetadataDataSource {
      * @since 1.1.0
      */
     public int count(long geoPackageId, String tableName) {
-        Cursor cursor = query(geoPackageId, tableName);
+        Cursor cursor = queryIds(geoPackageId, tableName);
         int count = cursor.getCount();
         cursor.close();
         return count;
@@ -463,6 +513,33 @@ public class GeometryMetadataDataSource {
      */
     public Cursor query(String geoPackage, String tableName, BoundingBox boundingBox) {
         return query(getGeoPackageId(geoPackage), tableName, boundingBox);
+    }
+
+    /**
+     * Query for all table geometry metadata ids matching the bounding box in the same projection
+     *
+     * @param geoPackage  GeoPackage name
+     * @param tableName   table name
+     * @param boundingBox bounding box
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor queryIds(String geoPackage, String tableName, BoundingBox boundingBox) {
+        return queryIds(getGeoPackageId(geoPackage), tableName, boundingBox);
+    }
+
+    /**
+     * Query for all table geometry metadata matching the bounding box in the same projection
+     *
+     * @param geoPackage  GeoPackage name
+     * @param tableName   table name
+     * @param columns     queried columns
+     * @param boundingBox bounding box
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor query(String geoPackage, String tableName, String[] columns, BoundingBox boundingBox) {
+        return query(getGeoPackageId(geoPackage), tableName, columns, boundingBox);
     }
 
     /**
@@ -487,12 +564,39 @@ public class GeometryMetadataDataSource {
      * @return cursor that must be closed
      */
     public Cursor query(long geoPackageId, String tableName, BoundingBox boundingBox) {
+        return query(geoPackageId, tableName, GeometryMetadata.COLUMNS, boundingBox);
+    }
+
+    /**
+     * Query for all table geometry metadata ids matching the bounding box in the same projection
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param boundingBox  bounding box
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor queryIds(long geoPackageId, String tableName, BoundingBox boundingBox) {
+        return query(geoPackageId, tableName, new String[]{GeometryMetadata.COLUMN_ID}, boundingBox);
+    }
+
+    /**
+     * Query for all table geometry metadata matching the bounding box in the same projection
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param columns      queried columns
+     * @param boundingBox  bounding box
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor query(long geoPackageId, String tableName, String[] columns, BoundingBox boundingBox) {
         GeometryEnvelope envelope = new GeometryEnvelope();
         envelope.setMinX(boundingBox.getMinLongitude());
         envelope.setMaxX(boundingBox.getMaxLongitude());
         envelope.setMinY(boundingBox.getMinLatitude());
         envelope.setMaxY(boundingBox.getMaxLatitude());
-        return query(geoPackageId, tableName, envelope);
+        return query(geoPackageId, tableName, columns, envelope);
     }
 
     /**
@@ -505,7 +609,7 @@ public class GeometryMetadataDataSource {
      * @since 1.1.0
      */
     public int count(long geoPackageId, String tableName, BoundingBox boundingBox) {
-        Cursor cursor = query(geoPackageId, tableName, boundingBox);
+        Cursor cursor = queryIds(geoPackageId, tableName, boundingBox);
         int count = cursor.getCount();
         cursor.close();
         return count;
@@ -521,6 +625,33 @@ public class GeometryMetadataDataSource {
      */
     public Cursor query(String geoPackage, String tableName, GeometryEnvelope envelope) {
         return query(getGeoPackageId(geoPackage), tableName, envelope);
+    }
+
+    /**
+     * Query for all table geometry metadata ids matching the envelope
+     *
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param envelope   geometry envelope
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor queryIds(String geoPackage, String tableName, GeometryEnvelope envelope) {
+        return queryIds(getGeoPackageId(geoPackage), tableName, envelope);
+    }
+
+    /**
+     * Query for all table geometry metadata matching the envelope
+     *
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param columns    queried columns
+     * @param envelope   geometry envelope
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor query(String geoPackage, String tableName, String[] columns, GeometryEnvelope envelope) {
+        return query(getGeoPackageId(geoPackage), tableName, columns, envelope);
     }
 
     /**
@@ -545,6 +676,33 @@ public class GeometryMetadataDataSource {
      * @return cursor that must be closed
      */
     public Cursor query(long geoPackageId, String tableName, GeometryEnvelope envelope) {
+        return query(geoPackageId, tableName, GeometryMetadata.COLUMNS, envelope);
+    }
+
+    /**
+     * Query for all table geometry metadata ids matching the envelope
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param envelope     geometry envelope
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor queryIds(long geoPackageId, String tableName, GeometryEnvelope envelope) {
+        return query(geoPackageId, tableName, new String[]{GeometryMetadata.COLUMN_ID}, envelope);
+    }
+
+    /**
+     * Query for all table geometry metadata matching the envelope
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param columns      queried columns
+     * @param envelope     geometry envelope
+     * @return cursor that must be closed
+     * @since 3.3.1
+     */
+    public Cursor query(long geoPackageId, String tableName, String[] columns, GeometryEnvelope envelope) {
         StringBuilder selection = new StringBuilder();
         selection.append(GeometryMetadata.COLUMN_GEOPACKAGE_ID).append(" = ? AND ")
                 .append(GeometryMetadata.COLUMN_TABLE_NAME).append(" = ?");
@@ -591,7 +749,7 @@ public class GeometryMetadataDataSource {
         }
         Cursor cursor = db.query(
                 GeometryMetadata.TABLE_NAME,
-                GeometryMetadata.COLUMNS, selection.toString(), selectionArgs, null, null, null);
+                columns, selection.toString(), selectionArgs, null, null, null);
         return cursor;
     }
 
@@ -605,7 +763,7 @@ public class GeometryMetadataDataSource {
      * @since 1.1.0
      */
     public int count(long geoPackageId, String tableName, GeometryEnvelope envelope) {
-        Cursor cursor = query(geoPackageId, tableName, envelope);
+        Cursor cursor = queryIds(geoPackageId, tableName, envelope);
         int count = cursor.getCount();
         cursor.close();
         return count;
@@ -637,7 +795,7 @@ public class GeometryMetadataDataSource {
         GeometryMetadata metadata = new GeometryMetadata();
         metadata.setGeoPackageId(cursor.getLong(0));
         metadata.setTableName(cursor.getString(1));
-        metadata.setId(cursor.getLong(2));
+        metadata.setId(getId(cursor));
         metadata.setMinX(cursor.getDouble(3));
         metadata.setMaxX(cursor.getDouble(4));
         metadata.setMinY(cursor.getDouble(5));
@@ -655,6 +813,17 @@ public class GeometryMetadataDataSource {
             metadata.setMaxM(cursor.getDouble(10));
         }
         return metadata;
+    }
+
+    /**
+     * Get the geometry metadata geometry id
+     *
+     * @param cursor cursor
+     * @return id
+     * @since 3.3.1
+     */
+    public static long getId(Cursor cursor) {
+        return cursor.getLong(2);
     }
 
 }
