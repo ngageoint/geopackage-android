@@ -1,0 +1,67 @@
+package mil.nga.geopackage.db;
+
+import android.database.Cursor;
+
+import mil.nga.geopackage.features.user.FeatureCursor;
+import mil.nga.geopackage.features.user.FeatureTable;
+
+/**
+ * Feature Indexer Id cursor to filter on matching queried ids
+ *
+ * @author osbornb
+ * @since 3.3.1
+ */
+public class FeatureIndexerIdCursor extends FeatureCursor {
+
+    /**
+     * Feature indexer id query
+     */
+    private final FeatureIndexerIdQuery idQuery;
+
+    /**
+     * Constructor
+     *
+     * @param cursor  feature cursor
+     * @param idQuery id query
+     */
+    public FeatureIndexerIdCursor(FeatureCursor cursor, FeatureIndexerIdQuery idQuery) {
+        this(cursor.getTable(), cursor.getWrappedCursor(), idQuery);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param table   feature table
+     * @param cursor  cursor
+     * @param idQuery id query
+     */
+    public FeatureIndexerIdCursor(FeatureTable table, Cursor cursor, FeatureIndexerIdQuery idQuery) {
+        super(table, cursor);
+        this.idQuery = idQuery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean moveToNext() {
+        boolean hasNext = super.moveToNext();
+        while (hasNext) {
+            if (idQuery.hasId(getId())) {
+                break;
+            }
+            hasNext = super.moveToNext();
+        }
+        return hasNext;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getCount() {
+        // Not exact, but best option without iterating through the features
+        return Math.min(super.getCount(), idQuery.getCount());
+    }
+
+}

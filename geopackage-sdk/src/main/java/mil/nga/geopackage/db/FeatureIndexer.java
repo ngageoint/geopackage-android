@@ -411,7 +411,7 @@ public class FeatureIndexer {
      */
     public FeatureCursor queryFeatures() {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
-        return featureDao.queryIn(idQuery.getSql(), idQuery.getArgs());
+        return query(idQuery);
     }
 
     /**
@@ -422,8 +422,9 @@ public class FeatureIndexer {
      * @since 3.3.1
      */
     public FeatureCursor queryFeatures(Map<String, Object> fieldValues) {
-        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
-        return featureDao.queryIn(idQuery.getSql(), idQuery.getArgs(), fieldValues);
+        String where = featureDao.buildWhere(fieldValues.entrySet());
+        String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
+        return queryFeatures(where, whereArgs);
     }
 
     /**
@@ -434,8 +435,9 @@ public class FeatureIndexer {
      * @since 3.3.1
      */
     public int countFeatures(Map<String, Object> fieldValues) {
-        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
-        return featureDao.countIn(idQuery.getSql(), idQuery.getArgs(), fieldValues);
+        String where = featureDao.buildWhere(fieldValues.entrySet());
+        String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
+        return countFeatures(where, whereArgs);
     }
 
     /**
@@ -470,7 +472,7 @@ public class FeatureIndexer {
      */
     public FeatureCursor queryFeatures(String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
-        return featureDao.queryIn(idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
+        return query(idQuery, where, whereArgs);
     }
 
     /**
@@ -483,7 +485,7 @@ public class FeatureIndexer {
      */
     public int countFeatures(String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
-        return featureDao.countIn(idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
+        return count(idQuery, where, whereArgs);
     }
 
     /**
@@ -874,7 +876,7 @@ public class FeatureIndexer {
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
-        return featureDao.queryIn(idQuery.getSql(), idQuery.getArgs());
+        return query(idQuery);
     }
 
     /**
@@ -886,7 +888,7 @@ public class FeatureIndexer {
      */
     public int countFeatures(GeometryEnvelope envelope) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
-        return featureDao.countIn(idQuery.getSql(), idQuery.getArgs());
+        return count(idQuery);
     }
 
     /**
@@ -899,8 +901,9 @@ public class FeatureIndexer {
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        Map<String, Object> fieldValues) {
-        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
-        return featureDao.queryIn(idQuery.getSql(), idQuery.getArgs(), fieldValues);
+        String where = featureDao.buildWhere(fieldValues.entrySet());
+        String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
+        return queryFeatures(envelope, where, whereArgs);
     }
 
     /**
@@ -913,8 +916,9 @@ public class FeatureIndexer {
      */
     public int countFeatures(GeometryEnvelope envelope,
                              Map<String, Object> fieldValues) {
-        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
-        return featureDao.countIn(idQuery.getSql(), idQuery.getArgs(), fieldValues);
+        String where = featureDao.buildWhere(fieldValues.entrySet());
+        String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
+        return countFeatures(envelope, where, whereArgs);
     }
 
     /**
@@ -954,7 +958,7 @@ public class FeatureIndexer {
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
-        return featureDao.queryIn(idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
+        return query(idQuery, where, whereArgs);
     }
 
     /**
@@ -969,7 +973,7 @@ public class FeatureIndexer {
     public int countFeatures(GeometryEnvelope envelope, String where,
                              String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
-        return featureDao.countIn(idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
+        return count(idQuery, where, whereArgs);
     }
 
     /**
@@ -1080,7 +1084,7 @@ public class FeatureIndexer {
         FeatureIndexerIdQuery query = null;
         FeatureIndexMetadataResults results = new FeatureIndexMetadataResults(this, cursor);
         try {
-            query = new FeatureIndexerIdQuery((int) results.count());
+            query = new FeatureIndexerIdQuery();
             for (long id : results.ids()) {
                 query.addArgument(id);
             }
@@ -1088,6 +1092,72 @@ public class FeatureIndexer {
             results.close();
         }
         return query;
+    }
+
+    /**
+     * Query using the id query
+     *
+     * @param idQuery id query
+     * @return feature cursor
+     */
+    private FeatureCursor query(FeatureIndexerIdQuery idQuery) {
+        return query(idQuery, null, null);
+    }
+
+    /**
+     * Count using the id query
+     *
+     * @param idQuery id query
+     * @return feature count
+     */
+    private int count(FeatureIndexerIdQuery idQuery) {
+        return idQuery.getCount();
+    }
+
+    /**
+     * Query using the id query and criteria
+     *
+     * @param idQuery   id query
+     * @param where     where statement
+     * @param whereArgs where args
+     * @return feature cursor
+     */
+    private FeatureCursor query(FeatureIndexerIdQuery idQuery, String where, String[] whereArgs) {
+        FeatureCursor cursor = null;
+        if (idQuery.aboveMaxArguments(whereArgs)) {
+            cursor = new FeatureIndexerIdCursor(featureDao.query(where, whereArgs), idQuery);
+        } else {
+            cursor = featureDao.queryIn(idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
+        }
+        return cursor;
+    }
+
+    /**
+     * Count using the id query and criteria
+     *
+     * @param idQuery   id query
+     * @param where     where statement
+     * @param whereArgs where args
+     * @return feature count
+     */
+    private int count(FeatureIndexerIdQuery idQuery, String where, String[] whereArgs) {
+        int count = 0;
+        if (idQuery.aboveMaxArguments(whereArgs)) {
+            FeatureCursor cursor = featureDao.query(where, whereArgs);
+            try {
+                while (cursor.moveToNext()) {
+                    FeatureRow featureRow = cursor.getRow();
+                    if (idQuery.hasId(featureRow.getId())) {
+                        count++;
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        } else {
+            count = featureDao.countIn(idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
+        }
+        return count;
     }
 
 }

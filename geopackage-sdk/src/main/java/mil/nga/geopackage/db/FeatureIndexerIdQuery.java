@@ -1,5 +1,8 @@
 package mil.nga.geopackage.db;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * Feature Indexer Id query with nested SQL and arguments
  *
@@ -9,35 +12,15 @@ package mil.nga.geopackage.db;
 public class FeatureIndexerIdQuery {
 
     /**
-     * Nested SQL in statement
+     * Set of ids
      */
-    private final String sql;
-
-    /**
-     * Query arguments
-     */
-    private final String[] args;
-
-    /**
-     * Argument add index
-     */
-    private int argumentIndex = 0;
+    private Set<Long> ids = new LinkedHashSet<>();
 
     /**
      * Constructor
-     *
-     * @param count result count
      */
-    public FeatureIndexerIdQuery(int count) {
-        args = new String[count];
-        StringBuilder sqlBuilder = new StringBuilder();
-        if (count > 0) {
-            sqlBuilder.append("?");
-            for (int i = 1; i < count; i++) {
-                sqlBuilder.append(", ?");
-            }
-        }
-        sql = sqlBuilder.toString();
+    public FeatureIndexerIdQuery() {
+
     }
 
     /**
@@ -46,16 +29,68 @@ public class FeatureIndexerIdQuery {
      * @param id id value
      */
     public void addArgument(long id) {
-        addArgument(String.valueOf(id));
+        ids.add(id);
     }
 
     /**
-     * Add an id argument
+     * Get the number of ids
      *
-     * @param id id value
+     * @return count
      */
-    public void addArgument(String id) {
-        args[argumentIndex++] = id;
+    public int getCount() {
+        return ids.size();
+    }
+
+    /**
+     * Get the set of ids
+     *
+     * @return ids
+     */
+    public Set<Long> getIds() {
+        return ids;
+    }
+
+    /**
+     * Check if the query has the id
+     *
+     * @param id id
+     * @return true if has id
+     */
+    public boolean hasId(long id) {
+        return ids.contains(id);
+    }
+
+    /**
+     * Check if the total number of query arguments is above the maximum allowed in a single query
+     *
+     * @return true if above the maximum allowed query arguments
+     */
+    public boolean aboveMaxArguments() {
+        return aboveMaxArguments(0);
+    }
+
+    /**
+     * Check if the total number of query arguments is above the maximum allowed in a single query
+     *
+     * @param additionalArgs additional arguments
+     * @return true if above the maximum allowed query arguments
+     */
+    public boolean aboveMaxArguments(String[] additionalArgs) {
+        int additionalArgCount = 0;
+        if (additionalArgs != null) {
+            additionalArgCount += additionalArgs.length;
+        }
+        return aboveMaxArguments(additionalArgCount);
+    }
+
+    /**
+     * Check if the total number of query arguments is above the maximum allowed in a single query
+     *
+     * @param additionalArgs additional argument count
+     * @return true if above the maximum allowed query arguments
+     */
+    public boolean aboveMaxArguments(int additionalArgs) {
+        return getCount() + additionalArgs > 999;
     }
 
     /**
@@ -64,7 +99,15 @@ public class FeatureIndexerIdQuery {
      * @return SQL
      */
     public String getSql() {
-        return sql;
+        StringBuilder sqlBuilder = new StringBuilder();
+        int count = getCount();
+        if (count > 0) {
+            sqlBuilder.append("?");
+            for (int i = 1; i < count; i++) {
+                sqlBuilder.append(", ?");
+            }
+        }
+        return sqlBuilder.toString();
     }
 
     /**
@@ -73,6 +116,11 @@ public class FeatureIndexerIdQuery {
      * @return args
      */
     public String[] getArgs() {
+        String[] args = new String[getCount()];
+        int index = 0;
+        for (long id : ids) {
+            args[index++] = String.valueOf(id);
+        }
         return args;
     }
 

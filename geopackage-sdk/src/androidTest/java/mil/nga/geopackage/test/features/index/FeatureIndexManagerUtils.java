@@ -8,18 +8,23 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.index.FeatureIndexType;
+import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
+import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.schema.TableColumnKey;
 import mil.nga.geopackage.test.TestUtils;
@@ -48,9 +53,9 @@ public class FeatureIndexManagerUtils {
      * @throws SQLException upon error
      */
     public static void testIndex(Activity activity, GeoPackage geoPackage) throws SQLException {
+        testIndex(activity, geoPackage, FeatureIndexType.RTREE, true);
         testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
         testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);
-        //testIndex(activity, geoPackage, FeatureIndexType.RTREE, true); // TODO RTree write not supported
     }
 
     private static void testIndex(Activity activity, GeoPackage geoPackage, FeatureIndexType type,
@@ -65,7 +70,14 @@ public class FeatureIndexManagerUtils {
                     geoPackage, featureDao);
             featureIndexManager.setContinueOnError(false);
             featureIndexManager.setIndexLocation(type);
-            featureIndexManager.deleteAllIndexes();
+            if(type == FeatureIndexType.RTREE){
+                if(!featureIndexManager.isIndexed(type)){
+                    featureIndexManager.close();
+                    continue;
+                }
+            }else {
+                featureIndexManager.deleteAllIndexes();
+            }
 
             // Determine how many features have geometry envelopes or geometries
             int expectedCount = 0;
@@ -89,29 +101,33 @@ public class FeatureIndexManagerUtils {
             }
             featureCursor.close();
 
-            TestCase.assertFalse(featureIndexManager.isIndexed());
-            TestCase.assertNull(featureIndexManager.getLastIndexed());
-            Date currentDate = new Date();
+            if(type != FeatureIndexType.RTREE) {
 
-            // Test indexing
-            TestGeoPackageProgress progress = new TestGeoPackageProgress();
-            featureIndexManager.setProgress(progress);
-            int indexCount = featureIndexManager.index();
-            TestCase.assertEquals(expectedCount, indexCount);
-            TestCase.assertEquals(featureDao.count(), progress.getProgress());
-            TestCase.assertNotNull(featureIndexManager.getLastIndexed());
-            Date lastIndexed = featureIndexManager.getLastIndexed();
-            TestCase.assertTrue(lastIndexed.getTime() > currentDate.getTime());
+                TestCase.assertFalse(featureIndexManager.isIndexed());
+                TestCase.assertNull(featureIndexManager.getLastIndexed());
+                Date currentDate = new Date();
 
-            TestCase.assertTrue(featureIndexManager.isIndexed());
-            TestCase.assertEquals(expectedCount, featureIndexManager.count());
+                // Test indexing
+                TestGeoPackageProgress progress = new TestGeoPackageProgress();
+                featureIndexManager.setProgress(progress);
+                int indexCount = featureIndexManager.index();
+                TestCase.assertEquals(expectedCount, indexCount);
+                TestCase.assertEquals(featureDao.count(), progress.getProgress());
+                TestCase.assertNotNull(featureIndexManager.getLastIndexed());
+                Date lastIndexed = featureIndexManager.getLastIndexed();
+                TestCase.assertTrue(lastIndexed.getTime() > currentDate.getTime());
 
-            // Test re-indexing, both ignored and forced
-            TestCase.assertEquals(0, featureIndexManager.index());
-            TestCase.assertEquals(expectedCount,
-                    featureIndexManager.index(true));
-            TestCase.assertTrue(featureIndexManager.getLastIndexed().getTime() > lastIndexed
-                    .getTime());
+                TestCase.assertTrue(featureIndexManager.isIndexed());
+                TestCase.assertEquals(expectedCount, featureIndexManager.count());
+
+                // Test re-indexing, both ignored and forced
+                TestCase.assertEquals(0, featureIndexManager.index());
+                TestCase.assertEquals(expectedCount,
+                        featureIndexManager.index(true));
+                TestCase.assertTrue(featureIndexManager.getLastIndexed().getTime() > lastIndexed
+                        .getTime());
+
+            }
 
             // Query for all indexed geometries
             int resultCount = 0;
@@ -213,39 +229,175 @@ public class FeatureIndexManagerUtils {
             TestCase.assertTrue(featureFound);
             TestCase.assertTrue(resultCount >= 1);
 
-            // Update a Geometry and update the index of a single feature row
-            GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
-                    featureDao.getGeometryColumns().getSrsId());
-            Point point = new Point(5, 5);
-            geometryData.setGeometry(point);
-            testFeatureRow.setGeometry(geometryData);
-            TestCase.assertEquals(1, featureDao.update(testFeatureRow));
-            Date lastIndexedBefore = featureIndexManager.getLastIndexed();
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-            }
-            TestCase.assertTrue(featureIndexManager.index(testFeatureRow));
-            Date lastIndexedAfter = featureIndexManager.getLastIndexed();
-            TestCase.assertTrue(lastIndexedAfter.after(lastIndexedBefore));
+            // Test query by criteria
+            FeatureTable table = featureDao.getTable();
+            List<FeatureColumn> columns = table.getColumns();
 
-            // Verify the index was updated for the feature row
-            envelope = GeometryEnvelopeBuilder.buildEnvelope(point);
-            resultCount = 0;
-            featureFound = false;
-            TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);
-            featureIndexResults = featureIndexManager.query(envelope);
-            for (FeatureRow featureRow : featureIndexResults) {
-                validateFeatureRow(featureIndexManager, featureRow, envelope,
-                        includeEmpty);
-                if (featureRow.getId() == testFeatureRow.getId()) {
-                    featureFound = true;
+            Map<String, Number> numbers = new HashMap<>();
+            Map<String, String> strings = new HashMap<>();
+
+            for (FeatureColumn column : columns) {
+                if (column.isPrimaryKey() || column.isGeometry()) {
+                    continue;
                 }
-                resultCount++;
+                GeoPackageDataType dataType = column.getDataType();
+                switch (dataType) {
+                    case DOUBLE:
+                    case FLOAT:
+                    case INT:
+                    case INTEGER:
+                    case TINYINT:
+                    case SMALLINT:
+                    case MEDIUMINT:
+                    case REAL:
+                        numbers.put(column.getName(), null);
+                        break;
+                    case TEXT:
+                        strings.put(column.getName(), null);
+                        break;
+                    default:
+
+                }
             }
-            featureIndexResults.close();
-            TestCase.assertTrue(featureFound);
-            TestCase.assertTrue(resultCount >= 1);
+
+            for (String number : numbers.keySet()) {
+                Object value = testFeatureRow.getValue(number);
+                numbers.put(number, (Number) value);
+            }
+
+            for (String string : strings.keySet()) {
+                String value = testFeatureRow.getValueString(string);
+                strings.put(string, value);
+            }
+
+            for (Map.Entry<String, Number> number : numbers.entrySet()) {
+
+                String column = number.getKey();
+                double value = number.getValue().doubleValue();
+
+                String where = column + " >= ? AND " + column + " <= ?";
+                String[] whereArgs = new String[] {
+                        String.valueOf(value - 0.001),
+                        String.valueOf(value + 0.001) };
+
+                long count = featureIndexManager.count(where, whereArgs);
+                TestCase.assertTrue(count >= 1);
+                featureIndexResults = featureIndexManager.query(where,
+                        whereArgs);
+                TestCase.assertEquals(count, featureIndexResults.count());
+                for (FeatureRow featureRow : featureIndexResults) {
+                    TestCase.assertEquals(value,
+                            ((Number) featureRow.getValue(column))
+                                    .doubleValue());
+                }
+                featureIndexResults.close();
+
+                resultCount = 0;
+                featureFound = false;
+
+                count = featureIndexManager.count(transformedBoundingBox,
+                        projection, where, whereArgs);
+                TestCase.assertTrue(count >= 1);
+                featureIndexResults = featureIndexManager.query(
+                        transformedBoundingBox, projection, where, whereArgs);
+                TestCase.assertEquals(count, featureIndexResults.count());
+                for (FeatureRow featureRow : featureIndexResults) {
+                    TestCase.assertEquals(value,
+                            ((Number) featureRow.getValue(column))
+                                    .doubleValue());
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    resultCount++;
+                }
+                featureIndexResults.close();
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+            }
+
+            for (Map.Entry<String, String> string : strings.entrySet()) {
+
+                String column = string.getKey();
+                String value = string.getValue();
+
+                Map<String, Object> fieldValues = new HashMap<>();
+                fieldValues.put(column, value);
+
+                long count = featureIndexManager.count(fieldValues);
+                TestCase.assertTrue(count >= 1);
+                featureIndexResults = featureIndexManager.query(fieldValues);
+                TestCase.assertEquals(count, featureIndexResults.count());
+                for (FeatureRow featureRow : featureIndexResults) {
+                    TestCase.assertEquals(value,
+                            featureRow.getValueString(column));
+                }
+                featureIndexResults.close();
+
+                resultCount = 0;
+                featureFound = false;
+
+                count = featureIndexManager.count(transformedBoundingBox,
+                        projection, fieldValues);
+                TestCase.assertTrue(count >= 1);
+                featureIndexResults = featureIndexManager
+                        .query(transformedBoundingBox, projection, fieldValues);
+                TestCase.assertEquals(count, featureIndexResults.count());
+                for (FeatureRow featureRow : featureIndexResults) {
+                    TestCase.assertEquals(value,
+                            featureRow.getValueString(column));
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    resultCount++;
+                }
+                featureIndexResults.close();
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+            }
+
+            if(type != FeatureIndexType.RTREE) {
+
+                // Update a Geometry and update the index of a single feature row
+                GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
+                        featureDao.getGeometryColumns().getSrsId());
+                Point point = new Point(5, 5);
+                geometryData.setGeometry(point);
+                testFeatureRow.setGeometry(geometryData);
+                TestCase.assertEquals(1, featureDao.update(testFeatureRow));
+                Date lastIndexedBefore = featureIndexManager.getLastIndexed();
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                }
+                TestCase.assertTrue(featureIndexManager.index(testFeatureRow));
+                Date lastIndexedAfter = featureIndexManager.getLastIndexed();
+                TestCase.assertTrue(lastIndexedAfter.after(lastIndexedBefore));
+
+                // Verify the index was updated for the feature row
+                envelope = GeometryEnvelopeBuilder.buildEnvelope(point);
+                resultCount = 0;
+                featureFound = false;
+                TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);
+                featureIndexResults = featureIndexManager.query(envelope);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow, envelope,
+                            includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    resultCount++;
+                }
+                featureIndexResults.close();
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+            }
 
             featureIndexManager.close();
         }
@@ -257,6 +409,10 @@ public class FeatureIndexManagerUtils {
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
             featureIndexManager.setIndexLocation(type);
+            if(type == FeatureIndexType.RTREE) {
+                featureIndexManager.close();
+                continue;
+            }
             TestCase.assertTrue(featureIndexManager.isIndexed());
 
             // Test deleting a single geometry index
@@ -516,6 +672,7 @@ public class FeatureIndexManagerUtils {
 
         FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                 geoPackage, featureDao);
+        featureIndexManager.setContinueOnError(false);
         try {
 
             featureIndexManager.setIndexLocation(type);
