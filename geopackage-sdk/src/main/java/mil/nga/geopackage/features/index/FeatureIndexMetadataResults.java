@@ -52,7 +52,7 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
 
             @Override
             public boolean hasNext() {
-                return !geometryMetadata.isLast();
+                return geometryMetadata.getCount() > 0 && !geometryMetadata.isLast();
             }
 
             @Override
@@ -99,7 +99,7 @@ public class FeatureIndexMetadataResults implements FeatureIndexResults {
                      */
                     @Override
                     public boolean hasNext() {
-                        return !geometryMetadata.isLast();
+                        return geometryMetadata.getCount() > 0 && !geometryMetadata.isLast();
                     }
 
                     /**
