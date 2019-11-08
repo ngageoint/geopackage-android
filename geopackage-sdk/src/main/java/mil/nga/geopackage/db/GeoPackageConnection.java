@@ -56,6 +56,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
     /**
      * Copy method
      *
+     * @return connection
      * @since 3.3.1
      */
     public GeoPackageConnection copy() {
@@ -66,6 +67,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * Copy method with provided database
      *
      * @param db database
+     * @return connection
      * @since 3.3.1
      */
     public GeoPackageConnection copy(GeoPackageDatabase db) {

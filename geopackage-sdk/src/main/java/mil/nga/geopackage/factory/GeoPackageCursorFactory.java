@@ -38,8 +38,8 @@ public class GeoPackageCursorFactory implements CursorFactory {
      * Register a cursor wrapper for the provided table name. Database queries
      * will wrap the returned cursor
      *
-     * @param tableName
-     * @param cursorWrapper
+     * @param tableName     table name
+     * @param cursorWrapper cursor wrapper
      */
     public void registerTable(String tableName,
                               GeoPackageCursorWrapper cursorWrapper) {
