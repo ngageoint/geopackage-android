@@ -8,9 +8,16 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 * compile SDK version 29
 * geopackage-core version 3.3.1
+* SQLite Android Bindings version 3300100
 * Java 8
 * Feature Index Manager catches and logs index type errors, attempts next index type
 * Fixed out of bounds iteration errors on Manual Feature Query Results and Feature Index List Results
+* Improved Android Bindings SQLite connection support
+* RTree, Feature Table Index, Metadata, and Manual Feature Query: feature query and count methods with additional arguments, nested single SQL queries
+* Feature Index Manager, single nested SQL queries for features with additional query argument options
+* Feature Index Results and Metadata Results id iteration shortcut to retrieve id without creating full features
+* Additional connection and DAO query and count methods
+* Additional user result get value and id methods
 * appcompat version 1.1.0
 * gradle plugin updated to 3.5.1
 * gradle version 5.4.1
