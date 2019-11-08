@@ -122,6 +122,7 @@ import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
+import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
@@ -166,6 +167,7 @@ public class GeoPackageExample extends BaseTestCase {
     private static final boolean RELATED_TABLES_MEDIA = true;
     private static final boolean RELATED_TABLES_FEATURES = true;
     private static final boolean RELATED_TABLES_SIMPLE_ATTRIBUTES = true;
+    private static final boolean RELATED_TABLES_TILES = true;
     private static final boolean GEOMETRY_INDEX = true;
     private static final boolean FEATURE_TILE_LINK = true;
     private static final boolean TILE_SCALING = true;
@@ -417,9 +419,15 @@ public class GeoPackageExample extends BaseTestCase {
                 createTileScalingExtension(geoPackage);
             }
 
+            Log.i(LOG_NAME, "Related Tables Tiles Extension: " + RELATED_TABLES_TILES);
+            if (RELATED_TABLES_TILES) {
+                createRelatedTablesTilesExtension(geoPackage);
+            }
+
         } else {
             Log.i(LOG_NAME, "WebP Extension: " + TILES);
             Log.i(LOG_NAME, "Tile Scaling Extension: " + TILES);
+            Log.i(LOG_NAME, "Related Tables Tiles Extension: " + TILES);
         }
 
         Log.i(LOG_NAME, "Attributes: " + ATTRIBUTES);
@@ -1913,6 +1921,61 @@ public class GeoPackageExample extends BaseTestCase {
             userMappingDao.create(userMappingRow);
         }
         attributesCursor.close();
+
+    }
+
+    private static void createRelatedTablesTilesExtension(
+            GeoPackage geoPackage) {
+
+        String featureTable = "point2";
+        String tileTable = "nga";
+
+        RelatedTablesExtension relatedTables = new RelatedTablesExtension(
+                geoPackage);
+
+        List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
+                .createAdditionalUserColumns();
+
+        UserMappingTable userMappingTable = UserMappingTable.create(
+                featureTable + "_" + tileTable, additionalMappingColumns);
+        ExtendedRelation relation = relatedTables.addTilesRelationship(
+                featureTable, tileTable, userMappingTable);
+
+        UserMappingDao userMappingDao = relatedTables.getMappingDao(relation);
+
+        FeatureDao featureDao = geoPackage
+                .getFeatureDao(relation.getBaseTableName());
+        TileDao tileDao = geoPackage.getTileDao(relation.getRelatedTableName());
+
+        FeatureCursor featureCursor = featureDao.queryForAll();
+        while (featureCursor.moveToNext()) {
+
+            FeatureRow featureRow = featureCursor.getRow();
+            String featureName = featureRow.getValue(TEXT_COLUMN).toString();
+
+            TileCursor tileCursor = tileDao
+                    .queryForTile(tileDao.getMinZoom());
+            while (tileCursor.moveToNext()) {
+
+                TileRow tileRow = tileCursor.getRow();
+
+                UserMappingRow userMappingRow = userMappingDao.newRow();
+                userMappingRow.setBaseId(featureRow.getId());
+                userMappingRow.setRelatedId(tileRow.getId());
+                RelatedTablesUtils.populateUserRow(userMappingDao.getTable(),
+                        userMappingRow, UserMappingTable.requiredColumns());
+                DublinCoreMetadata.setValue(userMappingRow,
+                        DublinCoreType.TITLE, featureName);
+                DublinCoreMetadata.setValue(userMappingRow,
+                        DublinCoreType.DESCRIPTION, featureName);
+                DublinCoreMetadata.setValue(userMappingRow,
+                        DublinCoreType.SOURCE, featureName);
+                userMappingDao.create(userMappingRow);
+            }
+            tileCursor.close();
+
+        }
+        featureCursor.close();
 
     }
 
