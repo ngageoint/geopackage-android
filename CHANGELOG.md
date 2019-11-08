@@ -19,7 +19,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Additional connection and DAO query and count methods
 * Additional user result get value and id methods
 * appcompat version 1.1.0
-* gradle plugin updated to 3.5.1
+* gradle plugin updated to 3.5.2
 * gradle version 5.4.1
 
 ## [3.3.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.3.0) (07-10-2019)
