@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteQuery;
+import android.util.Log;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +24,11 @@ import mil.nga.geopackage.db.CoreSQLUtils;
 public class GeoPackageCursorFactory implements CursorFactory {
 
     /**
+     * Log queries flag
+     */
+    private boolean debugLogQueries = false;
+
+    /**
      * Mapping between table names and their cursor wrapper
      */
     private final Map<String, GeoPackageCursorWrapper> tableCursors = Collections
@@ -32,6 +38,26 @@ public class GeoPackageCursorFactory implements CursorFactory {
      * Constructor
      */
     GeoPackageCursorFactory() {
+    }
+
+    /**
+     * Is debug log queries enabled
+     *
+     * @return true if queries are logged at the debug level
+     * @since 3.3.1
+     */
+    public boolean isDebugLogQueries() {
+        return debugLogQueries;
+    }
+
+    /**
+     * Set the debug log queries flag
+     *
+     * @param debugLogQueries true to debug log queries
+     * @since 3.3.1
+     */
+    public void setDebugLogQueries(boolean debugLogQueries) {
+        this.debugLogQueries = debugLogQueries;
     }
 
     /**
@@ -66,6 +92,10 @@ public class GeoPackageCursorFactory implements CursorFactory {
     @Override
     public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver driver,
                             String editTable, SQLiteQuery query) {
+
+        if (debugLogQueries) {
+            Log.d(GeoPackageCursorFactory.class.getSimpleName(), query.toString());
+        }
 
         // Create a standard cursor
         Cursor cursor = new SQLiteCursor(driver, editTable, query);
@@ -112,6 +142,10 @@ public class GeoPackageCursorFactory implements CursorFactory {
              */
             @Override
             public Cursor newCursor(org.sqlite.database.sqlite.SQLiteDatabase db, org.sqlite.database.sqlite.SQLiteCursorDriver driver, String editTable, org.sqlite.database.sqlite.SQLiteQuery query) {
+
+                if (debugLogQueries) {
+                    Log.d(GeoPackageCursorFactory.class.getSimpleName(), query.toString());
+                }
 
                 // Create a standard cursor
                 Cursor cursor = new org.sqlite.database.sqlite.SQLiteCursor(driver, editTable, query);

@@ -112,6 +112,14 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
+    public GeoPackageCursorFactory getCursorFactory() {
+        return cursorFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void registerCursorWrapper(String table, GeoPackageCursorWrapper cursorWrapper) {
         cursorFactory.registerTable(table,
                 cursorWrapper);

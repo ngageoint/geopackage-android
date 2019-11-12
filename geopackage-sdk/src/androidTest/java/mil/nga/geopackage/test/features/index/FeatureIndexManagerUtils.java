@@ -53,6 +53,7 @@ public class FeatureIndexManagerUtils {
      * @throws SQLException upon error
      */
     public static void testIndex(Activity activity, GeoPackage geoPackage) throws SQLException {
+        geoPackage.getCursorFactory().setDebugLogQueries(true);
         testIndex(activity, geoPackage, FeatureIndexType.RTREE, true);
         testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
         testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);

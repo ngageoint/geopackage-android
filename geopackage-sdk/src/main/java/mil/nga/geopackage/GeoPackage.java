@@ -6,6 +6,7 @@ import android.database.Cursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.factory.GeoPackageCursorFactory;
 import mil.nga.geopackage.factory.GeoPackageCursorWrapper;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -20,6 +21,14 @@ import mil.nga.geopackage.user.custom.UserCustomTable;
  * @author osbornb
  */
 public interface GeoPackage extends GeoPackageCore {
+
+    /**
+     * Get the cursor factory
+     *
+     * @return cursor factory
+     * @since 3.3.1
+     */
+    public GeoPackageCursorFactory getCursorFactory();
 
     /**
      * Register a GeoPackage Cursor Wrapper for table name
