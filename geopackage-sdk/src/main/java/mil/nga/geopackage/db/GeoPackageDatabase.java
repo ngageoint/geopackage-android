@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import mil.nga.geopackage.factory.GeoPackageCursorFactory;
 
@@ -36,6 +37,16 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     private final GeoPackageCursorFactory cursorFactory;
 
     /**
+     * Database Connection Writable connection flag
+     */
+    private final boolean writable;
+
+    /**
+     * SQLite Android Bindings Connection Writable connection flag
+     */
+    private boolean bindingsWritable = false;
+
+    /**
      * Constructor
      *
      * @param db database
@@ -52,8 +63,22 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * @since 3.3.1
      */
     public GeoPackageDatabase(SQLiteDatabase db, GeoPackageCursorFactory cursorFactory) {
+        this(db, true, cursorFactory);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param db            database
+     * @param writable      writable flag
+     * @param cursorFactory cursor factory
+     * @since 3.3.1
+     */
+    public GeoPackageDatabase(SQLiteDatabase db, boolean writable, GeoPackageCursorFactory cursorFactory) {
         this.db = new AndroidSQLiteDatabase(db);
         this.bindingsDb = new AndroidBindingsSQLiteDatabase();
+        this.writable = writable;
+        this.bindingsWritable = writable;
         this.cursorFactory = cursorFactory;
         active = this.db;
     }
@@ -67,6 +92,8 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     public GeoPackageDatabase(GeoPackageDatabase database) {
         this.db = database.db;
         this.bindingsDb = database.bindingsDb;
+        this.writable = database.writable;
+        this.bindingsWritable = database.bindingsWritable;
         this.cursorFactory = database.cursorFactory;
         this.active = database.active;
     }
@@ -101,15 +128,35 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
         if (bindingsDb.getDb() == null) {
             synchronized (db) {
                 if (bindingsDb.getDb() == null) {
+
                     System.loadLibrary("sqliteX");
+
                     org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory bindingsCursorFactory = null;
                     if (cursorFactory != null) {
                         bindingsCursorFactory = cursorFactory.getBindingsCursorFactory();
                     }
-                    org.sqlite.database.sqlite.SQLiteDatabase sqLiteDatabase = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(
-                            getDb().getPath(),
-                            bindingsCursorFactory,
-                            org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READWRITE);
+
+                    org.sqlite.database.sqlite.SQLiteDatabase sqLiteDatabase = null;
+                    String database = getDb().getPath();
+                    if (bindingsWritable) {
+                        try {
+                            sqLiteDatabase = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(
+                                    database,
+                                    bindingsCursorFactory,
+                                    org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READWRITE | org.sqlite.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+                        } catch (Exception e) {
+                            Log.e(GeoPackageDatabase.class.getSimpleName(), "Failed to open database as writable: " + database, e);
+                        }
+                    }
+
+                    if (sqLiteDatabase == null) {
+                        sqLiteDatabase = org.sqlite.database.sqlite.SQLiteDatabase.openDatabase(
+                                database,
+                                bindingsCursorFactory,
+                                org.sqlite.database.sqlite.SQLiteDatabase.OPEN_READONLY | org.sqlite.database.sqlite.SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+                        bindingsWritable = false;
+                    }
+
                     bindingsDb.setDb(sqLiteDatabase);
                 }
             }
@@ -144,6 +191,26 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     public boolean isUseBindings() {
         return active == bindingsDb;
+    }
+
+    /**
+     * Is the SQLite database connection writable
+     *
+     * @return true if writable
+     * @since 3.3.1
+     */
+    public boolean isWritable() {
+        return writable;
+    }
+
+    /**
+     * Is the SQLite bindings database connection writable
+     *
+     * @return true if writable
+     * @since 3.3.1
+     */
+    public boolean isBindingsWritable() {
+        return bindingsWritable;
     }
 
     /**

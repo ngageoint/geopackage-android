@@ -824,16 +824,16 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                 sqlite = context.openOrCreateDatabase(database,
                         Context.MODE_PRIVATE, cursorFactory);
             }
-            if(sqliteWriteAheadLogging){
+            if (sqliteWriteAheadLogging) {
                 sqlite.enableWriteAheadLogging();
-            }else {
+            } else {
                 sqlite.disableWriteAheadLogging();
             }
 
             // Validate the database if validation is enabled
             validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
 
-            GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite, cursorFactory));
+            GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite, writable, cursorFactory));
             connection.enableForeignKeys();
 
             GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
@@ -919,7 +919,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
-    public boolean isSqliteWriteAheadLogging(){
+    public boolean isSqliteWriteAheadLogging() {
         return sqliteWriteAheadLogging;
     }
 
@@ -927,7 +927,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
-    public void setSqliteWriteAheadLogging(boolean enabled){
+    public void setSqliteWriteAheadLogging(boolean enabled) {
         this.sqliteWriteAheadLogging = enabled;
     }
 
