@@ -397,9 +397,9 @@ public class FeatureIndexer {
      * Query for all Geometry Metadata count
      *
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count() {
+    public long count() {
         return geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName());
     }
 
@@ -545,9 +545,9 @@ public class FeatureIndexer {
      *
      * @param boundingBox bounding box
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count(BoundingBox boundingBox) {
+    public long count(BoundingBox boundingBox) {
         return geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName(), boundingBox);
     }
 
@@ -861,9 +861,9 @@ public class FeatureIndexer {
      *
      * @param envelope geometry envelope
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count(GeometryEnvelope envelope) {
+    public long count(GeometryEnvelope envelope) {
         return geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName(), envelope);
     }
 

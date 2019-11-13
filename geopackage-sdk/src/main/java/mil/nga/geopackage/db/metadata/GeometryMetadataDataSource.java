@@ -2,6 +2,7 @@ package mil.nga.geopackage.db.metadata;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
@@ -395,9 +396,9 @@ public class GeometryMetadataDataSource {
      * @param geoPackage GeoPackage name
      * @param tableName  table name
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count(String geoPackage, String tableName) {
+    public long count(String geoPackage, String tableName) {
         return count(getGeoPackageId(geoPackage), tableName);
     }
 
@@ -479,13 +480,9 @@ public class GeometryMetadataDataSource {
      * @since 3.3.1
      */
     public Cursor query(long geoPackageId, String tableName, String[] columns) {
-        String selection = GeometryMetadata.COLUMN_GEOPACKAGE_ID
-                + " = ? AND " + GeometryMetadata.COLUMN_TABLE_NAME + " = ?";
-        String[] selectionArgs = new String[]{String.valueOf(geoPackageId), tableName};
-        Cursor cursor = db.query(
+        return db.query(
                 GeometryMetadata.TABLE_NAME,
-                columns, selection, selectionArgs, null, null, null);
-        return cursor;
+                columns, querySQL(), querySQLArgs(geoPackageId, tableName), null, null, null);
     }
 
     /**
@@ -494,13 +491,33 @@ public class GeometryMetadataDataSource {
      * @param geoPackageId GeoPackage id
      * @param tableName    table name
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count(long geoPackageId, String tableName) {
-        Cursor cursor = queryIds(geoPackageId, tableName);
-        int count = cursor.getCount();
-        cursor.close();
-        return count;
+    public long count(long geoPackageId, String tableName) {
+        return DatabaseUtils.queryNumEntries(db.getAndroidSQLiteDatabase().getDb(), GeometryMetadata.TABLE_NAME, querySQL(), querySQLArgs(geoPackageId, tableName));
+    }
+
+    /**
+     * Get the query SQL for a GeoPackage id and table name
+     *
+     * @return SQL
+     * @since 3.3.1
+     */
+    public String querySQL() {
+        return GeometryMetadata.COLUMN_GEOPACKAGE_ID
+                + " = ? AND " + GeometryMetadata.COLUMN_TABLE_NAME + " = ?";
+    }
+
+    /**
+     * Get the query SQL args for a GeoPackage id and table name
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @return SQL args
+     * @since 3.3.1
+     */
+    public String[] querySQLArgs(long geoPackageId, String tableName) {
+        return new String[]{String.valueOf(geoPackageId), tableName};
     }
 
     /**
@@ -549,9 +566,9 @@ public class GeometryMetadataDataSource {
      * @param tableName   table name
      * @param boundingBox bounding box
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count(String geoPackage, String tableName, BoundingBox boundingBox) {
+    public long count(String geoPackage, String tableName, BoundingBox boundingBox) {
         return count(getGeoPackageId(geoPackage), tableName, boundingBox);
     }
 
@@ -591,12 +608,7 @@ public class GeometryMetadataDataSource {
      * @since 3.3.1
      */
     public Cursor query(long geoPackageId, String tableName, String[] columns, BoundingBox boundingBox) {
-        GeometryEnvelope envelope = new GeometryEnvelope();
-        envelope.setMinX(boundingBox.getMinLongitude());
-        envelope.setMaxX(boundingBox.getMaxLongitude());
-        envelope.setMinY(boundingBox.getMinLatitude());
-        envelope.setMaxY(boundingBox.getMaxLatitude());
-        return query(geoPackageId, tableName, columns, envelope);
+        return query(geoPackageId, tableName, columns, boundingBox.buildEnvelope());
     }
 
     /**
@@ -606,13 +618,10 @@ public class GeometryMetadataDataSource {
      * @param tableName    table name
      * @param boundingBox  bounding box
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count(long geoPackageId, String tableName, BoundingBox boundingBox) {
-        Cursor cursor = queryIds(geoPackageId, tableName, boundingBox);
-        int count = cursor.getCount();
-        cursor.close();
-        return count;
+    public long count(long geoPackageId, String tableName, BoundingBox boundingBox) {
+        return count(geoPackageId, tableName, boundingBox.buildEnvelope());
     }
 
     /**
@@ -661,9 +670,9 @@ public class GeometryMetadataDataSource {
      * @param tableName  table name
      * @param envelope   geometry envelope
      * @return count
-     * @since 1.1.0
+     * @since 3.3.1
      */
-    public int count(String geoPackage, String tableName, GeometryEnvelope envelope) {
+    public long count(String geoPackage, String tableName, GeometryEnvelope envelope) {
         return count(getGeoPackageId(geoPackage), tableName, envelope);
     }
 
@@ -703,23 +712,72 @@ public class GeometryMetadataDataSource {
      * @since 3.3.1
      */
     public Cursor query(long geoPackageId, String tableName, String[] columns, GeometryEnvelope envelope) {
+        return db.query(
+                GeometryMetadata.TABLE_NAME,
+                columns, querySQL(envelope), querySQLArgs(envelope, geoPackageId, tableName), null, null, null);
+    }
+
+    /**
+     * Query for all table geometry metadata count matching the envelope
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param envelope     geometry envelope
+     * @return count
+     * @since 3.3.1
+     */
+    public long count(long geoPackageId, String tableName, GeometryEnvelope envelope) {
+        return DatabaseUtils.queryNumEntries(db.getAndroidSQLiteDatabase().getDb(), GeometryMetadata.TABLE_NAME, querySQL(envelope), querySQLArgs(envelope, geoPackageId, tableName));
+    }
+
+    /**
+     * Get the query SQL for an envelope, GeoPackage id, and table name
+     *
+     * @param envelope geometry envelope
+     * @return SQL
+     * @since 3.3.1
+     */
+    public String querySQL(GeometryEnvelope envelope) {
+
         StringBuilder selection = new StringBuilder();
+
         selection.append(GeometryMetadata.COLUMN_GEOPACKAGE_ID).append(" = ? AND ")
                 .append(GeometryMetadata.COLUMN_TABLE_NAME).append(" = ?");
         selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_X).append(" <= ?");
         selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_X).append(" >= ?");
         selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_Y).append(" <= ?");
         selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_Y).append(" >= ?");
-        int args = 6;
+
         if (envelope.hasZ()) {
-            args += 2;
             selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_Z).append(" <= ?");
             selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_Z).append(" >= ?");
         }
+
         if (envelope.hasM()) {
-            args += 2;
             selection.append(" AND ").append(GeometryMetadata.COLUMN_MIN_M).append(" <= ?");
             selection.append(" AND ").append(GeometryMetadata.COLUMN_MAX_M).append(" >= ?");
+        }
+
+        return selection.toString();
+    }
+
+    /**
+     * Get the query SQL args for an envelope, GeoPackage id, and table name
+     *
+     * @param envelope     geometry envelope
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @return SQL args
+     * @since 3.3.1
+     */
+    public String[] querySQLArgs(GeometryEnvelope envelope, long geoPackageId, String tableName) {
+
+        int args = 6;
+        if (envelope.hasZ()) {
+            args += 2;
+        }
+        if (envelope.hasM()) {
+            args += 2;
         }
 
         double minX = envelope.getMinX() - tolerance;
@@ -747,26 +805,8 @@ public class GeometryMetadataDataSource {
             selectionArgs[argCount++] = String.valueOf(maxM);
             selectionArgs[argCount++] = String.valueOf(minM);
         }
-        Cursor cursor = db.query(
-                GeometryMetadata.TABLE_NAME,
-                columns, selection.toString(), selectionArgs, null, null, null);
-        return cursor;
-    }
 
-    /**
-     * Query for all table geometry metadata count matching the envelope
-     *
-     * @param geoPackageId GeoPackage id
-     * @param tableName    table name
-     * @param envelope     geometry envelope
-     * @return count
-     * @since 1.1.0
-     */
-    public int count(long geoPackageId, String tableName, GeometryEnvelope envelope) {
-        Cursor cursor = queryIds(geoPackageId, tableName, envelope);
-        int count = cursor.getCount();
-        cursor.close();
-        return count;
+        return selectionArgs;
     }
 
     /**

@@ -790,7 +790,7 @@ public class FeatureIndexManager {
                         count = featureTableIndex.count();
                         break;
                     case METADATA:
-                        count = (long) featureIndexer.count();
+                        count = featureIndexer.count();
                         break;
                     case RTREE:
                         count = (long) rTreeIndexTableDao.count();
@@ -1164,7 +1164,7 @@ public class FeatureIndexManager {
                         count = featureTableIndex.count(envelope);
                         break;
                     case METADATA:
-                        count = (long) featureIndexer.count(envelope);
+                        count = featureIndexer.count(envelope);
                         break;
                     case RTREE:
                         count = (long) rTreeIndexTableDao.count(envelope);
