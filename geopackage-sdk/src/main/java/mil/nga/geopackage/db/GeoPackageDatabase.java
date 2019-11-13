@@ -27,9 +27,9 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     private final AndroidBindingsSQLiteDatabase bindingsDb;
 
     /**
-     * Active connection
+     * Use SQLite Android Bindings flag
      */
-    private GeoPackageSQLiteDatabase active;
+    private boolean useBindings = false;
 
     /**
      * Cursor factory
@@ -80,7 +80,6 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
         this.writable = writable;
         this.bindingsWritable = writable;
         this.cursorFactory = cursorFactory;
-        active = this.db;
     }
 
     /**
@@ -95,7 +94,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
         this.writable = database.writable;
         this.bindingsWritable = database.bindingsWritable;
         this.cursorFactory = database.cursorFactory;
-        this.active = database.active;
+        this.useBindings = database.useBindings;
     }
 
     /**
@@ -105,6 +104,12 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * @since 3.3.1
      */
     public GeoPackageSQLiteDatabase getActive() {
+        GeoPackageSQLiteDatabase active = null;
+        if (useBindings) {
+            active = getAndroidBindingsSQLiteDatabase();
+        } else {
+            active = getAndroidSQLiteDatabase();
+        }
         return active;
     }
 
@@ -190,7 +195,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * @since 3.3.1
      */
     public boolean isUseBindings() {
-        return active == bindingsDb;
+        return useBindings;
     }
 
     /**
@@ -221,12 +226,8 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * @since 3.3.1
      */
     public boolean setUseBindings(boolean useBindings) {
-        boolean previous = isUseBindings();
-        if (useBindings) {
-            active = getAndroidBindingsSQLiteDatabase();
-        } else {
-            active = getAndroidSQLiteDatabase();
-        }
+        boolean previous = this.useBindings;
+        this.useBindings = useBindings;
         return previous;
     }
 
@@ -245,7 +246,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public void execSQL(String sql) throws SQLException {
-        active.execSQL(sql);
+        getActive().execSQL(sql);
     }
 
     /**
@@ -253,7 +254,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public void beginTransaction() {
-        active.beginTransaction();
+        getActive().beginTransaction();
     }
 
     /**
@@ -261,7 +262,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public void endTransaction() {
-        active.endTransaction();
+        getActive().endTransaction();
     }
 
     /**
@@ -269,7 +270,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public void endTransaction(boolean successful) {
-        active.endTransaction(successful);
+        getActive().endTransaction(successful);
     }
 
     /**
@@ -277,7 +278,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public void endAndBeginTransaction() {
-        active.endAndBeginTransaction();
+        getActive().endAndBeginTransaction();
     }
 
     /**
@@ -285,7 +286,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public boolean inTransaction() {
-        return active.inTransaction();
+        return getActive().inTransaction();
     }
 
     /**
@@ -293,7 +294,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public int delete(String table, String whereClause, String[] whereArgs) {
-        return active.delete(table, whereClause, whereArgs);
+        return getActive().delete(table, whereClause, whereArgs);
     }
 
     /**
@@ -301,7 +302,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public Cursor rawQuery(String sql, String[] selectionArgs) {
-        return active.rawQuery(sql, selectionArgs);
+        return getActive().rawQuery(sql, selectionArgs);
     }
 
     /**
@@ -320,7 +321,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     public Cursor query(String table, String[] columns, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy) {
-        return active.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+        return getActive().query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
     }
 
     /**
@@ -330,7 +331,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy) {
-        return active.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
+        return getActive().query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
     }
 
     /**
@@ -340,7 +341,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     public Cursor query(String table, String[] columns, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy, String limit) {
-        return active.query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+        return getActive().query(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
     /**
@@ -350,7 +351,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     public Cursor query(String table, String[] columns, String[] columnsAs, String selection,
                         String[] selectionArgs, String groupBy, String having,
                         String orderBy, String limit) {
-        return active.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
+        return getActive().query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
     /**
@@ -358,7 +359,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
-        return active.update(table, values, whereClause, whereArgs);
+        return getActive().update(table, values, whereClause, whereArgs);
     }
 
     /**
@@ -366,7 +367,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public long insertOrThrow(String table, String nullColumnHack, ContentValues values) throws SQLException {
-        return active.insertOrThrow(table, nullColumnHack, values);
+        return getActive().insertOrThrow(table, nullColumnHack, values);
     }
 
     /**
@@ -374,7 +375,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      */
     @Override
     public long insert(String table, String nullColumnHack, ContentValues values) {
-        return active.insert(table, nullColumnHack, values);
+        return getActive().insert(table, nullColumnHack, values);
     }
 
 }

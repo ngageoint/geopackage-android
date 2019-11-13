@@ -12,7 +12,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Java 8
 * Feature Index Manager catches and logs index type errors, attempts next index type
 * Fixed out of bounds iteration errors on Manual Feature Query Results and Feature Index List Results
-* Improved Android Bindings SQLite connection support
+* Improved Android Bindings SQLite connection support, including read only and on demand only connections
 * RTree, Feature Table Index, Metadata, and Manual Feature Query: feature query and count methods with additional arguments, nested single SQL queries
 * Feature Index Manager, single nested SQL queries for features with additional query argument options
 * Feature Index Results and Metadata Results id iteration shortcut to retrieve id without creating full features
