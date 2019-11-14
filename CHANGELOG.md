@@ -4,6 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## 3.4.1 (TBD)
+
+* TBD
+
 ## [3.4.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.4.0) (11-14-2019)
 
 * compile SDK version 29
