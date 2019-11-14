@@ -9,7 +9,7 @@ import mil.nga.geopackage.features.user.FeatureTable;
  * Feature Indexer Id cursor to filter on matching queried ids
  *
  * @author osbornb
- * @since 3.3.1
+ * @since 3.4.0
  */
 public class FeatureIndexerIdCursor extends FeatureCursor {
 

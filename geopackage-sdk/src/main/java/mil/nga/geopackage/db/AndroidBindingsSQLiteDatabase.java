@@ -10,7 +10,7 @@ import org.sqlite.database.sqlite.SQLiteDatabase;
  * Android Bindings SQLiteDatabase
  *
  * @author osbornb
- * @since 3.3.1
+ * @since 3.4.0
  */
 public class AndroidBindingsSQLiteDatabase implements GeoPackageSQLiteDatabase {
 

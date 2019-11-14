@@ -60,7 +60,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      *
      * @param db            database
      * @param cursorFactory cursor factory
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageDatabase(SQLiteDatabase db, GeoPackageCursorFactory cursorFactory) {
         this(db, true, cursorFactory);
@@ -72,7 +72,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * @param db            database
      * @param writable      writable flag
      * @param cursorFactory cursor factory
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageDatabase(SQLiteDatabase db, boolean writable, GeoPackageCursorFactory cursorFactory) {
         this.db = new AndroidSQLiteDatabase(db);
@@ -86,7 +86,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Copy constructor
      *
      * @param database GeoPackage database
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageDatabase(GeoPackageDatabase database) {
         this.db = database.db;
@@ -101,7 +101,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Get the active connection
      *
      * @return active connection
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageSQLiteDatabase getActive() {
         GeoPackageSQLiteDatabase active = null;
@@ -117,7 +117,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Get the Android SQLite Database connection
      *
      * @return connection
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public AndroidSQLiteDatabase getAndroidSQLiteDatabase() {
         return db;
@@ -127,7 +127,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Get the Android Bindings SQLite Database connection
      *
      * @return connection
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public AndroidBindingsSQLiteDatabase getAndroidBindingsSQLiteDatabase() {
         if (bindingsDb.getDb() == null) {
@@ -182,7 +182,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Get the SQLite bindings database connection
      *
      * @return connection
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public org.sqlite.database.sqlite.SQLiteDatabase getBindingsDb() {
         return getAndroidBindingsSQLiteDatabase().getDb();
@@ -192,7 +192,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Is SQLite Android Bindings connection enabled
      *
      * @return true if using bindings
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean isUseBindings() {
         return useBindings;
@@ -202,7 +202,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Is the SQLite database connection writable
      *
      * @return true if writable
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean isWritable() {
         return writable;
@@ -212,7 +212,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Is the SQLite bindings database connection writable
      *
      * @return true if writable
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean isBindingsWritable() {
         return bindingsWritable;
@@ -223,7 +223,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      *
      * @param useBindings true to use bindings connection, false for standard
      * @return previous bindings value
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean setUseBindings(boolean useBindings) {
         boolean previous = this.useBindings;
@@ -235,7 +235,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Copy the database, maintaining the same connections but with the ability to change the active used connection
      *
      * @return database
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageDatabase copy() {
         return new GeoPackageDatabase(this);

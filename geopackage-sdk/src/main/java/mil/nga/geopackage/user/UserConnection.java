@@ -42,7 +42,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      * Get the database
      *
      * @return database
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageDatabase getDatabase() {
         return database;

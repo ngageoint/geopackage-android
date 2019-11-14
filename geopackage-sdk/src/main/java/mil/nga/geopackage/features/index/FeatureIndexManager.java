@@ -184,7 +184,7 @@ public class FeatureIndexManager {
      * Is the continue on error flag enabled
      *
      * @return continue on error
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean isContinueOnError() {
         return continueOnError;
@@ -194,7 +194,7 @@ public class FeatureIndexManager {
      * Set the continue on error flag
      *
      * @param continueOnError continue on error
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public void setContinueOnError(boolean continueOnError) {
         this.continueOnError = continueOnError;
@@ -818,7 +818,7 @@ public class FeatureIndexManager {
      *
      * @param fieldValues field values
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -831,7 +831,7 @@ public class FeatureIndexManager {
      *
      * @param fieldValues field values
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -844,7 +844,7 @@ public class FeatureIndexManager {
      *
      * @param where where clause
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(String where) {
         return query(where, null);
@@ -855,7 +855,7 @@ public class FeatureIndexManager {
      *
      * @param where where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(String where) {
         return count(where, null);
@@ -867,7 +867,7 @@ public class FeatureIndexManager {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(String where, String[] whereArgs) {
         FeatureIndexResults results = null;
@@ -916,7 +916,7 @@ public class FeatureIndexManager {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(String where, String[] whereArgs) {
         Long count = null;
@@ -1062,7 +1062,7 @@ public class FeatureIndexManager {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(BoundingBox boundingBox,
                                      Map<String, Object> fieldValues) {
@@ -1076,7 +1076,7 @@ public class FeatureIndexManager {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox,
                       Map<String, Object> fieldValues) {
@@ -1090,7 +1090,7 @@ public class FeatureIndexManager {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(BoundingBox boundingBox, String where) {
         return query(boundingBox, where, null);
@@ -1103,7 +1103,7 @@ public class FeatureIndexManager {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, String where) {
         return count(boundingBox, where, null);
@@ -1117,7 +1117,7 @@ public class FeatureIndexManager {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(BoundingBox boundingBox, String where,
                                      String[] whereArgs) {
@@ -1132,7 +1132,7 @@ public class FeatureIndexManager {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, String where,
                       String[] whereArgs) {
@@ -1193,7 +1193,7 @@ public class FeatureIndexManager {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(GeometryEnvelope envelope,
                                      Map<String, Object> fieldValues) {
@@ -1208,7 +1208,7 @@ public class FeatureIndexManager {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(GeometryEnvelope envelope,
                       Map<String, Object> fieldValues) {
@@ -1223,7 +1223,7 @@ public class FeatureIndexManager {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(GeometryEnvelope envelope, String where) {
         return query(envelope, where, null);
@@ -1235,7 +1235,7 @@ public class FeatureIndexManager {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(GeometryEnvelope envelope, String where) {
         return count(envelope, where, null);
@@ -1248,7 +1248,7 @@ public class FeatureIndexManager {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(GeometryEnvelope envelope, String where,
                                      String[] whereArgs) {
@@ -1297,7 +1297,7 @@ public class FeatureIndexManager {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(GeometryEnvelope envelope, String where,
                       String[] whereArgs) {
@@ -1372,7 +1372,7 @@ public class FeatureIndexManager {
      * @param projection  projection
      * @param fieldValues field values
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(BoundingBox boundingBox,
                                      Projection projection, Map<String, Object> fieldValues) {
@@ -1389,7 +1389,7 @@ public class FeatureIndexManager {
      * @param projection  projection
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, Projection projection,
                       Map<String, Object> fieldValues) {
@@ -1406,7 +1406,7 @@ public class FeatureIndexManager {
      * @param projection  projection
      * @param where       where clause
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(BoundingBox boundingBox,
                                      Projection projection, String where) {
@@ -1421,7 +1421,7 @@ public class FeatureIndexManager {
      * @param projection  projection
      * @param where       where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, Projection projection,
                       String where) {
@@ -1437,7 +1437,7 @@ public class FeatureIndexManager {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature index results, close when done
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexResults query(BoundingBox boundingBox,
                                      Projection projection, String where, String[] whereArgs) {
@@ -1455,7 +1455,7 @@ public class FeatureIndexManager {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, Projection projection,
                       String where, String[] whereArgs) {
@@ -1468,7 +1468,7 @@ public class FeatureIndexManager {
      * Get a feature index location to iterate over indexed types
      *
      * @return feature index location
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexLocation getLocation() {
         return new FeatureIndexLocation(this);
@@ -1478,7 +1478,7 @@ public class FeatureIndexManager {
      * Get the first ordered indexed type
      *
      * @return feature index type
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureIndexType getIndexedType() {
 

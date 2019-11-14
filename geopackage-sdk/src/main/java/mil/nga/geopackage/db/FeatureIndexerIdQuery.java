@@ -7,7 +7,7 @@ import java.util.Set;
  * Feature Indexer Id query with nested SQL and arguments
  *
  * @author osbornb
- * @since 3.3.1
+ * @since 3.4.0
  */
 public class FeatureIndexerIdQuery {
 

@@ -44,7 +44,7 @@ public class GeoPackageCursorFactory implements CursorFactory {
      * Is debug log queries enabled
      *
      * @return true if queries are logged at the debug level
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean isDebugLogQueries() {
         return debugLogQueries;
@@ -54,7 +54,7 @@ public class GeoPackageCursorFactory implements CursorFactory {
      * Set the debug log queries flag
      *
      * @param debugLogQueries true to debug log queries
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public void setDebugLogQueries(boolean debugLogQueries) {
         this.debugLogQueries = debugLogQueries;
@@ -112,7 +112,7 @@ public class GeoPackageCursorFactory implements CursorFactory {
      * @param cursor    cursor
      * @param editTable edit table
      * @return cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public Cursor wrapCursor(Cursor cursor, String editTable) {
 
@@ -132,7 +132,7 @@ public class GeoPackageCursorFactory implements CursorFactory {
      * Get the SQLite Android Bindings cursor factory
      *
      * @return bindings cursor factory
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory getBindingsCursorFactory() {
         return new org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory() {

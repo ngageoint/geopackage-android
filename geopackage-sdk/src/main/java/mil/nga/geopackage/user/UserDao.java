@@ -74,7 +74,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      *
      * @param useBindings true to use bindings connection, false for standard
      * @return previous bindings value
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean setUseBindings(boolean useBindings) {
         return db.setUseBindings(useBindings);

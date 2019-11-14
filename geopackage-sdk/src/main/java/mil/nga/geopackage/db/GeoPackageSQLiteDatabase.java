@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
  * GeoPackage SQLiteDatabase interface
  *
  * @author osbornb
- * @since 3.3.1
+ * @since 3.4.0
  */
 public interface GeoPackageSQLiteDatabase {
 

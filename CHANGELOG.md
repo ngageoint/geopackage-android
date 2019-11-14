@@ -4,10 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 3.3.1 (TBD)
+## 3.4.0 (TBD)
 
 * compile SDK version 29
-* geopackage-core version 3.3.1
+* geopackage-core version 3.4.0
 * SQLite Android Bindings version 3300100
 * Java 8
 * Feature Index Manager catches and logs index type errors, attempts next index type

@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
  * Android SQLiteDatabase
  *
  * @author osbornb
- * @since 3.3.1
+ * @since 3.4.0
  */
 public class AndroidSQLiteDatabase implements GeoPackageSQLiteDatabase {
 

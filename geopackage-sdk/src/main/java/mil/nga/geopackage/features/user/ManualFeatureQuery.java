@@ -92,7 +92,7 @@ public class ManualFeatureQuery {
      * Query for features
      *
      * @return feature cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor query() {
         return featureDao.queryForAll();
@@ -121,7 +121,7 @@ public class ManualFeatureQuery {
      *
      * @param fieldValues field values
      * @return feature cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor query(Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -134,7 +134,7 @@ public class ManualFeatureQuery {
      *
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int count(Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -147,7 +147,7 @@ public class ManualFeatureQuery {
      *
      * @param where where clause
      * @return feature cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor query(String where) {
         return featureDao.query(where);
@@ -158,7 +158,7 @@ public class ManualFeatureQuery {
      *
      * @param where where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int count(String where) {
         return featureDao.count(where);
@@ -170,7 +170,7 @@ public class ManualFeatureQuery {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor query(String where, String[] whereArgs) {
         return featureDao.query(where, whereArgs);
@@ -182,7 +182,7 @@ public class ManualFeatureQuery {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int count(String where, String[] whereArgs) {
         return featureDao.count(where, whereArgs);
@@ -280,7 +280,7 @@ public class ManualFeatureQuery {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Map<String, Object> fieldValues) {
@@ -293,7 +293,7 @@ public class ManualFeatureQuery {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox,
                       Map<String, Object> fieldValues) {
@@ -306,7 +306,7 @@ public class ManualFeatureQuery {
      * @param boundingBox bounding box
      * @param where       were clause
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            String where) {
@@ -319,7 +319,7 @@ public class ManualFeatureQuery {
      * @param boundingBox bounding box
      * @param where       were clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, String where) {
         return count(boundingBox, where, null);
@@ -332,7 +332,7 @@ public class ManualFeatureQuery {
      * @param where       were clause
      * @param whereArgs   where arguments
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            String where, String[] whereArgs) {
@@ -346,7 +346,7 @@ public class ManualFeatureQuery {
      * @param where       were clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, String where,
                       String[] whereArgs) {
@@ -390,7 +390,7 @@ public class ManualFeatureQuery {
      * @param projection  projection
      * @param fieldValues field values
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Projection projection, Map<String, Object> fieldValues) {
@@ -407,7 +407,7 @@ public class ManualFeatureQuery {
      * @param projection  projection
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, Projection projection,
                       Map<String, Object> fieldValues) {
@@ -424,7 +424,7 @@ public class ManualFeatureQuery {
      * @param projection  projection
      * @param where       were clause
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Projection projection, String where) {
@@ -439,7 +439,7 @@ public class ManualFeatureQuery {
      * @param projection  projection
      * @param where       were clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, Projection projection,
                       String where) {
@@ -455,7 +455,7 @@ public class ManualFeatureQuery {
      * @param where       were clause
      * @param whereArgs   where arguments
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Projection projection, String where, String[] whereArgs) {
@@ -473,7 +473,7 @@ public class ManualFeatureQuery {
      * @param where       were clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox, Projection projection,
                       String where, String[] whereArgs) {
@@ -510,7 +510,7 @@ public class ManualFeatureQuery {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(GeometryEnvelope envelope,
                                            Map<String, Object> fieldValues) {
@@ -524,7 +524,7 @@ public class ManualFeatureQuery {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(GeometryEnvelope envelope,
                       Map<String, Object> fieldValues) {
@@ -538,7 +538,7 @@ public class ManualFeatureQuery {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(GeometryEnvelope envelope,
                                            String where) {
@@ -551,7 +551,7 @@ public class ManualFeatureQuery {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(GeometryEnvelope envelope, String where) {
         return count(envelope, where, null);
@@ -564,7 +564,7 @@ public class ManualFeatureQuery {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(GeometryEnvelope envelope,
                                            String where, String[] whereArgs) {
@@ -579,7 +579,7 @@ public class ManualFeatureQuery {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(GeometryEnvelope envelope, String where,
                       String[] whereArgs) {
@@ -623,7 +623,7 @@ public class ManualFeatureQuery {
      * @param maxY        max y
      * @param fieldValues field values
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(double minX, double minY,
                                            double maxX, double maxY, Map<String, Object> fieldValues) {
@@ -641,7 +641,7 @@ public class ManualFeatureQuery {
      * @param maxY        max y
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(double minX, double minY, double maxX, double maxY,
                       Map<String, Object> fieldValues) {
@@ -659,7 +659,7 @@ public class ManualFeatureQuery {
      * @param maxY  max y
      * @param where where clause
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(double minX, double minY,
                                            double maxX, double maxY, String where) {
@@ -675,7 +675,7 @@ public class ManualFeatureQuery {
      * @param maxY  max y
      * @param where where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(double minX, double minY, double maxX, double maxY,
                       String where) {
@@ -692,7 +692,7 @@ public class ManualFeatureQuery {
      * @param where     where clause
      * @param whereArgs where args
      * @return results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public ManualFeatureQueryResults query(double minX, double minY,
                                            double maxX, double maxY, String where, String[] whereArgs) {
@@ -756,7 +756,7 @@ public class ManualFeatureQuery {
      * @param where     where clause
      * @param whereArgs where args
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(double minX, double minY, double maxX, double maxY,
                       String where, String[] whereArgs) {

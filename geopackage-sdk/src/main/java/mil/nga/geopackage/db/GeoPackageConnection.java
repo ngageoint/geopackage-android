@@ -35,7 +35,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * Copy Constructor
      *
      * @param connection GeoPackage connection
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageConnection(GeoPackageConnection connection) {
         this(connection, connection.db);
@@ -46,7 +46,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      *
      * @param connection GeoPackage connection
      * @param db         database
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageConnection(GeoPackageConnection connection, GeoPackageDatabase db) {
         super(connection);
@@ -57,7 +57,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      * Copy method
      *
      * @return connection
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageConnection copy() {
         return new GeoPackageConnection(this);
@@ -68,7 +68,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      *
      * @param db database
      * @return connection
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public GeoPackageConnection copy(GeoPackageDatabase db) {
         return new GeoPackageConnection(this, db);
@@ -88,7 +88,7 @@ public class GeoPackageConnection extends GeoPackageCoreConnection {
      *
      * @param useBindings true to use bindings connection, false for standard
      * @return previous bindings value
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public boolean setUseBindings(boolean useBindings) {
         return db.setUseBindings(useBindings);

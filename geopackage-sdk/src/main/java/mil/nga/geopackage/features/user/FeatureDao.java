@@ -60,7 +60,7 @@ public class FeatureDao extends
      * Constructor, semi copy constructor with separate connection states
      *
      * @param featureDao feature dao
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureDao(FeatureDao featureDao) {
         this(featureDao.getDatabase(), featureDao.getDb(), featureDao.getGeometryColumns(), featureDao.getTable());
@@ -70,7 +70,7 @@ public class FeatureDao extends
      * Copy the feature dao for separate connection states, shares geometry columns and feature table memory
      *
      * @return feature dao
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureDao copy() {
         return new FeatureDao(this);

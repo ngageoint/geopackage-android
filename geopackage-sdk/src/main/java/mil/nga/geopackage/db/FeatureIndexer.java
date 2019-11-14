@@ -387,7 +387,7 @@ public class FeatureIndexer {
      * Query for all Geometry Metadata ids
      *
      * @return geometry metadata cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public Cursor queryIds() {
         return geometryMetadataDataSource.queryIds(featureDao.getDatabase(), featureDao.getTableName());
@@ -397,7 +397,7 @@ public class FeatureIndexer {
      * Query for all Geometry Metadata count
      *
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count() {
         return geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName());
@@ -407,7 +407,7 @@ public class FeatureIndexer {
      * Query for all features
      *
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures() {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -419,7 +419,7 @@ public class FeatureIndexer {
      *
      * @param fieldValues field values
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -432,7 +432,7 @@ public class FeatureIndexer {
      *
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -445,7 +445,7 @@ public class FeatureIndexer {
      *
      * @param where where clause
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(String where) {
         return queryFeatures(where, null);
@@ -456,7 +456,7 @@ public class FeatureIndexer {
      *
      * @param where where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(String where) {
         return countFeatures(where, null);
@@ -468,7 +468,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -481,7 +481,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -533,7 +533,7 @@ public class FeatureIndexer {
      *
      * @param boundingBox bounding box
      * @return geometry metadata cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public Cursor queryIds(BoundingBox boundingBox) {
         return geometryMetadataDataSource.queryIds(featureDao.getDatabase(), featureDao.getTableName(), boundingBox);
@@ -545,7 +545,7 @@ public class FeatureIndexer {
      *
      * @param boundingBox bounding box
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(BoundingBox boundingBox) {
         return geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName(), boundingBox);
@@ -556,7 +556,7 @@ public class FeatureIndexer {
      *
      * @param boundingBox bounding box
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox) {
         return queryFeatures(boundingBox.buildEnvelope());
@@ -567,7 +567,7 @@ public class FeatureIndexer {
      *
      * @param boundingBox bounding box
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox) {
         return countFeatures(boundingBox.buildEnvelope());
@@ -579,7 +579,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Map<String, Object> fieldValues) {
@@ -592,7 +592,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox,
                              Map<String, Object> fieldValues) {
@@ -605,7 +605,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        String where) {
@@ -618,7 +618,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, String where) {
         return countFeatures(boundingBox, where, null);
@@ -631,7 +631,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox, String where,
                                        String[] whereArgs) {
@@ -645,7 +645,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, String where,
                              String[] whereArgs) {
@@ -679,7 +679,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param projection  projection of the provided bounding box
      * @return geometry metadata cursor
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public Cursor queryIds(BoundingBox boundingBox,
                            Projection projection) {
@@ -717,7 +717,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param projection  projection
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection) {
@@ -732,7 +732,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param projection  projection
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
@@ -747,7 +747,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param fieldValues field values
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, Map<String, Object> fieldValues) {
@@ -763,7 +763,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection,
                              Map<String, Object> fieldValues) {
@@ -779,7 +779,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param where       where clause
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, String where) {
@@ -793,7 +793,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param where       where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection,
                              String where) {
@@ -808,7 +808,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, String where, String[] whereArgs) {
@@ -825,7 +825,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection,
                              String where, String[] whereArgs) {
@@ -861,7 +861,7 @@ public class FeatureIndexer {
      *
      * @param envelope geometry envelope
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long count(GeometryEnvelope envelope) {
         return geometryMetadataDataSource.count(featureDao.getDatabase(), featureDao.getTableName(), envelope);
@@ -872,7 +872,7 @@ public class FeatureIndexer {
      *
      * @param envelope geometry envelope
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
@@ -884,7 +884,7 @@ public class FeatureIndexer {
      *
      * @param envelope geometry envelope
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(GeometryEnvelope envelope) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
@@ -897,7 +897,7 @@ public class FeatureIndexer {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        Map<String, Object> fieldValues) {
@@ -912,7 +912,7 @@ public class FeatureIndexer {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(GeometryEnvelope envelope,
                              Map<String, Object> fieldValues) {
@@ -927,7 +927,7 @@ public class FeatureIndexer {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        String where) {
@@ -940,7 +940,7 @@ public class FeatureIndexer {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(GeometryEnvelope envelope, String where) {
         return countFeatures(envelope, where, null);
@@ -953,7 +953,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature results
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        String where, String[] whereArgs) {
@@ -968,7 +968,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public int countFeatures(GeometryEnvelope envelope, String where,
                              String[] whereArgs) {
@@ -1010,7 +1010,7 @@ public class FeatureIndexer {
      *
      * @param cursor cursor
      * @return geometry id
-     * @since 3.3.1
+     * @since 3.4.0
      */
     public long getGeometryId(Cursor cursor) {
         return GeometryMetadataDataSource.getId(cursor);
