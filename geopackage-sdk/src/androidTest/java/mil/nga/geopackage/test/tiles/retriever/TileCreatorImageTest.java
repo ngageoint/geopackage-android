@@ -6,6 +6,7 @@ import android.graphics.Color;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ import mil.nga.sf.proj.ProjectionFactory;
  *
  * @author osbornb
  */
+@Ignore // remove to run
 public class TileCreatorImageTest extends LoadGeoPackageTestCase {
 
     private final int COLOR_TOLERANCE = 19;
