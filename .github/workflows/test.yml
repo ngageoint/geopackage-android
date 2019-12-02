@@ -1,0 +1,20 @@
+name: Test
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+
+  test:
+    runs-on: macOS-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v1
+    - name: Run Tests
+      uses: reactivecircus/android-emulator-runner@v1
+      with:
+        api-level: 29
+        script: ./gradlew connectedAndroidTest
