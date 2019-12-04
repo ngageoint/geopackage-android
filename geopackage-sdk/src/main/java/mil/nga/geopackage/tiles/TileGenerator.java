@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory.Options;
+import android.util.Log;
 import android.util.SparseArray;
 
 import org.locationtech.proj4j.units.Units;
@@ -12,6 +13,10 @@ import org.locationtech.proj4j.units.Units;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
@@ -141,6 +146,11 @@ public abstract class TileGenerator {
      * Tile scaling settings
      */
     private TileScaling scaling = null;
+
+    /**
+     * Skip existing tiles
+     */
+    private boolean skipExisting = false;
 
     /**
      * Constructor
@@ -338,6 +348,26 @@ public abstract class TileGenerator {
      */
     public void setScaling(TileScaling scaling) {
         this.scaling = scaling;
+    }
+
+    /**
+     * Is skip existing tiles on
+     *
+     * @return true if skipping existing tiles
+     * @since 3.4.1
+     */
+    public boolean isSkipExisting() {
+        return skipExisting;
+    }
+
+    /**
+     * Set the skip existing tiles flag
+     *
+     * @param skipExisting true to skip existing tiles
+     * @since 3.4.1
+     */
+    public void setSkipExisting(boolean skipExisting) {
+        this.skipExisting = skipExisting;
     }
 
     /**
@@ -776,12 +806,49 @@ public abstract class TileGenerator {
         Integer tileWidth = null;
         Integer tileHeight = null;
 
+        Map<Long, Set<Long>> existingTiles = null;
+        if (update && skipExisting) {
+            existingTiles = new HashMap<>();
+            TileCursor tileCursor = tileDao.queryForTile(zoomLevel);
+            try {
+                while (tileCursor.moveToNext()) {
+                    long column = ((Number) tileCursor
+                            .getValue(TileTable.COLUMN_TILE_COLUMN))
+                            .longValue();
+                    long row = ((Number) tileCursor
+                            .getValue(TileTable.COLUMN_TILE_ROW)).longValue();
+                    Set<Long> columnRows = existingTiles.get(column);
+                    if (columnRows == null) {
+                        columnRows = new HashSet<>();
+                        existingTiles.put(column, columnRows);
+                    }
+                    columnRows.add(row);
+                }
+            } finally {
+                tileCursor.close();
+            }
+            if (existingTiles.isEmpty()) {
+                existingTiles = null;
+            }
+        }
+
         // Download and create the tile and each coordinate
         for (long x = tileGrid.getMinX(); x <= tileGrid.getMaxX(); x++) {
 
             // Check if the progress has been cancelled
             if (progress != null && !progress.isActive()) {
                 break;
+            }
+
+            long tileColumn = x;
+            // Update the column to the local tile grid location
+            if (localTileGrid != null) {
+                tileColumn = (x - tileGrid.getMinX()) + localTileGrid.getMinX();
+            }
+
+            Set<Long> existingColumnRows = null;
+            if (existingTiles != null) {
+                existingColumnRows = existingTiles.get(tileColumn);
             }
 
             for (long y = tileGrid.getMinY(); y <= tileGrid.getMaxY(); y++) {
@@ -791,65 +858,70 @@ public abstract class TileGenerator {
                     break;
                 }
 
-                try {
+                long tileRow = y;
+                // Update the row to the local tile grid location
+                if (localTileGrid != null) {
+                    tileRow = (y - tileGrid.getMinY())
+                            + localTileGrid.getMinY();
+                }
 
-                    // Create the tile
-                    byte[] tileBytes = createTile(zoomLevel, x, y);
+                boolean createTile = true;
+                if (existingColumnRows != null) {
+                    createTile = !existingColumnRows.contains(tileRow);
+                }
 
-                    if (tileBytes != null) {
+                if (createTile) {
+                    try {
 
-                        Bitmap bitmap = null;
+                        // Create the tile
+                        byte[] tileBytes = createTile(zoomLevel, x, y);
 
-                        // Compress the image
-                        if (compressFormat != null) {
-                            bitmap = BitmapConverter.toBitmap(tileBytes, options);
-                            if (bitmap != null) {
-                                tileBytes = BitmapConverter.toBytes(bitmap,
-                                        compressFormat, compressQuality);
+                        if (tileBytes != null) {
+
+                            Bitmap bitmap = null;
+
+                            // Compress the image
+                            if (compressFormat != null) {
+                                bitmap = BitmapConverter.toBitmap(tileBytes, options);
+                                if (bitmap != null) {
+                                    tileBytes = BitmapConverter.toBytes(bitmap,
+                                            compressFormat, compressQuality);
+                                }
+                            }
+
+                            // Create a new tile row
+                            TileRow newRow = tileDao.newRow();
+                            newRow.setZoomLevel(zoomLevel);
+
+                            // If an update, delete an existing row
+                            if (update) {
+                                tileDao.deleteTile(tileColumn, tileRow, zoomLevel);
+                            }
+
+                            newRow.setTileColumn(tileColumn);
+                            newRow.setTileRow(tileRow);
+                            newRow.setTileData(tileBytes);
+                            tileDao.create(newRow);
+
+                            count++;
+
+                            // Determine the tile width and height
+                            if (tileWidth == null) {
+                                if (bitmap == null) {
+                                    bitmap = BitmapConverter.toBitmap(tileBytes,
+                                            options);
+                                }
+                                if (bitmap != null) {
+                                    tileWidth = bitmap.getWidth();
+                                    tileHeight = bitmap.getHeight();
+                                }
                             }
                         }
-
-                        // Create a new tile row
-                        TileRow newRow = tileDao.newRow();
-                        newRow.setZoomLevel(zoomLevel);
-
-                        long tileColumn = x;
-                        long tileRow = y;
-
-                        // Update the column and row to the local tile grid location
-                        if (localTileGrid != null) {
-                            tileColumn = (x - tileGrid.getMinX())
-                                    + localTileGrid.getMinX();
-                            tileRow = (y - tileGrid.getMinY())
-                                    + localTileGrid.getMinY();
-                        }
-
-                        // If an update, delete an existing row
-                        if (update) {
-                            tileDao.deleteTile(tileColumn, tileRow, zoomLevel);
-                        }
-
-                        newRow.setTileColumn(tileColumn);
-                        newRow.setTileRow(tileRow);
-                        newRow.setTileData(tileBytes);
-                        tileDao.create(newRow);
-
-                        count++;
-
-                        // Determine the tile width and height
-                        if (tileWidth == null) {
-                            if (bitmap == null) {
-                                bitmap = BitmapConverter.toBitmap(tileBytes,
-                                        options);
-                            }
-                            if (bitmap != null) {
-                                tileWidth = bitmap.getWidth();
-                                tileHeight = bitmap.getHeight();
-                            }
-                        }
+                    } catch (Exception e) {
+                        Log.w(TileGenerator.class.getSimpleName(), "Failed to create tile. Zoom: "
+                                + zoomLevel + ", x: " + x + ", y: " + y, e);
+                        // Skip this tile, don't increase count
                     }
-                } catch (Exception e) {
-                    // Skip this tile, don't increase count
                 }
 
                 // Update the progress count, even on failures
@@ -863,7 +935,8 @@ public abstract class TileGenerator {
 
         // If none of the tiles were translated into a bitmap with dimensions,
         // delete them
-        if (tileWidth == null || tileHeight == null) {
+        if ((tileWidth == null || tileHeight == null)
+                && existingTiles == null) {
             count = 0;
 
             StringBuilder where = new StringBuilder();
