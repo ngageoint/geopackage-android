@@ -5,13 +5,12 @@ import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 
 /**
- * GeoPackage Tile Retriever, assumes the Google Maps API zoom level
- * and grid
+ * XYZ GeoPackage Tile Retriever, assumes XYZ tiles
  *
  * @author osbornb
- * @since 1.2.0
+ * @since 3.5.0
  */
-public class GoogleAPIGeoPackageTileRetriever implements TileRetriever {
+public class XYZGeoPackageTileRetriever implements TileRetriever {
 
     /**
      * Tile data access object
@@ -23,7 +22,7 @@ public class GoogleAPIGeoPackageTileRetriever implements TileRetriever {
      *
      * @param tileDao tile dao
      */
-    public GoogleAPIGeoPackageTileRetriever(TileDao tileDao) {
+    public XYZGeoPackageTileRetriever(TileDao tileDao) {
         this.tileDao = tileDao;
     }
 

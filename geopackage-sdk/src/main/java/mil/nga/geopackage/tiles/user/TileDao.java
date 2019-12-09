@@ -567,11 +567,12 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     }
 
     /**
-     * Determine if the tiles are in the Google tile coordinate format
+     * Determine if the tiles are in the XYZ tile coordinate format
      *
-     * @return google tiles flag
+     * @return true if XYZ tile format
+     * @since 3.5.0
      */
-    public boolean isGoogleTiles() {
+    public boolean isXYZTiles() {
 
         // Convert the bounding box to wgs84
         BoundingBox boundingBox = tileMatrixSet.getBoundingBox();
@@ -579,7 +580,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
                 projection.getTransformation(
                         ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM));
 
-        boolean googleTiles = false;
+        boolean xyzTiles = false;
 
         // Verify the bounds are the entire world
         if (wgs84BoundingBox.getMinLatitude() <= ProjectionConstants.WEB_MERCATOR_MIN_LAT_RANGE
@@ -587,7 +588,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
                 && wgs84BoundingBox.getMinLongitude() <= -ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH
                 && wgs84BoundingBox.getMaxLongitude() >= ProjectionConstants.WGS84_HALF_WORLD_LON_WIDTH) {
 
-            googleTiles = true;
+            xyzTiles = true;
 
             // Verify each tile matrix is the correct width and height
             for (TileMatrix tileMatrix : tileMatrices) {
@@ -596,13 +597,13 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
                         .tilesPerSide((int) zoomLevel);
                 if (tileMatrix.getMatrixWidth() != tilesPerSide
                         || tileMatrix.getMatrixHeight() != tilesPerSide) {
-                    googleTiles = false;
+                    xyzTiles = false;
                     break;
                 }
             }
         }
 
-        return googleTiles;
+        return xyzTiles;
     }
 
 }
