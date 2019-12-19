@@ -32,7 +32,7 @@ public class MediaRow extends UserCustomRow {
      * @param userCustomRow user custom row
      */
     public MediaRow(UserCustomRow userCustomRow) {
-        super(userCustomRow.getTable(), userCustomRow.getRowColumnTypes(),
+        super(userCustomRow.getTable(), userCustomRow.getColumns(), userCustomRow.getRowColumnTypes(),
                 userCustomRow.getValues());
     }
 
@@ -59,7 +59,7 @@ public class MediaRow extends UserCustomRow {
      * @return id column index
      */
     public int getIdColumnIndex() {
-        return getTable().getIdColumnIndex();
+        return getColumns().getPkColumnIndex();
     }
 
     /**
@@ -68,7 +68,7 @@ public class MediaRow extends UserCustomRow {
      * @return id column
      */
     public UserCustomColumn getIdColumn() {
-        return getTable().getIdColumn();
+        return getColumns().getPkColumn();
     }
 
     /**
@@ -86,7 +86,7 @@ public class MediaRow extends UserCustomRow {
      * @return data column index
      */
     public int getDataColumnIndex() {
-        return getTable().getDataColumnIndex();
+        return getColumns().getColumnIndex(MediaTable.COLUMN_DATA);
     }
 
     /**
@@ -95,7 +95,7 @@ public class MediaRow extends UserCustomRow {
      * @return data column
      */
     public UserCustomColumn getDataColumn() {
-        return getTable().getDataColumn();
+        return getColumns().getColumn(MediaTable.COLUMN_DATA);
     }
 
     /**
@@ -190,7 +190,7 @@ public class MediaRow extends UserCustomRow {
      * @return content type column index
      */
     public int getContentTypeColumnIndex() {
-        return getTable().getContentTypeColumnIndex();
+        return getColumns().getColumnIndex(MediaTable.COLUMN_CONTENT_TYPE);
     }
 
     /**
@@ -199,7 +199,7 @@ public class MediaRow extends UserCustomRow {
      * @return content type column
      */
     public UserCustomColumn getContentTypeColumn() {
-        return getTable().getContentTypeColumn();
+        return getColumns().getColumn(MediaTable.COLUMN_CONTENT_TYPE);
     }
 
     /**

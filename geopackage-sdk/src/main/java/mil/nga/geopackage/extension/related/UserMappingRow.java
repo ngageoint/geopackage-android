@@ -26,7 +26,7 @@ public class UserMappingRow extends UserCustomRow {
      * @param userCustomRow user custom row
      */
     public UserMappingRow(UserCustomRow userCustomRow) {
-        super(userCustomRow.getTable(), userCustomRow.getRowColumnTypes(),
+        super(userCustomRow.getTable(), userCustomRow.getColumns(), userCustomRow.getRowColumnTypes(),
                 userCustomRow.getValues());
     }
 
@@ -53,7 +53,7 @@ public class UserMappingRow extends UserCustomRow {
      * @return base ID column index
      */
     public int getBaseIdColumnIndex() {
-        return getTable().getBaseIdColumnIndex();
+        return getColumns().getColumnIndex(UserMappingTable.COLUMN_BASE_ID);
     }
 
     /**
@@ -62,7 +62,7 @@ public class UserMappingRow extends UserCustomRow {
      * @return base ID column
      */
     public UserCustomColumn getBaseIdColumn() {
-        return getTable().getBaseIdColumn();
+        return getColumns().getColumn(UserMappingTable.COLUMN_BASE_ID);
     }
 
     /**
@@ -89,7 +89,7 @@ public class UserMappingRow extends UserCustomRow {
      * @return related ID column index
      */
     public int getRelatedIdColumnIndex() {
-        return getTable().getRelatedIdColumnIndex();
+        return getColumns().getColumnIndex(UserMappingTable.COLUMN_RELATED_ID);
     }
 
     /**
@@ -98,7 +98,7 @@ public class UserMappingRow extends UserCustomRow {
      * @return related ID column
      */
     public UserCustomColumn getRelatedIdColumn() {
-        return getTable().getRelatedIdColumn();
+        return getColumns().getColumn(UserMappingTable.COLUMN_RELATED_ID);
     }
 
     /**

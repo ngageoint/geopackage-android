@@ -26,11 +26,13 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
      * Constructor
      *
      * @param table       table
+     * @param columns     columns
      * @param columnTypes column types
      * @param values      values
+     * @since 3.5.0
      */
-    protected UserRow(TTable table, int[] columnTypes, Object[] values) {
-        super(table, columnTypes, values);
+    protected UserRow(TTable table, UserColumns<TColumn> columns, int[] columnTypes, Object[] values) {
+        super(table, columns, columnTypes, values);
     }
 
     /**
@@ -59,7 +61,7 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
     public ContentValues toContentValues() {
 
         ContentValues contentValues = new ContentValues();
-        for (TColumn column : table.getColumns()) {
+        for (TColumn column : columns.getColumns()) {
 
             if (!column.isPrimaryKey()) {
 

@@ -63,7 +63,7 @@ public class IconRow extends MediaRow {
      * @return name column index
      */
     public int getNameColumnIndex() {
-        return getTable().getNameColumnIndex();
+        return getColumns().getColumnIndex(IconTable.COLUMN_NAME);
     }
 
     /**
@@ -72,7 +72,7 @@ public class IconRow extends MediaRow {
      * @return name column
      */
     public UserCustomColumn getNameColumn() {
-        return getTable().getNameColumn();
+        return getColumns().getColumn(IconTable.COLUMN_NAME);
     }
 
     /**
@@ -99,7 +99,7 @@ public class IconRow extends MediaRow {
      * @return description column index
      */
     public int getDescriptionColumnIndex() {
-        return getTable().getDescriptionColumnIndex();
+        return getColumns().getColumnIndex(IconTable.COLUMN_DESCRIPTION);
     }
 
     /**
@@ -108,7 +108,7 @@ public class IconRow extends MediaRow {
      * @return description column
      */
     public UserCustomColumn getDescriptionColumn() {
-        return getTable().getDescriptionColumn();
+        return getColumns().getColumn(IconTable.COLUMN_DESCRIPTION);
     }
 
     /**
@@ -135,7 +135,7 @@ public class IconRow extends MediaRow {
      * @return width column index
      */
     public int getWidthColumnIndex() {
-        return getTable().getWidthColumnIndex();
+        return getColumns().getColumnIndex(IconTable.COLUMN_WIDTH);
     }
 
     /**
@@ -144,7 +144,7 @@ public class IconRow extends MediaRow {
      * @return width column
      */
     public UserCustomColumn getWidthColumn() {
-        return getTable().getWidthColumn();
+        return getColumns().getColumn(IconTable.COLUMN_WIDTH);
     }
 
     /**
@@ -192,7 +192,7 @@ public class IconRow extends MediaRow {
      * @return height column index
      */
     public int getHeightColumnIndex() {
-        return getTable().getHeightColumnIndex();
+        return getColumns().getColumnIndex(IconTable.COLUMN_HEIGHT);
     }
 
     /**
@@ -201,7 +201,7 @@ public class IconRow extends MediaRow {
      * @return height column
      */
     public UserCustomColumn getHeightColumn() {
-        return getTable().getHeightColumn();
+        return getColumns().getColumn(IconTable.COLUMN_HEIGHT);
     }
 
     /**
@@ -287,7 +287,7 @@ public class IconRow extends MediaRow {
      * @return anchor u column index
      */
     public int getAnchorUColumnIndex() {
-        return getTable().getAnchorUColumnIndex();
+        return getColumns().getColumnIndex(IconTable.COLUMN_ANCHOR_U);
     }
 
     /**
@@ -296,7 +296,7 @@ public class IconRow extends MediaRow {
      * @return anchor u column
      */
     public UserCustomColumn getAnchorUColumn() {
-        return getTable().getAnchorUColumn();
+        return getColumns().getColumn(IconTable.COLUMN_ANCHOR_U);
     }
 
     /**
@@ -339,7 +339,7 @@ public class IconRow extends MediaRow {
      * @return anchor v column index
      */
     public int getAnchorVColumnIndex() {
-        return getTable().getAnchorVColumnIndex();
+        return getColumns().getColumnIndex(IconTable.COLUMN_ANCHOR_V);
     }
 
     /**
@@ -348,7 +348,7 @@ public class IconRow extends MediaRow {
      * @return anchor v column
      */
     public UserCustomColumn getAnchorVColumn() {
-        return getTable().getAnchorVColumn();
+        return getColumns().getColumn(IconTable.COLUMN_ANCHOR_V);
     }
 
     /**

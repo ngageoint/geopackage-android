@@ -192,6 +192,14 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      * {@inheritDoc}
      */
     @Override
+    public UserColumns<TColumn> getColumns() {
+        return cursor.getColumns();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int getCount() {
         return invalidPositions.size();
     }
@@ -224,7 +232,7 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      */
     @Override
     public Object getValue(int index) {
-        return getValue(getTable().getColumn(index));
+        return getValue(getColumns().getColumn(index));
     }
 
     /**
@@ -232,7 +240,7 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      */
     @Override
     public Object getValue(String columnName) {
-        return getValue(getTable().getColumn(columnName));
+        return getValue(getColumns().getColumn(columnName));
     }
 
     /**
@@ -242,10 +250,18 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
     public long getId() {
         long id = -1;
 
-        TColumn pkColumn = getTable().getPkColumn();
+        TColumn pkColumn = getColumns().getPkColumn();
         if (pkColumn == null) {
-            throw new GeoPackageException(
-                    "No primary key column for table: " + getTable().getTableName());
+            StringBuilder error = new StringBuilder(
+                    "No primary key column in ");
+            if (getColumns().isCustom()) {
+                error.append("custom specified table columns. ");
+            }
+            error.append("table: " + getColumns().getTableName());
+            if (getColumns().isCustom()) {
+                error.append(", columns: " + getColumns().getColumnNames());
+            }
+            throw new GeoPackageException(error.toString());
         }
 
         Object objectValue = getValue(pkColumn);
@@ -253,10 +269,10 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
             id = ((Number) objectValue).longValue();
         } else {
             throw new GeoPackageException(
-                    "Primary Key value was not a number. Table: "
-                            + getTable().getTableName() + ", Column Index: "
-                            + pkColumn.getIndex() + ", Column Name: "
-                            + pkColumn.getName() + ", Value: " + objectValue);
+                    "Primary Key value was not a number. table: "
+                            + getColumns().getTableName() + ", index: "
+                            + pkColumn.getIndex() + ", name: "
+                            + pkColumn.getName() + ", value: " + objectValue);
         }
 
         return id;

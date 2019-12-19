@@ -16,7 +16,7 @@ public class RTreeIndexTableRow extends UserCustomRow {
      * @param userCustomRow user custom row
      */
     RTreeIndexTableRow(UserCustomRow userCustomRow) {
-        super(userCustomRow.getTable(), userCustomRow.getRowColumnTypes(),
+        super(userCustomRow.getTable(), userCustomRow.getColumns(), userCustomRow.getRowColumnTypes(),
                 userCustomRow.getValues());
     }
 

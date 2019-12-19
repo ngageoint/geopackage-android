@@ -29,6 +29,11 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     private TTable table;
 
     /**
+     * Columns
+     */
+    private final UserColumns<TColumn> columns;
+
+    /**
      * Invalid cursor positions due to large sized blobs
      */
     private Set<Integer> invalidPositions = new LinkedHashSet<>();
@@ -55,8 +60,42 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * @param cursor cursor
      */
     protected UserCursor(TTable table, Cursor cursor) {
+        this(table, table.getUserColumns(), cursor);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param table   table
+     * @param columns columns
+     * @param cursor  cursor
+     * @since 3.5.0
+     */
+    protected UserCursor(TTable table, String[] columns, Cursor cursor) {
+        super(cursor);
+        UserColumns<TColumn> userColumns = null;
+        if (columns != null) {
+            userColumns = table.createUserColumns(columns);
+        } else {
+            userColumns = table.getUserColumns();
+        }
+        this.table = table;
+        this.columns = userColumns;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param table   table
+     * @param columns columns
+     * @param cursor  cursor
+     * @since 3.5.0
+     */
+    protected UserCursor(TTable table, UserColumns<TColumn> columns,
+                         Cursor cursor) {
         super(cursor);
         this.table = table;
+        this.columns = columns;
     }
 
     /**
@@ -64,7 +103,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      */
     @Override
     public Object getValue(TColumn column) {
-        return getValue(column.getIndex(), column.getDataType());
+        return getValue(columns.getColumnIndex(column.getName()), column.getDataType());
     }
 
     /**
@@ -72,7 +111,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      */
     @Override
     public Object getValue(int index) {
-        return getValue(table.getColumn(index));
+        return getValue(index, columns.getColumn(index).getDataType());
     }
 
     /**
@@ -80,7 +119,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      */
     @Override
     public Object getValue(String columnName) {
-        return getValue(table.getColumn(columnName));
+        return getValue(columns.getColumnIndex(columnName));
     }
 
     /**
@@ -90,10 +129,18 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     public long getId() {
         long id = -1;
 
-        TColumn pkColumn = table.getPkColumn();
+        TColumn pkColumn = columns.getPkColumn();
         if (pkColumn == null) {
-            throw new GeoPackageException(
-                    "No primary key column for table: " + table.getTableName());
+            StringBuilder error = new StringBuilder(
+                    "No primary key column in ");
+            if (columns.isCustom()) {
+                error.append("custom specified table columns. ");
+            }
+            error.append("table: " + columns.getTableName());
+            if (columns.isCustom()) {
+                error.append(", columns: " + columns.getColumnNames());
+            }
+            throw new GeoPackageException(error.toString());
         }
 
         Object objectValue = getValue(pkColumn);
@@ -101,10 +148,10 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
             id = ((Number) objectValue).longValue();
         } else {
             throw new GeoPackageException(
-                    "Primary Key value was not a number. Table: "
-                            + table.getTableName() + ", Column Index: "
-                            + pkColumn.getIndex() + ", Column Name: "
-                            + pkColumn.getName() + ", Value: " + objectValue);
+                    "Primary Key value was not a number. table: "
+                            + columns.getTableName() + ", index: "
+                            + pkColumn.getIndex() + ", name: "
+                            + pkColumn.getName() + ", value: " + objectValue);
         }
 
         return id;
@@ -126,6 +173,14 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     @Override
     public TTable getTable() {
         return table;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserColumns<TColumn> getColumns() {
+        return columns;
     }
 
     /**
@@ -183,35 +238,30 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      */
     private TRow getCurrentRow() {
 
-        TRow row = null;
+        int[] columnTypes = new int[columns.columnCount()];
+        Object[] values = new Object[columns.columnCount()];
 
-        if (table != null) {
+        boolean valid = true;
 
-            int[] columnTypes = new int[table.columnCount()];
-            Object[] values = new Object[table.columnCount()];
+        for (int index = 0; index < columns.columnCount(); index++) {
+            TColumn column = columns.getColumn(index);
 
-            boolean valid = true;
+            int columnType = getType(index);
 
-            for (TColumn column : table.getColumns()) {
-
-                int index = column.getIndex();
-                int columnType = getType(index);
-
-                if (column.isPrimaryKey() && columnType == FIELD_TYPE_NULL) {
-                    valid = false;
-                }
-
-                columnTypes[index] = columnType;
-                values[index] = getValue(column);
-
+            if (column.isPrimaryKey() && columnType == FIELD_TYPE_NULL) {
+                valid = false;
             }
 
-            row = getRow(columnTypes, values);
+            columnTypes[index] = columnType;
+            values[index] = getValue(column);
 
-            if (!valid) {
-                invalidPositions.add(getPosition());
-                row.setValid(false);
-            }
+        }
+
+        TRow row = getRow(columnTypes, values);
+
+        if (!valid) {
+            invalidPositions.add(getPosition());
+            row.setValid(false);
         }
 
         return row;
@@ -283,7 +333,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
             super.close();
 
             // Set the blob columns to return as null
-            List<TColumn> blobColumns = dao.getTable().columnsOfType(GeoPackageDataType.BLOB);
+            List<TColumn> blobColumns = columns.columnsOfType(GeoPackageDataType.BLOB);
             String[] columnsAs = dao.buildColumnsAsNull(blobColumns);
             query.set(UserQueryParamType.COLUMNS_AS, columnsAs);
 

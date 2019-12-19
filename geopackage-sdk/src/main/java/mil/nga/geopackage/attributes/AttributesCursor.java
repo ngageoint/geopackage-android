@@ -24,7 +24,20 @@ public class AttributesCursor extends
      * @param cursor cursor
      */
     public AttributesCursor(AttributesTable table, Cursor cursor) {
-        super(table, cursor);
+        this(table, null, cursor);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param table   attributes table
+     * @param columns columns
+     * @param cursor  cursor
+     * @since 3.5.0
+     */
+    public AttributesCursor(AttributesTable table, String[] columns,
+                            Cursor cursor) {
+        super(table, columns, cursor);
     }
 
     /**
@@ -32,7 +45,15 @@ public class AttributesCursor extends
      */
     @Override
     public AttributesRow getRow(int[] columnTypes, Object[] values) {
-        return new AttributesRow(getTable(), columnTypes, values);
+        return new AttributesRow(getTable(), getColumns(), columnTypes, values);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AttributesColumns getColumns() {
+        return (AttributesColumns) super.getColumns();
     }
 
     /**

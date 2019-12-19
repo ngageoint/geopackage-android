@@ -194,9 +194,18 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * {@inheritDoc}
      */
     @Override
-    public UserCustomCursor queryForAll() {
+    public UserCustomCursor query() {
         validateRTree();
-        return super.queryForAll();
+        return super.query();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserCustomCursor query(String[] columns) {
+        validateRTree();
+        return super.query(columns);
     }
 
     /**
@@ -206,6 +215,16 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public UserCustomCursor query(String where, String[] whereArgs) {
         validateRTree();
         return super.query(where, whereArgs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserCustomCursor query(String[] columns, String where,
+                                  String[] whereArgs) {
+        validateRTree();
+        return super.query(columns, where, whereArgs);
     }
 
     /**
@@ -229,6 +248,18 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for all features
+     *
+     * @param columns columns
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns) {
+        validateRTree();
+        return featureDao.queryIn(columns, queryIdsSQL());
+    }
+
+    /**
      * Query for features
      *
      * @param fieldValues field values
@@ -238,6 +269,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(Map<String, Object> fieldValues) {
         validateRTree();
         return featureDao.queryIn(queryIdsSQL(), fieldValues);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param columns     columns
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       Map<String, Object> fieldValues) {
+        validateRTree();
+        return featureDao.queryIn(columns, queryIdsSQL(), fieldValues);
     }
 
     /**
@@ -264,6 +309,18 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for features
+     *
+     * @param columns columns
+     * @param where   where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, String where) {
+        return queryFeatures(columns, where, null);
+    }
+
+    /**
      * Count features
      *
      * @param where where clause
@@ -285,6 +342,21 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(String where, String[] whereArgs) {
         validateRTree();
         return featureDao.queryIn(queryIdsSQL(), where, whereArgs);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param columns   columns
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, String where,
+                                       String[] whereArgs) {
+        validateRTree();
+        return featureDao.queryIn(columns, queryIdsSQL(), where, whereArgs);
     }
 
     /**
@@ -342,6 +414,19 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for rows within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @return results
+     * @since 3.5.0
+     */
+    public UserCustomCursor query(String[] columns,
+                                  BoundingBox boundingBox) {
+        return query(columns, boundingBox.buildEnvelope());
+    }
+
+    /**
      * Count the rows within the bounding box
      *
      * @param boundingBox bounding box
@@ -360,6 +445,19 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox) {
         return queryFeatures(boundingBox.buildEnvelope());
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox) {
+        return queryFeatures(columns, boundingBox.buildEnvelope());
     }
 
     /**
@@ -384,6 +482,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Map<String, Object> fieldValues) {
         return queryFeatures(boundingBox.buildEnvelope(), fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox, Map<String, Object> fieldValues) {
+        return queryFeatures(columns, boundingBox.buildEnvelope(), fieldValues);
     }
 
     /**
@@ -413,6 +525,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox, String where) {
+        return queryFeatures(columns, boundingBox, where, null);
+    }
+
+    /**
      * Count the features within the bounding box
      *
      * @param boundingBox bounding box
@@ -436,6 +562,22 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(BoundingBox boundingBox, String where,
                                        String[] whereArgs) {
         return queryFeatures(boundingBox.buildEnvelope(), where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox, String where, String[] whereArgs) {
+        return queryFeatures(columns, boundingBox.buildEnvelope(), where,
+                whereArgs);
     }
 
     /**
@@ -467,6 +609,22 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for rows within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return results
+     * @since 3.5.0
+     */
+    public UserCustomCursor query(String[] columns, BoundingBox boundingBox,
+                                  Projection projection) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return query(columns, featureBoundingBox);
+    }
+
+    /**
      * Count the rows within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
@@ -492,6 +650,22 @@ public class RTreeIndexTableDao extends UserCustomDao {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
         return queryFeatures(featureBoundingBox);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox, Projection projection) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(columns, featureBoundingBox);
     }
 
     /**
@@ -525,6 +699,24 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox, Projection projection,
+                                       Map<String, Object> fieldValues) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(columns, featureBoundingBox, fieldValues);
+    }
+
+    /**
      * Count the features within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
@@ -552,6 +744,21 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, String where) {
         return queryFeatures(boundingBox, projection, where, null);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox, Projection projection, String where) {
+        return queryFeatures(columns, boundingBox, projection, where, null);
     }
 
     /**
@@ -586,6 +793,25 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       BoundingBox boundingBox, Projection projection, String where,
+                                       String[] whereArgs) {
+        BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(columns, featureBoundingBox, where, whereArgs);
+    }
+
+    /**
      * Count the features within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
@@ -614,6 +840,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for rows within the geometry envelope
+     *
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @return results
+     * @since 3.5.0
+     */
+    public UserCustomCursor query(String[] columns,
+                                  GeometryEnvelope envelope) {
+        return query(columns, envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY());
+    }
+
+    /**
      * Count the rows within the geometry envelope
      *
      * @param envelope geometry envelope
@@ -633,6 +873,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope) {
         return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY());
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       GeometryEnvelope envelope) {
+        return queryFeatures(columns, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
     }
 
@@ -659,6 +913,21 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        Map<String, Object> fieldValues) {
         return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), fieldValues);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns     columns
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       GeometryEnvelope envelope, Map<String, Object> fieldValues) {
+        return queryFeatures(columns, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY(), fieldValues);
     }
 
@@ -690,6 +959,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       GeometryEnvelope envelope, String where) {
+        return queryFeatures(columns, envelope, where, null);
+    }
+
+    /**
      * Count the features within the geometry envelope
      *
      * @param envelope geometry envelope
@@ -713,6 +996,22 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        String where, String[] whereArgs) {
         return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns   columns
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns,
+                                       GeometryEnvelope envelope, String where, String[] whereArgs) {
+        return queryFeatures(columns, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
     }
 
@@ -748,6 +1047,25 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for rows within the bounds
+     *
+     * @param columns columns
+     * @param minX    min x
+     * @param minY    min y
+     * @param maxX    max x
+     * @param maxY    max y
+     * @return results
+     * @since 3.5.0
+     */
+    public UserCustomCursor query(String[] columns, double minX, double minY,
+                                  double maxX, double maxY) {
+        validateRTree();
+        String where = buildWhere(minX, minY, maxX, maxY);
+        String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return query(columns, where, whereArgs);
+    }
+
+    /**
      * Count the rows within the bounds
      *
      * @param minX min x
@@ -778,6 +1096,25 @@ public class RTreeIndexTableDao extends UserCustomDao {
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
         return featureDao.queryIn(queryIdsSQL(where), whereArgs);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param columns columns
+     * @param minX    min x
+     * @param minY    min y
+     * @param maxX    max x
+     * @param maxY    max y
+     * @return results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, double minX,
+                                       double minY, double maxX, double maxY) {
+        validateRTree();
+        String where = buildWhere(minX, minY, maxX, maxY);
+        String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.queryIn(columns, queryIdsSQL(where), whereArgs);
     }
 
     /**
@@ -818,6 +1155,28 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Query for features within the bounds
+     *
+     * @param columns     columns
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, double minX,
+                                       double minY, double maxX, double maxY,
+                                       Map<String, Object> fieldValues) {
+        validateRTree();
+        String where = buildWhere(minX, minY, maxX, maxY);
+        String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.queryIn(columns, queryIdsSQL(where), whereArgs,
+                fieldValues);
+    }
+
+    /**
      * Count the features within the bounds
      *
      * @param minX        min x
@@ -850,6 +1209,23 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public FeatureCursor queryFeatures(double minX, double minY, double maxX,
                                        double maxY, String where) {
         return queryFeatures(minX, minY, maxX, maxY, where, null);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param columns columns
+     * @param minX    min x
+     * @param minY    min y
+     * @param maxX    max x
+     * @param maxY    max y
+     * @param where   where clause
+     * @return results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, double minX,
+                                       double minY, double maxX, double maxY, String where) {
+        return queryFeatures(columns, minX, minY, maxX, maxY, where, null);
     }
 
     /**
@@ -887,6 +1263,29 @@ public class RTreeIndexTableDao extends UserCustomDao {
         String[] whereBoundsArgs = buildWhereArgs(minX, minY, maxX, maxY);
         return featureDao.queryIn(queryIdsSQL(whereBounds), whereBoundsArgs,
                 where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param columns   columns
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, double minX,
+                                       double minY, double maxX, double maxY, String where,
+                                       String[] whereArgs) {
+        validateRTree();
+        String whereBounds = buildWhere(minX, minY, maxX, maxY);
+        String[] whereBoundsArgs = buildWhereArgs(minX, minY, maxX, maxY);
+        return featureDao.queryIn(columns, queryIdsSQL(whereBounds),
+                whereBoundsArgs, where, whereArgs);
     }
 
     /**

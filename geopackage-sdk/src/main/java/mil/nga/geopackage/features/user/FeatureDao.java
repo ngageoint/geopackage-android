@@ -121,7 +121,7 @@ public class FeatureDao extends
     }
 
     /**
-     * The the Geometry Column name
+     * Get the Geometry Column name
      *
      * @return geometry column name
      */
@@ -136,6 +136,36 @@ public class FeatureDao extends
      */
     public GeometryType getGeometryType() {
         return geometryColumns.getGeometryType();
+    }
+
+    /**
+     * Get the Id Column
+     *
+     * @return id column
+     * @since 3.5.0
+     */
+    public FeatureColumn getIdColumn() {
+        return getTable().getPkColumn();
+    }
+
+    /**
+     * Get the Id Column name
+     *
+     * @return id column name
+     * @since 3.5.0
+     */
+    public String getIdColumnName() {
+        return getTable().getPkColumnName();
+    }
+
+    /**
+     * Get the Id and Geometry Column names
+     *
+     * @return column names
+     * @since 3.5.0
+     */
+    public String[] getIdAndGeometryColumnNames() {
+        return getTable().getIdAndGeometryColumnNames();
     }
 
 }

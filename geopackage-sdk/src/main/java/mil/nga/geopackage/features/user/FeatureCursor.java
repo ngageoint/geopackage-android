@@ -28,11 +28,24 @@ public class FeatureCursor extends
     }
 
     /**
+     * Constructor
+     *
+     * @param table   feature table
+     * @param columns columns
+     * @param cursor  cursor
+     * @since 3.5.0
+     */
+    public FeatureCursor(FeatureTable table, String[] columns,
+                         Cursor cursor) {
+        super(table, columns, cursor);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public FeatureRow getRow(int[] columnTypes, Object[] values) {
-        return new FeatureRow(getTable(), columnTypes, values);
+        return new FeatureRow(getTable(), getColumns(), columnTypes, values);
     }
 
     /**
@@ -51,6 +64,14 @@ public class FeatureCursor extends
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FeatureColumns getColumns() {
+        return (FeatureColumns) super.getColumns();
+    }
+
+    /**
      * Get the geometry
      *
      * @return geometry data
@@ -59,7 +80,7 @@ public class FeatureCursor extends
 
         GeoPackageGeometryData geometry = null;
 
-        int columnIndex = getTable().getGeometryColumnIndex();
+        int columnIndex = getColumns().getGeometryIndex();
         int type = getType(columnIndex);
 
         if (type != FIELD_TYPE_NULL) {

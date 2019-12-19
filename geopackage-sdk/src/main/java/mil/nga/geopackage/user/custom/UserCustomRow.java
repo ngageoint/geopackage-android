@@ -14,12 +14,14 @@ public class UserCustomRow extends UserRow<UserCustomColumn, UserCustomTable> {
      * Constructor
      *
      * @param table       user custom table
+     * @param columns     columns
      * @param columnTypes column types
      * @param values      values
+     * @since 3.5.0
      */
-    public UserCustomRow(UserCustomTable table, int[] columnTypes,
+    public UserCustomRow(UserCustomTable table, UserCustomColumns columns, int[] columnTypes,
                          Object[] values) {
-        super(table, columnTypes, values);
+        super(table, columns, columnTypes, values);
     }
 
     /**
@@ -38,6 +40,14 @@ public class UserCustomRow extends UserRow<UserCustomColumn, UserCustomTable> {
      */
     public UserCustomRow(UserCustomRow userCustomRow) {
         super(userCustomRow);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserCustomColumns getColumns() {
+        return (UserCustomColumns) super.getColumns();
     }
 
     /**

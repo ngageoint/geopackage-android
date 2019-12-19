@@ -22,12 +22,15 @@ public class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
     /**
      * Constructor
      *
-     * @param table
-     * @param columnTypes
-     * @param values
+     * @param table       feature table
+     * @param columns     columns
+     * @param columnTypes column types
+     * @param values      values
+     * @since 3.5.0
      */
-    FeatureRow(FeatureTable table, int[] columnTypes, Object[] values) {
-        super(table, columnTypes, values);
+    FeatureRow(FeatureTable table, FeatureColumns columns, int[] columnTypes,
+               Object[] values) {
+        super(table, columns, columnTypes, values);
     }
 
     /**
@@ -50,25 +53,16 @@ public class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
     }
 
     /**
-     * Get the geometry column index
-     *
-     * @return geometry column index
+     * {@inheritDoc}
      */
-    public int getGeometryColumnIndex() {
-        return getTable().getGeometryColumnIndex();
-    }
-
-    /**
-     * Get the geometry feature column
-     *
-     * @return geometry column
-     */
-    public FeatureColumn getGeometryColumn() {
-        return getTable().getGeometryColumn();
+    @Override
+    public FeatureColumns getColumns() {
+        return (FeatureColumns) super.getColumns();
     }
 
     /**
      * {@inheritDoc}
+     * <p>
      * Handles geometry columns
      */
     @Override
@@ -78,6 +72,102 @@ public class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
             value = new GeoPackageGeometryData(bytes);
         }
         super.setValue(index, value);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Handles geometry columns
+     */
+    @Override
+    protected Object copyValue(FeatureColumn column, Object value) {
+
+        Object copyValue = null;
+
+        if (column.isGeometry() && value instanceof GeoPackageGeometryData) {
+
+            GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
+            try {
+                byte[] bytes = geometryData.toBytes();
+                byte[] copyBytes = Arrays.copyOf(bytes, bytes.length);
+                copyValue = new GeoPackageGeometryData(copyBytes);
+            } catch (IOException e) {
+                throw new GeoPackageException(
+                        "Failed to copy Geometry Data bytes. column: "
+                                + column.getName(),
+                        e);
+            }
+
+        } else {
+            copyValue = super.copyValue(column, value);
+        }
+
+        return copyValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Handles geometry columns
+     */
+    @Override
+    protected void columnToContentValue(ContentValues contentValues,
+                                        FeatureColumn column, Object value) {
+
+        if (column.isGeometry()) {
+
+            String columnName = column.getName();
+
+            if (value instanceof GeoPackageGeometryData) {
+                GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
+                try {
+                    contentValues.put(columnName, geometryData.toBytes());
+                } catch (IOException e) {
+                    throw new GeoPackageException(
+                            "Failed to write Geometry Data bytes. column: "
+                                    + columnName,
+                            e);
+                }
+            } else if (value instanceof byte[]) {
+                contentValues.put(columnName, (byte[]) value);
+            } else {
+                throw new GeoPackageException(
+                        "Unsupported update geometry column value type. column: "
+                                + columnName + ", value type: "
+                                + value.getClass().getName());
+            }
+        } else {
+            super.columnToContentValue(contentValues, column, value);
+        }
+
+    }
+
+    /**
+     * Get the geometry column index
+     *
+     * @return geometry column index
+     */
+    public int getGeometryColumnIndex() {
+        return getColumns().getGeometryIndex();
+    }
+
+    /**
+     * Get the geometry feature column
+     *
+     * @return geometry column
+     */
+    public FeatureColumn getGeometryColumn() {
+        return getColumns().getGeometryColumn();
+    }
+
+    /**
+     * Get the geometry column name
+     *
+     * @return geometry column name
+     * @since 3.5.0
+     */
+    public String getGeometryColumnName() {
+        return getColumns().getGeometryColumnName();
     }
 
     /**
@@ -158,68 +248,5 @@ public class FeatureRow extends UserRow<FeatureColumn, FeatureTable> {
         return new FeatureRow(this);
     }
 
-    /**
-     * {@inheritDoc}
-     * Handles geometry columns
-     */
-    @Override
-    protected Object copyValue(FeatureColumn column, Object value) {
-
-        Object copyValue = null;
-
-        if (column.isGeometry() && value instanceof GeoPackageGeometryData) {
-
-            GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
-            try {
-                byte[] bytes = geometryData.toBytes();
-                byte[] copyBytes = Arrays.copyOf(bytes, bytes.length);
-                copyValue = new GeoPackageGeometryData(copyBytes);
-            } catch (IOException e) {
-                throw new GeoPackageException(
-                        "Failed to copy Geometry Data bytes. column: "
-                                + column.getName(), e);
-            }
-
-        } else {
-            copyValue = super.copyValue(column, value);
-        }
-
-        return copyValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     * Handles geometry columns
-     */
-    @Override
-    protected void columnToContentValue(ContentValues contentValues,
-                                        FeatureColumn column, Object value) {
-
-        if (column.isGeometry()) {
-
-            String columnName = column.getName();
-
-            if (value instanceof GeoPackageGeometryData) {
-                GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
-                try {
-                    contentValues.put(columnName, geometryData.toBytes());
-                } catch (IOException e) {
-                    throw new GeoPackageException(
-                            "Failed to write Geometry Data bytes. column: "
-                                    + columnName, e);
-                }
-            } else if (value instanceof byte[]) {
-                contentValues.put(columnName, (byte[]) value);
-            } else {
-                throw new GeoPackageException(
-                        "Unsupported update geometry column value type. column: "
-                                + columnName + ", value type: "
-                                + value.getClass().getName());
-            }
-        } else {
-            super.columnToContentValue(contentValues, column, value);
-        }
-
-    }
 
 }

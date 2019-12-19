@@ -26,7 +26,7 @@ public class SimpleAttributesRow extends UserCustomRow {
      * @param userCustomRow user custom row
      */
     public SimpleAttributesRow(UserCustomRow userCustomRow) {
-        super(userCustomRow.getTable(), userCustomRow.getRowColumnTypes(),
+        super(userCustomRow.getTable(), userCustomRow.getColumns(), userCustomRow.getRowColumnTypes(),
                 userCustomRow.getValues());
     }
 
@@ -53,7 +53,7 @@ public class SimpleAttributesRow extends UserCustomRow {
      * @return id column index
      */
     public int getIdColumnIndex() {
-        return getTable().getIdColumnIndex();
+        return getColumns().getPkColumnIndex();
     }
 
     /**
@@ -62,7 +62,7 @@ public class SimpleAttributesRow extends UserCustomRow {
      * @return id column
      */
     public UserCustomColumn getIdColumn() {
-        return getTable().getIdColumn();
+        return getColumns().getPkColumn();
     }
 
     /**
