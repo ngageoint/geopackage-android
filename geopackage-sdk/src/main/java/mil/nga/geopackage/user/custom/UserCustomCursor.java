@@ -24,7 +24,20 @@ public class UserCustomCursor extends
      * @param cursor cursor
      */
     public UserCustomCursor(UserCustomTable table, Cursor cursor) {
-        super(table, cursor);
+        this(table, null, cursor);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param table   user custom table
+     * @param columns columns
+     * @param cursor  cursor
+     * @since 3.5.0
+     */
+    public UserCustomCursor(UserCustomTable table, String[] columns,
+                            Cursor cursor) {
+        super(table, columns, cursor);
     }
 
     /**
@@ -32,7 +45,15 @@ public class UserCustomCursor extends
      */
     @Override
     public UserCustomRow getRow(int[] columnTypes, Object[] values) {
-        return new UserCustomRow(getTable(), columnTypes, values);
+        return new UserCustomRow(getTable(), getColumns(), columnTypes, values);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserCustomColumns getColumns() {
+        return (UserCustomColumns) super.getColumns();
     }
 
     /**

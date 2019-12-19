@@ -236,6 +236,14 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
         result.setQuery(query);
         if (table != null) {
             result.setTable(table);
+            UserColumns<TColumn> userColumns;
+            String[] columns = query.getColumns();
+            if (columns != null) {
+                userColumns = table.createUserColumns(columns);
+            } else {
+                userColumns = table.getUserColumns();
+            }
+            result.setColumns(userColumns);
         }
         return result;
     }

@@ -22,7 +22,19 @@ public class TileCursor extends UserCursor<TileColumn, TileTable, TileRow> {
      * @param cursor cursor
      */
     public TileCursor(TileTable table, Cursor cursor) {
-        super(table, cursor);
+        this(table, null, cursor);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param table   tile table
+     * @param columns columns
+     * @param cursor  cursor
+     * @since 3.5.0
+     */
+    public TileCursor(TileTable table, String[] columns, Cursor cursor) {
+        super(table, columns, cursor);
     }
 
     /**
@@ -30,7 +42,15 @@ public class TileCursor extends UserCursor<TileColumn, TileTable, TileRow> {
      */
     @Override
     public TileRow getRow(int[] columnTypes, Object[] values) {
-        return new TileRow(getTable(), columnTypes, values);
+        return new TileRow(getTable(), getColumns(), columnTypes, values);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TileColumns getColumns() {
+        return (TileColumns) super.getColumns();
     }
 
     /**

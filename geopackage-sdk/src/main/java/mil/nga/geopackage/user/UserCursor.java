@@ -31,7 +31,7 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     /**
      * Columns
      */
-    private final UserColumns<TColumn> columns;
+    private UserColumns<TColumn> columns;
 
     /**
      * Invalid cursor positions due to large sized blobs
@@ -173,6 +173,16 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     @Override
     public TTable getTable() {
         return table;
+    }
+
+    /**
+     * Set the columns
+     *
+     * @param columns columns
+     * @since 3.5.0
+     */
+    public void setColumns(UserColumns<TColumn> columns) {
+        this.columns = columns;
     }
 
     /**
