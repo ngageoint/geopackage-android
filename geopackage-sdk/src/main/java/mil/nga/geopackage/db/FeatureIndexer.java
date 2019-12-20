@@ -384,6 +384,17 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for all Geometry Metadata
+     *
+     * @param columns columns
+     * @return geometry metadata cursor
+     * @since 3.5.0
+     */
+    public Cursor query(String[] columns) {
+        return geometryMetadataDataSource.query(featureDao.getDatabase(), featureDao.getTableName(), columns);
+    }
+
+    /**
      * Query for all Geometry Metadata ids
      *
      * @return geometry metadata cursor
@@ -415,6 +426,18 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for all features
+     *
+     * @param columns columns
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns) {
+        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
+        return query(columns, idQuery);
+    }
+
+    /**
      * Query for features
      *
      * @param fieldValues field values
@@ -425,6 +448,20 @@ public class FeatureIndexer {
         String where = featureDao.buildWhere(fieldValues.entrySet());
         String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
         return queryFeatures(where, whereArgs);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param columns     columns
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, Map<String, Object> fieldValues) {
+        String where = featureDao.buildWhere(fieldValues.entrySet());
+        String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
+        return queryFeatures(columns, where, whereArgs);
     }
 
     /**
@@ -452,6 +489,18 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features
+     *
+     * @param columns columns
+     * @param where   where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, String where) {
+        return queryFeatures(columns, where, null);
+    }
+
+    /**
      * Count features
      *
      * @param where where clause
@@ -473,6 +522,20 @@ public class FeatureIndexer {
     public FeatureCursor queryFeatures(String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
         return query(idQuery, where, whereArgs);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param columns   columns
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, String where, String[] whereArgs) {
+        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
+        return query(columns, idQuery, where, whereArgs);
     }
 
     /**
@@ -528,6 +591,19 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for Geometry Metadata within the bounding box, projected
+     * correctly
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @return geometry metadata cursor
+     * @since 3.5.0
+     */
+    public Cursor query(String[] columns, BoundingBox boundingBox) {
+        return geometryMetadataDataSource.query(featureDao.getDatabase(), featureDao.getTableName(), columns, boundingBox);
+    }
+
+    /**
      * Query for Geometry Metadata ids within the bounding box, projected
      * correctly
      *
@@ -563,6 +639,18 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox) {
+        return queryFeatures(columns, boundingBox.buildEnvelope());
+    }
+
+    /**
      * Count the features within the bounding box
      *
      * @param boundingBox bounding box
@@ -584,6 +672,20 @@ public class FeatureIndexer {
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Map<String, Object> fieldValues) {
         return queryFeatures(boundingBox.buildEnvelope(), fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox,
+                                       Map<String, Object> fieldValues) {
+        return queryFeatures(columns, boundingBox.buildEnvelope(), fieldValues);
     }
 
     /**
@@ -613,6 +715,20 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox,
+                                       String where) {
+        return queryFeatures(columns, boundingBox, where, null);
+    }
+
+    /**
      * Count the features within the bounding box
      *
      * @param boundingBox bounding box
@@ -636,6 +752,21 @@ public class FeatureIndexer {
     public FeatureCursor queryFeatures(BoundingBox boundingBox, String where,
                                        String[] whereArgs) {
         return queryFeatures(boundingBox.buildEnvelope(), where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox, String where,
+                                       String[] whereArgs) {
+        return queryFeatures(columns, boundingBox.buildEnvelope(), where, whereArgs);
     }
 
     /**
@@ -668,6 +799,27 @@ public class FeatureIndexer {
                 projection);
 
         Cursor cursor = query(featureBoundingBox);
+
+        return cursor;
+    }
+
+    /**
+     * Query for Geometry Metadata within the bounding box in
+     * the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection of the provided bounding box
+     * @return geometry metadata cursor
+     * @since 3.5.0
+     */
+    public Cursor query(String[] columns, BoundingBox boundingBox,
+                        Projection projection) {
+
+        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
+                projection);
+
+        Cursor cursor = query(columns, featureBoundingBox);
 
         return cursor;
     }
@@ -727,6 +879,22 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox,
+                                       Projection projection) {
+        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(columns, featureBoundingBox);
+    }
+
+    /**
      * Count the features within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
@@ -757,6 +925,23 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox,
+                                       Projection projection, Map<String, Object> fieldValues) {
+        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(columns, featureBoundingBox, fieldValues);
+    }
+
+    /**
      * Count the features within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
@@ -784,6 +969,21 @@ public class FeatureIndexer {
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, String where) {
         return queryFeatures(boundingBox, projection, where, null);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox,
+                                       Projection projection, String where) {
+        return queryFeatures(columns, boundingBox, projection, where, null);
     }
 
     /**
@@ -818,6 +1018,24 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, BoundingBox boundingBox,
+                                       Projection projection, String where, String[] whereArgs) {
+        BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
+                projection);
+        return queryFeatures(columns, featureBoundingBox, where, whereArgs);
+    }
+
+    /**
      * Count the features within the bounding box in the provided projection
      *
      * @param boundingBox bounding box
@@ -843,6 +1061,18 @@ public class FeatureIndexer {
      */
     public Cursor query(GeometryEnvelope envelope) {
         return geometryMetadataDataSource.query(featureDao.getDatabase(), featureDao.getTableName(), envelope);
+    }
+
+    /**
+     * Query for Geometry Metadata within the Geometry Envelope
+     *
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @return geometry metadata cursor
+     * @since 3.5.0
+     */
+    public Cursor query(String[] columns, GeometryEnvelope envelope) {
+        return geometryMetadataDataSource.query(featureDao.getDatabase(), featureDao.getTableName(), columns, envelope);
     }
 
     /**
@@ -880,6 +1110,19 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, GeometryEnvelope envelope) {
+        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
+        return query(columns, idQuery);
+    }
+
+    /**
      * Count the features within the geometry envelope
      *
      * @param envelope geometry envelope
@@ -904,6 +1147,22 @@ public class FeatureIndexer {
         String where = featureDao.buildWhere(fieldValues.entrySet());
         String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
         return queryFeatures(envelope, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns     columns
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, GeometryEnvelope envelope,
+                                       Map<String, Object> fieldValues) {
+        String where = featureDao.buildWhere(fieldValues.entrySet());
+        String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
+        return queryFeatures(columns, envelope, where, whereArgs);
     }
 
     /**
@@ -935,6 +1194,20 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, GeometryEnvelope envelope,
+                                       String where) {
+        return queryFeatures(columns, envelope, where, null);
+    }
+
+    /**
      * Count the features within the geometry envelope
      *
      * @param envelope geometry envelope
@@ -959,6 +1232,22 @@ public class FeatureIndexer {
                                        String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
         return query(idQuery, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param columns   columns
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature results
+     * @since 3.5.0
+     */
+    public FeatureCursor queryFeatures(String[] columns, GeometryEnvelope envelope,
+                                       String where, String[] whereArgs) {
+        FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
+        return query(columns, idQuery, where, whereArgs);
     }
 
     /**
@@ -1105,6 +1394,17 @@ public class FeatureIndexer {
     }
 
     /**
+     * Query using the id query
+     *
+     * @param columns columns
+     * @param idQuery id query
+     * @return feature cursor
+     */
+    private FeatureCursor query(String[] columns, FeatureIndexerIdQuery idQuery) {
+        return query(columns, idQuery, null, null);
+    }
+
+    /**
      * Count using the id query
      *
      * @param idQuery id query
@@ -1128,6 +1428,25 @@ public class FeatureIndexer {
             cursor = new FeatureIndexerIdCursor(featureDao.query(where, whereArgs), idQuery);
         } else {
             cursor = featureDao.queryIn(idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
+        }
+        return cursor;
+    }
+
+    /**
+     * Query using the id query and criteria
+     *
+     * @param columns   columns
+     * @param idQuery   id query
+     * @param where     where statement
+     * @param whereArgs where args
+     * @return feature cursor
+     */
+    private FeatureCursor query(String[] columns, FeatureIndexerIdQuery idQuery, String where, String[] whereArgs) {
+        FeatureCursor cursor = null;
+        if (idQuery.aboveMaxArguments(whereArgs)) {
+            cursor = new FeatureIndexerIdCursor(columns, featureDao.query(where, whereArgs), idQuery);
+        } else {
+            cursor = featureDao.queryIn(columns, idQuery.getSql(), idQuery.getArgs(), where, whereArgs);
         }
         return cursor;
     }

@@ -760,8 +760,7 @@ public class FeatureIndexManager {
                                 geoPackageCursor);
                         break;
                     case METADATA:
-                        // TODO handle columns
-                        FeatureCursor geometryMetadataCursor = featureIndexer.queryFeatures();
+                        FeatureCursor geometryMetadataCursor = featureIndexer.queryFeatures(columns);
                         results = new FeatureIndexFeatureResults(geometryMetadataCursor);
                         break;
                     case RTREE:
@@ -934,8 +933,7 @@ public class FeatureIndexManager {
                                 geoPackageCursor);
                         break;
                     case METADATA:
-                        // TODO handle columns
-                        FeatureCursor geometryMetadataCursor = featureIndexer.queryFeatures(where, whereArgs);
+                        FeatureCursor geometryMetadataCursor = featureIndexer.queryFeatures(columns, where, whereArgs);
                         results = new FeatureIndexFeatureResults(geometryMetadataCursor);
                         break;
                     case RTREE:
@@ -1435,8 +1433,7 @@ public class FeatureIndexManager {
                                 geoPackageCursor);
                         break;
                     case METADATA:
-                        // TODO handle columns
-                        FeatureCursor geometryMetadataCursor = featureIndexer.queryFeatures(envelope, where, whereArgs);
+                        FeatureCursor geometryMetadataCursor = featureIndexer.queryFeatures(columns, envelope, where, whereArgs);
                         results = new FeatureIndexFeatureResults(geometryMetadataCursor);
                         break;
                     case RTREE:

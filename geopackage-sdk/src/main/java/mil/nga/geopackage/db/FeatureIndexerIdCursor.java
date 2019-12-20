@@ -31,12 +31,38 @@ public class FeatureIndexerIdCursor extends FeatureCursor {
     /**
      * Constructor
      *
+     * @param columns columns
+     * @param cursor  feature cursor
+     * @param idQuery id query
+     * @since 3.5.0
+     */
+    public FeatureIndexerIdCursor(String[] columns, FeatureCursor cursor, FeatureIndexerIdQuery idQuery) {
+        this(cursor.getTable(), columns, cursor.getWrappedCursor(), idQuery);
+    }
+
+    /**
+     * Constructor
+     *
      * @param table   feature table
      * @param cursor  cursor
      * @param idQuery id query
      */
     public FeatureIndexerIdCursor(FeatureTable table, Cursor cursor, FeatureIndexerIdQuery idQuery) {
         super(table, cursor);
+        this.idQuery = idQuery;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param table   feature table
+     * @param columns columns
+     * @param cursor  cursor
+     * @param idQuery id query
+     * @since 3.5.0
+     */
+    public FeatureIndexerIdCursor(FeatureTable table, String[] columns, Cursor cursor, FeatureIndexerIdQuery idQuery) {
+        super(table, columns, cursor);
         this.idQuery = idQuery;
     }
 
