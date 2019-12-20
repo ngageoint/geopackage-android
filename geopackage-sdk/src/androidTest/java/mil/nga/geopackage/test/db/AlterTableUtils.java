@@ -587,7 +587,7 @@ public class AlterTableUtils {
                         copyTable.getPkColumn().getIndex());
                 TestCase.assertEquals(geometry, table.getGeometryColumn());
                 TestCase.assertEquals(geometry.getName(),
-                        copyTable.getGeometryColumn().getName());
+                        copyTable.getGeometryColumnName());
                 TestCase.assertEquals(geometry.getIndex(),
                         copyTable.getGeometryColumn().getIndex());
 

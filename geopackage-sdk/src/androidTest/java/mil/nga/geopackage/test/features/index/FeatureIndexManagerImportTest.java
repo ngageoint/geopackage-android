@@ -40,7 +40,7 @@ public class FeatureIndexManagerImportTest extends ImportGeoPackageTestCase {
     @Test
     public void testLargeIndex() throws SQLException {
 
-        FeatureIndexManagerUtils.testLargeIndex(activity, geoPackage, 10000);
+        FeatureIndexManagerUtils.testLargeIndex(activity, geoPackage, 10000, false);
 
     }
 

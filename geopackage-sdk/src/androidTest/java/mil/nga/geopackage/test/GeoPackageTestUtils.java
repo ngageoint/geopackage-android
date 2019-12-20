@@ -158,7 +158,7 @@ public class GeoPackageTestUtils {
      *
      * @return
      */
-    private static List<FeatureColumn> getFeatureColumns() {
+    public static List<FeatureColumn> getFeatureColumns() {
         List<FeatureColumn> columns = new ArrayList<FeatureColumn>();
 
         columns.add(FeatureColumn.createColumn(7, "test_text_limited",
