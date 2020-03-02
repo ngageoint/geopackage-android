@@ -1280,14 +1280,12 @@ public abstract class FeatureTiles {
         minLatitude = Math.min(minLatitude, webMercatorBoundingBox.getMinLatitude());
         maxLatitude = Math.max(maxLatitude, webMercatorBoundingBox.getMaxLatitude());
 
-        // Bound with the web mercator limits
-        minLongitude = Math.max(minLongitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
-        maxLongitude = Math.min(maxLongitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
-        minLatitude = Math.max(minLatitude, -1 * ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
-        maxLatitude = Math.min(maxLatitude, ProjectionConstants.WEB_MERCATOR_HALF_WORLD_WIDTH);
-
         BoundingBox expandedBoundingBox = new BoundingBox(minLongitude,
                 minLatitude, maxLongitude, maxLatitude);
+
+        // Bound with the web mercator limits
+        expandedBoundingBox = TileBoundingBoxUtils
+                .boundWebMercatorBoundingBox(expandedBoundingBox);
 
         return expandedBoundingBox;
     }

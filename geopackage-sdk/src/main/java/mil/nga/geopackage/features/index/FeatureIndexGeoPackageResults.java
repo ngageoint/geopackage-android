@@ -15,7 +15,7 @@ import mil.nga.geopackage.features.user.FeatureRow;
  * @author osbornb
  * @since 1.1.0
  */
-class FeatureIndexGeoPackageResults implements FeatureIndexResults {
+public class FeatureIndexGeoPackageResults implements FeatureIndexResults {
 
     /**
      * Feature Table Index, for indexing within a GeoPackage extension

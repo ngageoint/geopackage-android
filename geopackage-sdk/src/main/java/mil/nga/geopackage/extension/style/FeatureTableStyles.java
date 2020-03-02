@@ -313,7 +313,7 @@ public class FeatureTableStyles {
                 if (styles == null) {
                     styles = getTableStyles();
                     if (styles == null) {
-                        styles = new Styles();
+                        styles = new Styles(true);
                     }
                     cachedTableFeatureStyles.setStyles(styles);
                 }
@@ -370,7 +370,7 @@ public class FeatureTableStyles {
                 if (icons == null) {
                     icons = getTableIcons();
                     if (icons == null) {
-                        icons = new Icons();
+                        icons = new Icons(true);
                     }
                     cachedTableFeatureStyles.setIcons(icons);
                 }

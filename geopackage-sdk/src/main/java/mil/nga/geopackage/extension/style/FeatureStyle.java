@@ -108,4 +108,17 @@ public class FeatureStyle {
         return icon != null;
     }
 
+    /**
+     * Determine if an icon exists and should be used. Returns false when an
+     * icon does not exist or when both a table level icon and row level style
+     * exist.
+     *
+     * @return true if the icon exists and should be used over a style
+     * @since 3.5.0
+     */
+    public boolean useIcon() {
+        return hasIcon()
+                && (!icon.isTableIcon() || !hasStyle() || style.isTableStyle());
+    }
+
 }

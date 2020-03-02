@@ -27,6 +27,28 @@ public class Icons {
     private Map<GeometryType, IconRow> icons = new HashMap<>();
 
     /**
+     * Table icons flag
+     */
+    private boolean tableIcons;
+
+    /**
+     * Constructor
+     */
+    public Icons() {
+        this(false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param tableIcons table icons
+     * @since 3.5.0
+     */
+    public Icons(boolean tableIcons) {
+        this.tableIcons = tableIcons;
+    }
+
+    /**
      * Set the default icon
      *
      * @param iconRow default icon
@@ -42,6 +64,9 @@ public class Icons {
      * @param geometryType geometry type
      */
     public void setIcon(IconRow iconRow, GeometryType geometryType) {
+        if (iconRow != null) {
+            iconRow.setTableIcon(tableIcons);
+        }
         if (geometryType != null) {
             if (iconRow != null) {
                 icons.put(geometryType, iconRow);
@@ -129,6 +154,26 @@ public class Icons {
      */
     public boolean hasDefault() {
         return defaultIcon != null;
+    }
+
+    /**
+     * Is table icons
+     *
+     * @return table icons flag
+     * @since 3.5.0
+     */
+    public boolean isTableIcons() {
+        return tableIcons;
+    }
+
+    /**
+     * Set table icons flag
+     *
+     * @param tableIcons table icons flag
+     * @since 3.5.0
+     */
+    public void setTableIcons(boolean tableIcons) {
+        this.tableIcons = tableIcons;
     }
 
 }

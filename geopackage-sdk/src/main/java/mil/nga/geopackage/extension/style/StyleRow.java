@@ -18,7 +18,13 @@ public class StyleRow extends AttributesRow {
     /**
      * Color hex pattern
      */
-    private Pattern colorPattern = Pattern.compile("^#([0-9a-fA-F]{3}){1,2}$");
+    private static final Pattern colorPattern = Pattern
+            .compile("^#([0-9a-fA-F]{3}){1,2}$");
+
+    /**
+     * Table style flag
+     */
+    private boolean tableStyle;
 
     /**
      * Constructor to create an empty row
@@ -60,6 +66,26 @@ public class StyleRow extends AttributesRow {
     @Override
     public StyleTable getTable() {
         return (StyleTable) super.getTable();
+    }
+
+    /**
+     * Is a table style
+     *
+     * @return table style flag
+     * @since 3.5.0
+     */
+    public boolean isTableStyle() {
+        return tableStyle;
+    }
+
+    /**
+     * Set table style flag
+     *
+     * @param tableStyle table style flag
+     * @since 3.5.0
+     */
+    public void setTableStyle(boolean tableStyle) {
+        this.tableStyle = tableStyle;
     }
 
     /**

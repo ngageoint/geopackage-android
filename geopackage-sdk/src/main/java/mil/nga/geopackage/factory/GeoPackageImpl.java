@@ -50,7 +50,7 @@ import mil.nga.sf.proj.Projection;
  *
  * @author osbornb
  */
-class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
+public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
     /**
      * Context
@@ -91,8 +91,8 @@ class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
-    protected BoundingBox getFeatureBoundingBox(Projection projection,
-                                                String table, boolean manual) {
+    public BoundingBox getFeatureBoundingBox(Projection projection,
+                                             String table, boolean manual) {
 
         BoundingBox boundingBox = null;
 

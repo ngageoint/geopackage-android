@@ -176,6 +176,14 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTableName() {
+        return table.getTableName();
+    }
+
+    /**
      * Set the columns
      *
      * @param columns columns

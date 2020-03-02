@@ -192,6 +192,14 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      * {@inheritDoc}
      */
     @Override
+    public String getTableName() {
+        return getTable().getTableName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserColumns<TColumn> getColumns() {
         return cursor.getColumns();
     }

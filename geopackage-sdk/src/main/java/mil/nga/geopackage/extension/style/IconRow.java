@@ -16,6 +16,11 @@ import mil.nga.geopackage.user.custom.UserCustomRow;
 public class IconRow extends MediaRow {
 
     /**
+     * Table icon flag
+     */
+    private boolean tableIcon;
+
+    /**
      * Constructor to create an empty row
      */
     public IconRow() {
@@ -55,6 +60,26 @@ public class IconRow extends MediaRow {
     @Override
     public IconTable getTable() {
         return (IconTable) super.getTable();
+    }
+
+    /**
+     * Is a table icon
+     *
+     * @return table icon flag
+     * @since 3.5.0
+     */
+    public boolean isTableIcon() {
+        return tableIcon;
+    }
+
+    /**
+     * Set table icon flag
+     *
+     * @param tableIcon table icon flag
+     * @since 3.5.0
+     */
+    public void setTableIcon(boolean tableIcon) {
+        this.tableIcon = tableIcon;
     }
 
     /**

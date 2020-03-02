@@ -345,13 +345,13 @@ public class DefaultFeatureTiles extends FeatureTiles {
                         BoundingBox geometryBoundingBox = new BoundingBox(envelope);
                         transformedBoundingBox = geometryBoundingBox.transform(transform);
 
-                        if(cacheGeometries){
+                        if (cacheGeometries) {
                             // Set the geometry envelope to the transformed bounding box
                             geomData.setEnvelope(transformedBoundingBox.buildEnvelope());
                         }
                     }
 
-                    if(cacheGeometries){
+                    if (cacheGeometries) {
                         // Cache the geometry
                         geometryCache.put(rowId, geomData);
                     }
@@ -621,7 +621,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
         float y = TileBoundingBoxUtils.getYPixel(tileHeight, boundingBox,
                 webMercatorPoint.getY());
 
-        if (featureStyle != null && featureStyle.hasIcon()) {
+        if (featureStyle != null && featureStyle.useIcon()) {
 
             IconRow iconRow = featureStyle.getIcon();
             Bitmap icon = getIcon(iconRow);
