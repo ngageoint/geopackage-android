@@ -35,9 +35,9 @@ public class FeatureIndexGeoPackageResults implements FeatureIndexResults {
     /**
      * Constructor
      *
-     * @param featureTableIndex
-     * @param count
-     * @param geometryIndices
+     * @param featureTableIndex feature table index
+     * @param count             count
+     * @param geometryIndices   geometry indices
      */
     public FeatureIndexGeoPackageResults(FeatureTableIndex featureTableIndex, long count, CloseableIterator<GeometryIndex> geometryIndices) {
         this.featureTableIndex = featureTableIndex;

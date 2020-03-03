@@ -434,10 +434,10 @@ public class TestSetupTeardown {
         polygon2dContents.setIdentifier("polygon2d");
         // polygon2dContents.setDescription("");
         // polygon2dContents.setLastChange(new Date());
-        polygon2dContents.setMinX(0.0);
-        polygon2dContents.setMinY(0.0);
-        polygon2dContents.setMaxX(10.0);
-        polygon2dContents.setMaxY(10.0);
+        polygon2dContents.setMinX(-180.0);
+        polygon2dContents.setMinY(-90.0);
+        polygon2dContents.setMaxX(180.0);
+        polygon2dContents.setMaxY(90.0);
         polygon2dContents.setSrs(undefinedGeographicSrs);
 
         Contents point3dContents = new Contents();

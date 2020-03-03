@@ -44,7 +44,7 @@ public class FeaturePreview {
     private boolean manual = false;
 
     /**
-     * Buffer percentage for drawing empty non features edges (>= 0.0 && < 0.5)
+     * Buffer percentage for drawing empty non features edges (greater than or equal to 0.0 and less than 0.5)
      */
     private double bufferPercentage = 0.0;
 
@@ -148,7 +148,7 @@ public class FeaturePreview {
      * Get the buffer percentage for drawing empty non features edges (i.e. 0.1
      * equals 10% buffer edges)
      *
-     * @return buffer percentage (>= 0.0 && < 0.5)
+     * @return buffer percentage (greater than or equal to 0.0 and less than 0.5)
      */
     public double getBufferPercentage() {
         return bufferPercentage;
@@ -158,7 +158,7 @@ public class FeaturePreview {
      * Set the buffer percentage for drawing empty non features edges (i.e. 0.1
      * equals 10% buffer edges)
      *
-     * @param bufferPercentage buffer percentage (>= 0.0 && < 0.5)
+     * @param bufferPercentage buffer percentage (greater than or equal to 0.0 and less than 0.5)
      */
     public void setBufferPercentage(double bufferPercentage) {
         if (bufferPercentage < 0.0 || bufferPercentage >= 0.5) {

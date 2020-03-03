@@ -52,6 +52,7 @@ import mil.nga.geopackage.extension.NGAExtensions;
 import mil.nga.geopackage.extension.RTreeIndexExtension;
 import mil.nga.geopackage.extension.SchemaExtension;
 import mil.nga.geopackage.extension.WebPExtension;
+import mil.nga.geopackage.extension.contents.ContentsId;
 import mil.nga.geopackage.extension.contents.ContentsIdExtension;
 import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.extension.coverage.CoverageDataPng;
@@ -116,6 +117,7 @@ import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
 import mil.nga.geopackage.tiles.TileGrid;
 import mil.nga.geopackage.tiles.features.DefaultFeatureTiles;
+import mil.nga.geopackage.tiles.features.FeaturePreview;
 import mil.nga.geopackage.tiles.features.FeatureTileGenerator;
 import mil.nga.geopackage.tiles.features.FeatureTiles;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
@@ -343,6 +345,11 @@ public class GeoPackageExample extends BaseTestCase {
             createCrsWktExtension(geoPackage);
         }
 
+        Log.i(LOG_NAME, "Contents Id: " + CONTENTS_ID);
+        if (CONTENTS_ID) {
+            createContentsIdExtension(geoPackage);
+        }
+
         Log.i(LOG_NAME, "Features: " + FEATURES);
         if (FEATURES) {
 
@@ -455,11 +462,6 @@ public class GeoPackageExample extends BaseTestCase {
         Log.i(LOG_NAME, "Properties: " + PROPERTIES);
         if (PROPERTIES) {
             createPropertiesExtension(geoPackage);
-        }
-
-        Log.i(LOG_NAME, "Contents Id: " + CONTENTS_ID);
-        if (CONTENTS_ID) {
-            createContentsIdExtension(geoPackage);
         }
 
         geoPackage.close();
@@ -1713,6 +1715,11 @@ public class GeoPackageExample extends BaseTestCase {
                 "NGA", "NGA.jpg", "image/jpeg", "Aerial View of NGA East",
                 "http://www.nga.mil");
 
+        if (CONTENTS_ID) {
+            insertRelatedTablesMediaPreviewExtensionRows(activity, geoPackage,
+                    relatedTables);
+        }
+
     }
 
     private static void insertRelatedTablesMediaExtensionRows(Activity activity, Context testContext,
@@ -1764,6 +1771,51 @@ public class GeoPackageExample extends BaseTestCase {
             userMappingDao.create(userMappingRow);
         }
         featureCursor.close();
+    }
+
+    private static void insertRelatedTablesMediaPreviewExtensionRows(Activity activity,
+                                                                     GeoPackage geoPackage, RelatedTablesExtension relatedTables)
+            throws IOException {
+
+        ContentsIdExtension contentsId = new ContentsIdExtension(geoPackage);
+
+        MediaTable mediaTable = MediaTable.create("preview");
+        UserMappingTable userMappingTable = UserMappingTable
+                .create("features_" + mediaTable.getTableName());
+
+        ExtendedRelation relation = relatedTables.addMediaRelationship(
+                ContentsId.TABLE_NAME, mediaTable, userMappingTable);
+
+        MediaDao mediaDao = relatedTables.getMediaDao(relation);
+        UserMappingDao userMappingDao = relatedTables.getMappingDao(relation);
+
+        for (String featureTable : geoPackage.getFeatureTables()) {
+
+            long featureContentsId = contentsId.getOrCreateId(featureTable);
+
+            FeaturePreview preview = new FeaturePreview(activity, geoPackage,
+                    featureTable);
+            try {
+                preview.setManual(true);
+                preview.setBufferPercentage(0.1);
+                Bitmap previewImage = preview.draw();
+                byte[] previewBytes = BitmapConverter.toBytes(previewImage,
+                        Bitmap.CompressFormat.PNG);
+
+                MediaRow mediaRow = mediaDao.newRow();
+                mediaRow.setData(previewBytes);
+                mediaRow.setContentType("image/png");
+                long mediaRowId = mediaDao.create(mediaRow);
+
+                UserMappingRow userMappingRow = userMappingDao.newRow();
+                userMappingRow.setBaseId(featureContentsId);
+                userMappingRow.setRelatedId(mediaRowId);
+                userMappingDao.create(userMappingRow);
+            } finally {
+                preview.close();
+            }
+        }
+
     }
 
     private static void createRelatedTablesFeaturesExtension(

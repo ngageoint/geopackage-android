@@ -18,6 +18,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.extension.GeoPackageExtensions;
 import mil.nga.geopackage.extension.contents.ContentsId;
 import mil.nga.geopackage.extension.contents.ContentsIdExtension;
+import mil.nga.geopackage.extension.style.FeatureStyle;
 import mil.nga.geopackage.extension.style.FeatureStyleExtension;
 import mil.nga.geopackage.extension.style.FeatureStyles;
 import mil.nga.geopackage.extension.style.FeatureTableStyles;
@@ -32,21 +33,26 @@ import mil.nga.geopackage.extension.style.Styles;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
-import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.style.Color;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.util.GeometryUtils;
 
+/**
+ * Test Feature Styles Utils
+ *
+ * @author osbornb
+ */
 public class FeatureStylesUtils {
 
     /**
      * Test Feature Styles extension
      *
-     * @param geoPackage
-     * @throws SQLException
-     * @throws IOException
+     * @param geoPackage GeoPackage
+     * @throws SQLException          upon error
+     * @throws IOException           upon error
+     * @throws NameNotFoundException upon error
      */
     public static void testFeatureStyles(GeoPackage geoPackage)
             throws SQLException, IOException, NameNotFoundException {
@@ -379,6 +385,37 @@ public class FeatureStylesUtils {
 
                     FeatureRow featureRow = featureCursor.getRow();
 
+                    long featureRowId = featureRow.getId();
+                    Map<GeometryType, StyleRow> featureRowStyles = featureResultsStyles
+                            .get(featureRowId);
+                    boolean hasFeatureRowStyles = featureRowStyles != null;
+                    Map<GeometryType, IconRow> featureRowIcons = featureResultsIcons
+                            .get(featureRowId);
+                    boolean hasFeatureRowIcons = featureRowIcons != null;
+                    FeatureStyle featureStyle = featureTableStyles
+                            .getFeatureStyle(featureRow);
+                    TestCase.assertNotNull(featureStyle);
+                    TestCase.assertTrue(featureStyle.hasStyle());
+                    TestCase.assertNotNull(featureStyle.getStyle());
+                    TestCase.assertEquals(!hasFeatureRowStyles,
+                            featureStyle.getStyle().isTableStyle());
+                    StyleRow expectedStyleRow = getExpectedRowStyle(featureRow,
+                            featureRow.getGeometryType(), tableStyleDefault,
+                            geometryTypeTableStyles, featureResultsStyles);
+                    TestCase.assertEquals(expectedStyleRow.getId(),
+                            featureStyle.getStyle().getId());
+                    TestCase.assertTrue(featureStyle.hasIcon());
+                    TestCase.assertNotNull(featureStyle.getIcon());
+                    TestCase.assertEquals(!hasFeatureRowIcons,
+                            featureStyle.getIcon().isTableIcon());
+                    IconRow expectedIconRow = getExpectedRowIcon(featureRow,
+                            featureRow.getGeometryType(), tableIconDefault,
+                            geometryTypeTableIcons, featureResultsIcons);
+                    TestCase.assertEquals(expectedIconRow.getId(),
+                            featureStyle.getIcon().getId());
+                    TestCase.assertEquals(hasFeatureRowIcons || !hasFeatureRowStyles,
+                            featureStyle.useIcon());
+
                     validateRowStyles(featureTableStyles, featureRow,
                             tableStyleDefault, geometryTypeTableStyles,
                             featureResultsStyles);
@@ -557,6 +594,34 @@ public class FeatureStylesUtils {
             styleRow = featureTableStyles.getStyle(featureRow, geometryType);
         }
 
+        StyleRow expectedStyleRow = getExpectedRowStyle(featureRow,
+                geometryType, tableStyleDefault, geometryTypeTableStyles,
+                featureResultsStyles);
+
+        if (expectedStyleRow != null) {
+            TestCase.assertEquals(expectedStyleRow.getId(), styleRow.getId());
+            TestCase.assertNotNull(styleRow.getTable());
+            TestCase.assertTrue(styleRow.getId() >= 0);
+            styleRow.getName();
+            styleRow.getDescription();
+            styleRow.getColor();
+            styleRow.getHexColor();
+            styleRow.getOpacity();
+            styleRow.getWidth();
+            styleRow.getFillColor();
+            styleRow.getFillHexColor();
+            styleRow.getFillOpacity();
+        } else {
+            TestCase.assertNull(styleRow);
+        }
+
+    }
+
+    private static StyleRow getExpectedRowStyle(FeatureRow featureRow,
+                                                GeometryType geometryType, StyleRow tableStyleDefault,
+                                                Map<GeometryType, StyleRow> geometryTypeTableStyles,
+                                                Map<Long, Map<GeometryType, StyleRow>> featureResultsStyles) {
+
         List<GeometryType> geometryTypes = null;
         if (geometryType != null) {
             geometryTypes = GeometryUtils.parentHierarchy(geometryType);
@@ -591,23 +656,7 @@ public class FeatureStylesUtils {
             }
         }
 
-        if (expectedStyleRow != null) {
-            TestCase.assertEquals(expectedStyleRow.getId(), styleRow.getId());
-            TestCase.assertNotNull(styleRow.getTable());
-            TestCase.assertTrue(styleRow.getId() >= 0);
-            styleRow.getName();
-            styleRow.getDescription();
-            styleRow.getColor();
-            styleRow.getHexColor();
-            styleRow.getOpacity();
-            styleRow.getWidth();
-            styleRow.getFillColor();
-            styleRow.getFillHexColor();
-            styleRow.getFillOpacity();
-        } else {
-            TestCase.assertNull(styleRow);
-        }
-
+        return expectedStyleRow;
     }
 
     private static void validateRowIcons(FeatureTableStyles featureTableStyles,
@@ -654,6 +703,30 @@ public class FeatureStylesUtils {
             iconRow = featureTableStyles.getIcon(featureRow, geometryType);
         }
 
+        IconRow expectedIconRow = getExpectedRowIcon(featureRow, geometryType,
+                tableIconDefault, geometryTypeTableIcons, featureResultsIcons);
+
+        if (expectedIconRow != null) {
+            TestCase.assertEquals(expectedIconRow.getId(), iconRow.getId());
+            TestCase.assertNotNull(iconRow.getTable());
+            TestCase.assertTrue(iconRow.getId() >= 0);
+            iconRow.getName();
+            iconRow.getDescription();
+            iconRow.getWidth();
+            iconRow.getHeight();
+            iconRow.getAnchorU();
+            iconRow.getAnchorV();
+        } else {
+            TestCase.assertNull(iconRow);
+        }
+
+    }
+
+    private static IconRow getExpectedRowIcon(FeatureRow featureRow,
+                                              GeometryType geometryType, IconRow tableIconDefault,
+                                              Map<GeometryType, IconRow> geometryTypeTableIcons,
+                                              Map<Long, Map<GeometryType, IconRow>> featureResultsIcons) {
+
         List<GeometryType> geometryTypes = null;
         if (geometryType != null) {
             geometryTypes = GeometryUtils.parentHierarchy(geometryType);
@@ -688,20 +761,7 @@ public class FeatureStylesUtils {
             }
         }
 
-        if (expectedIconRow != null) {
-            TestCase.assertEquals(expectedIconRow.getId(), iconRow.getId());
-            TestCase.assertNotNull(iconRow.getTable());
-            TestCase.assertTrue(iconRow.getId() >= 0);
-            iconRow.getName();
-            iconRow.getDescription();
-            iconRow.getWidth();
-            iconRow.getHeight();
-            iconRow.getAnchorU();
-            iconRow.getAnchorV();
-        } else {
-            TestCase.assertNull(iconRow);
-        }
-
+        return expectedIconRow;
     }
 
     private static StyleRow randomStyle() {
