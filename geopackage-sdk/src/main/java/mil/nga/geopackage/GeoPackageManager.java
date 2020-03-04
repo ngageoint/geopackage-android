@@ -403,8 +403,8 @@ public interface GeoPackageManager {
      * @param relativePath Relative path of this media item within the storage device where it is persisted
      * @param uri          The URL of the table to insert into
      * @throws IOException upon error
-     * @see {@link android.provider.MediaStore.MediaColumns#RELATIVE_PATH}
-     * @see {@link android.content.ContentResolver#insert(Uri, ContentValues)}
+     * @see android.provider.MediaStore.MediaColumns#RELATIVE_PATH
+     * @see android.content.ContentResolver#insert(Uri, ContentValues)
      * @since 3.5.0
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -418,8 +418,8 @@ public interface GeoPackageManager {
      * @param relativePath Relative path of this media item within the storage device where it is persisted
      * @param uri          The URL of the table to insert into
      * @throws IOException upon error
-     * @see {@link android.provider.MediaStore.MediaColumns#RELATIVE_PATH}
-     * @see {@link android.content.ContentResolver#insert(Uri, ContentValues)}
+     * @see android.provider.MediaStore.MediaColumns#RELATIVE_PATH
+     * @see android.content.ContentResolver#insert(Uri, ContentValues)
      * @since 3.5.0
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -432,7 +432,7 @@ public interface GeoPackageManager {
      * @param uri           The URL of the table to insert into
      * @param contentValues The initial values for the newly inserted row
      * @throws IOException upon error
-     * @see {@link android.content.ContentResolver#insert(Uri, ContentValues)}
+     * @see android.content.ContentResolver#insert(Uri, ContentValues)
      * @since 3.5.0
      */
     public void exportGeoPackage(String database, Uri uri, ContentValues contentValues) throws IOException;
