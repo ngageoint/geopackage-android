@@ -1,22 +1,22 @@
-package mil.nga.geopackage.test.features;
+package mil.nga.geopackage.test.tiles.features;
 
 import org.junit.Test;
 
 import java.io.IOException;
 
-import mil.nga.geopackage.test.CreateGeoPackageTestCase;
+import mil.nga.geopackage.test.ImportGeoPackageTestCase;
 
 /**
- * Test Feature Preview from a created database
+ * Test Feature Preview from an imported database
  *
  * @author osbornb
  */
-public class FeaturePreviewCreateTest extends CreateGeoPackageTestCase {
+public class FeaturePreviewImportTest extends ImportGeoPackageTestCase {
 
     /**
      * Constructor
      */
-    public FeaturePreviewCreateTest() {
+    public FeaturePreviewImportTest() {
 
     }
 

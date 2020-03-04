@@ -1,4 +1,4 @@
-package mil.nga.geopackage.test.features;
+package mil.nga.geopackage.test.tiles.features;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
