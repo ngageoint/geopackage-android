@@ -1,6 +1,13 @@
 package mil.nga.geopackage;
 
+import android.content.ContentValues;
+import android.net.Uri;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -388,6 +395,47 @@ public interface GeoPackageManager {
      * @param directory export directory
      */
     public void exportGeoPackage(String database, String name, File directory);
+
+    /**
+     * Export a GeoPackage database to a media store
+     *
+     * @param database     database name
+     * @param relativePath Relative path of this media item within the storage device where it is persisted
+     * @param uri          The URL of the table to insert into
+     * @throws IOException upon error
+     * @see {@link android.provider.MediaStore.MediaColumns#RELATIVE_PATH}
+     * @see {@link android.content.ContentResolver#insert(Uri, ContentValues)}
+     * @since 3.5.0
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void exportGeoPackage(String database, String relativePath, Uri uri) throws IOException;
+
+    /**
+     * Export a GeoPackage database to a media store
+     *
+     * @param database     database name
+     * @param name         name
+     * @param relativePath Relative path of this media item within the storage device where it is persisted
+     * @param uri          The URL of the table to insert into
+     * @throws IOException upon error
+     * @see {@link android.provider.MediaStore.MediaColumns#RELATIVE_PATH}
+     * @see {@link android.content.ContentResolver#insert(Uri, ContentValues)}
+     * @since 3.5.0
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void exportGeoPackage(String database, String name, String relativePath, Uri uri) throws IOException;
+
+    /**
+     * Export a GeoPackage database to a Uri
+     *
+     * @param database      database name
+     * @param uri           The URL of the table to insert into
+     * @param contentValues The initial values for the newly inserted row
+     * @throws IOException upon error
+     * @see {@link android.content.ContentResolver#insert(Uri, ContentValues)}
+     * @since 3.5.0
+     */
+    public void exportGeoPackage(String database, Uri uri, ContentValues contentValues) throws IOException;
 
     /**
      * Open the database

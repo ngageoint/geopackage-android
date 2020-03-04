@@ -2,14 +2,12 @@ package mil.nga.geopackage.test;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -20,11 +18,8 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -104,7 +99,6 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.BitmapConverter;
-import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.metadata.Metadata;
 import mil.nga.geopackage.metadata.MetadataDao;
 import mil.nga.geopackage.metadata.MetadataScopeType;
@@ -135,6 +129,7 @@ import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
+import mil.nga.geopackage.validate.GeoPackageValidate;
 import mil.nga.sf.CircularString;
 import mil.nga.sf.CompoundCurve;
 import mil.nga.sf.CurvePolygon;
@@ -482,27 +477,16 @@ public class GeoPackageExample extends BaseTestCase {
 
             GeoPackageManager manager = GeoPackageFactory.getManager(context);
 
-            File geoPackageFile = manager.getFile(GEOPACKAGE_NAME);
-            String fileName = GEOPACKAGE_NAME + "-" + System.currentTimeMillis() + "."
-                    + TestConstants.GEO_PACKAGE_EXTENSION;
+            String name = GeoPackageValidate.addGeoPackageExtension(GEOPACKAGE_NAME + "-" + System.currentTimeMillis());
+            manager.exportGeoPackage(GEOPACKAGE_NAME,
+                    name,
+                    Environment.DIRECTORY_DOCUMENTS,
+                    MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL));
 
-            ContentResolver resolver = context.getContentResolver();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
-            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream");
-            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
-
-            Uri uri = resolver.insert(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), contentValues);
-
-            OutputStream outputStream = resolver.openOutputStream(uri);
-            GeoPackageIOUtils.copyStream(new FileInputStream(geoPackageFile), outputStream);
-
-            String path = "/storage/emulated/0/Documents/" + fileName;
-
+            String path = "/storage/emulated/0/Documents/" + name;
             Log.i(LOG_NAME, "Created: " + path);
             Log.i(LOG_NAME, "To copy GeoPackage, run: "
-                    + "adb pull " + path + " " + GEOPACKAGE_NAME + "."
-                    + TestConstants.GEO_PACKAGE_EXTENSION);
+                    + "adb pull " + path + " " + GeoPackageValidate.addGeoPackageExtension(GEOPACKAGE_NAME));
         } else {
             Log.w(LOG_NAME,
                     "To export the GeoPackage, grant GeoPackageSDKTests Storage permission on the emulator or phone");

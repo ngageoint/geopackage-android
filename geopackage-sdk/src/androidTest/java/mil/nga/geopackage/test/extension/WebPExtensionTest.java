@@ -38,7 +38,7 @@ public class WebPExtensionTest extends CreateGeoPackageTestCase {
 
         assertEquals(extension.getExtensionName(), WebPExtension.EXTENSION_NAME);
         assertEquals(extension.getAuthor(),
-                GeoPackageConstants.GEO_PACKAGE_EXTENSION_AUTHOR);
+                GeoPackageConstants.EXTENSION_AUTHOR);
         assertEquals(extension.getExtensionNameNoAuthor(), WebPExtension.NAME);
         assertEquals(extension.getTableName(), tableName);
         assertEquals(extension.getColumnName(), TileTable.COLUMN_TILE_DATA);

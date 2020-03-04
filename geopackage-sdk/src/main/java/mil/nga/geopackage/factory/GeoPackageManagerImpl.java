@@ -1,17 +1,25 @@
 package mil.nga.geopackage.factory;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLException;
@@ -505,7 +513,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public boolean createAtPath(String database, File path) {
 
         // Create the absolute file path
-        File file = new File(path, database + "." + GeoPackageConstants.GEOPACKAGE_EXTENSION);
+        File file = new File(path, database + "." + GeoPackageConstants.EXTENSION);
 
         // Create the GeoPackage
         boolean created = createFile(database, file);
@@ -551,7 +559,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                 }
 
                 // Add the extension
-                file = new File(file.getParentFile(), file.getName() + "." + GeoPackageConstants.GEOPACKAGE_EXTENSION);
+                file = new File(file.getParentFile(), file.getName() + "." + GeoPackageConstants.EXTENSION);
             }
 
             // Make sure the file does not already exist
@@ -767,7 +775,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
         // Add the extension if not on the name
         if (!GeoPackageValidate.hasGeoPackageExtension(file)) {
-            name += "." + GeoPackageConstants.GEOPACKAGE_EXTENSION;
+            name += "." + GeoPackageConstants.EXTENSION;
             file = new File(directory, name);
         }
 
@@ -780,6 +788,53 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                     "Failed read or write GeoPackage database '" + database
                             + "' to file: '" + file, e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public void exportGeoPackage(String database, String relativePath, Uri uri) throws IOException {
+        exportGeoPackage(database, database, relativePath, uri);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public void exportGeoPackage(String database, String name, String relativePath, Uri uri) throws IOException {
+
+        // Add the extension if not on the name
+        name = GeoPackageValidate.addGeoPackageExtension(name);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, GeoPackageConstants.MEDIA_TYPE);
+        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
+
+        exportGeoPackage(database, uri, contentValues);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void exportGeoPackage(String database, Uri uri, ContentValues contentValues) throws IOException {
+
+        // Get the GeoPackage database file
+        File dbFile = getFile(database);
+
+        // Insert the row
+        ContentResolver resolver = context.getContentResolver();
+        Uri insertUri = resolver.insert(uri, contentValues);
+
+        // Copy the GeoPackage file
+        OutputStream outputStream = resolver.openOutputStream(insertUri);
+        InputStream inputStream = new FileInputStream(dbFile);
+        GeoPackageIOUtils.copyStream(inputStream, outputStream);
+
     }
 
     /**
