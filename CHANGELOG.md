@@ -14,6 +14,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Feature Preview for drawing a single preview tile of features
 * Feature Style Extension fix to use an individual feature style over a default table icon
 * GeoPackageImpl and FeatureIndexGeoPackageResults classes changed to be public
+* Android 29 / Q GeoPackage export methods
 * gradle plugin updated to 3.6.1
 
 ## [3.4.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.4.0) (11-14-2019)
