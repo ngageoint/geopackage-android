@@ -2,13 +2,16 @@ package mil.nga.geopackage.test;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
@@ -18,8 +21,10 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -99,6 +104,7 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.BitmapConverter;
+import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.metadata.Metadata;
 import mil.nga.geopackage.metadata.MetadataDao;
 import mil.nga.geopackage.metadata.MetadataScopeType;
@@ -469,28 +475,34 @@ public class GeoPackageExample extends BaseTestCase {
 
     }
 
-    private static void exportGeoPackage(Context context) {
+    private static void exportGeoPackage(Context context) throws IOException {
 
         if (ContextCompat.checkSelfPermission(context,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
             GeoPackageManager manager = GeoPackageFactory.getManager(context);
 
-            File exportDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            if (!exportDirectory.exists()) {
-                exportDirectory.mkdir();
-            }
+            File geoPackageFile = manager.getFile(GEOPACKAGE_NAME);
+            String fileName = GEOPACKAGE_NAME + "-" + System.currentTimeMillis() + "."
+                    + TestConstants.GEO_PACKAGE_EXTENSION;
 
-            File exportedFile = new File(exportDirectory, GEOPACKAGE_NAME + "."
-                    + TestConstants.GEO_PACKAGE_EXTENSION);
-            if (exportedFile.exists()) {
-                exportedFile.delete();
-            }
-            manager.exportGeoPackage(GEOPACKAGE_NAME, exportDirectory);
+            ContentResolver resolver = context.getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream");
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS);
 
-            Log.i(LOG_NAME, "Created: " + exportedFile.getPath());
+            Uri uri = resolver.insert(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), contentValues);
+
+            OutputStream outputStream = resolver.openOutputStream(uri);
+            GeoPackageIOUtils.copyStream(new FileInputStream(geoPackageFile), outputStream);
+
+            String path = "/storage/emulated/0/Documents/" + fileName;
+
+            Log.i(LOG_NAME, "Created: " + path);
             Log.i(LOG_NAME, "To copy GeoPackage, run: "
-                    + "adb pull /storage/emulated/0/Documents/example.gpkg ~/git/geopackage-android");
+                    + "adb pull " + path + " " + GEOPACKAGE_NAME + "."
+                    + TestConstants.GEO_PACKAGE_EXTENSION);
         } else {
             Log.w(LOG_NAME,
                     "To export the GeoPackage, grant GeoPackageSDKTests Storage permission on the emulator or phone");
