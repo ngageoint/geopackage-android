@@ -71,6 +71,7 @@ public class FeaturePreviewUtils {
             featureTiles.setTileHeight(TileUtils.TILE_PIXELS_DEFAULT);
             featureTiles.setDensity(
                     TileUtils.density(TileUtils.TILE_PIXELS_DEFAULT));
+            featureTiles.clearIconCache();
             Bitmap imageManual = preview.draw();
             if (epsg) {
                 assertNotNull(imageManual);
