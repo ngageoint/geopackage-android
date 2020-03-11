@@ -145,6 +145,9 @@ Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetail
 
 ### Build ###
 
+[![Build Artifacts](https://github.com/ngageoint/geopackage-android/workflows/Build%20Artifacts/badge.svg)](https://github.com/ngageoint/geopackage-android/actions?query=workflow%3A%22Build+Artifacts%22)
+[![Test](https://github.com/ngageoint/geopackage-android/workflows/Test/badge.svg)](https://github.com/ngageoint/geopackage-android/actions?query=workflow%3ATest)
+
 Build this repository using Android Studio and/or Gradle.
 
 #### Project Setup ####
