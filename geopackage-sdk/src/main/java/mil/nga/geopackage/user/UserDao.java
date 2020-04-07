@@ -219,7 +219,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
     public long insert(TRow row) {
         long id = db.insertOrThrow(getTableName(), null, row.toContentValues());
         if (row.hasIdColumn()) {
-            row.setId(id);
+            row.setId(id, true);
         }
         return id;
     }

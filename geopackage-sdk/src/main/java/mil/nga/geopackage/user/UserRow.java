@@ -63,9 +63,11 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
         ContentValues contentValues = new ContentValues();
         for (TColumn column : columns.getColumns()) {
 
-            if (!column.isPrimaryKey()) {
+            Object value = values[column.getIndex()];
 
-                Object value = values[column.getIndex()];
+            if (!column.isPrimaryKey()
+                    || (value != null && columns.isPkModifiable())) {
+
                 String columnName = column.getName();
 
                 if (value == null) {

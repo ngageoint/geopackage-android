@@ -127,8 +127,7 @@ public class ManualFeatureQuery {
     public int countWithGeometries() {
         return featureDao.count(
                 CoreSQLUtils.quoteWrap(featureDao.getGeometryColumnName())
-                        + " IS NOT NULL",
-                null);
+                        + " IS NOT NULL");
     }
 
     /**

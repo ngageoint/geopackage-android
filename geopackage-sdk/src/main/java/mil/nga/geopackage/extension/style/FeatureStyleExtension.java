@@ -100,7 +100,7 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
                                           String featureTable) {
         String tableName = tablePrefix + featureTable;
         StyleMappingDao dao = null;
-        if (geoPackage.isTable(tableName)) {
+        if (geoPackage.isTableOrView(tableName)) {
             dao = new StyleMappingDao(relatedTables.getUserDao(tableName));
         }
         return dao;
@@ -113,7 +113,7 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
      */
     public StyleDao getStyleDao() {
         StyleDao styleDao = null;
-        if (geoPackage.isTable(StyleTable.TABLE_NAME)) {
+        if (geoPackage.isTableOrView(StyleTable.TABLE_NAME)) {
             AttributesDao attributesDao = getGeoPackage().getAttributesDao(
                     StyleTable.TABLE_NAME);
             styleDao = new StyleDao(attributesDao);
@@ -129,7 +129,7 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
      */
     public IconDao getIconDao() {
         IconDao iconDao = null;
-        if (geoPackage.isTable(IconTable.TABLE_NAME)) {
+        if (geoPackage.isTableOrView(IconTable.TABLE_NAME)) {
             iconDao = new IconDao(
                     relatedTables.getUserDao(IconTable.TABLE_NAME));
             relatedTables.setContents(iconDao.getTable());

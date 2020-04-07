@@ -493,14 +493,15 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         String where = buildWhere(TileTable.COLUMN_ZOOM_LEVEL, zoomLevel);
         String[] whereArgs = buildWhereArgs(new Object[]{zoomLevel});
 
-        Integer minX = min(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
-        Integer maxX = max(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
-        Integer minY = min(TileTable.COLUMN_TILE_ROW, where, whereArgs);
-        Integer maxY = max(TileTable.COLUMN_TILE_ROW, where, whereArgs);
+        Number minX = min(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
+        Number maxX = max(TileTable.COLUMN_TILE_COLUMN, where, whereArgs);
+        Number minY = min(TileTable.COLUMN_TILE_ROW, where, whereArgs);
+        Number maxY = max(TileTable.COLUMN_TILE_ROW, where, whereArgs);
 
         TileGrid tileGrid = null;
         if (minX != null && maxX != null && minY != null && maxY != null) {
-            tileGrid = new TileGrid(minX, minY, maxX, maxY);
+            tileGrid = new TileGrid(minX.longValue(), minY.longValue(),
+                    maxX.longValue(), maxY.longValue());
         }
 
         return tileGrid;

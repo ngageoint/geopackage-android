@@ -194,46 +194,63 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * {@inheritDoc}
      */
     @Override
-    public UserCustomCursor query() {
+    public UserCustomCursor query(boolean distinct, String[] columns) {
         validateRTree();
-        return super.query();
+        return super.query(distinct, columns);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public UserCustomCursor query(String[] columns) {
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  String[] columnsAs) {
         validateRTree();
-        return super.query(columns);
+        return super.query(distinct, columns, columnsAs);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public UserCustomCursor query(String where, String[] whereArgs) {
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  String where, String[] whereArgs) {
         validateRTree();
-        return super.query(where, whereArgs);
+        return super.query(distinct, columns, where, whereArgs);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public UserCustomCursor query(String[] columns, String where,
-                                  String[] whereArgs) {
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  String where, String[] whereArgs, String groupBy, String having,
+                                  String orderBy) {
         validateRTree();
-        return super.query(columns, where, whereArgs);
+        return super.query(distinct, columns, where, whereArgs, groupBy, having,
+                orderBy);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int count(String where, String[] args) {
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  String where, String[] whereArgs, String groupBy, String having,
+                                  String orderBy, String limit) {
         validateRTree();
-        return super.count(where, args);
+        return super.query(distinct, columns, where, whereArgs, groupBy, having,
+                orderBy, limit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int count(boolean distinct, String column, String where,
+                     String[] args) {
+        validateRTree();
+        return super.count(distinct, column, where, args);
     }
 
     /**
@@ -250,13 +267,74 @@ public class RTreeIndexTableDao extends UserCustomDao {
     /**
      * Query for all features
      *
+     * @param distinct distinct rows
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct) {
+        validateRTree();
+        return featureDao.queryIn(distinct, queryIdsSQL());
+    }
+
+    /**
+     * Query for all features
+     *
      * @param columns columns
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns) {
         validateRTree();
         return featureDao.queryIn(columns, queryIdsSQL());
+    }
+
+    /**
+     * Query for all features
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns) {
+        validateRTree();
+        return featureDao.queryIn(distinct, columns, queryIdsSQL());
+    }
+
+    /**
+     * Count features
+     *
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures() {
+        validateRTree();
+        return featureDao.countIn(queryIdsSQL());
+    }
+
+    /**
+     * Count features
+     *
+     * @param column count column name
+     * @return count
+     * @since 3.5.1
+     */
+    public int countColumnFeatures(String column) {
+        validateRTree();
+        return featureDao.countIn(column, queryIdsSQL());
+    }
+
+    /**
+     * Count features
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column) {
+        validateRTree();
+        return featureDao.countIn(distinct, column, queryIdsSQL());
     }
 
     /**
@@ -274,15 +352,45 @@ public class RTreeIndexTableDao extends UserCustomDao {
     /**
      * Query for features
      *
+     * @param distinct    distinct rows
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       Map<String, Object> fieldValues) {
+        validateRTree();
+        return featureDao.queryIn(distinct, queryIdsSQL(), fieldValues);
+    }
+
+    /**
+     * Query for features
+     *
      * @param columns     columns
      * @param fieldValues field values
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        Map<String, Object> fieldValues) {
         validateRTree();
         return featureDao.queryIn(columns, queryIdsSQL(), fieldValues);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       Map<String, Object> fieldValues) {
+        validateRTree();
+        return featureDao.queryIn(distinct, columns, queryIdsSQL(),
+                fieldValues);
     }
 
     /**
@@ -298,6 +406,34 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Count features
+     *
+     * @param column      count column value
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, Map<String, Object> fieldValues) {
+        validateRTree();
+        return featureDao.countIn(column, queryIdsSQL(), fieldValues);
+    }
+
+    /**
+     * Count features
+     *
+     * @param distinct    distinct column values
+     * @param column      count column value
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             Map<String, Object> fieldValues) {
+        validateRTree();
+        return featureDao.countIn(distinct, column, queryIdsSQL(), fieldValues);
+    }
+
+    /**
      * Query for features
      *
      * @param where where clause
@@ -305,7 +441,19 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public FeatureCursor queryFeatures(String where) {
-        return queryFeatures(where, null);
+        return queryFeatures(false, where);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct distinct rows
+     * @param where    where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String where) {
+        return queryFeatures(distinct, where, null);
     }
 
     /**
@@ -313,11 +461,25 @@ public class RTreeIndexTableDao extends UserCustomDao {
      *
      * @param columns columns
      * @param where   where clause
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns, String where) {
-        return queryFeatures(columns, where, null);
+        return queryFeatures(false, columns, where);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param where    where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       String where) {
+        return queryFeatures(distinct, columns, where, null);
     }
 
     /**
@@ -328,7 +490,32 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public int countFeatures(String where) {
-        return countFeatures(where, null);
+        return countFeatures(false, null, where);
+    }
+
+    /**
+     * Count features
+     *
+     * @param column count column name
+     * @param where  where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, String where) {
+        return countFeatures(false, column, where);
+    }
+
+    /**
+     * Count features
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param where    where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column, String where) {
+        return countFeatures(distinct, column, where, null);
     }
 
     /**
@@ -347,16 +534,48 @@ public class RTreeIndexTableDao extends UserCustomDao {
     /**
      * Query for features
      *
+     * @param distinct  distinct rows
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String where,
+                                       String[] whereArgs) {
+        validateRTree();
+        return featureDao.queryIn(distinct, queryIdsSQL(), where, whereArgs);
+    }
+
+    /**
+     * Query for features
+     *
      * @param columns   columns
      * @param where     where clause
      * @param whereArgs where arguments
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns, String where,
                                        String[] whereArgs) {
         validateRTree();
         return featureDao.queryIn(columns, queryIdsSQL(), where, whereArgs);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct  distinct rows
+     * @param columns   columns
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       String where, String[] whereArgs) {
+        validateRTree();
+        return featureDao.queryIn(distinct, columns, queryIdsSQL(), where,
+                whereArgs);
     }
 
     /**
@@ -370,6 +589,37 @@ public class RTreeIndexTableDao extends UserCustomDao {
     public int countFeatures(String where, String[] whereArgs) {
         validateRTree();
         return featureDao.countIn(queryIdsSQL(), where, whereArgs);
+    }
+
+    /**
+     * Count features
+     *
+     * @param column    count column name
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, String where, String[] whereArgs) {
+        validateRTree();
+        return featureDao.countIn(column, queryIdsSQL(), where, whereArgs);
+    }
+
+    /**
+     * Count features
+     *
+     * @param distinct  distinct column values
+     * @param column    count column name
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column, String where,
+                             String[] whereArgs) {
+        validateRTree();
+        return featureDao.countIn(distinct, column, queryIdsSQL(), where,
+                whereArgs);
     }
 
     /**
@@ -407,10 +657,23 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * Query for rows within the bounding box
      *
      * @param boundingBox bounding box
-     * @return cursor results
+     * @return cursor
      */
     public UserCustomCursor query(BoundingBox boundingBox) {
-        return query(boundingBox.buildEnvelope());
+        return query(false, boundingBox);
+    }
+
+    /**
+     * Query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct,
+                                  BoundingBox boundingBox) {
+        return query(distinct, boundingBox.buildEnvelope());
     }
 
     /**
@@ -418,12 +681,26 @@ public class RTreeIndexTableDao extends UserCustomDao {
      *
      * @param columns     columns
      * @param boundingBox bounding box
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public UserCustomCursor query(String[] columns,
                                   BoundingBox boundingBox) {
-        return query(columns, boundingBox.buildEnvelope());
+        return query(false, columns, boundingBox);
+    }
+
+    /**
+     * Query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  BoundingBox boundingBox) {
+        return query(distinct, columns, boundingBox.buildEnvelope());
     }
 
     /**
@@ -433,7 +710,32 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @return count
      */
     public int count(BoundingBox boundingBox) {
-        return count(boundingBox.buildEnvelope());
+        return count(false, null, boundingBox);
+    }
+
+    /**
+     * Count the rows within the bounding box
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(String column, BoundingBox boundingBox) {
+        return count(false, column, boundingBox);
+    }
+
+    /**
+     * Count the rows within the bounding box
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column, BoundingBox boundingBox) {
+        return count(distinct, column, boundingBox.buildEnvelope());
     }
 
     /**
@@ -444,7 +746,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox) {
-        return queryFeatures(boundingBox.buildEnvelope());
+        return queryFeatures(false, boundingBox);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox) {
+        return queryFeatures(distinct, boundingBox.buildEnvelope());
     }
 
     /**
@@ -452,12 +767,26 @@ public class RTreeIndexTableDao extends UserCustomDao {
      *
      * @param columns     columns
      * @param boundingBox bounding box
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox) {
-        return queryFeatures(columns, boundingBox.buildEnvelope());
+        return queryFeatures(false, columns, boundingBox);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox) {
+        return queryFeatures(distinct, columns, boundingBox.buildEnvelope());
     }
 
     /**
@@ -468,7 +797,33 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox) {
-        return countFeatures(boundingBox.buildEnvelope());
+        return countFeatures(false, null, boundingBox);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param column      count column values
+     * @param boundingBox bounding box
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox) {
+        return countFeatures(false, column, boundingBox);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param distinct    distinct column values
+     * @param column      count column values
+     * @param boundingBox bounding box
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox) {
+        return countFeatures(distinct, column, boundingBox.buildEnvelope());
     }
 
     /**
@@ -481,7 +836,22 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Map<String, Object> fieldValues) {
-        return queryFeatures(boundingBox.buildEnvelope(), fieldValues);
+        return queryFeatures(false, boundingBox, fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox, Map<String, Object> fieldValues) {
+        return queryFeatures(distinct, boundingBox.buildEnvelope(),
+                fieldValues);
     }
 
     /**
@@ -490,12 +860,28 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param columns     columns
      * @param boundingBox bounding box
      * @param fieldValues field values
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox, Map<String, Object> fieldValues) {
-        return queryFeatures(columns, boundingBox.buildEnvelope(), fieldValues);
+        return queryFeatures(false, columns, boundingBox, fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox, Map<String, Object> fieldValues) {
+        return queryFeatures(distinct, columns, boundingBox.buildEnvelope(),
+                fieldValues);
     }
 
     /**
@@ -508,7 +894,37 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public int countFeatures(BoundingBox boundingBox,
                              Map<String, Object> fieldValues) {
-        return countFeatures(boundingBox.buildEnvelope(), fieldValues);
+        return countFeatures(false, null, boundingBox, fieldValues);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox,
+                             Map<String, Object> fieldValues) {
+        return countFeatures(false, column, boundingBox, fieldValues);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox, Map<String, Object> fieldValues) {
+        return countFeatures(distinct, column, boundingBox.buildEnvelope(),
+                fieldValues);
     }
 
     /**
@@ -521,7 +937,21 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        String where) {
-        return queryFeatures(boundingBox, where, null);
+        return queryFeatures(false, boundingBox, where);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox, String where) {
+        return queryFeatures(distinct, boundingBox, where, null);
     }
 
     /**
@@ -530,12 +960,27 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param columns     columns
      * @param boundingBox bounding box
      * @param where       where clause
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox, String where) {
-        return queryFeatures(columns, boundingBox, where, null);
+        return queryFeatures(false, columns, boundingBox, where);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox, String where) {
+        return queryFeatures(distinct, columns, boundingBox, where, null);
     }
 
     /**
@@ -547,7 +992,36 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, String where) {
-        return countFeatures(boundingBox, where, null);
+        return countFeatures(false, null, boundingBox, where);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox,
+                             String where) {
+        return countFeatures(false, column, boundingBox, where);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox, String where) {
+        return countFeatures(distinct, column, boundingBox, where, null);
     }
 
     /**
@@ -561,7 +1035,23 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox, String where,
                                        String[] whereArgs) {
-        return queryFeatures(boundingBox.buildEnvelope(), where, whereArgs);
+        return queryFeatures(false, boundingBox, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox, String where, String[] whereArgs) {
+        return queryFeatures(distinct, boundingBox.buildEnvelope(), where,
+                whereArgs);
     }
 
     /**
@@ -571,13 +1061,29 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param boundingBox bounding box
      * @param where       where clause
      * @param whereArgs   where arguments
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox, String where, String[] whereArgs) {
-        return queryFeatures(columns, boundingBox.buildEnvelope(), where,
-                whereArgs);
+        return queryFeatures(false, columns, boundingBox, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox, String where, String[] whereArgs) {
+        return queryFeatures(distinct, columns, boundingBox.buildEnvelope(),
+                where, whereArgs);
     }
 
     /**
@@ -591,7 +1097,39 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public int countFeatures(BoundingBox boundingBox, String where,
                              String[] whereArgs) {
-        return countFeatures(boundingBox.buildEnvelope(), where, whereArgs);
+        return countFeatures(false, null, boundingBox, where, whereArgs);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox,
+                             String where, String[] whereArgs) {
+        return countFeatures(false, column, boundingBox, where, whereArgs);
+    }
+
+    /**
+     * Count the features within the bounding box
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox, String where, String[] whereArgs) {
+        return countFeatures(distinct, column, boundingBox.buildEnvelope(),
+                where, whereArgs);
     }
 
     /**
@@ -599,13 +1137,27 @@ public class RTreeIndexTableDao extends UserCustomDao {
      *
      * @param boundingBox bounding box
      * @param projection  projection
-     * @return cursor results
+     * @return cursor
      */
     public UserCustomCursor query(BoundingBox boundingBox,
                                   Projection projection) {
+        return query(false, boundingBox, projection);
+    }
+
+    /**
+     * Query for rows within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct, BoundingBox boundingBox,
+                                  Projection projection) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return query(featureBoundingBox);
+        return query(distinct, featureBoundingBox);
     }
 
     /**
@@ -614,14 +1166,29 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param columns     columns
      * @param boundingBox bounding box
      * @param projection  projection
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public UserCustomCursor query(String[] columns, BoundingBox boundingBox,
                                   Projection projection) {
+        return query(false, columns, boundingBox, projection);
+    }
+
+    /**
+     * Query for rows within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return query(columns, featureBoundingBox);
+        return query(distinct, columns, featureBoundingBox);
     }
 
     /**
@@ -632,9 +1199,38 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @return count
      */
     public int count(BoundingBox boundingBox, Projection projection) {
+        return count(false, null, boundingBox, projection);
+    }
+
+    /**
+     * Count the rows within the bounding box in the provided projection
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(String column, BoundingBox boundingBox,
+                     Projection projection) {
+        return count(false, column, boundingBox, projection);
+    }
+
+    /**
+     * Count the rows within the bounding box in the provided projection
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column, BoundingBox boundingBox,
+                     Projection projection) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return count(featureBoundingBox);
+        return count(distinct, column, featureBoundingBox);
     }
 
     /**
@@ -647,9 +1243,23 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection) {
+        return queryFeatures(false, boundingBox, projection);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return queryFeatures(featureBoundingBox);
+        return queryFeatures(distinct, featureBoundingBox);
     }
 
     /**
@@ -658,14 +1268,29 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param columns     columns
      * @param boundingBox bounding box
      * @param projection  projection
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox, Projection projection) {
+        return queryFeatures(false, columns, boundingBox, projection);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return queryFeatures(columns, featureBoundingBox);
+        return queryFeatures(distinct, columns, featureBoundingBox);
     }
 
     /**
@@ -677,9 +1302,38 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection) {
+        return countFeatures(false, null, boundingBox, projection);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox,
+                             Projection projection) {
+        return countFeatures(false, column, boundingBox, projection);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return countFeatures(featureBoundingBox);
+        return countFeatures(distinct, column, featureBoundingBox);
     }
 
     /**
@@ -693,9 +1347,25 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, Map<String, Object> fieldValues) {
+        return queryFeatures(false, boundingBox, projection, fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox, Projection projection,
+                                       Map<String, Object> fieldValues) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return queryFeatures(featureBoundingBox, fieldValues);
+        return queryFeatures(distinct, featureBoundingBox, fieldValues);
     }
 
     /**
@@ -705,15 +1375,34 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param boundingBox bounding box
      * @param projection  projection
      * @param fieldValues field values
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox, Projection projection,
                                        Map<String, Object> fieldValues) {
+        return queryFeatures(false, columns, boundingBox, projection,
+                fieldValues);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox, Projection projection,
+                                       Map<String, Object> fieldValues) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return queryFeatures(columns, featureBoundingBox, fieldValues);
+        return queryFeatures(distinct, columns, featureBoundingBox,
+                fieldValues);
     }
 
     /**
@@ -727,9 +1416,42 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection,
                              Map<String, Object> fieldValues) {
+        return countFeatures(false, null, boundingBox, projection, fieldValues);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox,
+                             Projection projection, Map<String, Object> fieldValues) {
+        return countFeatures(false, column, boundingBox, projection,
+                fieldValues);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox, Projection projection,
+                             Map<String, Object> fieldValues) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return countFeatures(featureBoundingBox, fieldValues);
+        return countFeatures(distinct, column, featureBoundingBox, fieldValues);
     }
 
     /**
@@ -743,7 +1465,22 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, String where) {
-        return queryFeatures(boundingBox, projection, where, null);
+        return queryFeatures(false, boundingBox, projection, where);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox, Projection projection, String where) {
+        return queryFeatures(distinct, boundingBox, projection, where, null);
     }
 
     /**
@@ -753,12 +1490,29 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param boundingBox bounding box
      * @param projection  projection
      * @param where       where clause
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox, Projection projection, String where) {
-        return queryFeatures(columns, boundingBox, projection, where, null);
+        return queryFeatures(false, columns, boundingBox, projection, where);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox, Projection projection, String where) {
+        return queryFeatures(distinct, columns, boundingBox, projection, where,
+                null);
     }
 
     /**
@@ -772,7 +1526,39 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection,
                              String where) {
-        return countFeatures(boundingBox, projection, where, null);
+        return countFeatures(false, null, boundingBox, projection, where);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox,
+                             Projection projection, String where) {
+        return countFeatures(false, column, boundingBox, projection, where);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox, Projection projection, String where) {
+        return countFeatures(distinct, column, boundingBox, projection, where,
+                null);
     }
 
     /**
@@ -787,9 +1573,26 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(BoundingBox boundingBox,
                                        Projection projection, String where, String[] whereArgs) {
+        return queryFeatures(false, boundingBox, projection, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       BoundingBox boundingBox, Projection projection, String where,
+                                       String[] whereArgs) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return queryFeatures(featureBoundingBox, where, whereArgs);
+        return queryFeatures(distinct, featureBoundingBox, where, whereArgs);
     }
 
     /**
@@ -800,15 +1603,35 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param projection  projection
      * @param where       where clause
      * @param whereArgs   where arguments
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        BoundingBox boundingBox, Projection projection, String where,
                                        String[] whereArgs) {
+        return queryFeatures(false, columns, boundingBox, projection, where,
+                whereArgs);
+    }
+
+    /**
+     * Query for features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       BoundingBox boundingBox, Projection projection, String where,
+                                       String[] whereArgs) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return queryFeatures(columns, featureBoundingBox, where, whereArgs);
+        return queryFeatures(distinct, columns, featureBoundingBox, where,
+                whereArgs);
     }
 
     /**
@@ -823,19 +1646,69 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public int countFeatures(BoundingBox boundingBox, Projection projection,
                              String where, String[] whereArgs) {
+        return countFeatures(false, null, boundingBox, projection, where,
+                whereArgs);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, BoundingBox boundingBox,
+                             Projection projection, String where, String[] whereArgs) {
+        return countFeatures(false, column, boundingBox, projection, where,
+                whereArgs);
+    }
+
+    /**
+     * Count the features within the bounding box in the provided projection
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             BoundingBox boundingBox, Projection projection, String where,
+                             String[] whereArgs) {
         BoundingBox featureBoundingBox = projectBoundingBox(boundingBox,
                 projection);
-        return countFeatures(featureBoundingBox, where, whereArgs);
+        return countFeatures(distinct, column, featureBoundingBox, where,
+                whereArgs);
     }
 
     /**
      * Query for rows within the geometry envelope
      *
      * @param envelope geometry envelope
-     * @return cursor results
+     * @return cursor
      */
     public UserCustomCursor query(GeometryEnvelope envelope) {
-        return query(envelope.getMinX(), envelope.getMinY(),
+        return query(false, envelope);
+    }
+
+    /**
+     * Query for rows within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param envelope geometry envelope
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct,
+                                  GeometryEnvelope envelope) {
+        return query(distinct, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
     }
 
@@ -844,12 +1717,26 @@ public class RTreeIndexTableDao extends UserCustomDao {
      *
      * @param columns  columns
      * @param envelope geometry envelope
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public UserCustomCursor query(String[] columns,
                                   GeometryEnvelope envelope) {
-        return query(columns, envelope.getMinX(), envelope.getMinY(),
+        return query(false, columns, envelope);
+    }
+
+    /**
+     * Query for rows within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  GeometryEnvelope envelope) {
+        return query(distinct, columns, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
     }
 
@@ -860,7 +1747,33 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @return count
      */
     public int count(GeometryEnvelope envelope) {
-        return count(envelope.getMinX(), envelope.getMinY(),
+        return count(false, null, envelope);
+    }
+
+    /**
+     * Count the rows within the geometry envelope
+     *
+     * @param column   count column name
+     * @param envelope geometry envelope
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(String column, GeometryEnvelope envelope) {
+        return count(false, column, envelope);
+    }
+
+    /**
+     * Count the rows within the geometry envelope
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param envelope geometry envelope
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column,
+                     GeometryEnvelope envelope) {
+        return count(distinct, column, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
     }
 
@@ -872,7 +1785,20 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope) {
-        return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+        return queryFeatures(false, envelope);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param envelope geometry envelope
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       GeometryEnvelope envelope) {
+        return queryFeatures(distinct, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
     }
 
@@ -881,13 +1807,27 @@ public class RTreeIndexTableDao extends UserCustomDao {
      *
      * @param columns  columns
      * @param envelope geometry envelope
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        GeometryEnvelope envelope) {
-        return queryFeatures(columns, envelope.getMinX(), envelope.getMinY(),
-                envelope.getMaxX(), envelope.getMaxY());
+        return queryFeatures(false, columns, envelope);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       GeometryEnvelope envelope) {
+        return queryFeatures(distinct, columns, envelope.getMinX(),
+                envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
     }
 
     /**
@@ -898,8 +1838,34 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public int countFeatures(GeometryEnvelope envelope) {
-        return countFeatures(envelope.getMinX(), envelope.getMinY(),
-                envelope.getMaxX(), envelope.getMaxY());
+        return countFeatures(false, null, envelope);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param column   count column name
+     * @param envelope geometry envelope
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, GeometryEnvelope envelope) {
+        return countFeatures(false, column, envelope);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param envelope geometry envelope
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             GeometryEnvelope envelope) {
+        return countFeatures(distinct, column, envelope.getMinX(),
+                envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY());
     }
 
     /**
@@ -912,7 +1878,21 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        Map<String, Object> fieldValues) {
-        return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+        return queryFeatures(false, envelope, fieldValues);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct    distinct rows
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       GeometryEnvelope envelope, Map<String, Object> fieldValues) {
+        return queryFeatures(distinct, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY(), fieldValues);
     }
 
@@ -922,13 +1902,29 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param columns     columns
      * @param envelope    geometry envelope
      * @param fieldValues field values
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        GeometryEnvelope envelope, Map<String, Object> fieldValues) {
-        return queryFeatures(columns, envelope.getMinX(), envelope.getMinY(),
-                envelope.getMaxX(), envelope.getMaxY(), fieldValues);
+        return queryFeatures(false, columns, envelope, fieldValues);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       GeometryEnvelope envelope, Map<String, Object> fieldValues) {
+        return queryFeatures(distinct, columns, envelope.getMinX(),
+                envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(),
+                fieldValues);
     }
 
     /**
@@ -946,6 +1942,37 @@ public class RTreeIndexTableDao extends UserCustomDao {
     }
 
     /**
+     * Count the features within the geometry envelope
+     *
+     * @param column      count column name
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, GeometryEnvelope envelope,
+                             Map<String, Object> fieldValues) {
+        return countFeatures(false, column, envelope, fieldValues);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             GeometryEnvelope envelope, Map<String, Object> fieldValues) {
+        return countFeatures(distinct, column, envelope.getMinX(),
+                envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(),
+                fieldValues);
+    }
+
+    /**
      * Query for features within the geometry envelope
      *
      * @param envelope geometry envelope
@@ -955,7 +1982,21 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        String where) {
-        return queryFeatures(envelope, where, null);
+        return queryFeatures(false, envelope, where);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       GeometryEnvelope envelope, String where) {
+        return queryFeatures(distinct, envelope, where, null);
     }
 
     /**
@@ -964,12 +2005,27 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param columns  columns
      * @param envelope geometry envelope
      * @param where    where clause
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        GeometryEnvelope envelope, String where) {
-        return queryFeatures(columns, envelope, where, null);
+        return queryFeatures(false, columns, envelope, where);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       GeometryEnvelope envelope, String where) {
+        return queryFeatures(distinct, columns, envelope, where, null);
     }
 
     /**
@@ -981,7 +2037,36 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @since 3.4.0
      */
     public int countFeatures(GeometryEnvelope envelope, String where) {
-        return countFeatures(envelope, where, null);
+        return countFeatures(false, null, envelope, where);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param column   count column name
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, GeometryEnvelope envelope,
+                             String where) {
+        return countFeatures(false, column, envelope, where);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             GeometryEnvelope envelope, String where) {
+        return countFeatures(distinct, column, envelope, where, null);
     }
 
     /**
@@ -995,7 +2080,22 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(GeometryEnvelope envelope,
                                        String where, String[] whereArgs) {
-        return queryFeatures(envelope.getMinX(), envelope.getMinY(),
+        return queryFeatures(false, envelope, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct  distinct rows
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct,
+                                       GeometryEnvelope envelope, String where, String[] whereArgs) {
+        return queryFeatures(distinct, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
     }
 
@@ -1006,13 +2106,30 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param envelope  geometry envelope
      * @param where     where clause
      * @param whereArgs where arguments
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns,
                                        GeometryEnvelope envelope, String where, String[] whereArgs) {
-        return queryFeatures(columns, envelope.getMinX(), envelope.getMinY(),
-                envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
+        return queryFeatures(false, columns, envelope, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the geometry envelope
+     *
+     * @param distinct  distinct rows
+     * @param columns   columns
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       GeometryEnvelope envelope, String where, String[] whereArgs) {
+        return queryFeatures(distinct, columns, envelope.getMinX(),
+                envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(),
+                where, whereArgs);
     }
 
     /**
@@ -1026,8 +2143,40 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public int countFeatures(GeometryEnvelope envelope, String where,
                              String[] whereArgs) {
-        return countFeatures(envelope.getMinX(), envelope.getMinY(),
-                envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
+        return countFeatures(false, null, envelope, where, whereArgs);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param column    count column name
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, GeometryEnvelope envelope,
+                             String where, String[] whereArgs) {
+        return countFeatures(false, column, envelope, where, whereArgs);
+    }
+
+    /**
+     * Count the features within the geometry envelope
+     *
+     * @param distinct  distinct column values
+     * @param column    count column name
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column,
+                             GeometryEnvelope envelope, String where, String[] whereArgs) {
+        return countFeatures(distinct, column, envelope.getMinX(),
+                envelope.getMinY(), envelope.getMaxX(), envelope.getMaxY(),
+                where, whereArgs);
     }
 
     /**
@@ -1037,13 +2186,30 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param minY min y
      * @param maxX max x
      * @param maxY max y
-     * @return cursor results
+     * @return cursor
      */
     public UserCustomCursor query(double minX, double minY, double maxX,
                                   double maxY) {
+        return query(false, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Query for rows within the bounds
+     *
+     * @param distinct distinct rows
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct, double minX, double minY,
+                                  double maxX, double maxY) {
+        validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return query(where, whereArgs);
+        return query(distinct, where, whereArgs);
     }
 
     /**
@@ -1054,15 +2220,32 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param minY    min y
      * @param maxX    max x
      * @param maxY    max y
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public UserCustomCursor query(String[] columns, double minX, double minY,
                                   double maxX, double maxY) {
+        return query(false, columns, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Query for rows within the bounds
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return cursor
+     * @since 3.5.1
+     */
+    public UserCustomCursor query(boolean distinct, String[] columns,
+                                  double minX, double minY, double maxX, double maxY) {
         validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return query(columns, where, whereArgs);
+        return query(distinct, columns, where, whereArgs);
     }
 
     /**
@@ -1075,9 +2258,43 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @return count
      */
     public int count(double minX, double minY, double maxX, double maxY) {
+        return count(false, null, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Count the rows within the bounds
+     *
+     * @param column count column name
+     * @param minX   min x
+     * @param minY   min y
+     * @param maxX   max x
+     * @param maxY   max y
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(String column, double minX, double minY, double maxX,
+                     double maxY) {
+        return count(false, column, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Count the rows within the bounds
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column, double minX, double minY,
+                     double maxX, double maxY) {
+        validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return count(where, whereArgs);
+        return count(distinct, column, where, whereArgs);
     }
 
     /**
@@ -1092,10 +2309,26 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(double minX, double minY, double maxX,
                                        double maxY) {
+        return queryFeatures(false, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct distinct rows
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, double minX,
+                                       double minY, double maxX, double maxY) {
         validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.queryIn(queryIdsSQL(where), whereArgs);
+        return featureDao.queryIn(distinct, queryIdsSQL(where), whereArgs);
     }
 
     /**
@@ -1106,15 +2339,33 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param minY    min y
      * @param maxX    max x
      * @param maxY    max y
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns, double minX,
                                        double minY, double maxX, double maxY) {
+        return queryFeatures(false, columns, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       double minX, double minY, double maxX, double maxY) {
         validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.queryIn(columns, queryIdsSQL(where), whereArgs);
+        return featureDao.queryIn(distinct, columns, queryIdsSQL(where),
+                whereArgs);
     }
 
     /**
@@ -1124,15 +2375,49 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param minY min y
      * @param maxX max x
      * @param maxY max y
-     * @return results
+     * @return count
      * @since 3.4.0
      */
     public int countFeatures(double minX, double minY, double maxX,
                              double maxY) {
+        return countFeatures(false, null, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param column count column name
+     * @param minX   min x
+     * @param minY   min y
+     * @param maxX   max x
+     * @param maxY   max y
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, double minX, double minY,
+                             double maxX, double maxY) {
+        return countFeatures(false, column, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column, double minX,
+                             double minY, double maxX, double maxY) {
         validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.countIn(queryIdsSQL(where), whereArgs);
+        return featureDao.countIn(distinct, column, queryIdsSQL(where),
+                whereArgs);
     }
 
     /**
@@ -1148,10 +2433,29 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(double minX, double minY, double maxX,
                                        double maxY, Map<String, Object> fieldValues) {
+        return queryFeatures(false, minX, minY, maxX, maxY, fieldValues);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct    distinct rows
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, double minX,
+                                       double minY, double maxX, double maxY,
+                                       Map<String, Object> fieldValues) {
         validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.queryIn(queryIdsSQL(where), whereArgs, fieldValues);
+        return featureDao.queryIn(distinct, queryIdsSQL(where), whereArgs,
+                fieldValues);
     }
 
     /**
@@ -1163,17 +2467,37 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param maxX        max x
      * @param maxY        max y
      * @param fieldValues field values
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns, double minX,
                                        double minY, double maxX, double maxY,
                                        Map<String, Object> fieldValues) {
+        return queryFeatures(false, columns, minX, minY, maxX, maxY,
+                fieldValues);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       double minX, double minY, double maxX, double maxY,
+                                       Map<String, Object> fieldValues) {
         validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.queryIn(columns, queryIdsSQL(where), whereArgs,
-                fieldValues);
+        return featureDao.queryIn(distinct, columns, queryIdsSQL(where),
+                whereArgs, fieldValues);
     }
 
     /**
@@ -1184,15 +2508,53 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param maxX        max x
      * @param maxY        max y
      * @param fieldValues field values
-     * @return results
+     * @return count
      * @since 3.4.0
      */
     public int countFeatures(double minX, double minY, double maxX, double maxY,
                              Map<String, Object> fieldValues) {
+        return countFeatures(false, null, minX, minY, maxX, maxY, fieldValues);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param column      count column name
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, double minX, double minY,
+                             double maxX, double maxY, Map<String, Object> fieldValues) {
+        return countFeatures(false, column, minX, minY, maxX, maxY,
+                fieldValues);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column, double minX,
+                             double minY, double maxX, double maxY,
+                             Map<String, Object> fieldValues) {
         validateRTree();
         String where = buildWhere(minX, minY, maxX, maxY);
         String[] whereArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.countIn(queryIdsSQL(where), whereArgs, fieldValues);
+        return featureDao.countIn(distinct, column, queryIdsSQL(where),
+                whereArgs, fieldValues);
     }
 
     /**
@@ -1208,7 +2570,24 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(double minX, double minY, double maxX,
                                        double maxY, String where) {
-        return queryFeatures(minX, minY, maxX, maxY, where, null);
+        return queryFeatures(false, minX, minY, maxX, maxY, where);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct distinct rows
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @param where    where clause
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, double minX,
+                                       double minY, double maxX, double maxY, String where) {
+        return queryFeatures(distinct, minX, minY, maxX, maxY, where, null);
     }
 
     /**
@@ -1220,12 +2599,31 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param maxX    max x
      * @param maxY    max y
      * @param where   where clause
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns, double minX,
                                        double minY, double maxX, double maxY, String where) {
-        return queryFeatures(columns, minX, minY, maxX, maxY, where, null);
+        return queryFeatures(false, columns, minX, minY, maxX, maxY, where);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @param where    where clause
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       double minX, double minY, double maxX, double maxY, String where) {
+        return queryFeatures(distinct, columns, minX, minY, maxX, maxY, where,
+                null);
     }
 
     /**
@@ -1236,12 +2634,48 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param maxX  max x
      * @param maxY  max y
      * @param where where clause
-     * @return results
+     * @return count
      * @since 3.4.0
      */
     public int countFeatures(double minX, double minY, double maxX, double maxY,
                              String where) {
-        return countFeatures(minX, minY, maxX, maxY, where, null);
+        return countFeatures(false, null, minX, minY, maxX, maxY, where);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param column count column name
+     * @param minX   min x
+     * @param minY   min y
+     * @param maxX   max x
+     * @param maxY   max y
+     * @param where  where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, double minX, double minY,
+                             double maxX, double maxY, String where) {
+        return countFeatures(false, column, minX, minY, maxX, maxY, where);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @param where    where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column, double minX,
+                             double minY, double maxX, double maxY, String where) {
+        return countFeatures(distinct, column, minX, minY, maxX, maxY, where,
+                null);
     }
 
     /**
@@ -1258,11 +2692,30 @@ public class RTreeIndexTableDao extends UserCustomDao {
      */
     public FeatureCursor queryFeatures(double minX, double minY, double maxX,
                                        double maxY, String where, String[] whereArgs) {
+        return queryFeatures(false, minX, minY, maxX, maxY, where, whereArgs);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct  distinct rows
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, double minX,
+                                       double minY, double maxX, double maxY, String where,
+                                       String[] whereArgs) {
         validateRTree();
         String whereBounds = buildWhere(minX, minY, maxX, maxY);
         String[] whereBoundsArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.queryIn(queryIdsSQL(whereBounds), whereBoundsArgs,
-                where, whereArgs);
+        return featureDao.queryIn(distinct, queryIdsSQL(whereBounds),
+                whereBoundsArgs, where, whereArgs);
     }
 
     /**
@@ -1275,16 +2728,37 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param maxY      max y
      * @param where     where clause
      * @param whereArgs where arguments
-     * @return results
+     * @return cursor
      * @since 3.5.0
      */
     public FeatureCursor queryFeatures(String[] columns, double minX,
                                        double minY, double maxX, double maxY, String where,
                                        String[] whereArgs) {
+        return queryFeatures(false, columns, minX, minY, maxX, maxY, where,
+                whereArgs);
+    }
+
+    /**
+     * Query for features within the bounds
+     *
+     * @param distinct  distinct rows
+     * @param columns   columns
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor queryFeatures(boolean distinct, String[] columns,
+                                       double minX, double minY, double maxX, double maxY, String where,
+                                       String[] whereArgs) {
         validateRTree();
         String whereBounds = buildWhere(minX, minY, maxX, maxY);
         String[] whereBoundsArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.queryIn(columns, queryIdsSQL(whereBounds),
+        return featureDao.queryIn(distinct, columns, queryIdsSQL(whereBounds),
                 whereBoundsArgs, where, whereArgs);
     }
 
@@ -1297,16 +2771,56 @@ public class RTreeIndexTableDao extends UserCustomDao {
      * @param maxY      max y
      * @param where     where clause
      * @param whereArgs where arguments
-     * @return results
+     * @return count
      * @since 3.4.0
      */
     public int countFeatures(double minX, double minY, double maxX, double maxY,
                              String where, String[] whereArgs) {
+        return countFeatures(false, null, minX, minY, maxX, maxY, where,
+                whereArgs);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param column    count column name
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(String column, double minX, double minY,
+                             double maxX, double maxY, String where, String[] whereArgs) {
+        return countFeatures(false, column, minX, minY, maxX, maxY, where,
+                whereArgs);
+    }
+
+    /**
+     * Count the features within the bounds
+     *
+     * @param distinct  distinct column values
+     * @param column    count column name
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int countFeatures(boolean distinct, String column, double minX,
+                             double minY, double maxX, double maxY, String where,
+                             String[] whereArgs) {
         validateRTree();
         String whereBounds = buildWhere(minX, minY, maxX, maxY);
         String[] whereBoundsArgs = buildWhereArgs(minX, minY, maxX, maxY);
-        return featureDao.countIn(queryIdsSQL(whereBounds), whereBoundsArgs,
-                where, whereArgs);
+        return featureDao.countIn(distinct, column, queryIdsSQL(whereBounds),
+                whereBoundsArgs, where, whereArgs);
     }
 
     /**
