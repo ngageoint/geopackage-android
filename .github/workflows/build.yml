@@ -16,7 +16,7 @@ jobs:
       uses: frabert/replace-string-action@master
       id: core-repository
       with:
-        pattern: '(.*)-java'
+        pattern: '(.*)-android'
         string: "${{ github.repository }}"
         replace-with: '$1-core-java'
     - name: Checkout Core Repository
