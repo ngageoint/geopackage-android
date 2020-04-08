@@ -151,6 +151,26 @@ public interface GeoPackageSQLiteDatabase {
                         String orderBy, String limit);
 
     /**
+     * Query the table
+     *
+     * @param distinct      distinct flag
+     * @param table         table name
+     * @param columns       columns
+     * @param selection     selection
+     * @param selectionArgs selection arguments
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @param limit         limit
+     * @return cursor
+     * @see SQLiteDatabase#query(boolean, String, String[], String, String[], String, String, String, String)
+     * @since 3.5.1
+     */
+    public Cursor query(boolean distinct, String table, String[] columns,
+                        String selection, String[] selectionArgs, String groupBy,
+                        String having, String orderBy, String limit);
+
+    /**
      * Update the table
      *
      * @param table       table name

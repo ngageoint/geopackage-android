@@ -52,7 +52,26 @@ public class UserQuery {
     public UserQuery(String table, String[] columns, String selection,
                      String[] selectionArgs, String groupBy, String having,
                      String orderBy) {
-        this(table, columns, null, selection, selectionArgs, groupBy, having, orderBy, null);
+        this(null, table, columns, selection, selectionArgs, groupBy, having, orderBy);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param distinct      distinct flag
+     * @param table         table name
+     * @param columns       column names
+     * @param selection     selection
+     * @param selectionArgs selection args
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @since 3.5.1
+     */
+    public UserQuery(Boolean distinct, String table, String[] columns, String selection,
+                     String[] selectionArgs, String groupBy, String having,
+                     String orderBy) {
+        this(distinct, table, columns, null, selection, selectionArgs, groupBy, having, orderBy, null);
     }
 
     /**
@@ -70,7 +89,27 @@ public class UserQuery {
     public UserQuery(String table, String[] columns, String[] columnsAs, String selection,
                      String[] selectionArgs, String groupBy, String having,
                      String orderBy) {
-        this(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, null);
+        this(null, table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param distinct      distinct flag
+     * @param table         table name
+     * @param columns       column names
+     * @param columnsAs     columns as values
+     * @param selection     selection
+     * @param selectionArgs selection args
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @since 3.5.1
+     */
+    public UserQuery(Boolean distinct, String table, String[] columns, String[] columnsAs, String selection,
+                     String[] selectionArgs, String groupBy, String having,
+                     String orderBy) {
+        this(distinct, table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, null);
     }
 
     /**
@@ -88,7 +127,27 @@ public class UserQuery {
     public UserQuery(String table, String[] columns, String selection,
                      String[] selectionArgs, String groupBy, String having,
                      String orderBy, String limit) {
-        this(table, columns, null, selection, selectionArgs, groupBy, having, orderBy, limit);
+        this(null, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param distinct      distinct flag
+     * @param table         table name
+     * @param columns       column names
+     * @param selection     selection
+     * @param selectionArgs selection args
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @param limit         limit
+     * @since 3.5.1
+     */
+    public UserQuery(Boolean distinct, String table, String[] columns, String selection,
+                     String[] selectionArgs, String groupBy, String having,
+                     String orderBy, String limit) {
+        this(distinct, table, columns, null, selection, selectionArgs, groupBy, having, orderBy, limit);
     }
 
     /**
@@ -107,7 +166,31 @@ public class UserQuery {
     public UserQuery(String table, String[] columns, String[] columnsAs, String selection,
                      String[] selectionArgs, String groupBy, String having,
                      String orderBy, String limit) {
+        this(null, table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
+    }
 
+    /**
+     * Constructor
+     *
+     * @param distinct      distinct flag
+     * @param table         table name
+     * @param columns       column names
+     * @param columnsAs     columns as values
+     * @param selection     selection
+     * @param selectionArgs selection args
+     * @param groupBy       group by
+     * @param having        having
+     * @param orderBy       order by
+     * @param limit         limit
+     * @since 3.5.1
+     */
+    public UserQuery(Boolean distinct, String table, String[] columns, String[] columnsAs, String selection,
+                     String[] selectionArgs, String groupBy, String having,
+                     String orderBy, String limit) {
+
+        if (distinct != null) {
+            set(UserQueryParamType.DISTINCT, distinct);
+        }
         if (table != null) {
             set(UserQueryParamType.TABLE, table);
         }
@@ -184,6 +267,21 @@ public class UserQuery {
      */
     public String[] getSelectionArgs() {
         return (String[]) get(UserQueryParamType.SELECTION_ARGS);
+    }
+
+    /**
+     * Get the distinct flag
+     *
+     * @return distinct flag
+     * @since 3.5.1
+     */
+    public boolean getDistinct() {
+        boolean distinct = false;
+        Object value = get(UserQueryParamType.DISTINCT);
+        if (value != null) {
+            distinct = (Boolean) value;
+        }
+        return distinct;
     }
 
     /**

@@ -14,6 +14,11 @@ public enum UserQueryParamType {
     SQL,
 
     /**
+     * Distinct flag
+     */
+    DISTINCT,
+
+    /**
      * Table name
      */
     TABLE,

@@ -358,6 +358,16 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * {@inheritDoc}
      */
     @Override
+    public Cursor query(boolean distinct, String table, String[] columns,
+                        String selection, String[] selectionArgs, String groupBy,
+                        String having, String orderBy, String limit) {
+        return getActive().query(distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
         return getActive().update(table, values, whereClause, whereArgs);
     }

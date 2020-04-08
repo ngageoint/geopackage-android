@@ -162,6 +162,16 @@ public class AndroidSQLiteDatabase implements GeoPackageSQLiteDatabase {
      * {@inheritDoc}
      */
     @Override
+    public Cursor query(boolean distinct, String table, String[] columns,
+                        String selection, String[] selectionArgs, String groupBy,
+                        String having, String orderBy, String limit) {
+        return db.query(distinct, CoreSQLUtils.quoteWrap(table), CoreSQLUtils.quoteWrap(columns), selection, selectionArgs, groupBy, having, orderBy, limit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
         return db.update(CoreSQLUtils.quoteWrap(table), SQLUtils.quoteWrap(values), whereClause, whereArgs);
     }

@@ -73,9 +73,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      */
     @Override
     public TResult rawQuery(String sql, String[] selectionArgs) {
-        UserQuery query = new UserQuery(sql, selectionArgs);
-        TResult result = query(query);
-        return result;
+        return query(new UserQuery(sql, selectionArgs));
     }
 
     /**
@@ -85,9 +83,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(String table, String[] columns, String selection,
                          String[] selectionArgs, String groupBy, String having,
                          String orderBy) {
-        UserQuery query = new UserQuery(table, columns, selection, selectionArgs, groupBy, having, orderBy);
-        TResult result = query(query);
-        return result;
+        return query(new UserQuery(table, columns, selection, selectionArgs, groupBy, having, orderBy));
     }
 
     /**
@@ -97,7 +93,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(boolean distinct, String table, String[] columns,
                          String selection, String[] selectionArgs, String groupBy,
                          String having, String orderBy) {
-        return null; // TODO
+        return query(new UserQuery(distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy));
     }
 
     /**
@@ -107,9 +103,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(String table, String[] columns, String[] columnsAs, String selection,
                          String[] selectionArgs, String groupBy, String having,
                          String orderBy) {
-        UserQuery query = new UserQuery(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
-        TResult result = query(query);
-        return result;
+        return query(new UserQuery(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy));
     }
 
     /**
@@ -119,7 +113,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(boolean distinct, String table, String[] columns,
                          String[] columnsAs, String selection, String[] selectionArgs,
                          String groupBy, String having, String orderBy) {
-        return null; // TODO
+        return query(new UserQuery(distinct, table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy));
     }
 
     /**
@@ -129,9 +123,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(String table, String[] columns, String selection,
                          String[] selectionArgs, String groupBy, String having,
                          String orderBy, String limit) {
-        UserQuery query = new UserQuery(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
-        TResult result = query(query);
-        return result;
+        return query(new UserQuery(table, columns, selection, selectionArgs, groupBy, having, orderBy, limit));
     }
 
     /**
@@ -141,7 +133,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(boolean distinct, String table, String[] columns,
                          String selection, String[] selectionArgs, String groupBy,
                          String having, String orderBy, String limit) {
-        return null; // TODO
+        return query(new UserQuery(distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit));
     }
 
     /**
@@ -151,9 +143,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(String table, String[] columns, String[] columnsAs, String selection,
                          String[] selectionArgs, String groupBy, String having,
                          String orderBy, String limit) {
-        UserQuery query = new UserQuery(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
-        TResult result = query(query);
-        return result;
+        return query(new UserQuery(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit));
     }
 
     /**
@@ -163,7 +153,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     public TResult query(boolean distinct, String table, String[] columns,
                          String[] columnsAs, String selection, String[] selectionArgs,
                          String groupBy, String having, String orderBy, String limit) {
-        return null; // TODO
+        return query(new UserQuery(distinct, table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit));
     }
 
     /**
@@ -172,8 +162,8 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     @Override
     public String querySQL(String table, String[] columns, String selection,
                            String groupBy, String having, String orderBy) {
-        return querySQL(table, columns, null, selection, groupBy, having,
-                orderBy, null);
+        return querySQL(false, table, columns, selection, groupBy, having,
+                orderBy);
     }
 
     /**
@@ -192,8 +182,8 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     @Override
     public String querySQL(String table, String[] columns, String[] columnsAs,
                            String selection, String groupBy, String having, String orderBy) {
-        return querySQL(table, columns, columnsAs, selection, groupBy, having,
-                orderBy, null);
+        return querySQL(false, table, columns, columnsAs, selection, groupBy, having,
+                orderBy);
     }
 
     /**
@@ -213,7 +203,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     @Override
     public String querySQL(String table, String[] columns, String selection,
                            String groupBy, String having, String orderBy, String limit) {
-        return querySQL(table, columns, null, selection, groupBy, having,
+        return querySQL(false, table, columns, selection, groupBy, having,
                 orderBy, limit);
     }
 
@@ -258,9 +248,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      * @since 2.0.0
      */
     public TResult query(TResult previousResult) {
-        UserQuery query = previousResult.getQuery();
-        TResult result = query(query);
-        return result;
+        return query(previousResult.getQuery());
     }
 
     /**
@@ -280,6 +268,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
             cursor = database.rawQuery(sql, selectionArgs);
         } else {
 
+            boolean distinct = query.getDistinct();
             String table = query.getTable();
             String[] columns = query.getColumns();
             String selection = query.getSelection();
@@ -290,7 +279,9 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
             String[] columnsAs = query.getColumnsAs();
             String limit = query.getLimit();
 
-            if (columnsAs != null && limit != null) {
+            if (distinct) {
+                cursor = database.query(distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
+            } else if (columnsAs != null && limit != null) {
                 cursor = database.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy, limit);
             } else if (columnsAs != null) {
                 cursor = database.query(table, columns, columnsAs, selection, selectionArgs, groupBy, having, orderBy);
