@@ -102,12 +102,35 @@ public class ManualFeatureQuery {
     /**
      * Query for features
      *
+     * @param distinct distinct rows
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct) {
+        return featureDao.query(distinct);
+    }
+
+    /**
+     * Query for features
+     *
      * @param columns columns
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor query(String[] columns) {
         return featureDao.query(columns);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct, String[] columns) {
+        return featureDao.query(distinct, columns);
     }
 
     /**
@@ -131,6 +154,29 @@ public class ManualFeatureQuery {
     }
 
     /**
+     * Get a count of results
+     *
+     * @param column count column name
+     * @return count
+     * @since 3.5.1
+     */
+    public int countColumn(String column) {
+        return featureDao.countColumn(column);
+    }
+
+    /**
+     * Get a count of results
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column) {
+        return featureDao.count(distinct, column);
+    }
+
+    /**
      * Query for features
      *
      * @param fieldValues field values
@@ -138,9 +184,22 @@ public class ManualFeatureQuery {
      * @since 3.4.0
      */
     public FeatureCursor query(Map<String, Object> fieldValues) {
+        return query(false, fieldValues);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct    distinct rows
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct,
+                               Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
         String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
-        return featureDao.query(where, whereArgs);
+        return featureDao.query(distinct, where, whereArgs);
     }
 
     /**
@@ -148,14 +207,28 @@ public class ManualFeatureQuery {
      *
      * @param columns     columns
      * @param fieldValues field values
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor query(String[] columns,
                                Map<String, Object> fieldValues) {
+        return query(false, columns, fieldValues);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param fieldValues field values
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct, String[] columns,
+                               Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
         String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
-        return featureDao.query(columns, where, whereArgs);
+        return featureDao.query(distinct, columns, where, whereArgs);
     }
 
     /**
@@ -166,9 +239,35 @@ public class ManualFeatureQuery {
      * @since 3.4.0
      */
     public int count(Map<String, Object> fieldValues) {
+        return count(false, null, fieldValues);
+    }
+
+    /**
+     * Count features
+     *
+     * @param column      count column name
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(String column, Map<String, Object> fieldValues) {
+        return count(false, column, fieldValues);
+    }
+
+    /**
+     * Count features
+     *
+     * @param distinct    distinct column values
+     * @param column      count column name
+     * @param fieldValues field values
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column,
+                     Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
         String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
-        return featureDao.count(where, whereArgs);
+        return featureDao.count(distinct, column, where, whereArgs);
     }
 
     /**
@@ -185,13 +284,39 @@ public class ManualFeatureQuery {
     /**
      * Query for features
      *
+     * @param distinct distinct rows
+     * @param where    where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct, String where) {
+        return featureDao.query(distinct, where);
+    }
+
+    /**
+     * Query for features
+     *
      * @param columns columns
      * @param where   where clause
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor query(String[] columns, String where) {
         return featureDao.query(columns, where);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param where    where clause
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct, String[] columns,
+                               String where) {
+        return featureDao.query(distinct, columns, where);
     }
 
     /**
@@ -203,6 +328,31 @@ public class ManualFeatureQuery {
      */
     public int count(String where) {
         return featureDao.count(where);
+    }
+
+    /**
+     * Count features
+     *
+     * @param column count column name
+     * @param where  where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(String column, String where) {
+        return featureDao.count(column, where);
+    }
+
+    /**
+     * Count features
+     *
+     * @param distinct distinct column values
+     * @param column   count column name
+     * @param where    where clause
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column, String where) {
+        return featureDao.count(distinct, column, where);
     }
 
     /**
@@ -220,15 +370,44 @@ public class ManualFeatureQuery {
     /**
      * Query for features
      *
+     * @param distinct  distinct rows
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct, String where,
+                               String[] whereArgs) {
+        return featureDao.query(distinct, where, whereArgs);
+    }
+
+    /**
+     * Query for features
+     *
      * @param columns   columns
      * @param where     where clause
      * @param whereArgs where arguments
-     * @return feature results
+     * @return feature cursor
      * @since 3.5.0
      */
     public FeatureCursor query(String[] columns, String where,
                                String[] whereArgs) {
         return featureDao.query(columns, where, whereArgs);
+    }
+
+    /**
+     * Query for features
+     *
+     * @param distinct  distinct rows
+     * @param columns   columns
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return feature cursor
+     * @since 3.5.1
+     */
+    public FeatureCursor query(boolean distinct, String[] columns,
+                               String where, String[] whereArgs) {
+        return featureDao.query(distinct, columns, where, whereArgs);
     }
 
     /**
@@ -241,6 +420,34 @@ public class ManualFeatureQuery {
      */
     public int count(String where, String[] whereArgs) {
         return featureDao.count(where, whereArgs);
+    }
+
+    /**
+     * Count features
+     *
+     * @param column    count column name
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(String column, String where, String[] whereArgs) {
+        return featureDao.count(column, where, whereArgs);
+    }
+
+    /**
+     * Count features
+     *
+     * @param distinct  distinct column values
+     * @param column    count column name
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return count
+     * @since 3.5.1
+     */
+    public int count(boolean distinct, String column, String where,
+                     String[] whereArgs) {
+        return featureDao.count(distinct, column, where, whereArgs);
     }
 
     /**
@@ -318,7 +525,20 @@ public class ManualFeatureQuery {
      * @return results
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox) {
-        return query(boundingBox.buildEnvelope());
+        return query(false, boundingBox);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox) {
+        return query(distinct, boundingBox.buildEnvelope());
     }
 
     /**
@@ -331,7 +551,21 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox) {
-        return query(columns, boundingBox.buildEnvelope());
+        return query(false, columns, boundingBox);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox) {
+        return query(distinct, columns, boundingBox.buildEnvelope());
     }
 
     /**
@@ -354,7 +588,21 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Map<String, Object> fieldValues) {
-        return query(boundingBox.buildEnvelope(), fieldValues);
+        return query(false, boundingBox, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox, Map<String, Object> fieldValues) {
+        return query(distinct, boundingBox.buildEnvelope(), fieldValues);
     }
 
     /**
@@ -368,7 +616,23 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox, Map<String, Object> fieldValues) {
-        return query(columns, boundingBox.buildEnvelope(), fieldValues);
+        return query(false, columns, boundingBox, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox, Map<String, Object> fieldValues) {
+        return query(distinct, columns, boundingBox.buildEnvelope(),
+                fieldValues);
     }
 
     /**
@@ -388,13 +652,27 @@ public class ManualFeatureQuery {
      * Manually query for rows within the bounding box
      *
      * @param boundingBox bounding box
-     * @param where       were clause
+     * @param where       where clause
      * @return results
      * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            String where) {
-        return query(boundingBox, where, null);
+        return query(false, boundingBox, where);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox, String where) {
+        return query(distinct, boundingBox, where, null);
     }
 
     /**
@@ -402,20 +680,35 @@ public class ManualFeatureQuery {
      *
      * @param columns     columns
      * @param boundingBox bounding box
-     * @param where       were clause
+     * @param where       where clause
      * @return results
      * @since 3.5.0
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox, String where) {
-        return query(columns, boundingBox, where, null);
+        return query(false, columns, boundingBox, where);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox, String where) {
+        return query(distinct, columns, boundingBox, where, null);
     }
 
     /**
      * Manually count the rows within the bounding box
      *
      * @param boundingBox bounding box
-     * @param where       were clause
+     * @param where       where clause
      * @return count
      * @since 3.4.0
      */
@@ -427,14 +720,29 @@ public class ManualFeatureQuery {
      * Manually query for rows within the bounding box
      *
      * @param boundingBox bounding box
-     * @param where       were clause
+     * @param where       where clause
      * @param whereArgs   where arguments
      * @return results
      * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            String where, String[] whereArgs) {
-        return query(boundingBox.buildEnvelope(), where, whereArgs);
+        return query(false, boundingBox, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox, String where, String[] whereArgs) {
+        return query(distinct, boundingBox.buildEnvelope(), where, whereArgs);
     }
 
     /**
@@ -442,21 +750,38 @@ public class ManualFeatureQuery {
      *
      * @param columns     columns
      * @param boundingBox bounding box
-     * @param where       were clause
+     * @param where       where clause
      * @param whereArgs   where arguments
      * @return results
      * @since 3.5.0
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox, String where, String[] whereArgs) {
-        return query(columns, boundingBox.buildEnvelope(), where, whereArgs);
+        return query(false, columns, boundingBox, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the bounding box
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox, String where, String[] whereArgs) {
+        return query(distinct, columns, boundingBox.buildEnvelope(), where,
+                whereArgs);
     }
 
     /**
      * Manually count the rows within the bounding box
      *
      * @param boundingBox bounding box
-     * @param where       were clause
+     * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
      * @since 3.4.0
@@ -476,9 +801,24 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Projection projection) {
+        return query(false, boundingBox, projection);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = featureDao.projectBoundingBox(
                 boundingBox, projection);
-        return query(featureBoundingBox);
+        return query(distinct, featureBoundingBox);
     }
 
     /**
@@ -493,9 +833,25 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox, Projection projection) {
+        return query(false, columns, boundingBox, projection);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = featureDao
                 .projectBoundingBox(boundingBox, projection);
-        return query(columns, featureBoundingBox);
+        return query(distinct, columns, featureBoundingBox);
     }
 
     /**
@@ -524,9 +880,26 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Projection projection, Map<String, Object> fieldValues) {
+        return query(false, boundingBox, projection, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox, Projection projection,
+                                           Map<String, Object> fieldValues) {
         BoundingBox featureBoundingBox = featureDao
                 .projectBoundingBox(boundingBox, projection);
-        return query(featureBoundingBox, fieldValues);
+        return query(distinct, featureBoundingBox, fieldValues);
     }
 
     /**
@@ -543,9 +916,27 @@ public class ManualFeatureQuery {
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox, Projection projection,
                                            Map<String, Object> fieldValues) {
+        return query(false, columns, boundingBox, projection, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox, Projection projection,
+                                           Map<String, Object> fieldValues) {
         BoundingBox featureBoundingBox = featureDao
                 .projectBoundingBox(boundingBox, projection);
-        return query(columns, featureBoundingBox, fieldValues);
+        return query(distinct, columns, featureBoundingBox, fieldValues);
     }
 
     /**
@@ -571,13 +962,29 @@ public class ManualFeatureQuery {
      *
      * @param boundingBox bounding box
      * @param projection  projection
-     * @param where       were clause
+     * @param where       where clause
      * @return results
      * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Projection projection, String where) {
-        return query(boundingBox, projection, where, null);
+        return query(false, boundingBox, projection, where);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox, Projection projection, String where) {
+        return query(distinct, boundingBox, projection, where, null);
     }
 
     /**
@@ -587,13 +994,30 @@ public class ManualFeatureQuery {
      * @param columns     columns
      * @param boundingBox bounding box
      * @param projection  projection
-     * @param where       were clause
+     * @param where       where clause
      * @return results
      * @since 3.5.0
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox, Projection projection, String where) {
-        return query(columns, boundingBox, projection, where, null);
+        return query(false, columns, boundingBox, projection, where);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox, Projection projection, String where) {
+        return query(distinct, columns, boundingBox, projection, where, null);
     }
 
     /**
@@ -602,7 +1026,7 @@ public class ManualFeatureQuery {
      *
      * @param boundingBox bounding box
      * @param projection  projection
-     * @param where       were clause
+     * @param where       where clause
      * @return count
      * @since 3.4.0
      */
@@ -617,16 +1041,34 @@ public class ManualFeatureQuery {
      *
      * @param boundingBox bounding box
      * @param projection  projection
-     * @param where       were clause
+     * @param where       where clause
      * @param whereArgs   where arguments
      * @return results
      * @since 3.4.0
      */
     public ManualFeatureQueryResults query(BoundingBox boundingBox,
                                            Projection projection, String where, String[] whereArgs) {
+        return query(false, boundingBox, projection, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           BoundingBox boundingBox, Projection projection, String where,
+                                           String[] whereArgs) {
         BoundingBox featureBoundingBox = featureDao
                 .projectBoundingBox(boundingBox, projection);
-        return query(featureBoundingBox, where, whereArgs);
+        return query(distinct, featureBoundingBox, where, whereArgs);
     }
 
     /**
@@ -636,7 +1078,7 @@ public class ManualFeatureQuery {
      * @param columns     columns
      * @param boundingBox bounding box
      * @param projection  projection
-     * @param where       were clause
+     * @param where       where clause
      * @param whereArgs   where arguments
      * @return results
      * @since 3.5.0
@@ -644,9 +1086,28 @@ public class ManualFeatureQuery {
     public ManualFeatureQueryResults query(String[] columns,
                                            BoundingBox boundingBox, Projection projection, String where,
                                            String[] whereArgs) {
+        return query(false, columns, boundingBox, projection, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the bounding box in the provided
+     * projection
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param boundingBox bounding box
+     * @param projection  projection
+     * @param where       where clause
+     * @param whereArgs   where arguments
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           BoundingBox boundingBox, Projection projection, String where,
+                                           String[] whereArgs) {
         BoundingBox featureBoundingBox = featureDao
                 .projectBoundingBox(boundingBox, projection);
-        return query(columns, featureBoundingBox, where, whereArgs);
+        return query(distinct, columns, featureBoundingBox, where, whereArgs);
     }
 
     /**
@@ -655,7 +1116,7 @@ public class ManualFeatureQuery {
      *
      * @param boundingBox bounding box
      * @param projection  projection
-     * @param where       were clause
+     * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
      * @since 3.4.0
@@ -674,7 +1135,20 @@ public class ManualFeatureQuery {
      * @return results
      */
     public ManualFeatureQueryResults query(GeometryEnvelope envelope) {
-        return query(envelope.getMinX(), envelope.getMinY(),
+        return query(false, envelope);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param envelope geometry envelope
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           GeometryEnvelope envelope) {
+        return query(distinct, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
     }
 
@@ -688,7 +1162,21 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            GeometryEnvelope envelope) {
-        return query(columns, envelope.getMinX(), envelope.getMinY(),
+        return query(false, columns, envelope);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           GeometryEnvelope envelope) {
+        return query(distinct, columns, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY());
     }
 
@@ -713,8 +1201,22 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(GeometryEnvelope envelope,
                                            Map<String, Object> fieldValues) {
-        return query(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(),
-                envelope.getMaxY(), fieldValues);
+        return query(false, envelope, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct    distinct rows
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           GeometryEnvelope envelope, Map<String, Object> fieldValues) {
+        return query(distinct, envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), fieldValues);
     }
 
     /**
@@ -728,7 +1230,22 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            GeometryEnvelope envelope, Map<String, Object> fieldValues) {
-        return query(columns, envelope.getMinX(), envelope.getMinY(),
+        return query(false, columns, envelope, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param envelope    geometry envelope
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           GeometryEnvelope envelope, Map<String, Object> fieldValues) {
+        return query(distinct, columns, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY(), fieldValues);
     }
 
@@ -756,7 +1273,21 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(GeometryEnvelope envelope,
                                            String where) {
-        return query(envelope, where, null);
+        return query(false, envelope, where);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           GeometryEnvelope envelope, String where) {
+        return query(distinct, envelope, where, null);
     }
 
     /**
@@ -770,7 +1301,22 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            GeometryEnvelope envelope, String where) {
-        return query(columns, envelope, where, null);
+        return query(false, columns, envelope, where);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param envelope geometry envelope
+     * @param where    where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           GeometryEnvelope envelope, String where) {
+        return query(distinct, columns, envelope, where, null);
     }
 
     /**
@@ -796,8 +1342,23 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(GeometryEnvelope envelope,
                                            String where, String[] whereArgs) {
-        return query(envelope.getMinX(), envelope.getMinY(), envelope.getMaxX(),
-                envelope.getMaxY(), where, whereArgs);
+        return query(false, envelope, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct  distinct rows
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct,
+                                           GeometryEnvelope envelope, String where, String[] whereArgs) {
+        return query(distinct, envelope.getMinX(), envelope.getMinY(),
+                envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
     }
 
     /**
@@ -812,7 +1373,23 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns,
                                            GeometryEnvelope envelope, String where, String[] whereArgs) {
-        return query(columns, envelope.getMinX(), envelope.getMinY(),
+        return query(false, columns, envelope, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the geometry envelope
+     *
+     * @param distinct  distinct rows
+     * @param columns   columns
+     * @param envelope  geometry envelope
+     * @param where     where clause
+     * @param whereArgs where arguments
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           GeometryEnvelope envelope, String where, String[] whereArgs) {
+        return query(distinct, columns, envelope.getMinX(), envelope.getMinY(),
                 envelope.getMaxX(), envelope.getMaxY(), where, whereArgs);
     }
 
@@ -842,7 +1419,23 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(double minX, double minY,
                                            double maxX, double maxY) {
-        return query(minX, minY, maxX, maxY, null, null);
+        return query(false, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct distinct rows
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, double minX,
+                                           double minY, double maxX, double maxY) {
+        return query(distinct, minX, minY, maxX, maxY, null, null);
     }
 
     /**
@@ -858,7 +1451,24 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns, double minX,
                                            double minY, double maxX, double maxY) {
-        return query(columns, minX, minY, maxX, maxY, null, null);
+        return query(false, columns, minX, minY, maxX, maxY);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           double minX, double minY, double maxX, double maxY) {
+        return query(distinct, columns, minX, minY, maxX, maxY, null, null);
     }
 
     /**
@@ -887,9 +1497,27 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(double minX, double minY,
                                            double maxX, double maxY, Map<String, Object> fieldValues) {
+        return query(false, minX, minY, maxX, maxY, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct    distinct rows
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, double minX,
+                                           double minY, double maxX, double maxY,
+                                           Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
         String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
-        return query(minX, minY, maxX, maxY, where, whereArgs);
+        return query(distinct, minX, minY, maxX, maxY, where, whereArgs);
     }
 
     /**
@@ -907,9 +1535,29 @@ public class ManualFeatureQuery {
     public ManualFeatureQueryResults query(String[] columns, double minX,
                                            double minY, double maxX, double maxY,
                                            Map<String, Object> fieldValues) {
+        return query(false, columns, minX, minY, maxX, maxY, fieldValues);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct    distinct rows
+     * @param columns     columns
+     * @param minX        min x
+     * @param minY        min y
+     * @param maxX        max x
+     * @param maxY        max y
+     * @param fieldValues field values
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           double minX, double minY, double maxX, double maxY,
+                                           Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
         String[] whereArgs = featureDao.buildWhereArgs(fieldValues.values());
-        return query(columns, minX, minY, maxX, maxY, where, whereArgs);
+        return query(distinct, columns, minX, minY, maxX, maxY, where,
+                whereArgs);
     }
 
     /**
@@ -943,7 +1591,24 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(double minX, double minY,
                                            double maxX, double maxY, String where) {
-        return query(minX, minY, maxX, maxY, where, null);
+        return query(false, minX, minY, maxX, maxY, where);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct distinct rows
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @param where    where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, double minX,
+                                           double minY, double maxX, double maxY, String where) {
+        return query(distinct, minX, minY, maxX, maxY, where, null);
     }
 
     /**
@@ -960,7 +1625,25 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(String[] columns, double minX,
                                            double minY, double maxX, double maxY, String where) {
-        return query(columns, minX, minY, maxX, maxY, where, null);
+        return query(false, columns, minX, minY, maxX, maxY, where);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct distinct rows
+     * @param columns  columns
+     * @param minX     min x
+     * @param minY     min y
+     * @param maxX     max x
+     * @param maxY     max y
+     * @param where    where clause
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           double minX, double minY, double maxX, double maxY, String where) {
+        return query(distinct, columns, minX, minY, maxX, maxY, where, null);
     }
 
     /**
@@ -993,8 +1676,27 @@ public class ManualFeatureQuery {
      */
     public ManualFeatureQueryResults query(double minX, double minY,
                                            double maxX, double maxY, String where, String[] whereArgs) {
-        return query(featureDao.getColumnNames(), minX, minY, maxX, maxY, where,
-                whereArgs);
+        return query(false, minX, minY, maxX, maxY, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct  distinct rows
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where args
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, double minX,
+                                           double minY, double maxX, double maxY, String where,
+                                           String[] whereArgs) {
+        return query(distinct, featureDao.getColumnNames(), minX, minY, maxX,
+                maxY, where, whereArgs);
     }
 
     /**
@@ -1013,6 +1715,26 @@ public class ManualFeatureQuery {
     public ManualFeatureQueryResults query(String[] columns, double minX,
                                            double minY, double maxX, double maxY, String where,
                                            String[] whereArgs) {
+        return query(false, columns, minX, minY, maxX, maxY, where, whereArgs);
+    }
+
+    /**
+     * Manually query for rows within the bounds
+     *
+     * @param distinct  distinct rows
+     * @param columns   columns
+     * @param minX      min x
+     * @param minY      min y
+     * @param maxX      max x
+     * @param maxY      max y
+     * @param where     where clause
+     * @param whereArgs where args
+     * @return results
+     * @since 3.5.1
+     */
+    public ManualFeatureQueryResults query(boolean distinct, String[] columns,
+                                           double minX, double minY, double maxX, double maxY, String where,
+                                           String[] whereArgs) {
 
         List<Long> featureIds = new ArrayList<>();
 
@@ -1030,7 +1752,7 @@ public class ManualFeatureQuery {
 
             hasResults = false;
 
-            FeatureCursor featureCursor = featureDao.queryForChunk(queryColumns,
+            FeatureCursor featureCursor = featureDao.queryForChunk(distinct, queryColumns,
                     where, whereArgs, chunkLimit, offset);
             try {
                 while (featureCursor.moveToNext()) {
