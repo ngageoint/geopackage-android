@@ -199,6 +199,16 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     }
 
     /**
+     * Get the cursor factory
+     *
+     * @return cusror factory
+     * @since 3.5.1
+     */
+    public GeoPackageCursorFactory getCursorFactory() {
+        return cursorFactory;
+    }
+
+    /**
      * Is the SQLite database connection writable
      *
      * @return true if writable
@@ -303,6 +313,14 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
     @Override
     public Cursor rawQuery(String sql, String[] selectionArgs) {
         return getActive().rawQuery(sql, selectionArgs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cursor rawQueryWithFactory(GeoPackageCursorFactory cursorFactory, String sql, String[] selectionArgs, String editTable) {
+        return getActive().rawQueryWithFactory(cursorFactory, sql, selectionArgs, editTable);
     }
 
     /**

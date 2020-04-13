@@ -265,7 +265,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
 
         String sql = query.getSql();
         if (sql != null) {
-            cursor = database.rawQuery(sql, selectionArgs);
+            cursor = database.rawQueryWithFactory(database.getCursorFactory(), sql, selectionArgs, table.getTableName());
         } else {
 
             boolean distinct = query.getDistinct();

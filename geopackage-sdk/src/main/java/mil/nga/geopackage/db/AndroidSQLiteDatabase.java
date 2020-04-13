@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import mil.nga.geopackage.factory.GeoPackageCursorFactory;
+
 /**
  * Android SQLiteDatabase
  *
@@ -104,6 +106,14 @@ public class AndroidSQLiteDatabase implements GeoPackageSQLiteDatabase {
     @Override
     public Cursor rawQuery(String sql, String[] selectionArgs) {
         return db.rawQuery(sql, selectionArgs);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Cursor rawQueryWithFactory(GeoPackageCursorFactory cursorFactory, String sql, String[] selectionArgs, String editTable) {
+        return db.rawQueryWithFactory(cursorFactory, sql, selectionArgs, editTable);
     }
 
     /**

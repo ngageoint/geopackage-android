@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import mil.nga.geopackage.factory.GeoPackageCursorFactory;
+
 /**
  * GeoPackage SQLiteDatabase interface
  *
@@ -70,6 +72,19 @@ public interface GeoPackageSQLiteDatabase {
      * @see SQLiteDatabase#rawQuery(String, String[])
      */
     public Cursor rawQuery(String sql, String[] selectionArgs);
+
+    /**
+     * Raw query with factory
+     *
+     * @param cursorFactory cursor factory
+     * @param sql           sql command
+     * @param selectionArgs selection arguments
+     * @param editTable     edit table name
+     * @return cursor
+     * @see SQLiteDatabase#rawQueryWithFactory(SQLiteDatabase.CursorFactory, String, String[], String)
+     * @since 3.5.1
+     */
+    public Cursor rawQueryWithFactory(GeoPackageCursorFactory cursorFactory, String sql, String[] selectionArgs, String editTable);
 
     /**
      * Close the connection

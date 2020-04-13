@@ -35,6 +35,11 @@ public class GeoPackageCursorFactory implements CursorFactory {
             .synchronizedMap(new HashMap<String, GeoPackageCursorWrapper>());
 
     /**
+     * Bindings Cursor Factory
+     */
+    private org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory bindingsCursorFactory;
+
+    /**
      * Constructor
      */
     GeoPackageCursorFactory() {
@@ -135,28 +140,31 @@ public class GeoPackageCursorFactory implements CursorFactory {
      * @since 3.4.0
      */
     public org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory getBindingsCursorFactory() {
-        return new org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory() {
+        if (bindingsCursorFactory == null) {
+            bindingsCursorFactory = new org.sqlite.database.sqlite.SQLiteDatabase.CursorFactory() {
 
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public Cursor newCursor(org.sqlite.database.sqlite.SQLiteDatabase db, org.sqlite.database.sqlite.SQLiteCursorDriver driver, String editTable, org.sqlite.database.sqlite.SQLiteQuery query) {
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public Cursor newCursor(org.sqlite.database.sqlite.SQLiteDatabase db, org.sqlite.database.sqlite.SQLiteCursorDriver driver, String editTable, org.sqlite.database.sqlite.SQLiteQuery query) {
 
-                if (debugLogQueries) {
-                    Log.d(GeoPackageCursorFactory.class.getSimpleName(), query.toString());
+                    if (debugLogQueries) {
+                        Log.d(GeoPackageCursorFactory.class.getSimpleName(), query.toString());
+                    }
+
+                    // Create a standard cursor
+                    Cursor cursor = new org.sqlite.database.sqlite.SQLiteCursor(driver, editTable, query);
+
+                    // Wrap the cursor
+                    Cursor wrappedCursor = wrapCursor(cursor, editTable);
+
+                    return wrappedCursor;
                 }
 
-                // Create a standard cursor
-                Cursor cursor = new org.sqlite.database.sqlite.SQLiteCursor(driver, editTable, query);
-
-                // Wrap the cursor
-                Cursor wrappedCursor = wrapCursor(cursor, editTable);
-
-                return wrappedCursor;
-            }
-
-        };
+            };
+        }
+        return bindingsCursorFactory;
     }
 
 }
