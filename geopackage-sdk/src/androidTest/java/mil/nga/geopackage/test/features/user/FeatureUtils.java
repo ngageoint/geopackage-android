@@ -7,14 +7,19 @@ import junit.framework.TestCase;
 
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
@@ -26,6 +31,7 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.geopackage.schema.TableColumnKey;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.geopackage.user.ColumnValue;
@@ -38,6 +44,7 @@ import mil.nga.sf.MultiPoint;
 import mil.nga.sf.MultiPolygon;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
+import mil.nga.sf.proj.ProjectionConstants;
 import mil.nga.sf.util.ByteReader;
 import mil.nga.sf.wkb.GeometryReader;
 
@@ -259,7 +266,97 @@ public class FeatureUtils {
                     }
                     TestCase.assertTrue(found);
                     cursor.close();
+
                 }
+
+                String previousColumn = null;
+                for (String column : columns) {
+
+                    long expectedDistinctCount = dao
+                            .querySingleTypedResult(
+                                    "SELECT COUNT(DISTINCT " + column
+                                            + ") FROM " + dao.getTableName(),
+                                    null);
+                    int distinctCount = dao.count(true, column);
+                    TestCase.assertEquals(expectedDistinctCount, distinctCount);
+                    if (dao.count(column + " IS NULL") > 0) {
+                        distinctCount++;
+                    }
+                    FeatureCursor expectedCursor = dao
+                            .rawQuery("SELECT DISTINCT " + column + " FROM "
+                                    + dao.getTableName(), null);
+                    int expectedDistinctCursorCount = expectedCursor
+                            .getCount();
+                    int expectedDistinctManualCursorCount = 0;
+                    while (expectedCursor.moveToNext()) {
+                        expectedDistinctManualCursorCount++;
+                    }
+                    expectedCursor.close();
+                    TestCase.assertEquals(expectedDistinctManualCursorCount,
+                            expectedDistinctCursorCount);
+                    cursor = dao.query(true, new String[]{column});
+                    TestCase.assertEquals(1, cursor.getColumnCount());
+                    TestCase.assertEquals(expectedDistinctCursorCount,
+                            cursor.getCount());
+                    TestCase.assertEquals(distinctCount, cursor.getCount());
+                    cursor.close();
+                    cursor = dao.query(new String[]{column});
+                    TestCase.assertEquals(1, cursor.getColumnCount());
+                    TestCase.assertEquals(count, cursor.getCount());
+                    Set<Object> distinctValues = new HashSet<>();
+                    while (cursor.moveToNext()) {
+                        Object value = cursor.getValue(column);
+                        distinctValues.add(value);
+                    }
+                    cursor.close();
+                    if (!column.equals(featureTable.getGeometryColumnName())) {
+                        TestCase.assertEquals(distinctCount,
+                                distinctValues.size());
+                    }
+
+                    if (previousColumn != null) {
+
+                        cursor = dao.query(true,
+                                new String[]{previousColumn, column});
+                        TestCase.assertEquals(2, cursor.getColumnCount());
+                        distinctCount = cursor.getCount();
+                        if (distinctCount < 0) {
+                            distinctCount = 0;
+                            while (cursor.moveToNext()) {
+                                distinctCount++;
+                            }
+                        }
+                        cursor.close();
+                        cursor = dao
+                                .query(new String[]{previousColumn, column});
+                        TestCase.assertEquals(2, cursor.getColumnCount());
+                        TestCase.assertEquals(count, cursor.getCount());
+                        Map<Object, Set<Object>> distinctPairs = new HashMap<>();
+                        while (cursor.moveToNext()) {
+                            Object previousValue = cursor
+                                    .getValue(previousColumn);
+                            Object value = cursor.getValue(column);
+                            distinctValues = distinctPairs.get(previousValue);
+                            if (distinctValues == null) {
+                                distinctValues = new HashSet<>();
+                                distinctPairs.put(previousValue,
+                                        distinctValues);
+                            }
+                            distinctValues.add(value);
+                        }
+                        cursor.close();
+                        int distinctPairsCount = 0;
+                        for (Set<Object> values : distinctPairs.values()) {
+                            distinctPairsCount += values.size();
+                        }
+                        TestCase.assertEquals(distinctCount,
+                                distinctPairsCount);
+
+                    }
+
+                    previousColumn = column;
+                }
+
             }
         }
 
@@ -1399,6 +1496,99 @@ public class FeatureUtils {
                 cursor.close();
             }
         }
+    }
+
+    /**
+     * Test Feature DAO primary key modifications and disabling value validation
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     */
+    public static void testPkModifiableAndValueValidation(GeoPackage geoPackage)
+            throws SQLException {
+
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
+                .getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG,
+                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
+        GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
+                srs.getSrsId());
+        geometryData.setGeometry(new Point(0, 0));
+
+        GeometryColumns geometryColumns = new GeometryColumns();
+        geometryColumns.setId(new TableColumnKey("test_features", "geom"));
+        geometryColumns.setGeometryType(GeometryType.POINT);
+        geometryColumns.setZ((byte) 1);
+        geometryColumns.setM((byte) 0);
+
+        BoundingBox boundingBox = new BoundingBox(-180, -90, 180, 90);
+
+        String idColumn = "test_id";
+        String realColumn = "test_real";
+
+        List<FeatureColumn> additionalColumns = new ArrayList<FeatureColumn>();
+        additionalColumns.add(FeatureColumn.createColumn(realColumn,
+                GeoPackageDataType.REAL));
+        geometryColumns = geoPackage.createFeatureTableWithMetadata(
+                geometryColumns, idColumn, additionalColumns, boundingBox,
+                srs.getId());
+
+        FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);
+        TestCase.assertFalse(featureDao.isPkModifiable());
+        TestCase.assertTrue(featureDao.isValueValidation());
+
+        featureDao.setPkModifiable(true);
+        featureDao.setValueValidation(false);
+        TestCase.assertTrue(featureDao.isPkModifiable());
+        TestCase.assertFalse(featureDao.isValueValidation());
+
+        long idValue = 15;
+        long realValue = 20;
+
+        FeatureRow featureRow = featureDao.newRow();
+        featureRow.setId(idValue);
+        featureRow.setValue(realColumn, realValue);
+        featureRow.setGeometry(geometryData);
+
+        featureDao.insert(featureRow);
+
+        FeatureCursor cursor = featureDao.query();
+        try {
+            TestCase.assertTrue(cursor.moveToNext());
+            FeatureRow feature = cursor.getRow();
+            TestCase.assertEquals(idValue, feature.getId());
+            TestCase.assertNotNull(feature.getGeometry());
+            TestCase.assertEquals((double) realValue,
+                    feature.getValue(realColumn));
+        } finally {
+            cursor.close();
+        }
+
+        FeatureDao featureDao2 = geoPackage.getFeatureDao(geometryColumns);
+        TestCase.assertFalse(featureDao2.isPkModifiable());
+        TestCase.assertTrue(featureDao2.isValueValidation());
+
+        FeatureRow featureRow2 = featureDao2.newRow();
+        try {
+            featureRow2.setId(16);
+            TestCase.fail();
+        } catch (Exception e) {
+            // expected
+        }
+        try {
+            featureRow2.setValue(idColumn, 16);
+            TestCase.fail();
+        } catch (Exception e) {
+            // expected
+        }
+        featureRow2.setValue(realColumn, 21);
+        try {
+            featureDao2.insert(featureRow2);
+            TestCase.fail();
+        } catch (Exception e) {
+            // expected
+        }
+
     }
 
 }

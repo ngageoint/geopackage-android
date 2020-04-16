@@ -80,4 +80,17 @@ public class FeatureImportTest extends ImportGeoPackageTestCase {
 
     }
 
+    /**
+     * Test Feature DAO primary key modifications and disabling value validation
+     *
+     * @throws SQLException
+     *             upon error
+     */
+    @Test
+    public void testPkModifiableAndValueValidation() throws SQLException {
+
+        FeatureUtils.testPkModifiableAndValueValidation(geoPackage);
+
+    }
+
 }

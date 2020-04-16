@@ -715,10 +715,10 @@ public class AlterTableUtils {
                                 geoPackage.isTable(mappingTableName));
                         TestCase.assertTrue(
                                 geoPackage.isTable(copyMappingTableName));
-                        int mappingTableCount = geoPackage.getConnection().count(
-                                mappingTableName, null, null);
-                        int copyMappingTableCount = geoPackage.getConnection().count(
-                                copyMappingTableName, null, null);
+                        int mappingTableCount = geoPackage.getConnection()
+                                .count(mappingTableName);
+                        int copyMappingTableCount = geoPackage.getConnection()
+                                .count(copyMappingTableName);
                         TestCase.assertEquals(mappingTableCount,
                                 copyMappingTableCount);
                     }
@@ -1001,10 +1001,10 @@ public class AlterTableUtils {
                                 geoPackage.isTable(mappingTableName));
                         TestCase.assertTrue(
                                 geoPackage.isTable(copyMappingTableName));
-                        int mappingTableCount = geoPackage.getConnection().count(
-                                mappingTableName, null, null);
-                        int copyMappingTableCount = geoPackage.getConnection().count(
-                                copyMappingTableName, null, null);
+                        int mappingTableCount = geoPackage.getConnection()
+                                .count(mappingTableName);
+                        int copyMappingTableCount = geoPackage.getConnection()
+                                .count(copyMappingTableName);
                         TestCase.assertEquals(mappingTableCount,
                                 copyMappingTableCount);
                     }
@@ -1212,10 +1212,10 @@ public class AlterTableUtils {
                     TestCase.assertTrue(geoPackage.isTable(mappingTableName));
                     TestCase.assertTrue(
                             geoPackage.isTable(copyMappingTableName));
-                    int mappingTableCount = geoPackage.getConnection().count(
-                            mappingTableName, null, null);
-                    int copyMappingTableCount = geoPackage.getConnection().count(
-                            copyMappingTableName, null, null);
+                    int mappingTableCount = geoPackage.getConnection()
+                            .count(mappingTableName);
+                    int copyMappingTableCount = geoPackage.getConnection()
+                            .count(copyMappingTableName);
                     TestCase.assertEquals(mappingTableCount,
                             copyMappingTableCount);
                 }
