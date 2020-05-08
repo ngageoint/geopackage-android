@@ -183,7 +183,6 @@ public class TestSetupTeardown {
         MetadataDao metadataDao = geoPackage.getMetadataDao();
 
         Metadata metadata1 = new Metadata();
-        metadata1.setId(1);
         metadata1.setMetadataScope(MetadataScopeType.DATASET);
         metadata1.setStandardUri("TEST_URI_1");
         metadata1.setMimeType("text/xml");
@@ -191,7 +190,6 @@ public class TestSetupTeardown {
         metadataDao.create(metadata1);
 
         Metadata metadata2 = new Metadata();
-        metadata2.setId(2);
         metadata2.setMetadataScope(MetadataScopeType.FEATURE_TYPE);
         metadata2.setStandardUri("TEST_URI_2");
         metadata2.setMimeType("text/xml");
@@ -199,7 +197,6 @@ public class TestSetupTeardown {
         metadataDao.create(metadata2);
 
         Metadata metadata3 = new Metadata();
-        metadata3.setId(3);
         metadata3.setMetadataScope(MetadataScopeType.TILE);
         metadata3.setStandardUri("TEST_URI_3");
         metadata3.setMimeType("text/xml");
@@ -295,7 +292,6 @@ public class TestSetupTeardown {
                 attributesTable.getTableName());
 
         Metadata attributesMetadata = new Metadata();
-        attributesMetadata.setId(4);
         attributesMetadata.setMetadataScope(MetadataScopeType.ATTRIBUTE_TYPE);
         attributesMetadata.setStandardUri("ATTRIBUTES_TEST_URI");
         attributesMetadata.setMimeType("text/plain");

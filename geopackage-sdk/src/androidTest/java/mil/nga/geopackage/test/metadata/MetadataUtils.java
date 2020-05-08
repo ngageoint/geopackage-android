@@ -183,7 +183,6 @@ public class MetadataUtils {
 			// Get current count
 			long count = dao.countOf();
 
-			long id = 12345;
 			MetadataScopeType scopeType = MetadataScopeType.SOFTWARE;
 			String standardUri = "https://www.nga.mil";
 			String mimeType = "text/xml";
@@ -191,12 +190,12 @@ public class MetadataUtils {
 
 			// Create new metadata
 			Metadata metadata = new Metadata();
-			metadata.setId(id);
 			metadata.setMetadataScope(scopeType);
 			metadata.setStandardUri(standardUri);
 			metadata.setMimeType(mimeType);
 			metadata.setMetadata(metadataText);
 			dao.create(metadata);
+			long id = metadata.getId();
 
 			// Verify count
 			long newCount = dao.countOf();

@@ -263,7 +263,7 @@ public class RelatedTilesUtils {
             TestCase.assertEquals(ContentsDataType.FEATURES,
                     featuresContents.getDataType());
             TestCase.assertEquals(ContentsDataType.FEATURES.getName(),
-                    featuresContents.getDataTypeString());
+                    featuresContents.getDataTypeName());
             TestCase.assertEquals(featureTable.getTableName(),
                     featuresContents.getTableName());
             TestCase.assertNotNull(featuresContents.getLastChange());

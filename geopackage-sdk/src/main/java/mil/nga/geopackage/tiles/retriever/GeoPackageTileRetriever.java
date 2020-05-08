@@ -1,7 +1,7 @@
 package mil.nga.geopackage.tiles.retriever;
 
 import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.extension.scale.TileScaling;
+import mil.nga.geopackage.extension.nga.scale.TileScaling;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.sf.proj.Projection;

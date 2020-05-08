@@ -66,7 +66,7 @@ public class UserQuery {
      * @param groupBy       group by
      * @param having        having
      * @param orderBy       order by
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public UserQuery(Boolean distinct, String table, String[] columns, String selection,
                      String[] selectionArgs, String groupBy, String having,
@@ -104,7 +104,7 @@ public class UserQuery {
      * @param groupBy       group by
      * @param having        having
      * @param orderBy       order by
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public UserQuery(Boolean distinct, String table, String[] columns, String[] columnsAs, String selection,
                      String[] selectionArgs, String groupBy, String having,
@@ -142,7 +142,7 @@ public class UserQuery {
      * @param having        having
      * @param orderBy       order by
      * @param limit         limit
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public UserQuery(Boolean distinct, String table, String[] columns, String selection,
                      String[] selectionArgs, String groupBy, String having,
@@ -182,7 +182,7 @@ public class UserQuery {
      * @param having        having
      * @param orderBy       order by
      * @param limit         limit
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public UserQuery(Boolean distinct, String table, String[] columns, String[] columnsAs, String selection,
                      String[] selectionArgs, String groupBy, String having,
@@ -273,7 +273,7 @@ public class UserQuery {
      * Get the distinct flag
      *
      * @return distinct flag
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public boolean getDistinct() {
         boolean distinct = false;

@@ -5,7 +5,6 @@ import org.junit.Test;
 import mil.nga.geopackage.GeoPackageConstants;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
-import mil.nga.geopackage.extension.GeoPackageExtensions;
 import mil.nga.geopackage.extension.WebPExtension;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
 import mil.nga.geopackage.tiles.user.TileTable;
@@ -45,7 +44,7 @@ public class WebPExtensionTest extends CreateGeoPackageTestCase {
         assertEquals(extension.getScope(), ExtensionScopeType.READ_WRITE);
         assertEquals(extension.getDefinition(), WebPExtension.DEFINITION);
 
-        GeoPackageExtensions.deleteTableExtensions(geoPackage, tableName);
+        geoPackage.getExtensionManager().deleteTableExtensions(tableName);
         assertFalse(webpExtension.has(tableName));
 
     }

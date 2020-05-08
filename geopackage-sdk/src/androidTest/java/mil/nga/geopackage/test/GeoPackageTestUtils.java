@@ -16,6 +16,7 @@ import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.db.GeoPackageDataType;
+import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -280,7 +281,7 @@ public class GeoPackageTestUtils {
             TestCase.assertTrue(tileMatrixSetDao.isTableExists());
             TestCase.assertTrue(tileMatrixDao.isTableExists());
 
-            TestCase.assertEquals(geoPackage.getTables(ContentsDataType.TILES).size() + geoPackage.getTables(ContentsDataType.GRIDDED_COVERAGE).size(),
+            TestCase.assertEquals(geoPackage.getTables(ContentsDataType.TILES).size() + geoPackage.getTables(CoverageData.GRIDDED_COVERAGE).size(),
                     tileMatrixSetDao.countOf());
             for (String tileTable : geoPackage.getTileTables()) {
                 TestCase.assertTrue(geoPackage.isTable(tileTable));
@@ -289,7 +290,7 @@ public class GeoPackageTestUtils {
                 TestCase.assertFalse(geoPackage.isTable(tileTable));
                 TestCase.assertNull(contentsDao.queryForId(tileTable));
             }
-            TestCase.assertEquals(geoPackage.getTables(ContentsDataType.GRIDDED_COVERAGE).size(), tileMatrixSetDao.countOf());
+            TestCase.assertEquals(geoPackage.getTables(CoverageData.GRIDDED_COVERAGE).size(), tileMatrixSetDao.countOf());
 
             geoPackage.dropTable(TileMatrix.TABLE_NAME);
             geoPackage.dropTable(TileMatrixSet.TABLE_NAME);
@@ -488,7 +489,6 @@ public class GeoPackageTestUtils {
 
                         break;
                     case TILES:
-                    case GRIDDED_COVERAGE:
                         TileDao tileDao = geoPackage.getTileDao(contents
                                 .getTableName());
                         BoundingBox tileBoundingBox = tileDao

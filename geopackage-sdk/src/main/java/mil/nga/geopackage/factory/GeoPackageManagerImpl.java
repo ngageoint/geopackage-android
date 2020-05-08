@@ -489,7 +489,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Create the required GeoPackage application id and tables in the newly created and open database connection.  Then close the connection.
      *
-     * @param db
+     * @param db database connection
      */
     private void createAndCloseGeoPackage(GeoPackageDatabase db) {
 
@@ -891,8 +891,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite, writable, cursorFactory));
             connection.enableForeignKeys();
 
-            GeoPackageTableCreator tableCreator = new GeoPackageTableCreator(connection);
-            db = new GeoPackageImpl(context, database, path, connection, cursorFactory, tableCreator, writable);
+            db = new GeoPackageImpl(context, database, path, connection, cursorFactory, writable);
 
             // Validate the GeoPackage has the minimum required tables
             try {

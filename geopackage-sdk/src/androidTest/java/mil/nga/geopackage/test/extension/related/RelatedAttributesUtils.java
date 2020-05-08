@@ -256,7 +256,7 @@ public class RelatedAttributesUtils {
             TestCase.assertEquals(ContentsDataType.ATTRIBUTES,
                     attributesContents.getDataType());
             TestCase.assertEquals(ContentsDataType.ATTRIBUTES.getName(),
-                    attributesContents.getDataTypeString());
+                    attributesContents.getDataTypeName());
             TestCase.assertEquals(attributesTable.getTableName(),
                     attributesContents.getTableName());
             TestCase.assertNotNull(attributesContents.getLastChange());

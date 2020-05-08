@@ -24,7 +24,7 @@ import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
-import mil.nga.geopackage.extension.properties.PropertiesExtension;
+import mil.nga.geopackage.extension.nga.properties.PropertiesExtension;
 import mil.nga.geopackage.metadata.Metadata;
 import mil.nga.geopackage.metadata.MetadataScopeType;
 import mil.nga.geopackage.metadata.reference.MetadataReference;

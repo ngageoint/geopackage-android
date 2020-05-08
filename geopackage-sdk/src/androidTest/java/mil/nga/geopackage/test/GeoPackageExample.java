@@ -45,15 +45,10 @@ import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.CrsWktExtension;
 import mil.nga.geopackage.extension.ExtensionsDao;
-import mil.nga.geopackage.extension.GeoPackageExtensions;
 import mil.nga.geopackage.extension.GeometryExtensions;
 import mil.nga.geopackage.extension.MetadataExtension;
-import mil.nga.geopackage.extension.NGAExtensions;
-import mil.nga.geopackage.extension.RTreeIndexExtension;
 import mil.nga.geopackage.extension.SchemaExtension;
 import mil.nga.geopackage.extension.WebPExtension;
-import mil.nga.geopackage.extension.contents.ContentsId;
-import mil.nga.geopackage.extension.contents.ContentsIdExtension;
 import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.extension.coverage.CoverageDataPng;
 import mil.nga.geopackage.extension.coverage.CoverageDataTiff;
@@ -63,10 +58,20 @@ import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
-import mil.nga.geopackage.extension.index.FeatureTableIndex;
-import mil.nga.geopackage.extension.link.FeatureTileTableLinker;
-import mil.nga.geopackage.extension.properties.PropertiesExtension;
-import mil.nga.geopackage.extension.properties.PropertyNames;
+import mil.nga.geopackage.extension.nga.NGAExtensions;
+import mil.nga.geopackage.extension.nga.contents.ContentsId;
+import mil.nga.geopackage.extension.nga.contents.ContentsIdExtension;
+import mil.nga.geopackage.extension.nga.index.FeatureTableIndex;
+import mil.nga.geopackage.extension.nga.link.FeatureTileTableLinker;
+import mil.nga.geopackage.extension.nga.properties.PropertiesExtension;
+import mil.nga.geopackage.extension.nga.properties.PropertyNames;
+import mil.nga.geopackage.extension.nga.scale.TileScaling;
+import mil.nga.geopackage.extension.nga.scale.TileScalingType;
+import mil.nga.geopackage.extension.nga.scale.TileTableScaling;
+import mil.nga.geopackage.extension.nga.style.FeatureStyleExtension;
+import mil.nga.geopackage.extension.nga.style.FeatureTableStyles;
+import mil.nga.geopackage.extension.nga.style.IconRow;
+import mil.nga.geopackage.extension.nga.style.StyleRow;
 import mil.nga.geopackage.extension.related.ExtendedRelation;
 import mil.nga.geopackage.extension.related.RelatedTablesExtension;
 import mil.nga.geopackage.extension.related.UserMappingDao;
@@ -80,13 +85,7 @@ import mil.nga.geopackage.extension.related.media.MediaTable;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesDao;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesRow;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesTable;
-import mil.nga.geopackage.extension.scale.TileScaling;
-import mil.nga.geopackage.extension.scale.TileScalingType;
-import mil.nga.geopackage.extension.scale.TileTableScaling;
-import mil.nga.geopackage.extension.style.FeatureStyleExtension;
-import mil.nga.geopackage.extension.style.FeatureTableStyles;
-import mil.nga.geopackage.extension.style.IconRow;
-import mil.nga.geopackage.extension.style.StyleRow;
+import mil.nga.geopackage.extension.rtree.RTreeIndexExtension;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -228,7 +227,7 @@ public class GeoPackageExample extends BaseTestCase {
         validateExtensions(geoPackage, true);
         validateNGAExtensions(geoPackage, true);
 
-        GeoPackageExtensions.deleteExtensions(geoPackage);
+        geoPackage.getExtensionManager().deleteExtensions();
 
         validateExtensions(geoPackage, false);
         validateNGAExtensions(geoPackage, false);
@@ -255,7 +254,8 @@ public class GeoPackageExample extends BaseTestCase {
         validateExtensions(geoPackage, true);
         validateNGAExtensions(geoPackage, true);
 
-        NGAExtensions.deleteExtensions(geoPackage);
+        NGAExtensions extensions = new NGAExtensions(geoPackage);
+        extensions.deleteExtensions();
 
         validateExtensions(geoPackage, true);
         validateNGAExtensions(geoPackage, false);
@@ -1395,7 +1395,6 @@ public class GeoPackageExample extends BaseTestCase {
         MetadataDao metadataDao = geoPackage.getMetadataDao();
 
         Metadata metadata1 = new Metadata();
-        metadata1.setId(1);
         metadata1.setMetadataScope(MetadataScopeType.DATASET);
         metadata1.setStandardUri("TEST_URI_1");
         metadata1.setMimeType("text/xml");
@@ -1403,7 +1402,6 @@ public class GeoPackageExample extends BaseTestCase {
         metadataDao.create(metadata1);
 
         Metadata metadata2 = new Metadata();
-        metadata2.setId(2);
         metadata2.setMetadataScope(MetadataScopeType.FEATURE_TYPE);
         metadata2.setStandardUri("TEST_URI_2");
         metadata2.setMimeType("text/xml");
@@ -1411,7 +1409,6 @@ public class GeoPackageExample extends BaseTestCase {
         metadataDao.create(metadata2);
 
         Metadata metadata3 = new Metadata();
-        metadata3.setId(3);
         metadata3.setMetadataScope(MetadataScopeType.TILE);
         metadata3.setStandardUri("TEST_URI_3");
         metadata3.setMimeType("text/xml");

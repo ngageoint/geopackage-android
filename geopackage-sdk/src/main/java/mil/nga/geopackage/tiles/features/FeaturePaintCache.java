@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.graphics.Paint;
 import android.util.LruCache;
 
-import mil.nga.geopackage.extension.style.StyleRow;
+import mil.nga.geopackage.extension.nga.style.StyleRow;
 
 /**
  * Feature Paint Cache of Paint objects for each feature id and draw type

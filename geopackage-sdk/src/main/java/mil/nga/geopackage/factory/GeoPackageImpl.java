@@ -22,7 +22,7 @@ import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageTableCreator;
-import mil.nga.geopackage.extension.RTreeIndexExtension;
+import mil.nga.geopackage.extension.rtree.RTreeIndexExtension;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -75,13 +75,11 @@ public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * @param path          database path
      * @param database      database connection
      * @param cursorFactory cursor factory
-     * @param tableCreator  table creator
      * @param writable      writable flag
      */
     GeoPackageImpl(Context context, String name, String path, GeoPackageConnection database,
-                   GeoPackageCursorFactory cursorFactory,
-                   GeoPackageTableCreator tableCreator, boolean writable) {
-        super(name, path, database, tableCreator, writable);
+                   GeoPackageCursorFactory cursorFactory, boolean writable) {
+        super(name, path, database, writable);
         this.context = context;
         this.database = database;
         this.cursorFactory = cursorFactory;
@@ -336,11 +334,11 @@ public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                     + " is required to create "
                     + AttributesDao.class.getSimpleName());
         }
-        if (contents.getDataType() != ContentsDataType.ATTRIBUTES) {
+        if (!contents.isAttributesTypeOrUnknown()) {
             throw new GeoPackageException(Contents.class.getSimpleName()
                     + " is required to be of type "
                     + ContentsDataType.ATTRIBUTES + ". Actual: "
-                    + contents.getDataTypeString());
+                    + contents.getDataTypeName());
         }
 
         // Read the existing table and create the dao

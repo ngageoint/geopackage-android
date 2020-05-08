@@ -15,6 +15,7 @@ import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
+import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.extension.coverage.CoverageDataAlgorithm;
 import mil.nga.geopackage.extension.coverage.CoverageDataPng;
 import mil.nga.geopackage.extension.coverage.CoverageDataPngImage;
@@ -94,10 +95,8 @@ public class CoverageDataPngTestUtils {
             TestCase.assertNotNull(contents);
             TestCase.assertEquals(tileMatrixSet.getTableName(),
                     contents.getTableName());
-            TestCase.assertEquals(ContentsDataType.GRIDDED_COVERAGE,
-                    contents.getDataType());
-            TestCase.assertEquals(ContentsDataType.GRIDDED_COVERAGE.getName(),
-                    contents.getDataTypeString());
+            TestCase.assertEquals(CoverageData.GRIDDED_COVERAGE,
+                    contents.getDataTypeName());
             TestCase.assertNotNull(contents.getLastChange());
 
             // Test the contents SRS

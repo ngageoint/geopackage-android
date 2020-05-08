@@ -225,25 +225,22 @@ public class MetadataReferenceUtils {
 			// Get current count
 			long count = dao.countOf();
 
-			long fileId = 5555;
-			long parentId = 5556;
-
 			// Create new metadata
 			Metadata metadata = new Metadata();
-			metadata.setId(fileId);
 			metadata.setMetadataScope(MetadataScopeType.FEATURE);
 			metadata.setStandardUri("https://www.nga.mil");
 			metadata.setMimeType("text/xml");
 			metadata.setMetadata("Create metadata text");
 			metadataDao.create(metadata);
+			long fileId = metadata.getId();
 
 			Metadata metadata2 = new Metadata();
-			metadata2.setId(parentId);
 			metadata2.setMetadataScope(MetadataScopeType.FEATURE_TYPE);
 			metadata2.setStandardUri("https://www.nga.mil");
 			metadata2.setMimeType("text/xml");
 			metadata2.setMetadata("Create metadata text 2");
 			metadataDao.create(metadata2);
+			long parentId = metadata2.getId();
 
 			ReferenceScopeType scopeType = ReferenceScopeType.ROW;
 			String tableName = "CREATE_TABLE_NAME";

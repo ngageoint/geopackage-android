@@ -391,7 +391,7 @@ public class RelatedMediaUtils {
             TestCase.assertEquals(ContentsDataType.FEATURES,
                     featureContents.getDataType());
             TestCase.assertEquals(ContentsDataType.FEATURES.getName(),
-                    featureContents.getDataTypeString());
+                    featureContents.getDataTypeName());
             TestCase.assertEquals(featureTable.getTableName(),
                     featureContents.getTableName());
             TestCase.assertNotNull(featureContents.getLastChange());
@@ -520,7 +520,7 @@ public class RelatedMediaUtils {
         TestCase.assertEquals(MediaTable.RELATION_TYPE.getDataType(), contents
                 .getDataType().getName());
         TestCase.assertEquals(MediaTable.RELATION_TYPE.getDataType(),
-                contents.getDataTypeString());
+                contents.getDataTypeName());
         TestCase.assertEquals(mediaTable.getTableName(),
                 contents.getTableName());
         TestCase.assertNotNull(contents.getLastChange());

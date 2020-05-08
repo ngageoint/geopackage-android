@@ -202,7 +202,7 @@ public class GeoPackageDatabase implements GeoPackageSQLiteDatabase {
      * Get the cursor factory
      *
      * @return cusror factory
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public GeoPackageCursorFactory getCursorFactory() {
         return cursorFactory;

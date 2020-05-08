@@ -429,7 +429,7 @@ public class FeatureIndexer {
      *
      * @param distinct distinct rows
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -453,7 +453,7 @@ public class FeatureIndexer {
      * @param distinct distinct rows
      * @param columns  columns
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -464,7 +464,7 @@ public class FeatureIndexer {
      * Count features
      *
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures() {
         return countFeatures(false, null);
@@ -475,7 +475,7 @@ public class FeatureIndexer {
      *
      * @param column count column name
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countColumnFeatures(String column) {
         return countFeatures(false, column);
@@ -487,7 +487,7 @@ public class FeatureIndexer {
      * @param distinct distinct column values
      * @param column   count column name
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -511,7 +511,7 @@ public class FeatureIndexer {
      * @param distinct    distinct rows
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -538,7 +538,7 @@ public class FeatureIndexer {
      * @param columns     columns
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -563,7 +563,7 @@ public class FeatureIndexer {
      * @param column      count column name
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, Map<String, Object> fieldValues) {
         return countFeatures(false, column, fieldValues);
@@ -576,7 +576,7 @@ public class FeatureIndexer {
      * @param column      count column name
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, Map<String, Object> fieldValues) {
         String where = featureDao.buildWhere(fieldValues.entrySet());
@@ -601,7 +601,7 @@ public class FeatureIndexer {
      * @param distinct distinct rows
      * @param where    where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String where) {
         return queryFeatures(distinct, where, null);
@@ -626,7 +626,7 @@ public class FeatureIndexer {
      * @param columns  columns
      * @param where    where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, String where) {
         return queryFeatures(distinct, columns, where, null);
@@ -649,7 +649,7 @@ public class FeatureIndexer {
      * @param column count column name
      * @param where  where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, String where) {
         return countFeatures(false, column, where);
@@ -662,7 +662,7 @@ public class FeatureIndexer {
      * @param column   count column name
      * @param where    where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, String where) {
         return countFeatures(distinct, column, where, null);
@@ -687,7 +687,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -715,7 +715,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -741,7 +741,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, String where, String[] whereArgs) {
         return countFeatures(false, column, where, whereArgs);
@@ -755,7 +755,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, String where, String[] whereArgs) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds());
@@ -855,7 +855,7 @@ public class FeatureIndexer {
      * @param distinct    distinct rows
      * @param boundingBox bounding box
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox) {
         return queryFeatures(distinct, boundingBox.buildEnvelope());
@@ -880,7 +880,7 @@ public class FeatureIndexer {
      * @param columns     columns
      * @param boundingBox bounding box
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox) {
         return queryFeatures(distinct, columns, boundingBox.buildEnvelope());
@@ -903,7 +903,7 @@ public class FeatureIndexer {
      * @param column      count column name
      * @param boundingBox bounding box
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox) {
         return countFeatures(false, column, boundingBox);
@@ -916,7 +916,7 @@ public class FeatureIndexer {
      * @param column      count column name
      * @param boundingBox bounding box
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox) {
         return countFeatures(distinct, column, boundingBox.buildEnvelope());
@@ -942,7 +942,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox,
                                        Map<String, Object> fieldValues) {
@@ -971,7 +971,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox,
                                        Map<String, Object> fieldValues) {
@@ -998,7 +998,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox,
                              Map<String, Object> fieldValues) {
@@ -1013,7 +1013,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox,
                              Map<String, Object> fieldValues) {
@@ -1040,7 +1040,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox,
                                        String where) {
@@ -1069,7 +1069,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox,
                                        String where) {
@@ -1095,7 +1095,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox, String where) {
         return countFeatures(false, column, boundingBox, where);
@@ -1109,7 +1109,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param where       where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox, String where) {
         return countFeatures(distinct, column, boundingBox, where, null);
@@ -1137,7 +1137,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox, String where,
                                        String[] whereArgs) {
@@ -1168,7 +1168,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox, String where,
                                        String[] whereArgs) {
@@ -1197,7 +1197,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox, String where,
                              String[] whereArgs) {
@@ -1213,7 +1213,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox, String where,
                              String[] whereArgs) {
@@ -1320,7 +1320,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param projection  projection
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox,
                                        Projection projection) {
@@ -1351,7 +1351,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param projection  projection
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox,
                                        Projection projection) {
@@ -1379,7 +1379,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param projection  projection
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox, Projection projection) {
         return countFeatures(false, column, boundingBox, projection);
@@ -1393,7 +1393,7 @@ public class FeatureIndexer {
      * @param boundingBox bounding box
      * @param projection  projection
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox, Projection projection) {
         BoundingBox featureBoundingBox = getFeatureBoundingBox(boundingBox,
@@ -1423,7 +1423,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox,
                                        Projection projection, Map<String, Object> fieldValues) {
@@ -1456,7 +1456,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox,
                                        Projection projection, Map<String, Object> fieldValues) {
@@ -1487,7 +1487,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox, Projection projection,
                              Map<String, Object> fieldValues) {
@@ -1503,7 +1503,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox, Projection projection,
                              Map<String, Object> fieldValues) {
@@ -1534,7 +1534,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param where       where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox,
                                        Projection projection, String where) {
@@ -1565,7 +1565,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param where       where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox,
                                        Projection projection, String where) {
@@ -1594,7 +1594,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param where       where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox, Projection projection,
                              String where) {
@@ -1610,7 +1610,7 @@ public class FeatureIndexer {
      * @param projection  projection
      * @param where       where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox, Projection projection,
                              String where) {
@@ -1641,7 +1641,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, BoundingBox boundingBox,
                                        Projection projection, String where, String[] whereArgs) {
@@ -1676,7 +1676,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, BoundingBox boundingBox,
                                        Projection projection, String where, String[] whereArgs) {
@@ -1709,7 +1709,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, BoundingBox boundingBox, Projection projection,
                              String where, String[] whereArgs) {
@@ -1726,7 +1726,7 @@ public class FeatureIndexer {
      * @param where       where clause
      * @param whereArgs   where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, BoundingBox boundingBox, Projection projection,
                              String where, String[] whereArgs) {
@@ -1797,7 +1797,7 @@ public class FeatureIndexer {
      * @param distinct distinct column values
      * @param envelope geometry envelope
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, GeometryEnvelope envelope) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
@@ -1823,7 +1823,7 @@ public class FeatureIndexer {
      * @param columns  columns
      * @param envelope geometry envelope
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, GeometryEnvelope envelope) {
         FeatureIndexerIdQuery idQuery = buildIdQuery(queryIds(envelope));
@@ -1848,7 +1848,7 @@ public class FeatureIndexer {
      * @param column   count column name
      * @param envelope geometry envelope
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, GeometryEnvelope envelope) {
         return countFeatures(false, column, envelope);
@@ -1861,7 +1861,7 @@ public class FeatureIndexer {
      * @param column   count column name
      * @param envelope geometry envelope
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, GeometryEnvelope envelope) {
         return countFeatures(distinct, column, envelope, null, null);
@@ -1887,7 +1887,7 @@ public class FeatureIndexer {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, GeometryEnvelope envelope,
                                        Map<String, Object> fieldValues) {
@@ -1918,7 +1918,7 @@ public class FeatureIndexer {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, GeometryEnvelope envelope,
                                        Map<String, Object> fieldValues) {
@@ -1947,7 +1947,7 @@ public class FeatureIndexer {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, GeometryEnvelope envelope,
                              Map<String, Object> fieldValues) {
@@ -1962,7 +1962,7 @@ public class FeatureIndexer {
      * @param envelope    geometry envelope
      * @param fieldValues field values
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, GeometryEnvelope envelope,
                              Map<String, Object> fieldValues) {
@@ -1991,7 +1991,7 @@ public class FeatureIndexer {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, GeometryEnvelope envelope,
                                        String where) {
@@ -2020,7 +2020,7 @@ public class FeatureIndexer {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, GeometryEnvelope envelope,
                                        String where) {
@@ -2046,7 +2046,7 @@ public class FeatureIndexer {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, GeometryEnvelope envelope, String where) {
         return countFeatures(false, column, envelope, where, null);
@@ -2060,7 +2060,7 @@ public class FeatureIndexer {
      * @param envelope geometry envelope
      * @param where    where clause
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, GeometryEnvelope envelope, String where) {
         return countFeatures(distinct, column, envelope, where, null);
@@ -2088,7 +2088,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, GeometryEnvelope envelope,
                                        String where, String[] whereArgs) {
@@ -2120,7 +2120,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return feature results
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public FeatureCursor queryFeatures(boolean distinct, String[] columns, GeometryEnvelope envelope,
                                        String where, String[] whereArgs) {
@@ -2150,7 +2150,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(String column, GeometryEnvelope envelope, String where,
                              String[] whereArgs) {
@@ -2166,7 +2166,7 @@ public class FeatureIndexer {
      * @param where     where clause
      * @param whereArgs where arguments
      * @return count
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public int countFeatures(boolean distinct, String column, GeometryEnvelope envelope, String where,
                              String[] whereArgs) {

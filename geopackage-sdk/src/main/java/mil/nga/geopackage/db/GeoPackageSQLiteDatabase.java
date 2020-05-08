@@ -82,7 +82,7 @@ public interface GeoPackageSQLiteDatabase {
      * @param editTable     edit table name
      * @return cursor
      * @see SQLiteDatabase#rawQueryWithFactory(SQLiteDatabase.CursorFactory, String, String[], String)
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public Cursor rawQueryWithFactory(GeoPackageCursorFactory cursorFactory, String sql, String[] selectionArgs, String editTable);
 
@@ -179,7 +179,7 @@ public interface GeoPackageSQLiteDatabase {
      * @param limit         limit
      * @return cursor
      * @see SQLiteDatabase#query(boolean, String, String[], String, String[], String, String, String, String)
-     * @since 3.5.1
+     * @since 4.0.0
      */
     public Cursor query(boolean distinct, String table, String[] columns,
                         String selection, String[] selectionArgs, String groupBy,

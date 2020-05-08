@@ -29,18 +29,18 @@ import mil.nga.geopackage.db.table.Constraint;
 import mil.nga.geopackage.db.table.ConstraintType;
 import mil.nga.geopackage.db.table.RawConstraint;
 import mil.nga.geopackage.db.table.UniqueConstraint;
-import mil.nga.geopackage.extension.contents.ContentsId;
-import mil.nga.geopackage.extension.contents.ContentsIdExtension;
+import mil.nga.geopackage.extension.nga.contents.ContentsId;
+import mil.nga.geopackage.extension.nga.contents.ContentsIdExtension;
 import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
-import mil.nga.geopackage.extension.link.FeatureTileTableLinker;
+import mil.nga.geopackage.extension.nga.link.FeatureTileTableLinker;
 import mil.nga.geopackage.extension.related.ExtendedRelation;
 import mil.nga.geopackage.extension.related.RelatedTablesExtension;
-import mil.nga.geopackage.extension.scale.TileScaling;
-import mil.nga.geopackage.extension.scale.TileTableScaling;
-import mil.nga.geopackage.extension.style.FeatureTableStyles;
-import mil.nga.geopackage.extension.style.StyleMappingDao;
+import mil.nga.geopackage.extension.nga.scale.TileScaling;
+import mil.nga.geopackage.extension.nga.scale.TileTableScaling;
+import mil.nga.geopackage.extension.nga.style.FeatureTableStyles;
+import mil.nga.geopackage.extension.nga.style.StyleMappingDao;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -867,7 +867,7 @@ public class AlterTableUtils {
 
                 GriddedCoverage griddedCoverage = null;
                 List<GriddedTile> griddedTiles = null;
-                if (geoPackage.isTableType(ContentsDataType.GRIDDED_COVERAGE,
+                if (geoPackage.isTableType(CoverageData.GRIDDED_COVERAGE,
                         tableName)) {
                     CoverageData<?> coverageData = CoverageData
                             .getCoverageData(geoPackage, dao);

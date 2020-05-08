@@ -382,7 +382,7 @@ public class RelatedSimpleAttributesUtils {
             TestCase.assertEquals(ContentsDataType.ATTRIBUTES,
                     attributesContents.getDataType());
             TestCase.assertEquals(ContentsDataType.ATTRIBUTES.getName(),
-                    attributesContents.getDataTypeString());
+                    attributesContents.getDataTypeName());
             TestCase.assertEquals(attributesTable.getTableName(),
                     attributesContents.getTableName());
             TestCase.assertNotNull(attributesContents.getLastChange());
@@ -457,7 +457,7 @@ public class RelatedSimpleAttributesUtils {
                         .getDataType().getName());
         TestCase.assertEquals(
                 SimpleAttributesTable.RELATION_TYPE.getDataType(),
-                contents.getDataTypeString());
+                contents.getDataTypeName());
         TestCase.assertEquals(simpleAttributesTable.getTableName(),
                 contents.getTableName());
         TestCase.assertNotNull(contents.getLastChange());

@@ -30,6 +30,8 @@ import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.core.contents.ContentsDao;
 import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.db.ResultUtils;
+import mil.nga.geopackage.extension.coverage.CoverageData;
+import mil.nga.geopackage.extension.coverage.GriddedCoverage;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
@@ -387,7 +389,7 @@ public class TileUtils {
 
         if (testBitmap) {
             Bitmap bitmap = tileRow.getTileDataBitmap();
-            if (dao.getTileMatrixSet().getContents().getDataType() != ContentsDataType.GRIDDED_COVERAGE) {
+            if (!dao.getTileMatrixSet().getContents().getDataTypeName().equalsIgnoreCase(CoverageData.GRIDDED_COVERAGE)) {
                 TestCase.assertNotNull(bitmap);
                 TestCase.assertEquals(tileMatrix.getTileWidth(), bitmap.getWidth());
                 TestCase.assertEquals(tileMatrix.getTileHeight(),
