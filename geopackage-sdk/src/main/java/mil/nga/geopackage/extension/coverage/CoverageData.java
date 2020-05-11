@@ -48,8 +48,7 @@ public abstract class CoverageData<TImage extends CoverageDataImage> extends Cov
                                                   Projection requestProjection) {
 
         TileMatrixSet tileMatrixSet = tileDao.getTileMatrixSet();
-        GriddedCoverageDao griddedCoverageDao = geoPackage
-                .getGriddedCoverageDao();
+        GriddedCoverageDao griddedCoverageDao = getGriddedCoverageDao(geoPackage);
 
         GriddedCoverage griddedCoverage = null;
         try {
