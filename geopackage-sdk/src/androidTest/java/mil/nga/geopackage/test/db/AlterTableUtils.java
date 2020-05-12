@@ -16,7 +16,6 @@ import java.util.UUID;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.attributes.AttributesTable;
-import mil.nga.geopackage.core.contents.ContentsDataType;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageCoreConnection;
@@ -29,18 +28,19 @@ import mil.nga.geopackage.db.table.Constraint;
 import mil.nga.geopackage.db.table.ConstraintType;
 import mil.nga.geopackage.db.table.RawConstraint;
 import mil.nga.geopackage.db.table.UniqueConstraint;
-import mil.nga.geopackage.extension.nga.contents.ContentsId;
-import mil.nga.geopackage.extension.nga.contents.ContentsIdExtension;
+import mil.nga.geopackage.extension.MetadataExtension;
 import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
+import mil.nga.geopackage.extension.nga.contents.ContentsId;
+import mil.nga.geopackage.extension.nga.contents.ContentsIdExtension;
 import mil.nga.geopackage.extension.nga.link.FeatureTileTableLinker;
-import mil.nga.geopackage.extension.related.ExtendedRelation;
-import mil.nga.geopackage.extension.related.RelatedTablesExtension;
 import mil.nga.geopackage.extension.nga.scale.TileScaling;
 import mil.nga.geopackage.extension.nga.scale.TileTableScaling;
 import mil.nga.geopackage.extension.nga.style.FeatureTableStyles;
 import mil.nga.geopackage.extension.nga.style.StyleMappingDao;
+import mil.nga.geopackage.extension.related.ExtendedRelation;
+import mil.nga.geopackage.extension.related.RelatedTablesExtension;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -504,8 +504,8 @@ public class AlterTableUtils {
                 ContentsId contentsId = contentsIdExtension.get(tableName);
 
                 List<MetadataReference> metadataReference = null;
-                MetadataReferenceDao metadataReferenceDao = geoPackage
-                        .getMetadataReferenceDao();
+                MetadataReferenceDao metadataReferenceDao = MetadataExtension
+                        .getMetadataReferenceDao(geoPackage);
                 if (metadataReferenceDao.isTableExists()) {
                     metadataReference = metadataReferenceDao
                             .queryByTable(tableName);
@@ -836,8 +836,8 @@ public class AlterTableUtils {
                 ContentsId contentsId = contentsIdExtension.get(tableName);
 
                 List<MetadataReference> metadataReference = null;
-                MetadataReferenceDao metadataReferenceDao = geoPackage
-                        .getMetadataReferenceDao();
+                MetadataReferenceDao metadataReferenceDao = MetadataExtension
+                        .getMetadataReferenceDao(geoPackage);
                 if (metadataReferenceDao.isTableExists()) {
                     metadataReference = metadataReferenceDao
                             .queryByTable(tableName);
@@ -1082,8 +1082,8 @@ public class AlterTableUtils {
             ContentsId contentsId = contentsIdExtension.get(tableName);
 
             List<MetadataReference> metadataReference = null;
-            MetadataReferenceDao metadataReferenceDao = geoPackage
-                    .getMetadataReferenceDao();
+            MetadataReferenceDao metadataReferenceDao = MetadataExtension
+                    .getMetadataReferenceDao(geoPackage);
             if (metadataReferenceDao.isTableExists()) {
                 metadataReference = metadataReferenceDao
                         .queryByTable(tableName);

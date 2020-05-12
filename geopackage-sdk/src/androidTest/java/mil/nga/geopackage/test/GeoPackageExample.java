@@ -1391,8 +1391,9 @@ public class GeoPackageExample extends BaseTestCase {
     private static void createMetadataExtension(GeoPackage geoPackage)
             throws SQLException {
 
-        geoPackage.createMetadataTable();
-        MetadataDao metadataDao = geoPackage.getMetadataDao();
+        MetadataExtension metadataExtension = new MetadataExtension(geoPackage);
+        metadataExtension.createMetadataTable();
+        MetadataDao metadataDao = metadataExtension.getMetadataDao();
 
         Metadata metadata1 = new Metadata();
         metadata1.setMetadataScope(MetadataScopeType.DATASET);
@@ -1415,8 +1416,8 @@ public class GeoPackageExample extends BaseTestCase {
         metadata3.setMetadata("TEST METADATA 3");
         metadataDao.create(metadata3);
 
-        geoPackage.createMetadataReferenceTable();
-        MetadataReferenceDao metadataReferenceDao = geoPackage
+        metadataExtension.createMetadataReferenceTable();
+        MetadataReferenceDao metadataReferenceDao = metadataExtension
                 .getMetadataReferenceDao();
 
         MetadataReference reference1 = new MetadataReference();

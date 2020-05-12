@@ -34,6 +34,7 @@ import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
+import mil.nga.geopackage.extension.MetadataExtension;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -179,8 +180,9 @@ public class TestSetupTeardown {
             throws SQLException {
 
         // Metadata
-        geoPackage.createMetadataTable();
-        MetadataDao metadataDao = geoPackage.getMetadataDao();
+        MetadataExtension metadataExtension = new MetadataExtension(geoPackage);
+        metadataExtension.createMetadataTable();
+        MetadataDao metadataDao = metadataExtension.getMetadataDao();
 
         Metadata metadata1 = new Metadata();
         metadata1.setMetadataScope(MetadataScopeType.DATASET);
@@ -204,8 +206,8 @@ public class TestSetupTeardown {
         metadataDao.create(metadata3);
 
         // Metadata Reference
-        geoPackage.createMetadataReferenceTable();
-        MetadataReferenceDao metadataReferenceDao = geoPackage
+        metadataExtension.createMetadataReferenceTable();
+        MetadataReferenceDao metadataReferenceDao = metadataExtension
                 .getMetadataReferenceDao();
 
         MetadataReference reference1 = new MetadataReference();
