@@ -35,6 +35,7 @@ import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
 import mil.nga.geopackage.extension.MetadataExtension;
+import mil.nga.geopackage.extension.SchemaExtension;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -466,7 +467,7 @@ public class TestSetupTeardown {
         TestUtils.createConstraints(geoPackage);
 
         // Create data columns table
-        geoPackage.createDataColumnsTable();
+        (new SchemaExtension(geoPackage)).createDataColumnsTable();
 
         String geometryColumn = "geometry";
 

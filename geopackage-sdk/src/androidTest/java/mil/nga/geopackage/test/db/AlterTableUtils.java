@@ -29,6 +29,7 @@ import mil.nga.geopackage.db.table.ConstraintType;
 import mil.nga.geopackage.db.table.RawConstraint;
 import mil.nga.geopackage.db.table.UniqueConstraint;
 import mil.nga.geopackage.extension.MetadataExtension;
+import mil.nga.geopackage.extension.SchemaExtension;
 import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
@@ -512,7 +513,8 @@ public class AlterTableUtils {
                 }
 
                 List<DataColumns> dataColumns = null;
-                DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
+                DataColumnsDao dataColumnsDao = (new SchemaExtension(
+                        geoPackage)).getDataColumnsDao();
                 if (dataColumnsDao.isTableExists()) {
                     dataColumns = dataColumnsDao.queryByTable(tableName);
                 }
@@ -844,7 +846,8 @@ public class AlterTableUtils {
                 }
 
                 List<DataColumns> dataColumns = null;
-                DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
+                DataColumnsDao dataColumnsDao = (new SchemaExtension(
+                        geoPackage)).getDataColumnsDao();
                 if (dataColumnsDao.isTableExists()) {
                     dataColumns = dataColumnsDao.queryByTable(tableName);
                 }
@@ -1090,7 +1093,8 @@ public class AlterTableUtils {
             }
 
             List<DataColumns> dataColumns = null;
-            DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
+            DataColumnsDao dataColumnsDao = (new SchemaExtension(geoPackage))
+                    .getDataColumnsDao();
             if (dataColumnsDao.isTableExists()) {
                 dataColumns = dataColumnsDao.queryByTable(tableName);
             }

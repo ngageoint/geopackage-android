@@ -24,6 +24,7 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.core.contents.Contents;
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
+import mil.nga.geopackage.extension.SchemaExtension;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureDao;
@@ -209,7 +210,8 @@ public class TestUtils {
 
         double random = Math.random();
 
-        DataColumnsDao dataColumnsDao = geoPackage.getDataColumnsDao();
+        DataColumnsDao dataColumnsDao = SchemaExtension
+                .getDataColumnsDao(geoPackage);
         DataColumns dataColumns = new DataColumns();
         dataColumns.setContents(contents);
         dataColumns.setColumnName(TEST_INTEGER_COLUMN);
@@ -594,9 +596,11 @@ public class TestUtils {
     public static void createConstraints(GeoPackage geoPackage)
             throws SQLException {
 
-        geoPackage.createDataColumnConstraintsTable();
+        SchemaExtension schemaExtension = new SchemaExtension(geoPackage);
+        schemaExtension.createDataColumnConstraintsTable();
 
-        DataColumnConstraintsDao dao = geoPackage.getDataColumnConstraintsDao();
+        DataColumnConstraintsDao dao = schemaExtension
+                .getDataColumnConstraintsDao();
 
         DataColumnConstraints sampleRange = new DataColumnConstraints();
         sampleRange.setConstraintName(SAMPLE_RANGE_CONSTRAINT);
