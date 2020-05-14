@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Map;
 
 import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.core.contents.Contents;
-import mil.nga.geopackage.core.contents.ContentsDao;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystemSfSql;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystemSfSqlDao;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystemSqlMm;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystemSqlMmDao;
+import mil.nga.geopackage.contents.Contents;
+import mil.nga.geopackage.contents.ContentsDao;
 import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
+import mil.nga.geopackage.srs.SpatialReferenceSystem;
+import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
+import mil.nga.geopackage.srs.SpatialReferenceSystemSfSql;
+import mil.nga.geopackage.srs.SpatialReferenceSystemSfSqlDao;
+import mil.nga.geopackage.srs.SpatialReferenceSystemSqlMm;
+import mil.nga.geopackage.srs.SpatialReferenceSystemSqlMmDao;
 
 /**
  * Spatial Reference System Utility test methods
@@ -127,8 +127,8 @@ public class SpatialReferenceSystemUtils {
     public static void testSqlMmRead(GeoPackage geoPackage, Integer expectedResults)
             throws SQLException {
 
-        SpatialReferenceSystemSqlMmDao dao = geoPackage
-                .getSpatialReferenceSystemSqlMmDao();
+        SpatialReferenceSystemSqlMmDao dao = SpatialReferenceSystemSqlMmDao
+                .getDao(geoPackage);
         List<SpatialReferenceSystemSqlMm> results = dao.queryForAll();
         if (expectedResults != null) {
             TestCase.assertEquals(
@@ -210,8 +210,8 @@ public class SpatialReferenceSystemUtils {
     public static void testSfSqlRead(GeoPackage geoPackage, Integer expectedResults)
             throws SQLException {
 
-        SpatialReferenceSystemSfSqlDao dao = geoPackage
-                .getSpatialReferenceSystemSfSqlDao();
+        SpatialReferenceSystemSfSqlDao dao = SpatialReferenceSystemSfSqlDao
+                .getDao(geoPackage);
         List<SpatialReferenceSystemSfSql> results = dao.queryForAll();
         if (expectedResults != null) {
             TestCase.assertEquals(

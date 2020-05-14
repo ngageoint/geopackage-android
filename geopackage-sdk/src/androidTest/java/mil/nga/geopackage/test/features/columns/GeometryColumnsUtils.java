@@ -15,11 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.core.contents.Contents;
-import mil.nga.geopackage.core.contents.ContentsDao;
-import mil.nga.geopackage.core.contents.ContentsDataType;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystemDao;
+import mil.nga.geopackage.contents.Contents;
+import mil.nga.geopackage.contents.ContentsDao;
+import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -27,6 +25,8 @@ import mil.nga.geopackage.features.columns.GeometryColumnsSfSql;
 import mil.nga.geopackage.features.columns.GeometryColumnsSfSqlDao;
 import mil.nga.geopackage.features.columns.GeometryColumnsSqlMm;
 import mil.nga.geopackage.features.columns.GeometryColumnsSqlMmDao;
+import mil.nga.geopackage.srs.SpatialReferenceSystem;
+import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.wkb.GeometryCodes;
@@ -177,7 +177,8 @@ public class GeometryColumnsUtils {
     public static void testSqlMmRead(GeoPackage geoPackage,
                                      Integer expectedResults) throws SQLException {
 
-        GeometryColumnsSqlMmDao dao = geoPackage.getGeometryColumnsSqlMmDao();
+        GeometryColumnsSqlMmDao dao = GeometryColumnsSqlMmDao
+                .getDao(geoPackage);
 
         if (dao.isTableExists()) {
             List<GeometryColumnsSqlMm> results = dao.queryForAll();
@@ -308,7 +309,8 @@ public class GeometryColumnsUtils {
     public static void testSfSqlRead(GeoPackage geoPackage,
                                      Integer expectedResults) throws SQLException {
 
-        GeometryColumnsSfSqlDao dao = geoPackage.getGeometryColumnsSfSqlDao();
+        GeometryColumnsSfSqlDao dao = GeometryColumnsSfSqlDao
+                .getDao(geoPackage);
 
         if (dao.isTableExists()) {
             List<GeometryColumnsSfSql> results = dao.queryForAll();

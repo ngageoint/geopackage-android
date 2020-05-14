@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageManager;
-import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.factory.GeoPackageFactory;
 import mil.nga.geopackage.features.OAPIFeatureGenerator;
 import mil.nga.geopackage.features.index.FeatureIndexManager;

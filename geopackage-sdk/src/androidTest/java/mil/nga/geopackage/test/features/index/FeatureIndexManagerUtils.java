@@ -14,7 +14,6 @@ import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.features.columns.GeometryColumns;
@@ -27,6 +26,7 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
+import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.test.GeoPackageTestUtils;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.io.TestGeoPackageProgress;

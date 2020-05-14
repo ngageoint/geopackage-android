@@ -2,10 +2,10 @@ package mil.nga.geopackage.features.user;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.core.contents.Contents;
-import mil.nga.geopackage.core.srs.SpatialReferenceSystem;
+import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.features.columns.GeometryColumns;
+import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.user.UserDao;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.proj.Projection;

@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.UUID;
 
 import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.core.contents.Contents;
-import mil.nga.geopackage.core.contents.ContentsDao;
-import mil.nga.geopackage.core.contents.ContentsDataType;
+import mil.nga.geopackage.contents.Contents;
+import mil.nga.geopackage.contents.ContentsDao;
+import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.related.ExtendedRelation;
 import mil.nga.geopackage.extension.related.ExtendedRelationsDao;
@@ -53,7 +53,7 @@ public class RelatedMediaUtils {
         // Create a related tables extension
         RelatedTablesExtension rte = new RelatedTablesExtension(geoPackage);
 
-        if(rte.has()){
+        if (rte.has()) {
             rte.removeExtension();
         }
 
@@ -148,8 +148,8 @@ public class RelatedMediaUtils {
                 contentsDao.queryForId(mediaTable.getTableName()));
         TestCase.assertEquals(MediaTable.RELATION_TYPE.getDataType(),
                 geoPackage.getTableType(mediaTable.getTableName()));
-        TestCase.assertTrue(geoPackage.isTableType(
-                MediaTable.RELATION_TYPE.getDataType(), mediaTable.getTableName()));
+        TestCase.assertTrue(geoPackage.isTableType(mediaTable.getTableName(),
+                MediaTable.RELATION_TYPE.getDataType()));
 
         // Validate the media DAO
         MediaDao mediaDao = rte.getMediaDao(mediaTable);

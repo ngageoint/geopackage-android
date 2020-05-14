@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import mil.nga.geopackage.attributes.AttributesDao;
-import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.factory.GeoPackageCursorFactory;
 import mil.nga.geopackage.factory.GeoPackageCursorWrapper;

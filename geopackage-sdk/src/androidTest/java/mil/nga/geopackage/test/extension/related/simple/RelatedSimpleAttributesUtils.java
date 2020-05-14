@@ -11,9 +11,9 @@ import mil.nga.geopackage.attributes.AttributesCursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.attributes.AttributesRow;
 import mil.nga.geopackage.attributes.AttributesTable;
-import mil.nga.geopackage.core.contents.Contents;
-import mil.nga.geopackage.core.contents.ContentsDao;
-import mil.nga.geopackage.core.contents.ContentsDataType;
+import mil.nga.geopackage.contents.Contents;
+import mil.nga.geopackage.contents.ContentsDao;
+import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.related.ExtendedRelation;
 import mil.nga.geopackage.extension.related.ExtendedRelationsDao;
@@ -149,9 +149,8 @@ public class RelatedSimpleAttributesUtils {
                 contentsDao.queryForId(simpleTable.getTableName()));
         TestCase.assertEquals(SimpleAttributesTable.RELATION_TYPE.getDataType(),
                 geoPackage.getTableType(simpleTable.getTableName()));
-        TestCase.assertTrue(geoPackage.isTableType(
-                SimpleAttributesTable.RELATION_TYPE.getDataType(),
-                simpleTable.getTableName()));
+        TestCase.assertTrue(geoPackage.isTableType(simpleTable.getTableName(),
+                SimpleAttributesTable.RELATION_TYPE.getDataType()));
 
         // Validate the simple attributes DAO
         SimpleAttributesDao simpleDao = rte.getSimpleAttributesDao(simpleTable);

@@ -9,7 +9,7 @@ import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.core.contents.Contents;
+import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
 import mil.nga.geopackage.db.metadata.GeometryMetadata;
 import mil.nga.geopackage.db.metadata.GeometryMetadataDataSource;
