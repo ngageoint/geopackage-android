@@ -1,4 +1,4 @@
-package mil.nga.geopackage.test.core.srs;
+package mil.nga.geopackage.test.srs;
 
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedDelete;

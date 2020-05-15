@@ -1,4 +1,4 @@
-package mil.nga.geopackage.test.core.contents;
+package mil.nga.geopackage.test.contents;
 
 import org.junit.Test;
 
