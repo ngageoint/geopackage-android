@@ -108,4 +108,17 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test table types
+	 *
+	 * @throws SQLException
+	 *             upon error
+	 */
+	@Test
+	public void testTableTypes() throws SQLException {
+
+		GeoPackageTestUtils.testTableTypes(geoPackage);
+
+	}
+
 }

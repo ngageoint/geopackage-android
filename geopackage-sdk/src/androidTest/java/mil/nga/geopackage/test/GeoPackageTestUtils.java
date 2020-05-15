@@ -6,7 +6,11 @@ import junit.framework.TestCase;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
@@ -551,6 +555,146 @@ public class GeoPackageTestUtils {
             TestCase.assertTrue(size > newSize);
             size = newSize;
 
+        }
+
+    }
+
+    /**
+     * Test the GeoPackage table types
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     */
+    public static void testTableTypes(GeoPackage geoPackage)
+            throws SQLException {
+
+        Map<String, Set<String>> types = new HashMap<>();
+        Map<String, String> tables = new HashMap<>();
+
+        for (ContentsDataType type : ContentsDataType.values()) {
+            types.put(type.getName(), new HashSet<>());
+        }
+
+        ContentsDao dao = geoPackage.getContentsDao();
+        for (Contents contents : dao.queryForAll()) {
+
+            String tableName = contents.getTableName();
+            String dataTypeNameString = contents.getDataTypeName();
+
+            Set<String> typeTables = types.get(dataTypeNameString);
+            if (typeTables == null) {
+                typeTables = new HashSet<>();
+                types.put(dataTypeNameString, typeTables);
+            }
+            typeTables.add(tableName);
+
+            tables.put(tableName, dataTypeNameString);
+        }
+
+        String previousType = null;
+
+        for (String type : types.keySet()) {
+
+            Set<String> typeTables = types.get(type);
+
+            List<String> tablesByType = geoPackage.getTables(type);
+            TestCase.assertEquals(typeTables.size(), tablesByType.size());
+            for (String tableByType : tablesByType) {
+                TestCase.assertTrue(typeTables.contains(tableByType));
+            }
+
+            ContentsDataType coreDataType = ContentsDataType.fromCoreName(type);
+            if (coreDataType != null) {
+                List<String> coreTablesByType = geoPackage
+                        .getTables(coreDataType);
+                TestCase.assertEquals(typeTables.size(),
+                        coreTablesByType.size());
+                for (String coreTableByType : coreTablesByType) {
+                    TestCase.assertTrue(typeTables.contains(coreTableByType));
+                }
+            }
+
+            if (previousType != null) {
+
+                Set<String> previousTypeTables = types.get(previousType);
+
+                List<String> tablesByMultiType = geoPackage.getTables(type,
+                        previousType);
+                TestCase.assertEquals(
+                        typeTables.size() + previousTypeTables.size(),
+                        tablesByMultiType.size());
+                for (String tableByMultiType : tablesByMultiType) {
+                    TestCase.assertTrue(typeTables.contains(tableByMultiType)
+                            || previousTypeTables.contains(tableByMultiType));
+                }
+
+                if (coreDataType != null) {
+                    ContentsDataType previousCoreDataType = ContentsDataType
+                            .fromCoreName(previousType);
+                    if (previousCoreDataType != null) {
+                        List<String> coreTablesByMultiType = geoPackage
+                                .getTables(coreDataType, previousCoreDataType);
+                        TestCase.assertEquals(
+                                typeTables.size() + previousTypeTables.size(),
+                                coreTablesByMultiType.size());
+                        for (String coreTableByMultiType : coreTablesByMultiType) {
+                            TestCase.assertTrue(
+                                    typeTables.contains(coreTableByMultiType)
+                                            || previousTypeTables.contains(
+                                            coreTableByMultiType));
+                        }
+
+                    }
+                }
+
+            }
+
+            previousType = type;
+        }
+
+        previousType = null;
+
+        for (String table : tables.keySet()) {
+            String type = tables.get(table);
+
+            TestCase.assertTrue(geoPackage.isTableOrView(table));
+            TestCase.assertTrue(geoPackage.isContentsTable(table));
+            TestCase.assertTrue(geoPackage.isTableType(table, type));
+
+            ContentsDataType dataType = ContentsDataType.fromName(type);
+            if (dataType != null) {
+                TestCase.assertTrue(ContentsDataType.isType(type));
+                TestCase.assertTrue(geoPackage.isTableType(table, dataType));
+                boolean attributes = dataType == ContentsDataType.ATTRIBUTES;
+                boolean features = dataType == ContentsDataType.FEATURES;
+                boolean tiles = dataType == ContentsDataType.TILES;
+
+                TestCase.assertTrue(attributes || features || tiles);
+                TestCase.assertEquals(attributes,
+                        geoPackage.isAttributeTable(table));
+                TestCase.assertEquals(features,
+                        geoPackage.isFeatureTable(table));
+                TestCase.assertEquals(tiles, geoPackage.isTileTable(table));
+            }
+
+            if (previousType != null && !type.equals(previousType)) {
+                TestCase.assertTrue(
+                        geoPackage.isTableType(table, type, previousType));
+
+                if (dataType != null) {
+                    ContentsDataType previousDataType = ContentsDataType
+                            .fromName(previousType);
+                    if (previousDataType != null) {
+                        boolean sameCoreType = dataType == previousDataType;
+                        TestCase.assertEquals(sameCoreType, geoPackage
+                                .isTableType(table, previousDataType));
+                        TestCase.assertTrue(geoPackage.isTableType(table,
+                                dataType, previousDataType));
+                    }
+                }
+            }
+
+            previousType = type;
         }
 
     }
