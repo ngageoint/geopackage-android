@@ -1354,10 +1354,8 @@ public class AlterTableUtils {
                         + " FOREIGN KEY (column6) REFERENCES gpkg_spatial_ref_sys(srs_id)",
                 copyConstraints.get(3).buildSql());
 
-        TestCase.assertEquals("NOT NULL",
-                copyTable.getColumn(0).getConstraints().get(0).buildSql());
         TestCase.assertEquals("PRIMARY KEY AUTOINCREMENT",
-                copyTable.getColumn(0).getConstraints().get(1).buildSql());
+                copyTable.getColumn(0).getConstraints().get(0).buildSql());
         TestCase.assertEquals("NOT NULL",
                 copyTable.getColumn(1).getConstraints().get(0).buildSql());
         TestCase.assertEquals("UNIQUE",
