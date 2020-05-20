@@ -30,6 +30,7 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.test.TestUtils;
@@ -1520,6 +1521,7 @@ public class FeatureUtils {
         geometryColumns.setGeometryType(GeometryType.POINT);
         geometryColumns.setZ((byte) 1);
         geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
 
         BoundingBox boundingBox = new BoundingBox(-180, -90, 180, 90);
 
@@ -1529,9 +1531,8 @@ public class FeatureUtils {
         List<FeatureColumn> additionalColumns = new ArrayList<FeatureColumn>();
         additionalColumns.add(FeatureColumn.createColumn(realColumn,
                 GeoPackageDataType.REAL));
-        geometryColumns = geoPackage.createFeatureTableWithMetadata(
-                geometryColumns, idColumn, additionalColumns, boundingBox,
-                srs.getId());
+        geoPackage.createFeatureTable(new FeatureTableMetadata(
+                geometryColumns, idColumn, additionalColumns, boundingBox));
 
         FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);
         TestCase.assertFalse(featureDao.isPkModifiable());

@@ -85,6 +85,7 @@ import mil.nga.geopackage.extension.related.dublin.DublinCoreType;
 import mil.nga.geopackage.extension.related.media.MediaDao;
 import mil.nga.geopackage.extension.related.media.MediaRow;
 import mil.nga.geopackage.extension.related.media.MediaTable;
+import mil.nga.geopackage.extension.related.media.MediaTableMetadata;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesDao;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesRow;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesTable;
@@ -1681,8 +1682,8 @@ public class GeoPackageExample extends BaseTestCase {
 
         List<UserCustomColumn> additionalMediaColumns = RelatedTablesUtils
                 .createAdditionalUserColumns();
-        MediaTable mediaTable = MediaTable.create("media",
-                additionalMediaColumns);
+        MediaTable mediaTable = MediaTable.create(
+                new MediaTableMetadata("media", additionalMediaColumns));
 
         List<UserCustomColumn> additionalMappingColumns = RelatedTablesUtils
                 .createAdditionalUserColumns();
@@ -1774,7 +1775,8 @@ public class GeoPackageExample extends BaseTestCase {
 
         ContentsIdExtension contentsId = new ContentsIdExtension(geoPackage);
 
-        MediaTable mediaTable = MediaTable.create("preview");
+        MediaTable mediaTable = MediaTable
+                .create(new MediaTableMetadata("preview"));
         UserMappingTable userMappingTable = UserMappingTable
                 .create("features_" + mediaTable.getTableName());
 

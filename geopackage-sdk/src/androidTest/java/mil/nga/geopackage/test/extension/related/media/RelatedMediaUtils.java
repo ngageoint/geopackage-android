@@ -27,6 +27,7 @@ import mil.nga.geopackage.extension.related.dublin.DublinCoreType;
 import mil.nga.geopackage.extension.related.media.MediaDao;
 import mil.nga.geopackage.extension.related.media.MediaRow;
 import mil.nga.geopackage.extension.related.media.MediaTable;
+import mil.nga.geopackage.extension.related.media.MediaTableMetadata;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
@@ -71,14 +72,15 @@ public class RelatedMediaUtils {
         // Populate and validate a media table
         List<UserCustomColumn> additionalMediaColumns = RelatedTablesUtils
                 .createAdditionalUserColumns();
-        MediaTable mediaTable = MediaTable.create("media_table",
-                additionalMediaColumns);
+        MediaTable mediaTable = MediaTable.create(
+                new MediaTableMetadata("media_table", additionalMediaColumns));
         String[] mediaColumns = mediaTable.getColumnNames();
         TestCase.assertEquals(MediaTable.numRequiredColumns()
                 + additionalMediaColumns.size(), mediaColumns.length);
         UserCustomColumn idColumn = mediaTable.getIdColumn();
         TestCase.assertNotNull(idColumn);
-        TestCase.assertTrue(idColumn.isNamed(MediaTable.COLUMN_ID));
+        TestCase.assertTrue(
+                idColumn.isNamed(MediaTableMetadata.DEFAULT_ID_COLUMN_NAME));
         TestCase.assertEquals(GeoPackageDataType.INTEGER,
                 idColumn.getDataType());
         TestCase.assertTrue(idColumn.isNotNull());

@@ -28,6 +28,7 @@ import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
+import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
@@ -55,18 +56,20 @@ public class GeoPackageTestUtils {
     public static void testCreateFeatureTableWithMetadata(GeoPackage geoPackage)
             throws SQLException {
 
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey("feature_metadata", "geom"));
         geometryColumns.setGeometryType(GeometryType.POINT);
         geometryColumns.setZ((byte) 1);
         geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
 
         BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
-                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
-        geometryColumns = geoPackage.createFeatureTableWithMetadata(
-                geometryColumns, boundingBox, srs.getId());
+        geoPackage.createFeatureTable(
+                new FeatureTableMetadata(geometryColumns, boundingBox));
 
         validateFeatureTableWithMetadata(geoPackage, geometryColumns, null,
                 null);
@@ -81,19 +84,21 @@ public class GeoPackageTestUtils {
     public static void testCreateFeatureTableWithMetadataIdColumn(
             GeoPackage geoPackage) throws SQLException {
 
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey("feature_metadata2", "geom2"));
         geometryColumns.setGeometryType(GeometryType.POINT);
         geometryColumns.setZ((byte) 1);
         geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
 
         BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
-                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
         String idColumn = "my_id";
-        geometryColumns = geoPackage.createFeatureTableWithMetadata(
-                geometryColumns, idColumn, boundingBox, srs.getId());
+        geoPackage.createFeatureTable(new FeatureTableMetadata(geometryColumns,
+                idColumn, boundingBox));
 
         validateFeatureTableWithMetadata(geoPackage, geometryColumns, idColumn,
                 null);
@@ -108,20 +113,22 @@ public class GeoPackageTestUtils {
     public static void testCreateFeatureTableWithMetadataAdditionalColumns(
             GeoPackage geoPackage) throws SQLException {
 
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey("feature_metadata3", "geom3"));
         geometryColumns.setGeometryType(GeometryType.POINT);
         geometryColumns.setZ((byte) 1);
         geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
 
         BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
         List<FeatureColumn> additionalColumns = getFeatureColumns();
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
-                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
-        geometryColumns = geoPackage.createFeatureTableWithMetadata(
-                geometryColumns, additionalColumns, boundingBox, srs.getId());
+        geoPackage.createFeatureTable(new FeatureTableMetadata(geometryColumns,
+                additionalColumns, boundingBox));
 
         validateFeatureTableWithMetadata(geoPackage, geometryColumns, null,
                 additionalColumns);
@@ -137,22 +144,23 @@ public class GeoPackageTestUtils {
     public static void testCreateFeatureTableWithMetadataIdColumnAdditionalColumns(
             GeoPackage geoPackage) throws SQLException {
 
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
+                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
+
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey("feature_metadata4", "geom4"));
         geometryColumns.setGeometryType(GeometryType.POINT);
         geometryColumns.setZ((byte) 1);
         geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
 
         BoundingBox boundingBox = new BoundingBox(-90, -45, 90, 45);
 
         List<FeatureColumn> additionalColumns = getFeatureColumns();
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao().getOrCreateCode(
-                ProjectionConstants.AUTHORITY_EPSG, ProjectionConstants.EPSG_WEB_MERCATOR);
         String idColumn = "my_other_id";
-        geometryColumns = geoPackage.createFeatureTableWithMetadata(
-                geometryColumns, idColumn, additionalColumns, boundingBox,
-                srs.getId());
+        geoPackage.createFeatureTable(new FeatureTableMetadata(geometryColumns,
+                idColumn, additionalColumns, boundingBox));
 
         validateFeatureTableWithMetadata(geoPackage, geometryColumns, idColumn,
                 additionalColumns);
@@ -328,6 +336,11 @@ public class GeoPackageTestUtils {
                 ProjectionConstants.AUTHORITY_EPSG,
                 ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
+                .queryForOrganizationCoordsysId(
+                        ProjectionConstants.AUTHORITY_EPSG,
+                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
         // Create a feature table with empty contents
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey("feature_empty_contents",
@@ -335,12 +348,9 @@ public class GeoPackageTestUtils {
         geometryColumns.setGeometryType(GeometryType.POINT);
         geometryColumns.setZ((byte) 0);
         geometryColumns.setM((byte) 0);
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
-                .queryForOrganizationCoordsysId(
-                        ProjectionConstants.AUTHORITY_EPSG,
-                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
-        geoPackage.createFeatureTableWithMetadata(geometryColumns, null,
-                srs.getId());
+        geometryColumns.setSrs(srs);
+        geoPackage
+                .createFeatureTable(new FeatureTableMetadata(geometryColumns));
 
         BoundingBox geoPackageContentsBoundingBox = geoPackage
                 .getContentsBoundingBox(projection);

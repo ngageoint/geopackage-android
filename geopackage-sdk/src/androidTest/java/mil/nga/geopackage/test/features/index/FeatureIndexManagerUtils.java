@@ -25,6 +25,7 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.test.GeoPackageTestUtils;
@@ -605,21 +606,23 @@ public class FeatureIndexManagerUtils {
 
         String featureTable = "large_index";
 
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
+                .getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG,
+                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey(featureTable, "geom"));
         geometryColumns.setGeometryType(GeometryType.POLYGON);
         geometryColumns.setZ((byte) 0);
         geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
 
         BoundingBox boundingBox = new BoundingBox(-180, -90, 180, 90);
 
-        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
-                .getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG,
-                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
         List<FeatureColumn> additionalColumns = GeoPackageTestUtils
                 .getFeatureColumns();
-        geometryColumns = geoPackage.createFeatureTableWithMetadata(
-                geometryColumns, additionalColumns, boundingBox, srs.getId());
+        geoPackage.createFeatureTable(new FeatureTableMetadata(geometryColumns,
+                additionalColumns, boundingBox));
 
         FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);
 

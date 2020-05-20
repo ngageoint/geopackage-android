@@ -17,6 +17,7 @@ import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
+import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.tiles.features.DefaultFeatureTiles;
 import mil.nga.geopackage.tiles.features.FeatureTilePointIcon;
@@ -47,9 +48,11 @@ public class FeatureTileUtils {
         geometryColumns.setGeometryType(GeometryType.GEOMETRY);
         geometryColumns.setZ((byte) 0);
         geometryColumns.setM((byte) 0);
+        geometryColumns
+                .setSrsId(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
-        geoPackage.createFeatureTableWithMetadata(
-                geometryColumns, boundingBox, ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+        geoPackage.createFeatureTable(
+                new FeatureTableMetadata(geometryColumns, boundingBox));
 
         FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);
 
