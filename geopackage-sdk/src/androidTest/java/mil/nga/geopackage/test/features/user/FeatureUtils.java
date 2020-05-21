@@ -1531,7 +1531,7 @@ public class FeatureUtils {
         List<FeatureColumn> additionalColumns = new ArrayList<FeatureColumn>();
         additionalColumns.add(FeatureColumn.createColumn(realColumn,
                 GeoPackageDataType.REAL));
-        geoPackage.createFeatureTable(new FeatureTableMetadata(
+        geoPackage.createFeatureTable(FeatureTableMetadata.create(
                 geometryColumns, idColumn, additionalColumns, boundingBox));
 
         FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);

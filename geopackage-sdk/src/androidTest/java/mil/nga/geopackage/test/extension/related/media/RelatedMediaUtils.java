@@ -73,7 +73,7 @@ public class RelatedMediaUtils {
         List<UserCustomColumn> additionalMediaColumns = RelatedTablesUtils
                 .createAdditionalUserColumns();
         MediaTable mediaTable = MediaTable.create(
-                new MediaTableMetadata("media_table", additionalMediaColumns));
+                MediaTableMetadata.create("media_table", additionalMediaColumns));
         String[] mediaColumns = mediaTable.getColumnNames();
         TestCase.assertEquals(MediaTable.numRequiredColumns()
                 + additionalMediaColumns.size(), mediaColumns.length);

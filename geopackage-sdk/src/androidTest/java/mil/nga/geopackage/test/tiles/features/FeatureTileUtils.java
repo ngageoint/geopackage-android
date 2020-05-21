@@ -52,7 +52,7 @@ public class FeatureTileUtils {
                 .setSrsId(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
         geoPackage.createFeatureTable(
-                new FeatureTableMetadata(geometryColumns, boundingBox));
+                FeatureTableMetadata.create(geometryColumns, boundingBox));
 
         FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);
 

@@ -38,6 +38,7 @@ import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
+import mil.nga.geopackage.tiles.user.TileTableMetadata;
 import mil.nga.sf.proj.Projection;
 import mil.nga.sf.proj.ProjectionConstants;
 import mil.nga.sf.proj.ProjectionFactory;
@@ -441,12 +442,13 @@ public abstract class TileGenerator {
             SpatialReferenceSystem srs = srsDao.getOrCreateCode(projection.getAuthority(),
                     Long.parseLong(projection.getCode()));
             // Create the tile table
-            tileMatrixSet = geoPackage.createTileTableWithMetadata(
+            geoPackage.createTileTable(TileTableMetadata.create(
                     tableName,
                     boundingBox,
                     srs.getSrsId(),
                     tileGridBoundingBox,
-                    srs.getSrsId());
+                    srs.getSrsId()));
+            tileMatrixSet = tileMatrixSetDao.queryForId(tableName);
         } else {
             update = true;
             // Query to get the Tile Matrix Set

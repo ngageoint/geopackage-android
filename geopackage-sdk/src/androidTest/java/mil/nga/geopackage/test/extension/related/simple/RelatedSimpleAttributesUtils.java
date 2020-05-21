@@ -24,6 +24,7 @@ import mil.nga.geopackage.extension.related.UserMappingTable;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesDao;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesRow;
 import mil.nga.geopackage.extension.related.simple.SimpleAttributesTable;
+import mil.nga.geopackage.extension.related.simple.SimpleAttributesTableMetadata;
 import mil.nga.geopackage.test.extension.related.RelatedTablesUtils;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.user.custom.UserCustomCursor;
@@ -59,24 +60,27 @@ public class RelatedSimpleAttributesUtils {
 
         // Validate nullable non simple columns
         try {
-            SimpleAttributesTable.create("simple_table", RelatedTablesUtils
-                    .createAdditionalUserColumns());
+            SimpleAttributesTable.create(
+                    SimpleAttributesTableMetadata.create("simple_table", RelatedTablesUtils
+                            .createAdditionalUserColumns()));
             TestCase.fail("Simple Attributes Table created with nullable non simple columns");
         } catch (Exception e) {
             // pass
         }
         // Validate non nullable non simple columns
         try {
-            SimpleAttributesTable.create("simple_table", RelatedTablesUtils
-                    .createAdditionalUserColumns(true));
+            SimpleAttributesTable.create(
+                    SimpleAttributesTableMetadata.create("simple_table", RelatedTablesUtils
+                            .createAdditionalUserColumns(true)));
             TestCase.fail("Simple Attributes Table created with non nullable non simple columns");
         } catch (Exception e) {
             // pass
         }
         // Validate nullable simple columns
         try {
-            SimpleAttributesTable.create("simple_table", RelatedTablesUtils
-                    .createSimpleUserColumns(false));
+            SimpleAttributesTable.create(
+                    SimpleAttributesTableMetadata.create("simple_table", RelatedTablesUtils
+                            .createSimpleUserColumns(false)));
             TestCase.fail("Simple Attributes Table created with nullable simple columns");
         } catch (Exception e) {
             // pass
@@ -86,7 +90,7 @@ public class RelatedSimpleAttributesUtils {
         List<UserCustomColumn> simpleUserColumns = RelatedTablesUtils
                 .createSimpleUserColumns();
         SimpleAttributesTable simpleTable = SimpleAttributesTable.create(
-                "simple_table", simpleUserColumns);
+                SimpleAttributesTableMetadata.create("simple_table", simpleUserColumns));
         String[] simpleColumns = simpleTable.getColumnNames();
         TestCase.assertEquals(SimpleAttributesTable.numRequiredColumns()
                 + simpleUserColumns.size(), simpleColumns.length);

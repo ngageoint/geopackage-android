@@ -123,7 +123,7 @@ public class GeoPackagePerformance extends BaseTestCase {
                 GeometryEnvelopeBuilder.buildEnvelope(geometry));
 
         geoPackage.createFeatureTable(
-                new FeatureTableMetadata(geometryColumns, boundingBox));
+                FeatureTableMetadata.create(geometryColumns, boundingBox));
 
         GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
                 srs.getSrsId());

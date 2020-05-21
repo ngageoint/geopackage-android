@@ -621,7 +621,7 @@ public class FeatureIndexManagerUtils {
 
         List<FeatureColumn> additionalColumns = GeoPackageTestUtils
                 .getFeatureColumns();
-        geoPackage.createFeatureTable(new FeatureTableMetadata(geometryColumns,
+        geoPackage.createFeatureTable(FeatureTableMetadata.create(geometryColumns,
                 additionalColumns, boundingBox));
 
         FeatureDao featureDao = geoPackage.getFeatureDao(geometryColumns);
