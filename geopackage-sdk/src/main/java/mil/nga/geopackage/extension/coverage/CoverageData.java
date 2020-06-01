@@ -20,12 +20,13 @@ import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
+import mil.nga.geopackage.tiles.user.TileTableMetadata;
 import mil.nga.sf.proj.Projection;
 import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Tiled Gridded Coverage Data, abstract Common Encoding, Extension
- *
+ * <p>
  * http://docs.opengeospatial.org/is/17-066r1/17-066r1.html
  *
  * @author osbornb
@@ -113,26 +114,18 @@ public abstract class CoverageData<TImage extends CoverageDataImage> extends Cov
     /**
      * Create the coverage data tile table with metadata and extension
      *
-     * @param geoPackage               GeoPackage
-     * @param tableName                table name
-     * @param contentsBoundingBox      contents bounding box
-     * @param contentsSrsId            contents srs id
-     * @param tileMatrixSetBoundingBox tile matrix set bounding box
-     * @param tileMatrixSetSrsId       tile matrix set srs id
-     * @param dataType                 gridded coverage data type
+     * @param geoPackage GeoPackage
+     * @param metadata   tile table metadata
+     * @param dataType   gridded coverage data type
      * @return coverage data
+     * @since 4.0.0
      */
-    public static CoverageData<?> createTileTableWithMetadata(
-            GeoPackage geoPackage, String tableName,
-            BoundingBox contentsBoundingBox, long contentsSrsId,
-            BoundingBox tileMatrixSetBoundingBox, long tileMatrixSetSrsId,
-            GriddedCoverageDataType dataType) {
+    public static CoverageData<?> createTileTable(GeoPackage geoPackage,
+                                                  TileTableMetadata metadata, GriddedCoverageDataType dataType) {
 
-        TileMatrixSet tileMatrixSet = CoverageDataCore
-                .createTileTableWithMetadata(geoPackage, tableName,
-                        contentsBoundingBox, contentsSrsId,
-                        tileMatrixSetBoundingBox, tileMatrixSetSrsId);
-        TileDao tileDao = geoPackage.getTileDao(tileMatrixSet);
+        TileTable tileTable = CoverageDataCore.createTileTable(geoPackage,
+                metadata);
+        TileDao tileDao = geoPackage.getTileDao(tileTable);
 
         CoverageData<?> coverageData = null;
         switch (dataType) {

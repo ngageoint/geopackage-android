@@ -6,8 +6,6 @@ import android.database.SQLException;
 
 import org.sqlite.database.sqlite.SQLiteDatabase;
 
-import mil.nga.geopackage.factory.GeoPackageCursorFactory;
-
 /**
  * Android Bindings SQLiteDatabase
  *

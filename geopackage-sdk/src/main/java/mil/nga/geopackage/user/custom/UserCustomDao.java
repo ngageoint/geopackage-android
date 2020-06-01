@@ -6,7 +6,7 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.GeoPackageConnection;
-import mil.nga.geopackage.factory.GeoPackageCursorWrapper;
+import mil.nga.geopackage.db.GeoPackageCursorWrapper;
 import mil.nga.geopackage.user.UserDao;
 import mil.nga.sf.proj.Projection;
 

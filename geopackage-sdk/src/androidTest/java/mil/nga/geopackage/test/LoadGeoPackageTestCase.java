@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageManager;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 
 /**
  * Abstract Test Case for loading a GeoPackage for tests

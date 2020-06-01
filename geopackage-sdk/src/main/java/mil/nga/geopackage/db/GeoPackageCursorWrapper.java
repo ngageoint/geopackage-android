@@ -1,4 +1,4 @@
-package mil.nga.geopackage.factory;
+package mil.nga.geopackage.db;
 
 import android.database.Cursor;
 

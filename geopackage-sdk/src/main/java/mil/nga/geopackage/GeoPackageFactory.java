@@ -1,10 +1,8 @@
-package mil.nga.geopackage.factory;
+package mil.nga.geopackage;
 
 import android.content.Context;
 
 import com.j256.ormlite.logger.LocalLog;
-
-import mil.nga.geopackage.GeoPackageManager;
 
 /**
  * GeoPackage Factory to get a GeoPackage Manager

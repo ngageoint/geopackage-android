@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageManager;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.io.ContextIOUtils;
 
 import static org.junit.Assert.assertFalse;

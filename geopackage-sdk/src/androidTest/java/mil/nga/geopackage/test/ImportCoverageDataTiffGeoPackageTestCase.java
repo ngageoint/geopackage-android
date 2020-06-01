@@ -7,7 +7,7 @@ import java.io.File;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageManager;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 
 /**
  * Abstract Test Case for Imported TIFF Tiled Gridded Coverage Data GeoPackages

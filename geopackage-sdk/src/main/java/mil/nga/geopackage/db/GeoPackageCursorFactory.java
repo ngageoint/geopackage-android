@@ -1,4 +1,4 @@
-package mil.nga.geopackage.factory;
+package mil.nga.geopackage.db;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCursor;
@@ -11,8 +11,6 @@ import android.util.Log;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import mil.nga.geopackage.db.CoreSQLUtils;
 
 /**
  * GeoPackage Cursor Factory. Used when connecting to a GeoPackage database.
@@ -42,7 +40,7 @@ public class GeoPackageCursorFactory implements CursorFactory {
     /**
      * Constructor
      */
-    GeoPackageCursorFactory() {
+    public GeoPackageCursorFactory() {
     }
 
     /**

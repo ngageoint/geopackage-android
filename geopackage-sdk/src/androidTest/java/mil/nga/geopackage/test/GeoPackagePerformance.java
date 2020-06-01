@@ -14,7 +14,7 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.db.TableColumnKey;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;

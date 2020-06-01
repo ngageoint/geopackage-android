@@ -14,7 +14,7 @@ import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.extension.nga.properties.PropertiesExtension;
 import mil.nga.geopackage.extension.nga.properties.PropertiesManager;
 import mil.nga.geopackage.extension.nga.properties.PropertyNames;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.test.BaseTestCase;
 import mil.nga.geopackage.test.TestSetupTeardown;
 

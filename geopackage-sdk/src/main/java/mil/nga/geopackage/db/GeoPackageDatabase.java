@@ -6,8 +6,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import mil.nga.geopackage.factory.GeoPackageCursorFactory;
-
 /**
  * GeoPackage database wrapper around SQLiteDatabase to quote table and column names
  *

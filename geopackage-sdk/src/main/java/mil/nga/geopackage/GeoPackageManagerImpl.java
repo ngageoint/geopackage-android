@@ -1,4 +1,4 @@
-package mil.nga.geopackage.factory;
+package mil.nga.geopackage;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -30,11 +30,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.GeoPackageConstants;
-import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.GeoPackageManager;
-import mil.nga.geopackage.R;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageDatabase;
@@ -42,6 +37,7 @@ import mil.nga.geopackage.db.GeoPackageTableCreator;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadata;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDataSource;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
+import mil.nga.geopackage.db.GeoPackageCursorFactory;
 import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;

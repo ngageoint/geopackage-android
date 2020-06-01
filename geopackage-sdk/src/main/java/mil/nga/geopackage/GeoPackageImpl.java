@@ -1,4 +1,4 @@
-package mil.nga.geopackage.factory;
+package mil.nga.geopackage;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,10 +9,6 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import java.sql.SQLException;
 import java.util.List;
 
-import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.GeoPackageCoreImpl;
-import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.attributes.AttributesCursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.attributes.AttributesTable;
@@ -23,6 +19,8 @@ import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.extension.rtree.RTreeIndexExtension;
+import mil.nga.geopackage.db.GeoPackageCursorFactory;
+import mil.nga.geopackage.db.GeoPackageCursorWrapper;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -189,6 +187,14 @@ public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
+    public FeatureDao getFeatureDao(FeatureTable table) {
+        return getFeatureDao(table.getTableName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public FeatureDao getFeatureDao(String tableName) {
         GeometryColumnsDao dao = getGeometryColumnsDao();
         List<GeometryColumns> geometryColumnsList;
@@ -295,6 +301,14 @@ public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * {@inheritDoc}
      */
     @Override
+    public TileDao getTileDao(TileTable table) {
+        return getTileDao(table.getTableName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TileDao getTileDao(String tableName) {
 
         TileMatrixSetDao dao = getTileMatrixSetDao();
@@ -360,6 +374,14 @@ public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
                 });
 
         return dao;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AttributesDao getAttributesDao(AttributesTable table) {
+        return getAttributesDao(table.getTableName());
     }
 
     /**

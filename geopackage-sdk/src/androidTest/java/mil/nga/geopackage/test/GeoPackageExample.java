@@ -98,7 +98,7 @@ import mil.nga.geopackage.extension.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraintType;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraints;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraintsDao;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -130,6 +130,7 @@ import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
+import mil.nga.geopackage.tiles.user.TileTableMetadata;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.validate.GeoPackageValidate;
 import mil.nga.sf.CircularString;
@@ -1489,9 +1490,9 @@ public class GeoPackageExample extends BaseTestCase {
         }
 
         CoverageDataPng coverageData = CoverageDataPng
-                .createTileTableWithMetadata(geoPackage, "coverage_png",
+                .createTileTable(geoPackage, TileTableMetadata.create("coverage_png",
                         contentsBoundingBox, contentsSrs.getId(), bbox,
-                        tileMatrixSetSrs.getId());
+                        tileMatrixSetSrs.getId()));
         TileDao tileDao = coverageData.getTileDao();
         TileMatrixSet tileMatrixSet = coverageData.getTileMatrixSet();
 
@@ -1586,9 +1587,9 @@ public class GeoPackageExample extends BaseTestCase {
         }
 
         CoverageDataTiff coverageData = CoverageDataTiff
-                .createTileTableWithMetadata(geoPackage, "coverage_tiff",
+                .createTileTable(geoPackage, TileTableMetadata.create("coverage_tiff",
                         contentsBoundingBox, contentsSrs.getId(), bbox,
-                        tileMatrixSetSrs.getId());
+                        tileMatrixSetSrs.getId()));
         TileDao tileDao = coverageData.getTileDao();
         TileMatrixSet tileMatrixSet = coverageData.getTileMatrixSet();
 

@@ -41,7 +41,7 @@ import mil.nga.geopackage.extension.metadata.reference.MetadataReference;
 import mil.nga.geopackage.extension.metadata.reference.MetadataReferenceDao;
 import mil.nga.geopackage.extension.metadata.reference.ReferenceScopeType;
 import mil.nga.geopackage.extension.schema.SchemaExtension;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureTable;

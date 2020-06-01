@@ -21,7 +21,7 @@ import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.extension.coverage.CoverageData;
-import mil.nga.geopackage.factory.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
