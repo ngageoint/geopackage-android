@@ -150,14 +150,14 @@ public class TestSetupTeardown {
         }
 
         TestCase.assertEquals("Application Id", geoPackage.getApplicationId(), GeoPackageConstants.APPLICATION_ID);
-        TestCase.assertEquals("User Version", geoPackage.getUserVersion(), GeoPackageConstants.USER_VERSION);
+        TestCase.assertEquals("User Version", geoPackage.getUserVersion().intValue(), GeoPackageConstants.USER_VERSION);
         String userVersionString = String.valueOf(geoPackage.getUserVersion());
         String majorVersion = userVersionString.substring(0, userVersionString.length() - 4);
         String minorVersion = userVersionString.substring(userVersionString.length() - 4, userVersionString.length() - 2);
         String patchVersion = userVersionString.substring(userVersionString.length() - 2);
-        TestCase.assertEquals("Major User Version", geoPackage.getUserVersionMajor(), Integer.valueOf(majorVersion).intValue());
-        TestCase.assertEquals("Minor User Version", geoPackage.getUserVersionMinor(), Integer.valueOf(minorVersion).intValue());
-        TestCase.assertEquals("Patch User Version", geoPackage.getUserVersionPatch(), Integer.valueOf(patchVersion).intValue());
+        TestCase.assertEquals("Major User Version", geoPackage.getUserVersionMajor().intValue(), Integer.valueOf(majorVersion).intValue());
+        TestCase.assertEquals("Minor User Version", geoPackage.getUserVersionMinor().intValue(), Integer.valueOf(minorVersion).intValue());
+        TestCase.assertEquals("Patch User Version", geoPackage.getUserVersionPatch().intValue(), Integer.valueOf(patchVersion).intValue());
 
         if (features) {
             setUpCreateFeatures(geoPackage, allowEmptyFeatures);
