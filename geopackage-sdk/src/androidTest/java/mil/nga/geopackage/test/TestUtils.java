@@ -524,27 +524,31 @@ public class TestUtils {
     public static void validateIntegerValue(Object value,
                                             GeoPackageDataType dataType) {
 
-        switch (dataType) {
+        if (dataType != null) {
 
-            case BOOLEAN:
-                TestCase.assertTrue(value instanceof Boolean);
-                break;
-            case TINYINT:
-                TestCase.assertTrue(value instanceof Byte);
-                break;
-            case SMALLINT:
-                TestCase.assertTrue(value instanceof Short);
-                break;
-            case MEDIUMINT:
-                TestCase.assertTrue(value instanceof Integer);
-                break;
-            case INT:
-            case INTEGER:
-                TestCase.assertTrue(value instanceof Long);
-                break;
-            default:
-                throw new GeoPackageException("Data Type " + dataType
-                        + " is not an integer type");
+            switch (dataType) {
+
+                case BOOLEAN:
+                    TestCase.assertTrue(value instanceof Boolean);
+                    break;
+                case TINYINT:
+                    TestCase.assertTrue(value instanceof Byte);
+                    break;
+                case SMALLINT:
+                    TestCase.assertTrue(value instanceof Short);
+                    break;
+                case MEDIUMINT:
+                    TestCase.assertTrue(value instanceof Integer);
+                    break;
+                case INT:
+                case INTEGER:
+                    TestCase.assertTrue(value instanceof Long);
+                    break;
+                default:
+                    throw new GeoPackageException("Data Type " + dataType
+                            + " is not an integer type");
+            }
+
         }
     }
 
@@ -558,18 +562,22 @@ public class TestUtils {
     public static void validateFloatValue(Object value,
                                           GeoPackageDataType dataType) {
 
-        switch (dataType) {
+        if (dataType != null) {
 
-            case FLOAT:
-                TestCase.assertTrue(value instanceof Float);
-                break;
-            case DOUBLE:
-            case REAL:
-                TestCase.assertTrue(value instanceof Double);
-                break;
-            default:
-                throw new GeoPackageException("Data Type " + dataType
-                        + " is not a float type");
+            switch (dataType) {
+
+                case FLOAT:
+                    TestCase.assertTrue(value instanceof Float);
+                    break;
+                case DOUBLE:
+                case REAL:
+                    TestCase.assertTrue(value instanceof Double);
+                    break;
+                default:
+                    throw new GeoPackageException("Data Type " + dataType
+                            + " is not a float type");
+            }
+
         }
     }
 

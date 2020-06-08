@@ -28,6 +28,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.contents.ContentsDao;
+import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
 import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.io.BitmapConverter;
@@ -471,7 +472,12 @@ public class TileUtils {
                     int rowColumnType = tileRow.getRowColumnType(tileColumn
                             .getIndex());
 
-                    switch (tileColumn.getDataType()) {
+                    GeoPackageDataType dataType = tileColumn.getDataType();
+                    if (dataType == null) {
+                        continue;
+                    }
+
+                    switch (dataType) {
                         case TEXT:
                             validateRowColumnType(rowColumnType,
                                     ResultUtils.FIELD_TYPE_STRING);
