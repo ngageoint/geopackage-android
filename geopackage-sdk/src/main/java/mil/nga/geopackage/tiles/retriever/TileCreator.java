@@ -78,9 +78,14 @@ public class TileCreator {
     private final BoundingBox tileSetBoundingBox;
 
     /**
-     * Flag indicating the the tile and request projections are the same
+     * Flag indicating if the tile and request projections are the same
      */
     private final boolean sameProjection;
+
+    /**
+     * Flag indicating if the tile and request projection units are the same
+     */
+    private final boolean sameUnit;
 
     /**
      * Tile Scaling options
@@ -105,8 +110,9 @@ public class TileCreator {
         tilesProjection = tileDao.getTileMatrixSet().getProjection();
         tileSetBoundingBox = tileMatrixSet.getBoundingBox();
 
-        // Check if the projections have the same units
-        sameProjection = (requestProjection.getUnit().name.equals(tilesProjection.getUnit().name));
+        // Check if the projections are the same or have the same units
+        sameProjection = requestProjection.equals(tilesProjection);
+        sameUnit = (requestProjection.getUnit().name.equals(tilesProjection.getUnit().name));
     }
 
     /**
@@ -212,6 +218,16 @@ public class TileCreator {
     }
 
     /**
+     * Is the request and tile projection the same unit
+     *
+     * @return true if the same
+     * @since 4.0.0
+     */
+    public boolean isSameUnit() {
+        return sameUnit;
+    }
+
+    /**
      * Get the tile scaling options
      *
      * @return tile scaling options
@@ -303,7 +319,7 @@ public class TileCreator {
                         // Determine the size of the tile to initially draw
                         int tileWidth = requestedTileWidth;
                         int tileHeight = requestedTileHeight;
-                        if (!sameProjection) {
+                        if (!sameUnit) {
                             tileWidth = (int) Math.round(
                                     (requestProjectedBoundingBox.getMaxLongitude() - requestProjectedBoundingBox.getMinLongitude())
                                             / tileMatrix.getPixelXSize());
