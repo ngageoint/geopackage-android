@@ -11,6 +11,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Contents Data Type refactor, core data types and expanded custom data type support
 * DAO options to enable modifying row ids or disable column value type validation
 * Distinct select statement queries and counts
+* GeoPackage DAO by table methods
+* Tile creation projection fix for different projections in the same unit
 * gradle plugin updated to 4.0.0
 
 ## [3.5.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.5.0) (03-10-2020)
