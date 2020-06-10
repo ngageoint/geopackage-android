@@ -60,6 +60,7 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileTable;
+import mil.nga.geopackage.user.UserTable;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomRow;
@@ -1354,8 +1355,13 @@ public class AlterTableUtils {
                         + " FOREIGN KEY (column6) REFERENCES gpkg_spatial_ref_sys(srs_id)",
                 copyConstraints.get(3).buildSql());
 
+        if (UserTable.DEFAULT_PK_NOT_NULL) {
+            TestCase.assertEquals("NOT NULL",
+                    copyTable.getColumn(0).getConstraints().get(0).buildSql());
+        }
         TestCase.assertEquals("PRIMARY KEY AUTOINCREMENT",
-                copyTable.getColumn(0).getConstraints().get(0).buildSql());
+                copyTable.getColumn(0).getConstraints()
+                        .get(UserTable.DEFAULT_PK_NOT_NULL ? 1 : 0).buildSql());
         TestCase.assertEquals("NOT NULL",
                 copyTable.getColumn(1).getConstraints().get(0).buildSql());
         TestCase.assertEquals("UNIQUE",

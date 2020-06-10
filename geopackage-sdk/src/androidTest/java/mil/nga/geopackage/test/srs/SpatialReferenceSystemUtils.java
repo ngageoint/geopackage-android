@@ -128,7 +128,7 @@ public class SpatialReferenceSystemUtils {
             throws SQLException {
 
         SpatialReferenceSystemSqlMmDao dao = SpatialReferenceSystemSqlMmDao
-                .getDao(geoPackage);
+                .create(geoPackage);
         List<SpatialReferenceSystemSqlMm> results = dao.queryForAll();
         if (expectedResults != null) {
             TestCase.assertEquals(
@@ -211,7 +211,7 @@ public class SpatialReferenceSystemUtils {
             throws SQLException {
 
         SpatialReferenceSystemSfSqlDao dao = SpatialReferenceSystemSfSqlDao
-                .getDao(geoPackage);
+                .create(geoPackage);
         List<SpatialReferenceSystemSfSql> results = dao.queryForAll();
         if (expectedResults != null) {
             TestCase.assertEquals(
