@@ -139,6 +139,26 @@ public class FeatureDao extends
     }
 
     /**
+     * Get the Spatial Reference System
+     *
+     * @return srs
+     * @since 4.0.0
+     */
+    public SpatialReferenceSystem getSrs() {
+        return geometryColumns.getSrs();
+    }
+
+    /**
+     * Get the Spatial Reference System id
+     *
+     * @return srs id
+     * @since 4.0.0
+     */
+    public long getSrsId() {
+        return geometryColumns.getSrsId();
+    }
+
+    /**
      * Get the Id Column
      *
      * @return id column
