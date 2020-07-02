@@ -107,7 +107,7 @@ public class TileCreator {
         this.requestProjection = requestProjection;
 
         tileMatrixSet = tileDao.getTileMatrixSet();
-        tilesProjection = tileDao.getTileMatrixSet().getProjection();
+        tilesProjection = tileDao.getProjection();
         tileSetBoundingBox = tileMatrixSet.getBoundingBox();
 
         // Check if the projections are the same or have the same units
