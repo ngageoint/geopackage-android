@@ -87,28 +87,27 @@ public class GeoPackageGeometryDataUtils {
 
                         // Create a new geometry data from the bytes and compare
                         // with original
-                        GeoPackageGeometryData geometryDataFromBytes = new GeoPackageGeometryData(
-                                geometryDataToBytes);
-                        compareGeometryData(geometryData, geometryDataFromBytes);
+                        GeoPackageGeometryData geometryDataFromBytes = GeoPackageGeometryData
+                                .create(geometryDataToBytes);
+                        compareGeometryData(geometryData,
+                                geometryDataFromBytes);
 
                         // Set the geometry empty flag and verify the geometry
-                        // was
-                        // not written / read
+                        // was not written / read
                         geometryDataAfterToBytes = cursor.getGeometry();
                         geometryDataAfterToBytes.setEmpty(true);
                         geometryDataToBytes = geometryDataAfterToBytes
                                 .toBytes();
-                        geometryDataFromBytes = new GeoPackageGeometryData(
-                                geometryDataToBytes);
-                        TestCase.assertNull(geometryDataFromBytes.getGeometry());
+                        geometryDataFromBytes = GeoPackageGeometryData
+                                .create(geometryDataToBytes);
+                        TestCase.assertNull(
+                                geometryDataFromBytes.getGeometry());
                         compareByteArrays(
                                 geometryDataAfterToBytes.getHeaderBytes(),
                                 geometryDataFromBytes.getHeaderBytes());
 
                         // Flip the byte order and verify the header and bytes
-                        // no
-                        // longer matches the original, but the geometries still
-                        // do
+                        // no longer matches the original, but the geometries still do
                         geometryDataAfterToBytes = cursor.getGeometry();
                         geometryDataAfterToBytes
                                 .setByteOrder(geometryDataAfterToBytes
@@ -116,16 +115,16 @@ public class GeoPackageGeometryDataUtils {
                                         : ByteOrder.BIG_ENDIAN);
                         geometryDataToBytes = geometryDataAfterToBytes
                                 .toBytes();
-                        geometryDataFromBytes = new GeoPackageGeometryData(
-                                geometryDataToBytes);
+                        geometryDataFromBytes = GeoPackageGeometryData
+                                .create(geometryDataToBytes);
                         compareGeometryData(geometryDataAfterToBytes,
                                 geometryDataFromBytes);
                         TestCase.assertFalse(equalByteArrays(
                                 geometryDataAfterToBytes.getHeaderBytes(),
                                 geometryData.getHeaderBytes()));
                         TestCase.assertFalse(equalByteArrays(
-                                geometryDataAfterToBytes.getWkbBytes(),
-                                geometryData.getWkbBytes()));
+                                geometryDataAfterToBytes.getWkb(),
+                                geometryData.getWkb()));
                         TestCase.assertFalse(equalByteArrays(
                                 geometryDataAfterToBytes.getBytes(),
                                 geometryData.getBytes()));
@@ -191,17 +190,12 @@ public class GeoPackageGeometryDataUtils {
                             ProjectionTransform transformFrom = srs.getTransformation(transformTo
                                     .getToProjection());
 
-                            byte[] bytes = geometryData.getWkbBytes();
+                            byte[] bytes = geometryData.getWkb();
 
                             Geometry projectedGeometry = transformTo
                                     .transform(geometry);
-                            GeoPackageGeometryData projectedGeometryData = new GeoPackageGeometryData(
-                                    -1);
-                            projectedGeometryData
-                                    .setGeometry(projectedGeometry);
-                            projectedGeometryData.toBytes();
-                            byte[] projectedBytes = projectedGeometryData
-                                    .getWkbBytes();
+                            byte[] projectedBytes = GeoPackageGeometryData
+                                    .wkb(projectedGeometry);
 
                             if (epsg > 0) {
                                 TestCase.assertFalse(equalByteArrays(bytes,
@@ -246,7 +240,7 @@ public class GeoPackageGeometryDataUtils {
         compareGeometries(expected.getGeometry(), actual.getGeometry());
 
         // Compare well-known binary geometries
-        compareByteArrays(expected.getWkbBytes(), actual.getWkbBytes());
+        compareByteArrays(expected.getWkb(), actual.getWkb());
 
         // Compare all bytes
         compareByteArrays(expected.getBytes(), actual.getBytes());

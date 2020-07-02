@@ -12,9 +12,9 @@ import java.time.Instant;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.db.TableColumnKey;
-import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
@@ -125,9 +125,8 @@ public class GeoPackagePerformance extends BaseTestCase {
         geoPackage.createFeatureTable(
                 FeatureTableMetadata.create(geometryColumns, boundingBox));
 
-        GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
-                srs.getSrsId());
-        geometryData.setGeometry(geometry);
+        GeoPackageGeometryData geometryData = GeoPackageGeometryData
+                .create(srs.getSrsId(), geometry);
 
         FeatureDao dao = geoPackage.getFeatureDao(geometryColumns);
 

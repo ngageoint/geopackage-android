@@ -2,6 +2,7 @@ package mil.nga.geopackage.test.features.user;
 
 import org.junit.Test;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
@@ -24,9 +25,10 @@ public class FeatureCreateTest extends CreateGeoPackageTestCase {
      * Test reading
      *
      * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     @Test
-    public void testRead() throws SQLException {
+    public void testRead() throws SQLException, IOException {
 
         FeatureUtils.testRead(geoPackage);
 
@@ -83,8 +85,7 @@ public class FeatureCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test Feature DAO primary key modifications and disabling value validation
      *
-     * @throws SQLException
-     *             upon error
+     * @throws SQLException upon error
      */
     @Test
     public void testPkModifiableAndValueValidation() throws SQLException {

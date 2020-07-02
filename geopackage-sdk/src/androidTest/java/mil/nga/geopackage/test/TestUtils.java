@@ -340,9 +340,8 @@ public class TestUtils {
                                                 + column.getGeometryType());
                         }
 
-                        GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
-                                geometryColumns.getSrsId());
-                        geometryData.setGeometry(geometry);
+                        GeoPackageGeometryData geometryData = GeoPackageGeometryData
+                                .create(geometryColumns.getSrsId(), geometry);
 
                         newRow.setGeometry(geometryData);
 

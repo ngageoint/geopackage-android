@@ -387,8 +387,7 @@ public class RelatedMediaUtils {
             TestCase.assertNotNull(featureDao);
             FeatureTable featureTable = featureDao.getTable();
             TestCase.assertNotNull(featureTable);
-            Contents featureContents = featureDao.getGeometryColumns()
-                    .getContents();
+            Contents featureContents = featureDao.getContents();
             TestCase.assertNotNull(featureContents);
             TestCase.assertEquals(ContentsDataType.FEATURES,
                     featureContents.getDataType());

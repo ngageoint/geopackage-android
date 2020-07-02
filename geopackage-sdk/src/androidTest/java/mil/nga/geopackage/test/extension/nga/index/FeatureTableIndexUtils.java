@@ -75,7 +75,7 @@ public class FeatureTableIndexUtils {
             }
             featureCursor.close();
 
-            if(featureTableIndex.isIndexed()){
+            if (featureTableIndex.isIndexed()) {
                 featureTableIndex.deleteIndex();
             }
 
@@ -186,10 +186,9 @@ public class FeatureTableIndexUtils {
             TestCase.assertTrue(resultCount >= 1);
 
             // Update a Geometry and update the index of a single feature row
-            GeoPackageGeometryData geometryData = new GeoPackageGeometryData(featureDao
-                    .getGeometryColumns().getSrsId());
             Point point = new Point(5, 5);
-            geometryData.setGeometry(point);
+            GeoPackageGeometryData geometryData = GeoPackageGeometryData
+                    .create(featureDao.getSrsId(), point);
             testFeatureRow.setGeometry(geometryData);
             TestCase.assertEquals(1, featureDao.update(testFeatureRow));
             Date lastIndexedBefore = featureTableIndex.getLastIndexed();
@@ -314,7 +313,7 @@ public class FeatureTableIndexUtils {
             FeatureTableIndex featureTableIndex = new FeatureTableIndex(
                     geoPackage, featureDao);
 
-            if(featureTableIndex.isIndexed()){
+            if (featureTableIndex.isIndexed()) {
                 featureTableIndex.deleteIndex();
             }
 

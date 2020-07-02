@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteException;
 
 import junit.framework.TestCase;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -66,8 +67,9 @@ public class FeatureUtils {
      *
      * @param geoPackage GeoPackage
      * @throws SQLException upon error
+     * @throws IOException upon error
      */
-    public static void testRead(GeoPackage geoPackage) throws SQLException {
+    public static void testRead(GeoPackage geoPackage) throws SQLException, IOException {
 
         GeometryColumnsDao geometryColumnsDao = geoPackage
                 .getGeometryColumnsDao();
@@ -116,30 +118,24 @@ public class FeatureUtils {
                                 .getGeometryType();
                         validateGeometry(geometryType, geometry);
 
-                        byte[] wkbBytes = geoPackageGeometryData.getWkbBytes();
+                        byte[] wkbBytes = geoPackageGeometryData.getWkb();
                         int byteLenth = wkbBytes.length;
                         TestCase.assertTrue(byteLenth > 0);
-                        ByteReader wkbReader = new ByteReader(wkbBytes);
-                        wkbReader.setByteOrder(geoPackageGeometryData
-                                .getByteOrder());
                         Geometry geometryFromBytes = GeometryReader
-                                .readGeometry(wkbReader);
+                                .readGeometry(wkbBytes);
                         TestCase.assertNotNull(geometryFromBytes);
                         TestCase.assertEquals(geometry.getGeometryType(),
                                 geometryFromBytes.getGeometryType());
                         validateGeometry(geometryType, geometryFromBytes);
 
                         ByteBuffer wkbByteBuffer = geoPackageGeometryData
-                                .getWkbByteBuffer();
+                                .getWkbBuffer();
                         TestCase.assertEquals(byteLenth,
                                 wkbByteBuffer.remaining());
                         byte[] wkbBytes2 = new byte[wkbByteBuffer.remaining()];
                         wkbByteBuffer.get(wkbBytes2);
-                        ByteReader wkbReader2 = new ByteReader(wkbBytes2);
-                        wkbReader2.setByteOrder(geoPackageGeometryData
-                                .getByteOrder());
                         Geometry geometryFromBytes2 = GeometryReader
-                                .readGeometry(wkbReader2);
+                                .readGeometry(wkbBytes2);
                         TestCase.assertNotNull(geometryFromBytes2);
                         TestCase.assertEquals(geometry.getGeometryType(),
                                 geometryFromBytes2.getGeometryType());
@@ -1512,9 +1508,8 @@ public class FeatureUtils {
                 .getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG,
                         ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
-        GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
-                srs.getSrsId());
-        geometryData.setGeometry(new Point(0, 0));
+        GeoPackageGeometryData geometryData = GeoPackageGeometryData
+                .create(srs.getSrsId(), new Point(0, 0));
 
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey("test_features", "geom"));

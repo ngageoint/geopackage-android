@@ -30,6 +30,7 @@ import java.util.UUID;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.attributes.AttributesColumn;
 import mil.nga.geopackage.attributes.AttributesCursor;
@@ -98,7 +99,6 @@ import mil.nga.geopackage.extension.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraintType;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraints;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraintsDao;
-import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -866,9 +866,8 @@ public class GeoPackageExample extends BaseTestCase {
 
             FeatureRow newRow = dao.newRow();
 
-            GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
-                    geometryColumns.getSrsId());
-            geometryData.setGeometry(geometry);
+            GeoPackageGeometryData geometryData = GeoPackageGeometryData
+                    .create(geometryColumns.getSrsId(), geometry);
             newRow.setGeometry(geometryData);
 
             newRow.setValue(TEXT_COLUMN, name);
@@ -1212,8 +1211,7 @@ public class GeoPackageExample extends BaseTestCase {
                         && column.getDataType() == GeoPackageDataType.INTEGER) {
 
                     DataColumns dataColumns = new DataColumns();
-                    dataColumns.setContents(featureDao.getGeometryColumns()
-                            .getContents());
+                    dataColumns.setContents(featureDao.getContents());
                     dataColumns.setColumnName(column.getName());
                     dataColumns.setName(featureTable);
                     dataColumns.setTitle("TEST_TITLE");
