@@ -87,7 +87,7 @@ public class FeatureCursor extends
             byte[] geometryBytes = getBlob(columnIndex);
 
             if (geometryBytes != null) {
-                geometry = new GeoPackageGeometryData(geometryBytes);
+                geometry = GeoPackageGeometryData.create(geometryBytes);
             }
         }
 
