@@ -49,6 +49,7 @@ android {
         classpath += configurations.javadocDeps
         options.links "https://ngageoint.github.io/geopackage-core-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-wkb-java/docs/api/"
+        options.links "https://ngageoint.github.io/simple-features-wkt-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-geojson-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-proj-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-java/docs/api/"
@@ -157,7 +158,7 @@ dependencies {
     api 'mil.nga.geopackage:geopackage-core:4.0.0'
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:2.0.2'
-    api 'mil.nga:sqlite-android:3300100'
+    api 'mil.nga:sqlite-android:3320300'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.1',
             'mil.nga.geopackage:geopackage-core:4.0.0',
             'ar.com.hjg:pngj:2.1.0',
