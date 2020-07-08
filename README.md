@@ -116,7 +116,7 @@ indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
 int indexedCount = indexer.index();
 
 // Draw tiles from features
-FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao);
+FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao, context.getResources().getDisplayMetrics().density);
 featureTiles.setMaxFeaturesPerTile(1000); // Set max features to draw per tile
 NumberFeaturesTile numberFeaturesTile = new NumberFeaturesTile(context); // Custom feature tile implementation
 featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
@@ -135,6 +135,9 @@ int urlTileCount = urlTileGenerator.generateTiles();
 TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
         featureTable + "_tiles", featureTiles, 1, 2, boundingBox, projection);
 int featureTileCount = featureTileGenerator.generateTiles();
+
+// Close feature tiles (and indexer)
+featureTiles.close();
 
 // Close database when done
 geoPackage.close();
