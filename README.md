@@ -51,11 +51,11 @@ The [Disconnected Interactive Content Explorer (DICE)](https://github.com/ngageo
 // Get a manager
 GeoPackageManager manager = GeoPackageFactory.getManager(context);
 
-// Available databases
-List<String> databases = manager.databases();
-
 // Import database
 boolean imported = manager.importGeoPackage(geoPackageFile);
+
+// Available databases
+List<String> databases = manager.databases();
 
 // Open database
 GeoPackage geoPackage = manager.open(databases.get(0));
