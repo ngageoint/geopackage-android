@@ -88,8 +88,10 @@ try {
     while (featureCursor.moveToNext()) {
         FeatureRow featureRow = featureCursor.getRow();
         GeoPackageGeometryData geometryData = featureRow.getGeometry();
-        Geometry geometry = geometryData.getGeometry();
-        // ...
+        if (geometryData != null && !geometryData.isEmpty()) {
+          Geometry geometry = geometryData.getGeometry();
+          // ...
+        }
     }
 } finally {
     featureCursor.close();
