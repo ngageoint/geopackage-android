@@ -7,12 +7,15 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 4.0.0 (TBD)
 
 * geopackage-core version 4.0.0
+* tiff version 2.0.2
+* SQLite Android Bindings version 3320300
 * Community extensions decoupling and management, including class repackaging
 * Contents Data Type refactor, core data types and expanded custom data type support
 * DAO options to enable modifying row ids or disable column value type validation
 * Distinct select statement queries and counts
 * GeoPackage DAO by table methods
 * Tile creation projection fix for different projections in the same unit
+* SRS and Projection shortcut methods
 * gradle plugin updated to 4.0.0
 
 ## [3.5.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.5.0) (03-10-2020)
