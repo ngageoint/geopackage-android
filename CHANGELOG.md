@@ -16,7 +16,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * GeoPackage DAO by table methods
 * Tile creation projection fix for different projections in the same unit
 * SRS and Projection shortcut methods
-* gradle plugin updated to 4.0.0
+* gradle plugin updated to 4.0.1
 
 ## [3.5.0](https://github.com/ngageoint/geopackage-android/releases/tag/3.5.0) (03-10-2020)
 
