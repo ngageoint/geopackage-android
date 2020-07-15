@@ -178,8 +178,12 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         int urlTileCount = urlTileGenerator.generateTiles();
 
         // Feature Tile Generator (generate tiles from features)
+        String featureTilesTable = featureTable + "_tiles";
+        if(geoPackage.isTileTable(featureTilesTable)){
+            projection = geoPackage.getTileDao(featureTilesTable).getProjection();
+        }
         TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
-                featureTable + "_tiles", featureTiles, 1, 2, boundingBox, projection);
+                featureTilesTable, featureTiles, 1, 2, boundingBox, projection);
         int featureTileCount = featureTileGenerator.generateTiles();
 
         // Close feature tiles (and indexer)
