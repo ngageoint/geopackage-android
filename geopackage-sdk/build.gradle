@@ -155,12 +155,12 @@ android {
 dependencies {
     api 'androidx.appcompat:appcompat:1.1.0'
     api 'com.j256.ormlite:ormlite-android:5.1'
-    api 'mil.nga.geopackage:geopackage-core:4.0.0'
+    api 'mil.nga.geopackage:geopackage-core:4.0.1'
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:2.0.2'
     api 'mil.nga:sqlite-android:3320300'
     javadocDeps 'com.j256.ormlite:ormlite-android:5.1',
-            'mil.nga.geopackage:geopackage-core:4.0.0',
+            'mil.nga.geopackage:geopackage-core:4.0.1',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:2.0.2'
     androidTestImplementation 'androidx.test:runner:1.2.0'

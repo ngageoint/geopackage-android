@@ -627,4 +627,58 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
         return xyzTiles;
     }
 
+    /**
+     * Get the map zoom level range
+     *
+     * @return map zoom level range, min at index 0, max at index 1
+     * @since 4.0.1
+     */
+    public long[] getMapZoomRange() {
+        return TileDaoUtils.getMapZoomRange(tileMatrixSet, tileMatrices);
+    }
+
+    /**
+     * Get the map min zoom level
+     *
+     * @return map min zoom level
+     * @since 4.0.1
+     */
+    public long getMapMinZoom() {
+        return TileDaoUtils.getMapMinZoom(tileMatrixSet, tileMatrices);
+    }
+
+    /**
+     * Get the map max zoom level
+     *
+     * @return map max zoom level
+     * @since 4.0.1
+     */
+    public long getMapMaxZoom() {
+        return TileDaoUtils.getMapMaxZoom(tileMatrixSet, tileMatrices);
+    }
+
+    /**
+     * Get the map zoom level from the tile matrix
+     *
+     * @param tileMatrix
+     *            tile matrix
+     * @return map zoom level
+     * @since 4.0.1
+     */
+    public long getMapZoom(TileMatrix tileMatrix) {
+        return TileDaoUtils.getMapZoom(tileMatrixSet, tileMatrix);
+    }
+
+    /**
+     * Get the map zoom level from the tile matrix zoom level
+     *
+     * @param zoomLevel
+     *            tile matrix zoom level
+     * @return map zoom level
+     * @since 4.0.1
+     */
+    public long getMapZoom(long zoomLevel) {
+        return getMapZoom(getTileMatrix(zoomLevel));
+    }
+
 }

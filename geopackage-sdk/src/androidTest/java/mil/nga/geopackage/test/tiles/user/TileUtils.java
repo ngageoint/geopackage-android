@@ -1011,6 +1011,10 @@ public class TileUtils {
 
                 List<TileMatrix> tileMatrices = dao.getTileMatrices();
 
+                long mapMinZoom = Long.MAX_VALUE;
+                long mapMaxZoom = Long.MIN_VALUE;
+                long[] mapZoomRange = dao.getMapZoomRange();
+
                 for (TileMatrix tileMatrix : tileMatrices) {
 
                     double width = tileMatrix.getPixelXSize()
@@ -1019,6 +1023,10 @@ public class TileUtils {
                             * tileMatrix.getTileHeight();
 
                     long zoomLevel = dao.getZoomLevel(width, height);
+
+                    long mapZoom = dao.getMapZoom(tileMatrix.getZoomLevel());
+                    mapMinZoom = Math.min(mapMinZoom, mapZoom);
+                    mapMaxZoom = Math.max(mapMaxZoom, mapZoom);
 
                     BoundingBox setProjectionBoundingBox = tileMatrixSet
                             .getBoundingBox();
@@ -1095,6 +1103,9 @@ public class TileUtils {
                     }
 
                 }
+
+                TestCase.assertEquals(mapZoomRange[0], mapMinZoom);
+                TestCase.assertEquals(mapZoomRange[1], mapMaxZoom);
 
             }
 
