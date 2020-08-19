@@ -153,7 +153,7 @@ android {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.1.0'
+    api 'androidx.appcompat:appcompat:1.2.0'
     api 'com.j256.ormlite:ormlite-android:5.1'
     api 'mil.nga.geopackage:geopackage-core:4.0.1'
     api 'ar.com.hjg:pngj:2.1.0'
