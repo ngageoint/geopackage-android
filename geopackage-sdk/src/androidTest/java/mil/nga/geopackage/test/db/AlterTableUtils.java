@@ -24,8 +24,8 @@ import mil.nga.geopackage.db.master.SQLiteMaster;
 import mil.nga.geopackage.db.master.SQLiteMasterColumn;
 import mil.nga.geopackage.db.master.SQLiteMasterQuery;
 import mil.nga.geopackage.db.master.SQLiteMasterType;
-import mil.nga.geopackage.db.table.Constraint;
 import mil.nga.geopackage.db.table.ConstraintType;
+import mil.nga.geopackage.db.table.Constraints;
 import mil.nga.geopackage.db.table.RawConstraint;
 import mil.nga.geopackage.db.table.UniqueConstraint;
 import mil.nga.geopackage.extension.coverage.CoverageData;
@@ -1327,7 +1327,7 @@ public class AlterTableUtils {
                 indexCount, triggerCount, viewCount);
         TestCase.assertEquals(copyTableName, copyTable.getTableName());
 
-        List<Constraint> copyConstraints = copyTable.getConstraints();
+        Constraints copyConstraints = copyTable.getConstraints();
         TestCase.assertEquals(4, copyConstraints.size());
         TestCase.assertEquals(copyTableName + "_unique",
                 copyConstraints.get(0).getName());
@@ -1359,9 +1359,12 @@ public class AlterTableUtils {
             TestCase.assertEquals("NOT NULL",
                     copyTable.getColumn(0).getConstraints().get(0).buildSql());
         }
-        TestCase.assertEquals("PRIMARY KEY AUTOINCREMENT",
+        TestCase.assertEquals("PRIMARY KEY",
                 copyTable.getColumn(0).getConstraints()
                         .get(UserTable.DEFAULT_PK_NOT_NULL ? 1 : 0).buildSql());
+        TestCase.assertEquals("AUTOINCREMENT",
+                copyTable.getColumn(0).getConstraints()
+                        .get(UserTable.DEFAULT_PK_NOT_NULL ? 2 : 1).buildSql());
         TestCase.assertEquals("NOT NULL",
                 copyTable.getColumn(1).getConstraints().get(0).buildSql());
         TestCase.assertEquals("UNIQUE",
@@ -1400,7 +1403,7 @@ public class AlterTableUtils {
                 indexCount, triggerCount, viewCount);
         TestCase.assertEquals(copyTableName2, copyTable2.getTableName());
 
-        List<Constraint> copyConstraints2 = copyTable2.getConstraints();
+        Constraints copyConstraints2 = copyTable2.getConstraints();
         TestCase.assertEquals(copyConstraints.size(), copyConstraints2.size());
         TestCase.assertEquals(copyTableName2 + "_unique",
                 copyConstraints2.get(0).getName());
