@@ -1,0 +1,6 @@
+
+blank_issues_enabled: false
+contact_links:
+  - name: Discussions
+    url: https://github.com/ngageoint/geopackage-android/discussions
+    about: Questions, Feature Requests, Feedback, Conversations
