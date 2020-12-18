@@ -59,6 +59,18 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
      * @return content values
      */
     public ContentValues toContentValues() {
+        return toContentValues(true);
+    }
+
+    /**
+     * Convert the row to content values
+     *
+     * @param includeNulls
+     *            include null values
+     *
+     * @return content values
+     */
+    public ContentValues toContentValues(boolean includeNulls) {
 
         ContentValues contentValues = new ContentValues();
         for (TColumn column : columns.getColumns()) {
@@ -70,14 +82,22 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
 
                 String columnName = column.getName();
 
-                if (value == null) {
-                    contentValues.putNull(columnName);
-                } else {
+                if (value != null) {
                     columnToContentValue(contentValues, column, value);
+                } else if (includeNulls) {
+                    contentValues.putNull(columnName);
                 }
 
             }
 
+        }
+
+        if (contentValues.size() == 0) {
+            for (TColumn column : columns.getColumns()) {
+                if (!column.isPrimaryKey()) {
+                    contentValues.putNull(column.getName());
+                }
+            }
         }
 
         return contentValues;

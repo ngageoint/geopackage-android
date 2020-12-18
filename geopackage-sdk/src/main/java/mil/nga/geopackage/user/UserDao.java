@@ -217,7 +217,7 @@ public abstract class UserDao<TColumn extends UserColumn, TTable extends UserTab
      */
     @Override
     public long insert(TRow row) {
-        long id = db.insertOrThrow(getTableName(), null, row.toContentValues());
+        long id = db.insertOrThrow(getTableName(), null, row.toContentValues(false));
         if (row.hasIdColumn()) {
             row.setId(id, true);
         }
