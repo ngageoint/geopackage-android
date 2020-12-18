@@ -6,7 +6,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 4.0.1 (TBD)
 
-* TBD
+* compile SDK version 30
+* ormlite-android version 5.3
+* Omit null values in inserts
+* gradle plugin updated to 4.1.1
 
 ## [4.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/4.0.0) (07-14-2020)
 
