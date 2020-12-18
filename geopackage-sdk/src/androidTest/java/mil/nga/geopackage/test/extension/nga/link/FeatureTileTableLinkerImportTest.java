@@ -11,12 +11,12 @@ import mil.nga.geopackage.test.ImportGeoPackageTestCase;
  *
  * @author osbornb
  */
-public class FeatureTileTablerLinkerImportTest extends ImportGeoPackageTestCase {
+public class FeatureTileTableLinkerImportTest extends ImportGeoPackageTestCase {
 
     /**
      * Constructor
      */
-    public FeatureTileTablerLinkerImportTest() {
+    public FeatureTileTableLinkerImportTest() {
 
     }
 
@@ -28,7 +28,7 @@ public class FeatureTileTablerLinkerImportTest extends ImportGeoPackageTestCase 
     @Test
     public void testLink() throws SQLException {
 
-        FeatureTileTablerLinkerUtils.testLink(geoPackage);
+        FeatureTileTableLinkerUtils.testLink(geoPackage);
 
     }
 

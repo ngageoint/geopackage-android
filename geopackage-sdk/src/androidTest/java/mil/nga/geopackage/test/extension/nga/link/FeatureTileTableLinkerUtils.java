@@ -18,7 +18,7 @@ import mil.nga.geopackage.extension.nga.link.FeatureTileTableLinker;
  *
  * @author osbornb
  */
-public class FeatureTileTablerLinkerUtils {
+public class FeatureTileTableLinkerUtils {
 
     /**
      * Test link
