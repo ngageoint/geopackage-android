@@ -8,6 +8,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 * compile SDK version 30
 * ormlite-android version 5.3
+* SQLite Android Bindings version 3340000
 * Omit null values in inserts
 * gradle plugin updated to 4.1.1
 
