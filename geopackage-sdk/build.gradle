@@ -132,8 +132,8 @@ android {
                             developer {
                                 id 'bosborn'
                                 name 'Brian Osborn'
-                                email 'osbornb@bit-sys.com'
-                                organizationUrl 'https://www.bit-sys.com'
+                                email 'bosborn@caci.com'
+                                organizationUrl 'https://www.caci.com/bit-systems'
                                 roles {
                                     role 'developer'
                                 }
