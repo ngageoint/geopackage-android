@@ -439,8 +439,7 @@ public abstract class TileGenerator {
                 || !tileMatrixSetDao.idExists(tableName)) {
             // Create the srs if needed
             SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();
-            SpatialReferenceSystem srs = srsDao.getOrCreateCode(projection.getAuthority(),
-                    Long.parseLong(projection.getCode()));
+            SpatialReferenceSystem srs = srsDao.getOrCreate(projection);
             // Create the tile table
             geoPackage.createTileTable(TileTableMetadata.create(
                     tableName,
@@ -505,7 +504,7 @@ public abstract class TileGenerator {
                 }
             }
 
-            // Delete the table if cancelled
+            // Delete the table if canceled
             if (progress != null && !progress.isActive()
                     && progress.cleanupOnCancel()) {
                 geoPackage.deleteTableQuietly(tableName);
@@ -573,8 +572,8 @@ public abstract class TileGenerator {
         // Get the fitting tile grid and determine the bounding box that fits it
         TileGrid tileGrid = TileBoundingBoxUtils.getTileGridWGS84(boundingBox, zoom);
         tileGridBoundingBox = TileBoundingBoxUtils.getWGS84BoundingBox(tileGrid, zoom);
-        matrixWidth = tileGrid.getMaxX() + 1 - tileGrid.getMinX();
-        matrixHeight = tileGrid.getMaxY() + 1 - tileGrid.getMinY();
+        matrixWidth = tileGrid.getWidth();
+        matrixHeight = tileGrid.getHeight();
     }
 
     /**
@@ -591,8 +590,8 @@ public abstract class TileGenerator {
         TileGrid tileGrid = TileBoundingBoxUtils.getTileGrid(
                 requestWebMercatorBoundingBox, zoom);
         tileGridBoundingBox = TileBoundingBoxUtils.getWebMercatorBoundingBox(tileGrid, zoom);
-        matrixWidth = tileGrid.getMaxX() + 1 - tileGrid.getMinX();
-        matrixHeight = tileGrid.getMaxY() + 1 - tileGrid.getMinY();
+        matrixWidth = tileGrid.getWidth();
+        matrixHeight = tileGrid.getHeight();
     }
 
     /**
@@ -838,7 +837,7 @@ public abstract class TileGenerator {
         // Download and create the tile and each coordinate
         for (long x = tileGrid.getMinX(); x <= tileGrid.getMaxX(); x++) {
 
-            // Check if the progress has been cancelled
+            // Check if the progress has been canceled
             if (progress != null && !progress.isActive()) {
                 break;
             }
@@ -856,7 +855,7 @@ public abstract class TileGenerator {
 
             for (long y = tileGrid.getMinY(); y <= tileGrid.getMaxY(); y++) {
 
-                // Check if the progress has been cancelled
+                // Check if the progress has been canceled
                 if (progress != null && !progress.isActive()) {
                     break;
                 }

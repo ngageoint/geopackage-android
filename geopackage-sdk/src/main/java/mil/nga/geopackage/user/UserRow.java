@@ -65,9 +65,7 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
     /**
      * Convert the row to content values
      *
-     * @param includeNulls
-     *            include null values
-     *
+     * @param includeNulls include null values
      * @return content values
      */
     public ContentValues toContentValues(boolean includeNulls) {

@@ -288,6 +288,39 @@ public class TileCreator {
      * @return tile
      */
     public GeoPackageTile getTile(BoundingBox requestBoundingBox) {
+        return getTile(requestBoundingBox, null);
+    }
+
+    /**
+     * Get the tile from the request bounding box in the request projection,
+     * only from the zoom level
+     *
+     * @param requestBoundingBox request bounding box in the request projection
+     * @param zoomLevel          zoom level
+     * @return tile
+     * @since 4.0.1
+     */
+    public GeoPackageTile getTile(BoundingBox requestBoundingBox,
+                                  long zoomLevel) {
+        GeoPackageTile tile = null;
+        TileMatrix tileMatrix = tileDao.getTileMatrix(zoomLevel);
+        if (tileMatrix != null) {
+            List<TileMatrix> tileMatrices = new ArrayList<>();
+            tileMatrices.add(tileMatrix);
+            tile = getTile(requestBoundingBox, tileMatrices);
+        }
+        return tile;
+    }
+
+    /**
+     * Get the tile from the request bounding box in the request projection
+     *
+     * @param requestBoundingBox request bounding box in the request projection
+     * @param tileMatrices       tile matrices
+     * @return tile
+     */
+    private GeoPackageTile getTile(BoundingBox requestBoundingBox,
+                                   List<TileMatrix> tileMatrices) {
 
         GeoPackageTile tile = null;
 
@@ -295,7 +328,9 @@ public class TileCreator {
         ProjectionTransform transformRequestToTiles = requestProjection.getTransformation(tilesProjection);
         BoundingBox tilesBoundingBox = requestBoundingBox.transform(transformRequestToTiles);
 
-        List<TileMatrix> tileMatrices = getTileMatrices(tilesBoundingBox);
+        if (tileMatrices == null) {
+            tileMatrices = getTileMatrices(tilesBoundingBox);
+        }
 
         for (int i = 0; tile == null && i < tileMatrices.size(); i++) {
 

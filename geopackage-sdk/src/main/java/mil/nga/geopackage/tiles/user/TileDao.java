@@ -1,10 +1,11 @@
 package mil.nga.geopackage.tiles.user;
 
-import androidx.collection.LongSparseArray;
-
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
@@ -14,10 +15,13 @@ import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGrid;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
+import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
+import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.user.UserDao;
 import mil.nga.sf.proj.Projection;
 import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Tile DAO for reading tile user tables
@@ -44,7 +48,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     /**
      * Mapping between zoom levels and the tile matrix
      */
-    private final LongSparseArray<TileMatrix> zoomLevelToTileMatrix = new LongSparseArray<>();
+    private final TreeMap<Long, TileMatrix> zoomLevelToTileMatrix = new TreeMap<>();
 
     /**
      * Min zoom
@@ -159,6 +163,24 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     }
 
     /**
+     * Get the bounding box of tiles at the zoom level
+     *
+     * @param zoomLevel  zoom level
+     * @param projection desired projection
+     * @return bounding box of zoom level, or nil if no tiles
+     * @since 4.0.1
+     */
+    public BoundingBox getBoundingBox(long zoomLevel, Projection projection) {
+        BoundingBox boundingBox = getBoundingBox(zoomLevel);
+        if (boundingBox != null) {
+            ProjectionTransform transform = this.projection
+                    .getTransformation(projection);
+            boundingBox = boundingBox.transform(transform);
+        }
+        return boundingBox;
+    }
+
+    /**
      * Get the tile grid of the zoom level
      *
      * @param zoomLevel zoom level
@@ -220,6 +242,16 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     }
 
     /**
+     * Get the zoom levels
+     *
+     * @return zoom level set
+     * @since 4.0.1
+     */
+    public Set<Long> getZoomLevels() {
+        return Collections.unmodifiableSet(zoomLevelToTileMatrix.keySet());
+    }
+
+    /**
      * Get the tile matrix at the zoom level
      *
      * @param zoomLevel zoom level
@@ -227,6 +259,16 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      */
     public TileMatrix getTileMatrix(long zoomLevel) {
         return zoomLevelToTileMatrix.get(zoomLevel);
+    }
+
+    /**
+     * Get the tile matrix at the min (first) zoom
+     *
+     * @return tile matrix
+     * @since 4.0.1
+     */
+    public TileMatrix getTileMatrixAtMinZoom() {
+        return zoomLevelToTileMatrix.firstEntry().getValue();
     }
 
     /**
@@ -660,8 +702,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     /**
      * Get the map zoom level from the tile matrix
      *
-     * @param tileMatrix
-     *            tile matrix
+     * @param tileMatrix tile matrix
      * @return map zoom level
      * @since 4.0.1
      */
@@ -672,13 +713,32 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
     /**
      * Get the map zoom level from the tile matrix zoom level
      *
-     * @param zoomLevel
-     *            tile matrix zoom level
+     * @param zoomLevel tile matrix zoom level
      * @return map zoom level
      * @since 4.0.1
      */
     public long getMapZoom(long zoomLevel) {
         return getMapZoom(getTileMatrix(zoomLevel));
+    }
+
+    /**
+     * Get a tile matrix set DAO
+     *
+     * @return tile matrix set DAO
+     * @since 4.0.1
+     */
+    public TileMatrixSetDao getTileMatrixSetDao() {
+        return TileMatrixSetDao.create(getDb());
+    }
+
+    /**
+     * Get a tile matrix DAO
+     *
+     * @return tile matrix DAO
+     * @since 4.0.1
+     */
+    public TileMatrixDao getTileMatrixDao() {
+        return TileMatrixDao.create(getDb());
     }
 
 }

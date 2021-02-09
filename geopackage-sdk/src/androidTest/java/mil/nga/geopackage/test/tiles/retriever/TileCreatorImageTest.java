@@ -9,13 +9,14 @@ import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.io.BitmapConverter;
+import mil.nga.geopackage.test.LoadGeoPackageTestCase;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.TestUtils;
-import mil.nga.geopackage.test.LoadGeoPackageTestCase;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.TileCreator;
@@ -23,13 +24,13 @@ import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.sf.proj.Projection;
 import mil.nga.sf.proj.ProjectionConstants;
 import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Test Tile Creator image accuracy from a GeoPackage with tiles
  *
  * @author osbornb
  */
-@Ignore // remove to run
 public class TileCreatorImageTest extends LoadGeoPackageTestCase {
 
     private final int COLOR_TOLERANCE = 19;
@@ -47,6 +48,7 @@ public class TileCreatorImageTest extends LoadGeoPackageTestCase {
      * @throws SQLException
      */
     @Test
+    @Ignore // remove to run
     public void testTileImage() throws SQLException {
 
         TileDao tileDao = geoPackage.getTileDao(TestConstants.TILES2_DB_TABLE_NAME);
@@ -196,6 +198,140 @@ public class TileCreatorImageTest extends LoadGeoPackageTestCase {
                 TestCase.assertTrue(bitmap.getPixel(x, y) != 0);
             }
         }
+
+    }
+
+    /**
+     * Test tile image projections
+     *
+     * @throws IOException upon error
+     */
+    @Test
+    public void testTileImageProjections() throws IOException {
+
+        TileDao tileDao = geoPackage
+                .getTileDao(TestConstants.TILES2_DB_TABLE_NAME);
+        BoundingBox boundingBox = geoPackage
+                .getBoundingBox(TestConstants.TILES2_DB_TABLE_NAME);
+
+        Projection wgs84 = geoPackage
+                .getProjection(TestConstants.TILES2_DB_TABLE_NAME);
+        Projection webMercator = ProjectionFactory
+                .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
+        ProjectionTransform toWebMercator = wgs84
+                .getTransformation(webMercator);
+        ProjectionTransform toWGS84 = toWebMercator.getInverseTransformation();
+
+        BoundingBox webMercatorBoundingBox = boundingBox
+                .transform(toWebMercator);
+
+        int width = 256;
+        int height = 256;
+        TileCreator webMercatorTileCreator = new TileCreator(tileDao, width,
+                height, webMercator);
+        TileCreator wgs84TileCreator = new TileCreator(tileDao, width, height);
+
+        double minLongitude = webMercatorBoundingBox.getMinLongitude();
+        double maxLongitude = webMercatorBoundingBox.getMaxLongitude();
+        double midLongitude = minLongitude
+                + ((maxLongitude - minLongitude) / 2);
+
+        double minLatitude = webMercatorBoundingBox.getMinLatitude();
+        double maxLatitude = webMercatorBoundingBox.getMaxLatitude();
+        double midLatitude = minLatitude + ((maxLatitude - minLatitude) / 2);
+
+        double minWGS84Longitude = boundingBox.getMinLongitude();
+        double maxWGS84Longitude = boundingBox.getMaxLongitude();
+        double midWGS84Longitude = minWGS84Longitude
+                + ((maxWGS84Longitude - minWGS84Longitude) / 2);
+
+        double minWGS84Latitude = boundingBox.getMinLatitude();
+        double maxWGS84Latitude = boundingBox.getMaxLatitude();
+        double midWGS84Latitude = minWGS84Latitude
+                + ((maxWGS84Latitude - minWGS84Latitude) / 2);
+
+        BoundingBox topLeft = new BoundingBox(minLongitude, midLatitude,
+                midLongitude, maxLatitude);
+        BoundingBox topLeftWGS84 = new BoundingBox(minWGS84Longitude,
+                midWGS84Latitude, midWGS84Longitude, maxWGS84Latitude);
+        createTiles(webMercatorTileCreator, topLeft, wgs84TileCreator,
+                topLeftWGS84);
+
+        BoundingBox topRight = new BoundingBox(midLongitude, midLatitude,
+                maxLongitude, maxLatitude);
+        BoundingBox topRightWGS84 = new BoundingBox(midWGS84Longitude,
+                midWGS84Latitude, maxWGS84Longitude, maxWGS84Latitude);
+        createTiles(webMercatorTileCreator, topRight, wgs84TileCreator,
+                topRightWGS84);
+
+        BoundingBox bottomLeft = new BoundingBox(minLongitude, minLatitude,
+                midLongitude, midLatitude);
+        BoundingBox bottomLeftWGS84 = new BoundingBox(minWGS84Longitude,
+                minWGS84Latitude, midWGS84Longitude, midWGS84Latitude);
+        createTiles(webMercatorTileCreator, bottomLeft, wgs84TileCreator,
+                bottomLeftWGS84);
+
+        BoundingBox bottomRight = new BoundingBox(midLongitude, minLatitude,
+                maxLongitude, midLatitude);
+        BoundingBox bottomRightWGS84 = new BoundingBox(midWGS84Longitude,
+                minWGS84Latitude, maxWGS84Longitude, midWGS84Latitude);
+        createTiles(webMercatorTileCreator, bottomRight, wgs84TileCreator,
+                bottomRightWGS84);
+
+        double pixelXSize = (maxLongitude - minLongitude) / (2.0 * width);
+        double pixelYSize = (maxLatitude - minLatitude) / (2.0 * height);
+
+        double pixelXSizeWGS84 = (maxWGS84Longitude - minWGS84Longitude)
+                / (2.0 * width);
+        double pixelYSizeWGS84 = (maxWGS84Latitude - minWGS84Latitude)
+                / (2.0 * height);
+
+    }
+
+    /**
+     * Create tiles
+     *
+     * @param webMercatorCreator web mercator tile creator
+     * @param webMercator        web mercator bounding box
+     * @param wgs84Creator       wgs84 tile creator
+     * @param wgs84              wgs84 bounding box
+     * @throws IOException upon error
+     */
+    private void createTiles(TileCreator webMercatorCreator,
+                             BoundingBox webMercator, TileCreator wgs84Creator,
+                             BoundingBox wgs84) throws IOException {
+
+        Projection wgs84Projection = geoPackage
+                .getProjection(TestConstants.TILES2_DB_TABLE_NAME);
+        Projection webMercatorProjection = ProjectionFactory
+                .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
+        ProjectionTransform toWebMercator = wgs84Projection
+                .getTransformation(webMercatorProjection);
+        ProjectionTransform toWGS84 = toWebMercator.getInverseTransformation();
+
+        BoundingBox wgs84WebMercator = webMercator.transform(toWGS84);
+        double pixelXSize = (wgs84WebMercator.getMaxLongitude()
+                - wgs84WebMercator.getMinLongitude())
+                / (1.0 * wgs84Creator.getWidth().doubleValue());
+        double pixelYSize = (wgs84WebMercator.getMaxLatitude()
+                - wgs84WebMercator.getMinLatitude())
+                / (1.0 * wgs84Creator.getHeight().doubleValue());
+
+        GeoPackageTile tile = webMercatorCreator.getTile(webMercator);
+        GeoPackageTile wgs84WebMercatorTile = wgs84Creator
+                .getTile(wgs84WebMercator);
+        GeoPackageTile wgs84Tile = wgs84Creator.getTile(wgs84);
+
+        Bitmap image = BitmapConverter.toBitmap(tile.getData());
+        Bitmap wgs84WebMercatorImage = BitmapConverter.toBitmap(wgs84WebMercatorTile.getData());
+        Bitmap wgs84Image = BitmapConverter.toBitmap(wgs84Tile.getData());
+
+        TestCase.assertEquals(image.getWidth(),
+                wgs84WebMercatorImage.getWidth());
+        TestCase.assertEquals(image.getHeight(),
+                wgs84WebMercatorImage.getHeight());
+        TestCase.assertEquals(image.getWidth(), wgs84Image.getWidth());
+        TestCase.assertEquals(image.getHeight(), wgs84Image.getHeight());
 
     }
 

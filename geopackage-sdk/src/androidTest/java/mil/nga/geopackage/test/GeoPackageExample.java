@@ -1007,8 +1007,8 @@ public class GeoPackageExample extends BaseTestCase {
                 tileHeight = 256;
             }
 
-            long matrixWidth = tileGrid.getMaxX() - tileGrid.getMinX() + 1;
-            long matrixHeight = tileGrid.getMaxY() - tileGrid.getMinY() + 1;
+            long matrixWidth = tileGrid.getWidth();
+            long matrixHeight = tileGrid.getHeight();
             double pixelXSize = (tileMatrixSet.getMaxX() - tileMatrixSet
                     .getMinX()) / (matrixWidth * tileWidth);
             double pixelYSize = (tileMatrixSet.getMaxY() - tileMatrixSet
