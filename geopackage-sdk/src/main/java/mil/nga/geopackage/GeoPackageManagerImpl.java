@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,12 +33,12 @@ import java.util.TreeSet;
 
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
+import mil.nga.geopackage.db.GeoPackageCursorFactory;
 import mil.nga.geopackage.db.GeoPackageDatabase;
 import mil.nga.geopackage.db.GeoPackageTableCreator;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadata;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDataSource;
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
-import mil.nga.geopackage.db.GeoPackageCursorFactory;
 import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
@@ -222,7 +223,6 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         return databases;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -320,10 +320,17 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public boolean existsAtExternalFile(DocumentFile file) {
+        return existsAtExternalPath(getPath(file));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getPath(String database) {
         File dbFile = getFile(database);
-        String path = dbFile.getAbsolutePath();
-        return path;
+        return dbFile.getAbsolutePath();
     }
 
     /**
@@ -351,6 +358,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public DocumentFile getDocumentFile(String database) {
+        return DocumentFile.fromFile(getFile(database));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getDatabaseAtExternalFile(File file) {
         return getDatabaseAtExternalPath(file.getAbsolutePath());
     }
@@ -366,6 +381,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             database = metadata.getName();
         }
         return database;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDatabaseAtExternalFile(DocumentFile file) {
+        return getDatabaseAtExternalPath(getPath(file));
     }
 
     /**
@@ -512,9 +535,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         File file = new File(path, database + "." + GeoPackageConstants.EXTENSION);
 
         // Create the GeoPackage
-        boolean created = createFile(database, file);
-
-        return created;
+        return createFile(database, file);
     }
 
     /**
@@ -522,14 +543,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean createFile(File file) {
-
-        // Get the database name
-        String database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
-
-        // Create the GeoPackage
-        boolean created = createFile(database, file);
-
-        return created;
+        return createFile(null, file);
     }
 
     /**
@@ -539,6 +553,11 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public boolean createFile(String database, File file) {
 
         boolean created = false;
+
+        if (database == null) {
+            // Get the database name
+            database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
+        }
 
         if (exists(database)) {
             throw new GeoPackageException("GeoPackage already exists: "
@@ -578,8 +597,32 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public boolean createFile(DocumentFile file) {
+        return createFile(file.getName(), file);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean createFile(String database, DocumentFile file) {
+        return createFile(database, getFile(file));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean importGeoPackage(File file) {
-        return importGeoPackage(null, file, false);
+        return importGeoPackage(file, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(File file, GeoPackageProgress progress) {
+        return importGeoPackage(file, false, progress);
     }
 
     /**
@@ -587,7 +630,144 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean importGeoPackage(File file, boolean override) {
-        return importGeoPackage(null, file, override);
+        return importGeoPackage(file, override, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(File file, boolean override, GeoPackageProgress progress) {
+        return importGeoPackage(null, file, override, progress);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, File file) {
+        return importGeoPackage(name, file, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, File file, GeoPackageProgress progress) {
+        return importGeoPackage(name, file, false, progress);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, File file, boolean override) {
+        return importGeoPackage(name, file, override, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, File file, boolean override, GeoPackageProgress progress) {
+
+        // Verify the file has the right extension
+        GeoPackageValidate.validateGeoPackageExtension(file);
+
+        // Use the provided name or the base file name as the database name
+        String database;
+        if (name != null) {
+            database = name;
+        } else {
+            database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
+        }
+
+        boolean success = false;
+        try {
+            FileInputStream geoPackageStream = new FileInputStream(file);
+            success = importGeoPackage(database, override, geoPackageStream,
+                    progress);
+        } catch (FileNotFoundException e) {
+            throw new GeoPackageException(
+                    "Failed read or write GeoPackage file '" + file
+                            + "' to database: '" + database + "'", e);
+        }
+
+        return success;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(DocumentFile file) {
+        return importGeoPackage(file, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(DocumentFile file, GeoPackageProgress progress) {
+        return importGeoPackage(file, false, progress);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(DocumentFile file, boolean override) {
+        return importGeoPackage(file, override, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(DocumentFile file, boolean override, GeoPackageProgress progress) {
+        return importGeoPackage(null, file, override, progress);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, DocumentFile file) {
+        return importGeoPackage(name, file, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, DocumentFile file, GeoPackageProgress progress) {
+        return importGeoPackage(name, file, false, progress);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, DocumentFile file, boolean override) {
+        return importGeoPackage(name, file, override, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackage(String name, DocumentFile file, boolean override, GeoPackageProgress progress) {
+        if (name == null) {
+            name = GeoPackageIOUtils.getFileNameWithoutExtension(file.getName());
+        }
+        InputStream intputStream = null;
+        try {
+            intputStream = context.getContentResolver().openInputStream(file.getUri());
+        } catch (FileNotFoundException e) {
+            throw new GeoPackageException("Failed to import GeoPackage " + name
+                    + " from URI: '" + file.getUri() + "'", e);
+        }
+        return importGeoPackage(name, intputStream, override, progress);
     }
 
     /**
@@ -633,47 +813,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             }
         }
 
-        boolean success = importGeoPackage(database, override, stream, progress);
-        return success;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean importGeoPackage(String name, File file) {
-        return importGeoPackage(name, file, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean importGeoPackage(String name, File file, boolean override) {
-
-        // Verify the file has the right extension
-        GeoPackageValidate.validateGeoPackageExtension(file);
-
-        // Use the provided name or the base file name as the database name
-        String database;
-        if (name != null) {
-            database = name;
-        } else {
-            database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
-        }
-
-        boolean success = false;
-        try {
-            FileInputStream geoPackageStream = new FileInputStream(file);
-            success = importGeoPackage(database, override, geoPackageStream,
-                    null);
-        } catch (FileNotFoundException e) {
-            throw new GeoPackageException(
-                    "Failed read or write GeoPackage file '" + file
-                            + "' to database: '" + database + "'", e);
-        }
-
-        return success;
+        return importGeoPackage(database, override, stream, progress);
     }
 
     /**
@@ -758,7 +898,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public void exportGeoPackage(String database, File directory) {
-        exportGeoPackage(database, database, directory);
+        exportGeoPackage(database, directory, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void exportGeoPackage(String database, File directory, GeoPackageProgress progress) {
+        exportGeoPackage(database, database, directory, progress);
     }
 
     /**
@@ -766,19 +914,35 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public void exportGeoPackage(String database, String name, File directory) {
+        exportGeoPackage(database, name, directory, null);
+    }
 
-        File file = new File(directory, name);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void exportGeoPackage(String database, String name, File directory, GeoPackageProgress progress) {
 
-        // Add the extension if not on the name
+        File file = directory;
+
+        // If the directory is not already the desired output file with extension
         if (!GeoPackageValidate.hasGeoPackageExtension(file)) {
-            name += "." + GeoPackageConstants.EXTENSION;
-            file = new File(directory, name);
+
+            // Add the file name
+            file = new File(file, name);
+
+            // Add the extension if not on the name
+            if (!GeoPackageValidate.hasGeoPackageExtension(file)) {
+                name += "." + GeoPackageConstants.EXTENSION;
+                file = new File(directory, name);
+            }
+
         }
 
         // Copy the geopackage database to the new file location
         File dbFile = getFile(database);
         try {
-            GeoPackageIOUtils.copyFile(dbFile, file);
+            GeoPackageIOUtils.copyFile(dbFile, file, progress);
         } catch (IOException e) {
             throw new GeoPackageException(
                     "Failed read or write GeoPackage database '" + database
@@ -789,10 +953,46 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void exportGeoPackage(String database, DocumentFile file) {
+        exportGeoPackage(database, file, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void exportGeoPackage(String database, DocumentFile file, GeoPackageProgress progress) {
+
+        // Copy the geopackage database to the document file location
+        File dbFile = getFile(database);
+
+        try {
+            OutputStream outputStream = context.getContentResolver().openOutputStream(file.getUri());
+            GeoPackageIOUtils.copyFile(dbFile, outputStream, progress);
+        } catch (IOException e) {
+            throw new GeoPackageException(
+                    "Failed read or write GeoPackage database '" + database
+                            + "' to document file: '" + file.getUri(), e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void exportGeoPackage(String database, String relativePath, Uri uri) throws IOException {
-        exportGeoPackage(database, database, relativePath, uri);
+        exportGeoPackage(database, relativePath, uri, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public void exportGeoPackage(String database, String relativePath, Uri uri, GeoPackageProgress progress) throws IOException {
+        exportGeoPackage(database, database, relativePath, uri, progress);
     }
 
     /**
@@ -801,6 +1001,15 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void exportGeoPackage(String database, String name, String relativePath, Uri uri) throws IOException {
+        exportGeoPackage(database, name, relativePath, uri, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public void exportGeoPackage(String database, String name, String relativePath, Uri uri, GeoPackageProgress progress) throws IOException {
 
         // Add the extension if not on the name
         name = GeoPackageValidate.addGeoPackageExtension(name);
@@ -810,7 +1019,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, GeoPackageConstants.MEDIA_TYPE);
         contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
 
-        exportGeoPackage(database, uri, contentValues);
+        exportGeoPackage(database, uri, contentValues, progress);
     }
 
     /**
@@ -818,6 +1027,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public void exportGeoPackage(String database, Uri uri, ContentValues contentValues) throws IOException {
+        exportGeoPackage(database, uri, contentValues, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void exportGeoPackage(String database, Uri uri, ContentValues contentValues, GeoPackageProgress progress) throws IOException {
 
         // Get the GeoPackage database file
         File dbFile = getFile(database);
@@ -829,7 +1046,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         // Copy the GeoPackage file
         OutputStream outputStream = resolver.openOutputStream(insertUri);
         InputStream inputStream = new FileInputStream(dbFile);
-        GeoPackageIOUtils.copyStream(inputStream, outputStream);
+        GeoPackageIOUtils.copyStream(inputStream, outputStream, progress);
 
     }
 
@@ -986,8 +1203,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean validate(String database) {
-        boolean valid = isValid(database, true, true);
-        return valid;
+        return isValid(database, true, true);
     }
 
     /**
@@ -995,8 +1211,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean validateHeader(String database) {
-        boolean valid = isValid(database, true, false);
-        return valid;
+        return isValid(database, true, false);
     }
 
     /**
@@ -1004,14 +1219,13 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean validateIntegrity(String database) {
-        boolean valid = isValid(database, false, true);
-        return valid;
+        return isValid(database, false, true);
     }
 
     /**
      * Validate the GeoPackage database
      *
-     * @param database
+     * @param database          database name
      * @param validateHeader    true to validate the header of the database
      * @param validateIntegrity true to validate the integrity of the database
      * @return true if valid
@@ -1060,11 +1274,19 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     @Override
     public boolean copy(String database, String databaseCopy) {
+        return copy(database, databaseCopy, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean copy(String database, String databaseCopy, GeoPackageProgress progress) {
         // Copy the database as a new file
         File dbFile = getFile(database);
         File dbCopyFile = context.getDatabasePath(databaseCopy);
         try {
-            GeoPackageIOUtils.copyFile(dbFile, dbCopyFile);
+            GeoPackageIOUtils.copyFile(dbFile, dbCopyFile, progress);
         } catch (IOException e) {
             throw new GeoPackageException(
                     "Failed to copy GeoPackage database '" + database
@@ -1103,8 +1325,24 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public boolean importGeoPackageAsExternalLink(File path) {
+        return importGeoPackageAsExternalLink(path, path.getName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean importGeoPackageAsExternalLink(File path, String database) {
         return importGeoPackageAsExternalLink(path, database, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(File path, boolean override) {
+        return importGeoPackageAsExternalLink(path, path.getName(), override);
     }
 
     /**
@@ -1119,6 +1357,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public boolean importGeoPackageAsExternalLink(String path) {
+        return importGeoPackageAsExternalLink(path, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean importGeoPackageAsExternalLink(String path, String database) {
         return importGeoPackageAsExternalLink(path, database, false);
     }
@@ -1127,7 +1373,21 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * {@inheritDoc}
      */
     @Override
+    public boolean importGeoPackageAsExternalLink(String path, boolean override) {
+        return importGeoPackageAsExternalLink(path, null, override);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean importGeoPackageAsExternalLink(String path, String database, boolean override) {
+
+        if (database == null) {
+            database = Uri.parse(path).getLastPathSegment();
+        }
+
+        database = GeoPackageIOUtils.getFileNameWithoutExtension(database);
 
         if (exists(database)) {
             if (override) {
@@ -1185,6 +1445,38 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         }
 
         return exists(database);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(DocumentFile file) {
+        return importGeoPackageAsExternalLink(file, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(DocumentFile file, boolean override) {
+        return importGeoPackageAsExternalLink(file, file.getName(), override);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(DocumentFile file, String database) {
+        return importGeoPackageAsExternalLink(file, database, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean importGeoPackageAsExternalLink(DocumentFile file, String database, boolean override) {
+        return importGeoPackageAsExternalLink(getFilePath(file), database, override);
     }
 
     /**
@@ -1302,7 +1594,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Add all databases to the collection
      *
-     * @param databases
+     * @param databases database names
      */
     private void addDatabases(Collection<String> databases) {
 
@@ -1316,7 +1608,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Add all internal databases to the collection
      *
-     * @param databases
+     * @param databases database names
      */
     private void addInternalDatabases(Collection<String> databases) {
         String[] databaseArray = context.databaseList();
@@ -1332,7 +1624,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Add all external databases to the collection
      *
-     * @param databases
+     * @param databases database names
      */
     private void addExternalDatabases(Collection<String> databases) {
         // Get the external GeoPackages, adding those where the file exists and
@@ -1350,10 +1642,10 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Import the GeoPackage stream
      *
-     * @param database
-     * @param override
-     * @param geoPackageStream
-     * @param progress
+     * @param database         database name
+     * @param override         override flag
+     * @param geoPackageStream input stream
+     * @param progress         progress
      * @return true if imported successfully
      */
     private boolean importGeoPackage(String database, boolean override,
@@ -1458,7 +1750,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Get all external GeoPackage metadata
      *
-     * @return
+     * @return GeoPackage metadata
      */
     private List<GeoPackageMetadata> getExternalGeoPackages() {
         List<GeoPackageMetadata> metadata = null;
@@ -1479,8 +1771,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Get the GeoPackage metadata
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return GeoPackage metadata
      */
     private GeoPackageMetadata getGeoPackageMetadata(String database) {
         GeoPackageMetadata metadata = null;
@@ -1523,13 +1815,47 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Check if the database is temporary (rollback journal)
      *
-     * @param database
-     * @return
+     * @param database database name
+     * @return true if temporary
      */
     private boolean isTemporary(String database) {
         return database.endsWith(context.getString(R.string.geopackage_db_rollback_journal_suffix))
                 || database.endsWith(context.getString(R.string.geopackage_db_write_ahead_log_suffix))
                 || database.endsWith(context.getString(R.string.geopackage_db_shared_memory_suffix));
+    }
+
+    /**
+     * Get the path from the document file
+     *
+     * @param file document file
+     * @return path
+     */
+    private String getPath(DocumentFile file) {
+        return file.getUri().getPath();
+    }
+
+    /**
+     * Get a file path from the document file
+     *
+     * @param file document file
+     * @return file path
+     */
+    private String getFilePath(DocumentFile file) {
+        Uri uri = file.getUri();
+        if (!uri.getScheme().equalsIgnoreCase("file")) {
+            throw new GeoPackageException("Operation requires an Uri file scheme. Unsupported Uri: " + uri);
+        }
+        return uri.getPath();
+    }
+
+    /**
+     * Get a file from the document file
+     *
+     * @param file document file
+     * @return file
+     */
+    private File getFile(DocumentFile file) {
+        return new File(getFilePath(file));
     }
 
 }

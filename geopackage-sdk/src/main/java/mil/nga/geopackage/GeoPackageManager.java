@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
+import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -150,6 +151,15 @@ public interface GeoPackageManager {
     public boolean existsAtExternalPath(String path);
 
     /**
+     * Determine if a database exists at the provided external document file
+     *
+     * @param file document file
+     * @return true if exists
+     * @since 4.0.1
+     */
+    public boolean existsAtExternalFile(DocumentFile file);
+
+    /**
      * Get the path of the database
      *
      * @param database database name
@@ -164,6 +174,15 @@ public interface GeoPackageManager {
      * @return file
      */
     public File getFile(String database);
+
+    /**
+     * Get the document file of the database
+     *
+     * @param database database name
+     * @return document file
+     * @since 4.0.1
+     */
+    public DocumentFile getDocumentFile(String database);
 
     /**
      * Get the database name at the external file
@@ -182,6 +201,15 @@ public interface GeoPackageManager {
      * @since 1.1.1
      */
     public String getDatabaseAtExternalPath(String path);
+
+    /**
+     * Get the database name at the external file
+     *
+     * @param file database document file
+     * @return database name or null if does not exist
+     * @since 4.0.1
+     */
+    public String getDatabaseAtExternalFile(DocumentFile file);
 
     /**
      * Get a readable version of the database size
@@ -259,6 +287,25 @@ public interface GeoPackageManager {
     public boolean createFile(String database, File file);
 
     /**
+     * Create a new GeoPackage database at the specified file location
+     *
+     * @param file GeoPackage document file
+     * @return true if created
+     * @since 4.0.1
+     */
+    public boolean createFile(DocumentFile file);
+
+    /**
+     * Create a new GeoPackage database at the specified file location with the provided name
+     *
+     * @param database database name
+     * @param file     GeoPackage document file
+     * @return true if created
+     * @since 4.0.1
+     */
+    public boolean createFile(String database, DocumentFile file);
+
+    /**
      * Import a GeoPackage file
      *
      * @param file GeoPackage file to import
@@ -270,10 +317,159 @@ public interface GeoPackageManager {
      * Import a GeoPackage file
      *
      * @param file     GeoPackage file to import
+     * @param progress progress tracker
+     * @return true if loaded
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(File file, GeoPackageProgress progress);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param file     GeoPackage file to import
      * @param override true to override existing
      * @return true if created successfully
      */
     public boolean importGeoPackage(File file, boolean override);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param file     GeoPackage file to import
+     * @param override true to override existing
+     * @param progress progress tracker
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(File file, boolean override, GeoPackageProgress progress);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name database name to save as
+     * @param file GeoPackage file to import
+     * @return true if created successfully
+     */
+    public boolean importGeoPackage(String name, File file);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name     database name to save as
+     * @param file     GeoPackage file to import
+     * @param progress progress tracker
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(String name, File file, GeoPackageProgress progress);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name     database name to save the imported file as
+     * @param file     GeoPackage file to import
+     * @param override true to override existing
+     * @return true if created successfully
+     */
+    public boolean importGeoPackage(String name, File file, boolean override);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name     database name to save the imported file as
+     * @param file     GeoPackage file to import
+     * @param override true to override existing
+     * @param progress progress tracker
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(String name, File file, boolean override, GeoPackageProgress progress);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param file GeoPackage document file to import
+     * @return true if loaded
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(DocumentFile file);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param file     GeoPackage document file to import
+     * @param progress progress tracker
+     * @return true if loaded
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(DocumentFile file, GeoPackageProgress progress);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param file     GeoPackage document file to import
+     * @param override true to override existing
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(DocumentFile file, boolean override);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param file     GeoPackage document file to import
+     * @param override true to override existing
+     * @param progress progress tracker
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(DocumentFile file, boolean override,
+                                    GeoPackageProgress progress);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name database name to save as
+     * @param file GeoPackage document file to import
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(String name, DocumentFile file);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name     database name to save as
+     * @param file     GeoPackage document file to import
+     * @param progress progress tracker
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(String name, DocumentFile file, GeoPackageProgress progress);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name     database name to save the imported file as
+     * @param file     GeoPackage document file to import
+     * @param override true to override existing
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(String name, DocumentFile file, boolean override);
+
+    /**
+     * Import a GeoPackage file
+     *
+     * @param name     database name to save the imported file as
+     * @param file     GeoPackage document file to import
+     * @param override true to override existing
+     * @param progress progress tracker
+     * @return true if created successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackage(String name, DocumentFile file, boolean override,
+                                    GeoPackageProgress progress);
 
     /**
      * Import a GeoPackage stream
@@ -317,25 +513,6 @@ public interface GeoPackageManager {
      */
     public boolean importGeoPackage(String database, InputStream stream,
                                     boolean override, GeoPackageProgress progress);
-
-    /**
-     * Import a GeoPackage file
-     *
-     * @param name database name to save as
-     * @param file GeoPackage file to import
-     * @return true if created successfully
-     */
-    public boolean importGeoPackage(String name, File file);
-
-    /**
-     * Import a GeoPackage file
-     *
-     * @param name     database name to save the imported file as
-     * @param file     GeoPackage file to import
-     * @param override true to override existing
-     * @return true if created successfully
-     */
-    public boolean importGeoPackage(String name, File file, boolean override);
 
     /**
      * Import a GeoPackage file from a URL
@@ -391,10 +568,50 @@ public interface GeoPackageManager {
      * Export a GeoPackage database to a file
      *
      * @param database  database name
+     * @param directory export directory
+     * @param progress  progress tracker
+     * @since 4.0.1
+     */
+    public void exportGeoPackage(String database, File directory, GeoPackageProgress progress);
+
+    /**
+     * Export a GeoPackage database to a file
+     *
+     * @param database  database name
      * @param name      name
      * @param directory export directory
      */
     public void exportGeoPackage(String database, String name, File directory);
+
+    /**
+     * Export a GeoPackage database to a file
+     *
+     * @param database  database name
+     * @param name      name
+     * @param directory export directory
+     * @param progress  progress tracker
+     * @since 4.0.1
+     */
+    public void exportGeoPackage(String database, String name, File directory, GeoPackageProgress progress);
+
+    /**
+     * Export a GeoPackage database to a document file
+     *
+     * @param database database name
+     * @param file     export document file
+     * @since 4.0.1
+     */
+    public void exportGeoPackage(String database, DocumentFile file);
+
+    /**
+     * Export a GeoPackage database to a document file
+     *
+     * @param database database name
+     * @param file     export document file
+     * @param progress progress tracker
+     * @since 4.0.1
+     */
+    public void exportGeoPackage(String database, DocumentFile file, GeoPackageProgress progress);
 
     /**
      * Export a GeoPackage database to a media store
@@ -414,6 +631,21 @@ public interface GeoPackageManager {
      * Export a GeoPackage database to a media store
      *
      * @param database     database name
+     * @param relativePath Relative path of this media item within the storage device where it is persisted
+     * @param uri          The URL of the table to insert into
+     * @param progress     progress tracker
+     * @throws IOException upon error
+     * @see android.provider.MediaStore.MediaColumns#RELATIVE_PATH
+     * @see android.content.ContentResolver#insert(Uri, ContentValues)
+     * @since 4.0.1
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void exportGeoPackage(String database, String relativePath, Uri uri, GeoPackageProgress progress) throws IOException;
+
+    /**
+     * Export a GeoPackage database to a media store
+     *
+     * @param database     database name
      * @param name         name
      * @param relativePath Relative path of this media item within the storage device where it is persisted
      * @param uri          The URL of the table to insert into
@@ -426,6 +658,22 @@ public interface GeoPackageManager {
     public void exportGeoPackage(String database, String name, String relativePath, Uri uri) throws IOException;
 
     /**
+     * Export a GeoPackage database to a media store
+     *
+     * @param database     database name
+     * @param name         name
+     * @param relativePath Relative path of this media item within the storage device where it is persisted
+     * @param uri          The URL of the table to insert into
+     * @param progress     progress tracker
+     * @throws IOException upon error
+     * @see android.provider.MediaStore.MediaColumns#RELATIVE_PATH
+     * @see android.content.ContentResolver#insert(Uri, ContentValues)
+     * @since 4.0.1
+     */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public void exportGeoPackage(String database, String name, String relativePath, Uri uri, GeoPackageProgress progress) throws IOException;
+
+    /**
      * Export a GeoPackage database to a Uri
      *
      * @param database      database name
@@ -436,6 +684,19 @@ public interface GeoPackageManager {
      * @since 3.5.0
      */
     public void exportGeoPackage(String database, Uri uri, ContentValues contentValues) throws IOException;
+
+    /**
+     * Export a GeoPackage database to a Uri
+     *
+     * @param database      database name
+     * @param uri           The URL of the table to insert into
+     * @param contentValues The initial values for the newly inserted row
+     * @param progress      progress tracker
+     * @throws IOException upon error
+     * @see android.content.ContentResolver#insert(Uri, ContentValues)
+     * @since 4.0.1
+     */
+    public void exportGeoPackage(String database, Uri uri, ContentValues contentValues, GeoPackageProgress progress) throws IOException;
 
     /**
      * Open the database
@@ -590,6 +851,17 @@ public interface GeoPackageManager {
     public boolean copy(String database, String databaseCopy);
 
     /**
+     * Copy the database
+     *
+     * @param database     database name
+     * @param databaseCopy database copy name
+     * @param progress     progress tracker
+     * @return true if copied
+     * @since 4.0.1
+     */
+    public boolean copy(String database, String databaseCopy, GeoPackageProgress progress);
+
+    /**
      * Rename the database to the new name
      *
      * @param database    database name
@@ -601,11 +873,30 @@ public interface GeoPackageManager {
     /**
      * Import an GeoPackage as an external file link without copying locally
      *
+     * @param path full file path
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(File path);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
      * @param path     full file path
      * @param database name to reference the database
      * @return true if imported successfully
      */
     public boolean importGeoPackageAsExternalLink(File path, String database);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param path     full file path
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(File path, boolean override);
 
     /**
      * Import an GeoPackage as an external file link without copying locally
@@ -621,11 +912,30 @@ public interface GeoPackageManager {
     /**
      * Import an GeoPackage as an external file link without copying locally
      *
+     * @param path full file path
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(String path);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
      * @param path     full file path
      * @param database name to reference the database
      * @return true if imported successfully
      */
     public boolean importGeoPackageAsExternalLink(String path, String database);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param path     full file path
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(String path, boolean override);
 
     /**
      * Import an GeoPackage as an external file link without copying locally
@@ -637,5 +947,45 @@ public interface GeoPackageManager {
      * @since 1.2.7
      */
     public boolean importGeoPackageAsExternalLink(String path, String database, boolean override);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param file document file
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(DocumentFile file);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param file     document file
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(DocumentFile file, boolean override);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param file     document file
+     * @param database name to reference the database
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(DocumentFile file, String database);
+
+    /**
+     * Import an GeoPackage as an external file link without copying locally
+     *
+     * @param file     document file
+     * @param database name to reference the database
+     * @param override true to delete an existing database
+     * @return true if imported successfully
+     * @since 4.0.1
+     */
+    public boolean importGeoPackageAsExternalLink(DocumentFile file, String database, boolean override);
 
 }

@@ -9,7 +9,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * compile SDK version 30
 * ormlite-android version 5.3
 * SQLite Android Bindings version 3340000
+* androidx documentfile 1.0.1 (new dependency)
 * Omit null values in inserts
+* GeoPackage Manager improvements, including DocumentFile and progress support
 * gradle plugin updated to 4.1.2
 
 ## [4.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/4.0.0) (07-14-2020)

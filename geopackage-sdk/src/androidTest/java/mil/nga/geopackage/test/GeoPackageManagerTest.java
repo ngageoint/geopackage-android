@@ -1,5 +1,7 @@
 package mil.nga.geopackage.test;
 
+import androidx.documentfile.provider.DocumentFile;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,10 +12,11 @@ import java.sql.SQLException;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.GeoPackageFactory;
+import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.io.ContextIOUtils;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -231,6 +234,140 @@ public class GeoPackageManagerTest extends BaseTestCase {
     }
 
     /**
+     * Test importing a database from a GeoPackage document file
+     */
+    @Test
+    public void testImportDocument() {
+
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+
+        // Verify does not exist
+        assertFalse("Database already exists",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database already returned in the set", manager
+                .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+
+        // Copy the test db file from assets to the internal storage
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext,
+                TestConstants.IMPORT_DB_FILE_NAME);
+
+        // Import
+        String importLocation = TestUtils.getAssetFileInternalStorageLocation(
+                activity, TestConstants.IMPORT_DB_FILE_NAME);
+        File importFile = new File(importLocation);
+        DocumentFile importDocument = DocumentFile.fromFile(importFile);
+        assertTrue("Database not imported",
+                manager.importGeoPackage(importDocument));
+        assertTrue("Database does not exist",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertTrue("Database not returned in the set", manager.databaseSet()
+                .contains(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
+
+        // Open
+        GeoPackage geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        // Attempt to import again
+        try {
+            manager.importGeoPackage(importDocument);
+            fail("Importing database again did not cause exception");
+        } catch (GeoPackageException e) {
+            // expected
+        }
+
+        // Import with override
+        assertTrue("Database not imported",
+                manager.importGeoPackage(importDocument, true));
+
+        // Open
+        geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        // Delete
+        assertTrue("Database not deleted",
+                manager.delete(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database exists after delete",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database returned in the set after delete", manager
+                .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+
+        // Try to import file with no extension
+        String noFileExtension = TestUtils.getAssetFileInternalStorageLocation(
+                activity, TestConstants.IMPORT_DB_NAME);
+        try {
+            manager.importGeoPackage(new File(noFileExtension));
+            fail("GeoPackage without extension did not throw an exception");
+        } catch (GeoPackageException e) {
+            // Expected
+        }
+
+        // Try to import file with invalid extension
+        String invalidFileExtension = TestUtils
+                .getAssetFileInternalStorageLocation(activity,
+                        TestConstants.IMPORT_DB_NAME + ".invalid");
+        try {
+            manager.importGeoPackage(new File(invalidFileExtension));
+            fail("GeoPackage with invalid extension did not throw an exception");
+        } catch (GeoPackageException e) {
+            // Expected
+        }
+
+        // Try to import corrupt database
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext,
+                IMPORT_CORRUPT_DB_FILE_NAME);
+        String loadCorruptFileLocation = TestUtils
+                .getAssetFileInternalStorageLocation(activity,
+                        IMPORT_CORRUPT_DB_FILE_NAME);
+        File loadCorruptFile = new File(loadCorruptFileLocation);
+        try {
+            manager.importGeoPackage(loadCorruptFile);
+            fail("Corrupted GeoPackage did not throw an exception");
+        } catch (GeoPackageException e) {
+            // Expected
+        }
+
+        // Import and Open with inverse validation
+        manager.setImportHeaderValidation(!manager.isImportHeaderValidation());
+        manager.setImportIntegrityValidation(!manager.isImportIntegrityValidation());
+        manager.setOpenHeaderValidation(!manager.isOpenHeaderValidation());
+        manager.setOpenIntegrityValidation(!manager.isOpenIntegrityValidation());
+
+        // Import
+        assertTrue("Database not imported",
+                manager.importGeoPackage(importDocument));
+        assertTrue("Database does not exist",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertTrue("Database not returned in the set", manager.databaseSet()
+                .contains(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
+
+        // Open
+        geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        // Delete
+        assertTrue("Database not deleted",
+                manager.delete(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database exists after delete",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database returned in the set after delete", manager
+                .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+
+        // Delete the files
+        assertTrue("Import file could not be deleted", importDocument.delete());
+        assertTrue("Corrupt Import file could not be deleted",
+                loadCorruptFile.delete());
+    }
+
+    /**
      * Test importing a database from a GeoPackage file
      *
      * @throws MalformedURLException
@@ -367,7 +504,7 @@ public class GeoPackageManagerTest extends BaseTestCase {
         File exportedImport = new File(exportDirectory, exportedImportName
                 + "." + TestConstants.GEO_PACKAGE_EXTENSION);
         manager.exportGeoPackage(TestConstants.IMPORT_DB_NAME,
-                exportedImportName, exportDirectory);
+                DocumentFile.fromFile(exportedImport));
         assertTrue("Exported import file does not exist",
                 exportedImport.exists());
         assertTrue("Exported import file was empty",
@@ -434,11 +571,17 @@ public class GeoPackageManagerTest extends BaseTestCase {
                 activity, TestConstants.IMPORT_DB_FILE_NAME);
         File importFile = new File(importLocation);
         assertTrue("Database not imported",
-                manager.importGeoPackageAsExternalLink(importFile, TestConstants.IMPORT_DB_NAME));
+                manager.importGeoPackageAsExternalLink(importLocation));
         assertTrue("Database does not exist",
                 manager.exists(TestConstants.IMPORT_DB_NAME));
         assertTrue("Database not returned in the set", manager.databaseSet()
                 .contains(TestConstants.IMPORT_DB_NAME));
+        assertTrue("External file does not exist as database",
+                manager.existsAtExternalFile(importFile));
+        assertEquals("External files do not match",
+                importFile, manager.getFile(TestConstants.IMPORT_DB_NAME));
+        assertEquals("Database name does not match",
+                TestConstants.IMPORT_DB_NAME, manager.getDatabaseAtExternalFile(importFile));
         assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
         assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
         assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
@@ -463,6 +606,8 @@ public class GeoPackageManagerTest extends BaseTestCase {
                 manager.exists(TestConstants.IMPORT_DB_NAME));
         assertFalse("Database returned in the set after delete", manager
                 .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+        assertFalse("External file exists as database after delete",
+                manager.existsAtExternalFile(importFile));
 
         // Try to import corrupt database
         TestUtils.copyAssetFileToInternalStorage(activity, testContext,
@@ -491,6 +636,8 @@ public class GeoPackageManagerTest extends BaseTestCase {
                 manager.exists(TestConstants.IMPORT_DB_NAME));
         assertTrue("Database not returned in the set", manager.databaseSet()
                 .contains(TestConstants.IMPORT_DB_NAME));
+        assertTrue("External file does not exist as database",
+                manager.existsAtExternalFile(importFile));
         assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
         assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
         assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
@@ -507,9 +654,127 @@ public class GeoPackageManagerTest extends BaseTestCase {
                 manager.exists(TestConstants.IMPORT_DB_NAME));
         assertFalse("Database returned in the set after delete", manager
                 .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+        assertFalse("External file exists as database after delete",
+                manager.existsAtExternalFile(importFile));
 
         // Delete the files
         assertTrue("Import file could not be deleted", importFile.delete());
+        assertTrue("Corrupt Import file could not be deleted",
+                loadCorruptFile.delete());
+    }
+
+    /**
+     * Test importing a database from a GeoPackage document file as an external link
+     */
+    @Test
+    public void testImportDocumentAsExternalLink() {
+
+        GeoPackageManager manager = GeoPackageFactory.getManager(activity);
+
+        // Verify does not exist
+        assertFalse("Database already exists",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database already returned in the set", manager
+                .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+
+        // Copy the test db file from assets to the internal storage
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext,
+                TestConstants.IMPORT_DB_FILE_NAME);
+
+        // Import
+        String importLocation = TestUtils.getAssetFileInternalStorageLocation(
+                activity, TestConstants.IMPORT_DB_FILE_NAME);
+        File importFile = new File(importLocation);
+        DocumentFile importDocument = DocumentFile.fromFile(importFile);
+        assertTrue("Database not imported",
+                manager.importGeoPackageAsExternalLink(importDocument));
+        assertTrue("Database does not exist",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertTrue("Database not returned in the set", manager.databaseSet()
+                .contains(TestConstants.IMPORT_DB_NAME));
+        assertTrue("External file does not exist as database",
+                manager.existsAtExternalFile(importDocument));
+        assertEquals("External files do not match",
+                importDocument.getUri(), manager.getDocumentFile(TestConstants.IMPORT_DB_NAME).getUri());
+        assertEquals("Database name does not match",
+                TestConstants.IMPORT_DB_NAME, manager.getDatabaseAtExternalFile(importDocument));
+        assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
+
+        // Open
+        GeoPackage geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        // Attempt to import again
+        try {
+            manager.importGeoPackageAsExternalLink(importDocument, TestConstants.IMPORT_DB_NAME);
+            fail("Importing database again did not cause exception");
+        } catch (GeoPackageException e) {
+            // expected
+        }
+
+        // Delete
+        assertTrue("Database not deleted",
+                manager.delete(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database exists after delete",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database returned in the set after delete", manager
+                .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+        assertFalse("External file exists as database after delete",
+                manager.existsAtExternalFile(importDocument));
+
+        // Try to import corrupt database
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext,
+                IMPORT_CORRUPT_DB_FILE_NAME);
+        String loadCorruptFileLocation = TestUtils
+                .getAssetFileInternalStorageLocation(activity,
+                        IMPORT_CORRUPT_DB_FILE_NAME);
+        File loadCorruptFile = new File(loadCorruptFileLocation);
+        try {
+            manager.importGeoPackageAsExternalLink(loadCorruptFile, TestConstants.IMPORT_DB_NAME);
+            fail("Corrupted GeoPackage did not throw an exception");
+        } catch (GeoPackageException e) {
+            // Expected
+        }
+
+        // Import and Open with inverse validation
+        manager.setImportHeaderValidation(!manager.isImportHeaderValidation());
+        manager.setImportIntegrityValidation(!manager.isImportIntegrityValidation());
+        manager.setOpenHeaderValidation(!manager.isOpenHeaderValidation());
+        manager.setOpenIntegrityValidation(!manager.isOpenIntegrityValidation());
+
+        // Import
+        assertTrue("Database not imported",
+                manager.importGeoPackageAsExternalLink(importDocument));
+        assertTrue("Database does not exist",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertTrue("Database not returned in the set", manager.databaseSet()
+                .contains(TestConstants.IMPORT_DB_NAME));
+        assertTrue("External file does not exist as database",
+                manager.existsAtExternalFile(importDocument));
+        assertTrue(manager.validate(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateHeader(TestConstants.IMPORT_DB_NAME));
+        assertTrue(manager.validateIntegrity(TestConstants.IMPORT_DB_NAME));
+
+        // Open
+        geoPackage = manager.open(TestConstants.IMPORT_DB_NAME);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        // Delete
+        assertTrue("Database not deleted",
+                manager.delete(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database exists after delete",
+                manager.exists(TestConstants.IMPORT_DB_NAME));
+        assertFalse("Database returned in the set after delete", manager
+                .databaseSet().contains(TestConstants.IMPORT_DB_NAME));
+        assertFalse("External file exists as database after delete",
+                manager.existsAtExternalFile(importDocument));
+
+        // Delete the files
+        assertTrue("Import file could not be deleted", importDocument.delete());
         assertTrue("Corrupt Import file could not be deleted",
                 loadCorruptFile.delete());
     }
@@ -536,6 +801,22 @@ public class GeoPackageManagerTest extends BaseTestCase {
     @Test
     public void testCreateAtPath() {
         createExternal(2);
+    }
+
+    /**
+     * Test creating a database GeoPackage at a file
+     */
+    @Test
+    public void testCreateDocument() {
+        createExternal(3);
+    }
+
+    /**
+     * Test creating a database GeoPackage at a file with specified name
+     */
+    @Test
+    public void testCreateDocumentWithName() {
+        createExternal(4);
     }
 
     /**
@@ -639,6 +920,12 @@ public class GeoPackageManagerTest extends BaseTestCase {
                 break;
             case 2:
                 created = manager.createAtPath(TestConstants.IMPORT_DB_NAME, externalDirectory);
+                break;
+            case 3:
+                created = manager.createFile(DocumentFile.fromFile(createFile));
+                break;
+            case 4:
+                created = manager.createFile(TestConstants.IMPORT_DB_NAME, DocumentFile.fromFile(createFile));
                 break;
             default:
                 fail("Unsupported test case");
