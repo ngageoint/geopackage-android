@@ -8,7 +8,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 * compile SDK version 30
 * ormlite-android version 5.3
-* SQLite Android Bindings version 3340000
+* SQLite Android Bindings version 3340100
 * androidx documentfile 1.0.1 (new dependency)
 * Omit null values in inserts
 * GeoPackage Manager improvements, including DocumentFile and progress support
