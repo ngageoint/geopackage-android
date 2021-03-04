@@ -20,7 +20,7 @@ import mil.nga.sf.proj.Projection;
  * Tile Reprojection for reprojecting an existing tile table
  *
  * @author osbornb
- * @since 4.0.1
+ * @since 5.0.0
  */
 public class TileReprojection extends TileReprojectionCore {
 

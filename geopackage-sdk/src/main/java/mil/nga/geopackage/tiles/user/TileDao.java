@@ -168,7 +168,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * @param zoomLevel  zoom level
      * @param projection desired projection
      * @return bounding box of zoom level, or nil if no tiles
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public BoundingBox getBoundingBox(long zoomLevel, Projection projection) {
         BoundingBox boundingBox = getBoundingBox(zoomLevel);
@@ -245,7 +245,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the zoom levels
      *
      * @return zoom level set
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public Set<Long> getZoomLevels() {
         return Collections.unmodifiableSet(zoomLevelToTileMatrix.keySet());
@@ -265,7 +265,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the tile matrix at the min (first) zoom
      *
      * @return tile matrix
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public TileMatrix getTileMatrixAtMinZoom() {
         return zoomLevelToTileMatrix.firstEntry().getValue();
@@ -673,7 +673,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the map zoom level range
      *
      * @return map zoom level range, min at index 0, max at index 1
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public long[] getMapZoomRange() {
         return TileDaoUtils.getMapZoomRange(tileMatrixSet, tileMatrices);
@@ -683,7 +683,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the map min zoom level
      *
      * @return map min zoom level
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public long getMapMinZoom() {
         return TileDaoUtils.getMapMinZoom(tileMatrixSet, tileMatrices);
@@ -693,7 +693,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get the map max zoom level
      *
      * @return map max zoom level
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public long getMapMaxZoom() {
         return TileDaoUtils.getMapMaxZoom(tileMatrixSet, tileMatrices);
@@ -704,7 +704,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      *
      * @param tileMatrix tile matrix
      * @return map zoom level
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public long getMapZoom(TileMatrix tileMatrix) {
         return TileDaoUtils.getMapZoom(tileMatrixSet, tileMatrix);
@@ -715,7 +715,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      *
      * @param zoomLevel tile matrix zoom level
      * @return map zoom level
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public long getMapZoom(long zoomLevel) {
         return getMapZoom(getTileMatrix(zoomLevel));
@@ -725,7 +725,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get a tile matrix set DAO
      *
      * @return tile matrix set DAO
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public TileMatrixSetDao getTileMatrixSetDao() {
         return TileMatrixSetDao.create(getDb());
@@ -735,7 +735,7 @@ public class TileDao extends UserDao<TileColumn, TileTable, TileRow, TileCursor>
      * Get a tile matrix DAO
      *
      * @return tile matrix DAO
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public TileMatrixDao getTileMatrixDao() {
         return TileMatrixDao.create(getDb());

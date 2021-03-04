@@ -298,7 +298,7 @@ public class TileCreator {
      * @param requestBoundingBox request bounding box in the request projection
      * @param zoomLevel          zoom level
      * @return tile
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public GeoPackageTile getTile(BoundingBox requestBoundingBox,
                                   long zoomLevel) {

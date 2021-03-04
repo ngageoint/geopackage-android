@@ -4,9 +4,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 4.0.1 (TBD)
+## [5.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/5.0.0) (TBD)
 
-* geopackage-core version 4.0.1
+* geopackage-core version 5.0.0
 * compile SDK version 30
 * ormlite-android version 5.3
 * SQLite Android Bindings version 3340100

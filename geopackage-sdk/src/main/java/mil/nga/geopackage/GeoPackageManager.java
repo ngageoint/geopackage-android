@@ -155,7 +155,7 @@ public interface GeoPackageManager {
      *
      * @param file document file
      * @return true if exists
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean existsAtExternalFile(DocumentFile file);
 
@@ -180,7 +180,7 @@ public interface GeoPackageManager {
      *
      * @param database database name
      * @return document file
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public DocumentFile getDocumentFile(String database);
 
@@ -207,7 +207,7 @@ public interface GeoPackageManager {
      *
      * @param file database document file
      * @return database name or null if does not exist
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public String getDatabaseAtExternalFile(DocumentFile file);
 
@@ -291,7 +291,7 @@ public interface GeoPackageManager {
      *
      * @param file GeoPackage document file
      * @return true if created
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean createFile(DocumentFile file);
 
@@ -301,7 +301,7 @@ public interface GeoPackageManager {
      * @param database database name
      * @param file     GeoPackage document file
      * @return true if created
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean createFile(String database, DocumentFile file);
 
@@ -319,7 +319,7 @@ public interface GeoPackageManager {
      * @param file     GeoPackage file to import
      * @param progress progress tracker
      * @return true if loaded
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(File file, GeoPackageProgress progress);
 
@@ -339,7 +339,7 @@ public interface GeoPackageManager {
      * @param override true to override existing
      * @param progress progress tracker
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(File file, boolean override, GeoPackageProgress progress);
 
@@ -359,7 +359,7 @@ public interface GeoPackageManager {
      * @param file     GeoPackage file to import
      * @param progress progress tracker
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(String name, File file, GeoPackageProgress progress);
 
@@ -381,7 +381,7 @@ public interface GeoPackageManager {
      * @param override true to override existing
      * @param progress progress tracker
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(String name, File file, boolean override, GeoPackageProgress progress);
 
@@ -390,7 +390,7 @@ public interface GeoPackageManager {
      *
      * @param file GeoPackage document file to import
      * @return true if loaded
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(DocumentFile file);
 
@@ -400,7 +400,7 @@ public interface GeoPackageManager {
      * @param file     GeoPackage document file to import
      * @param progress progress tracker
      * @return true if loaded
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(DocumentFile file, GeoPackageProgress progress);
 
@@ -410,7 +410,7 @@ public interface GeoPackageManager {
      * @param file     GeoPackage document file to import
      * @param override true to override existing
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(DocumentFile file, boolean override);
 
@@ -421,7 +421,7 @@ public interface GeoPackageManager {
      * @param override true to override existing
      * @param progress progress tracker
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(DocumentFile file, boolean override,
                                     GeoPackageProgress progress);
@@ -432,7 +432,7 @@ public interface GeoPackageManager {
      * @param name database name to save as
      * @param file GeoPackage document file to import
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(String name, DocumentFile file);
 
@@ -443,7 +443,7 @@ public interface GeoPackageManager {
      * @param file     GeoPackage document file to import
      * @param progress progress tracker
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(String name, DocumentFile file, GeoPackageProgress progress);
 
@@ -454,7 +454,7 @@ public interface GeoPackageManager {
      * @param file     GeoPackage document file to import
      * @param override true to override existing
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(String name, DocumentFile file, boolean override);
 
@@ -466,7 +466,7 @@ public interface GeoPackageManager {
      * @param override true to override existing
      * @param progress progress tracker
      * @return true if created successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackage(String name, DocumentFile file, boolean override,
                                     GeoPackageProgress progress);
@@ -570,7 +570,7 @@ public interface GeoPackageManager {
      * @param database  database name
      * @param directory export directory
      * @param progress  progress tracker
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public void exportGeoPackage(String database, File directory, GeoPackageProgress progress);
 
@@ -590,7 +590,7 @@ public interface GeoPackageManager {
      * @param name      name
      * @param directory export directory
      * @param progress  progress tracker
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public void exportGeoPackage(String database, String name, File directory, GeoPackageProgress progress);
 
@@ -599,7 +599,7 @@ public interface GeoPackageManager {
      *
      * @param database database name
      * @param file     export document file
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public void exportGeoPackage(String database, DocumentFile file);
 
@@ -609,7 +609,7 @@ public interface GeoPackageManager {
      * @param database database name
      * @param file     export document file
      * @param progress progress tracker
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public void exportGeoPackage(String database, DocumentFile file, GeoPackageProgress progress);
 
@@ -637,7 +637,7 @@ public interface GeoPackageManager {
      * @throws IOException upon error
      * @see android.provider.MediaStore.MediaColumns#RELATIVE_PATH
      * @see android.content.ContentResolver#insert(Uri, ContentValues)
-     * @since 4.0.1
+     * @since 5.0.0
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public void exportGeoPackage(String database, String relativePath, Uri uri, GeoPackageProgress progress) throws IOException;
@@ -668,7 +668,7 @@ public interface GeoPackageManager {
      * @throws IOException upon error
      * @see android.provider.MediaStore.MediaColumns#RELATIVE_PATH
      * @see android.content.ContentResolver#insert(Uri, ContentValues)
-     * @since 4.0.1
+     * @since 5.0.0
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public void exportGeoPackage(String database, String name, String relativePath, Uri uri, GeoPackageProgress progress) throws IOException;
@@ -694,7 +694,7 @@ public interface GeoPackageManager {
      * @param progress      progress tracker
      * @throws IOException upon error
      * @see android.content.ContentResolver#insert(Uri, ContentValues)
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public void exportGeoPackage(String database, Uri uri, ContentValues contentValues, GeoPackageProgress progress) throws IOException;
 
@@ -857,7 +857,7 @@ public interface GeoPackageManager {
      * @param databaseCopy database copy name
      * @param progress     progress tracker
      * @return true if copied
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean copy(String database, String databaseCopy, GeoPackageProgress progress);
 
@@ -875,7 +875,7 @@ public interface GeoPackageManager {
      *
      * @param path full file path
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(File path);
 
@@ -894,7 +894,7 @@ public interface GeoPackageManager {
      * @param path     full file path
      * @param override true to delete an existing database
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(File path, boolean override);
 
@@ -914,7 +914,7 @@ public interface GeoPackageManager {
      *
      * @param path full file path
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(String path);
 
@@ -933,7 +933,7 @@ public interface GeoPackageManager {
      * @param path     full file path
      * @param override true to delete an existing database
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(String path, boolean override);
 
@@ -953,7 +953,7 @@ public interface GeoPackageManager {
      *
      * @param file document file
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(DocumentFile file);
 
@@ -963,7 +963,7 @@ public interface GeoPackageManager {
      * @param file     document file
      * @param override true to delete an existing database
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(DocumentFile file, boolean override);
 
@@ -973,7 +973,7 @@ public interface GeoPackageManager {
      * @param file     document file
      * @param database name to reference the database
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(DocumentFile file, String database);
 
@@ -984,7 +984,7 @@ public interface GeoPackageManager {
      * @param database name to reference the database
      * @param override true to delete an existing database
      * @return true if imported successfully
-     * @since 4.0.1
+     * @since 5.0.0
      */
     public boolean importGeoPackageAsExternalLink(DocumentFile file, String database, boolean override);
 

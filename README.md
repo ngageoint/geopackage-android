@@ -148,14 +148,14 @@ geoPackage.close();
 
 ### Installation ###
 
-Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|4.0.0|aar) (AAR, POM, Source, Javadoc)
+Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|5.0.0|aar) (AAR, POM, Source, Javadoc)
 
-    compile "mil.nga.geopackage:geopackage-android:4.0.0"
+    compile "mil.nga.geopackage:geopackage-android:5.0.0"
 
 ### Build ###
 
-[![Build Artifacts](https://github.com/ngageoint/geopackage-android/workflows/Build%20Artifacts/badge.svg)](https://github.com/ngageoint/geopackage-android/actions?query=workflow%3A%22Build+Artifacts%22)
-[![Test](https://github.com/ngageoint/geopackage-android/workflows/Test/badge.svg)](https://github.com/ngageoint/geopackage-android/actions?query=workflow%3ATest)
+[![Build Artifacts](https://github.com/ngageoint/geopackage-android/workflows/Build%20Artifacts/badge.svg)](https://github.com/ngageoint/geopackage-android/actions/workflows/build-artifacts.yml)
+[![Test](https://github.com/ngageoint/geopackage-android/workflows/Test/badge.svg)](https://github.com/ngageoint/geopackage-android/actions/workflows/test.yml)
 
 Build this repository using Android Studio and/or Gradle.
 
@@ -172,7 +172,7 @@ Include as repositories in your project build.gradle:
 
 Include the dependency in your module build.gradle with desired version number:
 
-    compile "mil.nga.geopackage:geopackage-android:4.0.0"
+    compile "mil.nga.geopackage:geopackage-android:5.0.0"
 
 As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
 
