@@ -19,6 +19,7 @@ mil.nga.geopackage.tiles
 mil.nga.geopackage.tiles.features
 mil.nga.geopackage.tiles.features.custom
 mil.nga.geopackage.tiles.overlay
+mil.nga.geopackage.tiles.reproject
 mil.nga.geopackage.tiles.retriever
 mil.nga.geopackage.tiles.user
 mil.nga.geopackage.user
