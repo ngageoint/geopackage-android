@@ -27,4 +27,14 @@ public class GeoPackageFactory {
         return new GeoPackageManagerImpl(context);
     }
 
+    /**
+     * Get a GeoPackage Manager for operating only on external GeoPackages
+     *
+     * @return GeoPackage manager
+     * @since 5.1.0
+     */
+    public static GeoPackageManager getExternalManager() {
+        return getManager(null);
+    }
+
 }

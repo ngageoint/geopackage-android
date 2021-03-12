@@ -780,6 +780,40 @@ public class GeoPackageManagerTest extends BaseTestCase {
     }
 
     /**
+     * Test opening an external file GeoPackage
+     */
+    @Test
+    public void testOpenExternal() {
+
+        GeoPackageManager manager = GeoPackageFactory.getExternalManager();
+
+        // Copy the test db file from assets to the internal storage
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext,
+                TestConstants.IMPORT_DB_FILE_NAME);
+
+        // Open
+        String externalLocation = TestUtils.getAssetFileInternalStorageLocation(
+                activity, TestConstants.IMPORT_DB_FILE_NAME);
+        File externalFile = new File(externalLocation);
+        DocumentFile externalDocument = DocumentFile.fromFile(externalFile);
+
+        GeoPackage geoPackage = manager.openExternal(externalLocation);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        geoPackage = manager.openExternal(externalFile);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        geoPackage = manager.openExternal(externalDocument);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        // Delete the file
+        assertTrue("External file could not be deleted", externalFile.delete());
+    }
+
+    /**
      * Test creating a database GeoPackage at a file
      */
     @Test

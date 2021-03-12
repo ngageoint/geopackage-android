@@ -1,6 +1,7 @@
 package mil.nga.geopackage;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 
@@ -22,6 +23,14 @@ import mil.nga.geopackage.io.GeoPackageProgress;
  * @author osbornb
  */
 public interface GeoPackageManager {
+
+    /**
+     * Get the application context
+     *
+     * @return context
+     * @since 5.1.0
+     */
+    public Context getContext();
 
     /**
      * List all GeoPackage databases sorted alphabetically
@@ -715,6 +724,60 @@ public interface GeoPackageManager {
      * @since 2.0.1
      */
     public GeoPackage open(String database, boolean writable);
+
+    /**
+     * Open an external GeoPackage
+     *
+     * @param path full file path
+     * @return open GeoPackage
+     * @since 5.1.0
+     */
+    public GeoPackage openExternal(File path);
+
+    /**
+     * Open an external GeoPackage
+     *
+     * @param path     full file path
+     * @param writable true to open as writable, false as read only
+     * @return 5.1.0
+     */
+    public GeoPackage openExternal(File path, boolean writable);
+
+    /**
+     * Open an external GeoPackage
+     *
+     * @param path full file path
+     * @return open GeoPackage
+     * @since 5.1.0
+     */
+    public GeoPackage openExternal(String path);
+
+    /**
+     * Open an external GeoPackage
+     *
+     * @param path     full file path
+     * @param writable true to open as writable, false as read only
+     * @return 5.1.0
+     */
+    public GeoPackage openExternal(String path, boolean writable);
+
+    /**
+     * Open an external GeoPackage
+     *
+     * @param file document file
+     * @return open GeoPackage
+     * @since 5.1.0
+     */
+    public GeoPackage openExternal(DocumentFile file);
+
+    /**
+     * Open an external GeoPackage
+     *
+     * @param file     document file
+     * @param writable true to open as writable, false as read only
+     * @return 5.1.0
+     */
+    public GeoPackage openExternal(DocumentFile file, boolean writable);
 
     /**
      * Is import database header validation enabled.

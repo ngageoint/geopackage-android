@@ -60,27 +60,27 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Validate the database header of an imported database
      */
-    private boolean importHeaderValidation;
+    private boolean importHeaderValidation = true;
 
     /**
      * Validate the database integrity of a imported database
      */
-    private boolean importIntegrityValidation;
+    private boolean importIntegrityValidation = false;
 
     /**
      * Validate the database header when opening a database
      */
-    private boolean openHeaderValidation;
+    private boolean openHeaderValidation = false;
 
     /**
      * Validate the database integrity when opening a database
      */
-    private boolean openIntegrityValidation;
+    private boolean openIntegrityValidation = false;
 
     /**
      * Write ahead logging state for SQLite connections
      */
-    private boolean sqliteWriteAheadLogging;
+    private boolean sqliteWriteAheadLogging = false;
 
     /**
      * Constructor
@@ -90,12 +90,22 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     GeoPackageManagerImpl(Context context) {
         this.context = context;
 
-        Resources resources = context.getResources();
-        importHeaderValidation = resources.getBoolean(R.bool.manager_validation_import_header);
-        importIntegrityValidation = resources.getBoolean(R.bool.manager_validation_import_integrity);
-        openHeaderValidation = resources.getBoolean(R.bool.manager_validation_open_header);
-        openIntegrityValidation = resources.getBoolean(R.bool.manager_validation_open_integrity);
-        sqliteWriteAheadLogging = resources.getBoolean(R.bool.sqlite_write_ahead_logging);
+        if (context != null) {
+            Resources resources = context.getResources();
+            importHeaderValidation = resources.getBoolean(R.bool.manager_validation_import_header);
+            importIntegrityValidation = resources.getBoolean(R.bool.manager_validation_import_integrity);
+            openHeaderValidation = resources.getBoolean(R.bool.manager_validation_open_header);
+            openIntegrityValidation = resources.getBoolean(R.bool.manager_validation_open_integrity);
+            sqliteWriteAheadLogging = resources.getBoolean(R.bool.sqlite_write_ahead_logging);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Context getContext() {
+        return context;
     }
 
     /**
@@ -117,7 +127,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public List<String> databasesLike(String like) {
         List<String> databases = null;
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
+                getRequiredContext());
         metadataDb.open();
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -138,7 +148,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public List<String> databasesNotLike(String notLike) {
         List<String> databases = null;
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
+                getRequiredContext());
         metadataDb.open();
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -252,7 +262,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
         if (!exists) {
             GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                    context);
+                    getRequiredContext());
             metadataDb.open();
             try {
                 GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -288,7 +298,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public boolean isExternal(String database) {
         boolean external = false;
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
+                getRequiredContext());
         metadataDb.open();
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -343,7 +353,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         if (metadata != null && metadata.isExternal()) {
             dbFile = new File(metadata.getExternalPath());
         } else {
-            dbFile = context.getDatabasePath(database);
+            dbFile = getRequiredContext().getDatabasePath(database);
         }
 
         if (dbFile == null || !dbFile.exists()) {
@@ -408,6 +418,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         boolean deleted = false;
         boolean external = isExternal(database);
 
+        Context context = getRequiredContext();
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
                 context);
         metadataDb.open();
@@ -484,6 +495,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             throw new GeoPackageException("GeoPackage already exists: "
                     + database);
         } else {
+            Context context = getRequiredContext();
             GeoPackageDatabase db = new GeoPackageDatabase(context.openOrCreateDatabase(database,
                     Context.MODE_PRIVATE, null));
             createAndCloseGeoPackage(db);
@@ -762,7 +774,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         }
         InputStream intputStream = null;
         try {
-            intputStream = context.getContentResolver().openInputStream(file.getUri());
+            intputStream = getRequiredContext().getContentResolver().openInputStream(file.getUri());
         } catch (FileNotFoundException e) {
             throw new GeoPackageException("Failed to import GeoPackage " + name
                     + " from URI: '" + file.getUri() + "'", e);
@@ -968,7 +980,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         File dbFile = getFile(database);
 
         try {
-            OutputStream outputStream = context.getContentResolver().openOutputStream(file.getUri());
+            OutputStream outputStream = getRequiredContext().getContentResolver().openOutputStream(file.getUri());
             GeoPackageIOUtils.copyFile(dbFile, outputStream, progress);
         } catch (IOException e) {
             throw new GeoPackageException(
@@ -1040,7 +1052,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         File dbFile = getFile(database);
 
         // Insert the row
-        ContentResolver resolver = context.getContentResolver();
+        ContentResolver resolver = getRequiredContext().getContentResolver();
         Uri insertUri = resolver.insert(uri, contentValues);
 
         // Copy the GeoPackage file
@@ -1071,48 +1083,169 @@ class GeoPackageManagerImpl implements GeoPackageManager {
             String path = null;
             SQLiteDatabase sqlite = null;
             GeoPackageMetadata metadata = getGeoPackageMetadata(database);
+            Context context = getRequiredContext();
             if (metadata != null && metadata.isExternal()) {
                 path = metadata.getExternalPath();
                 if (writable) {
-                    try {
-                        sqlite = SQLiteDatabase.openDatabase(path,
-                                cursorFactory, SQLiteDatabase.OPEN_READWRITE
-                                        | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-                    } catch (Exception e) {
-                        Log.e(GeoPackageManagerImpl.class.getSimpleName(), "Failed to open database as writable: " + database, e);
-                    }
+                    sqlite = openDatabase(path, true, cursorFactory);
                 }
                 if (sqlite == null) {
-                    sqlite = SQLiteDatabase.openDatabase(path,
-                            cursorFactory, SQLiteDatabase.OPEN_READONLY
-                                    | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+                    sqlite = openDatabase(path, false, cursorFactory);
                     writable = false;
                 }
             } else {
                 sqlite = context.openOrCreateDatabase(database,
                         Context.MODE_PRIVATE, cursorFactory);
             }
-            if (sqliteWriteAheadLogging) {
-                sqlite.enableWriteAheadLogging();
-            } else {
-                sqlite.disableWriteAheadLogging();
-            }
 
-            // Validate the database if validation is enabled
-            validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
+            db = createGeoPackage(database, path, writable, cursorFactory, sqlite);
 
-            GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite, writable, cursorFactory));
-            connection.enableForeignKeys();
+        }
 
-            db = new GeoPackageImpl(context, database, path, connection, cursorFactory, writable);
+        return db;
+    }
 
-            // Validate the GeoPackage has the minimum required tables
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage openExternal(File path) {
+        return openExternal(path, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage openExternal(File path, boolean writable) {
+        return openExternal(path.getAbsolutePath(), path.getName(), writable);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage openExternal(String path) {
+        return openExternal(path, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage openExternal(String path, boolean writable) {
+        return openExternal(path, null, writable);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage openExternal(DocumentFile file) {
+        return openExternal(file, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GeoPackage openExternal(DocumentFile file, boolean writable) {
+        return openExternal(getFilePath(file), file.getName(), writable);
+    }
+
+    /**
+     * Open an external GeoPackage
+     *
+     * @param path     full file path
+     * @param database database name
+     * @param writable true to open as writable, false as read only
+     * @return GeoPackage
+     */
+    private GeoPackage openExternal(String path, String database, boolean writable) {
+
+        if (database == null) {
+            database = Uri.parse(path).getLastPathSegment();
+        }
+
+        database = GeoPackageIOUtils.getFileNameWithoutExtension(database);
+
+        GeoPackageCursorFactory cursorFactory = new GeoPackageCursorFactory();
+
+        SQLiteDatabase sqlite = null;
+        if (writable) {
+            sqlite = openDatabase(path, true, cursorFactory);
+        }
+        if (sqlite == null) {
+            sqlite = openDatabase(path, false, cursorFactory);
+            writable = false;
+        }
+
+        return createGeoPackage(database, path, writable, cursorFactory, sqlite);
+    }
+
+    /**
+     * Open the SQLite Database
+     *
+     * @param path          full file path
+     * @param writable      true to attempt open as writable, false to open as read only
+     * @param cursorFactory GeoPackage cursor factory
+     * @return database or null if unable to open as writable
+     */
+    private SQLiteDatabase openDatabase(String path, boolean writable, GeoPackageCursorFactory cursorFactory) {
+
+        SQLiteDatabase sqlite = null;
+
+        if (writable) {
             try {
-                GeoPackageValidate.validateMinimumTables(db);
-            } catch (RuntimeException e) {
-                db.close();
-                throw e;
+                sqlite = SQLiteDatabase.openDatabase(path,
+                        cursorFactory, SQLiteDatabase.OPEN_READWRITE
+                                | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+            } catch (Exception e) {
+                Log.e(GeoPackageManagerImpl.class.getSimpleName(), "Failed to open database as writable: " + path, e);
             }
+        } else {
+            sqlite = SQLiteDatabase.openDatabase(path,
+                    cursorFactory, SQLiteDatabase.OPEN_READONLY
+                            | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+        }
+
+        return sqlite;
+    }
+
+    /**
+     * Create a GeoPackage for the connection
+     *
+     * @param database      database name
+     * @param path          full file path
+     * @param writable      true to open as writable, false as read only
+     * @param cursorFactory GeoPackage cursor factory
+     * @param sqlite        SQLite database
+     * @return GeoPackage
+     */
+    private GeoPackage createGeoPackage(String database, String path, boolean writable, GeoPackageCursorFactory cursorFactory, SQLiteDatabase sqlite) {
+
+        GeoPackage db = null;
+
+        if (sqliteWriteAheadLogging) {
+            sqlite.enableWriteAheadLogging();
+        } else {
+            sqlite.disableWriteAheadLogging();
+        }
+
+        // Validate the database if validation is enabled
+        validateDatabaseAndCloseOnError(sqlite, openHeaderValidation, openIntegrityValidation);
+
+        GeoPackageConnection connection = new GeoPackageConnection(new GeoPackageDatabase(sqlite, writable, cursorFactory));
+        connection.enableForeignKeys();
+
+        db = new GeoPackageImpl(context, database, path, connection, cursorFactory, writable);
+
+        // Validate the GeoPackage has the minimum required tables
+        try {
+            GeoPackageValidate.validateMinimumTables(db);
+        } catch (RuntimeException e) {
+            db.close();
+            throw e;
         }
 
         return db;
@@ -1251,6 +1384,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                                     | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
                 }
             } else {
+                Context context = getRequiredContext();
                 path = context.getDatabasePath(database).getAbsolutePath();
                 sqlite = context.openOrCreateDatabase(database,
                         Context.MODE_PRIVATE, cursorFactory);
@@ -1284,7 +1418,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
     public boolean copy(String database, String databaseCopy, GeoPackageProgress progress) {
         // Copy the database as a new file
         File dbFile = getFile(database);
-        File dbCopyFile = context.getDatabasePath(databaseCopy);
+        File dbCopyFile = getRequiredContext().getDatabasePath(databaseCopy);
         try {
             GeoPackageIOUtils.copyFile(dbFile, dbCopyFile, progress);
         } catch (IOException e) {
@@ -1305,7 +1439,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         if (metadata != null) {
 
             GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                    context);
+                    getRequiredContext());
             metadataDb.open();
             try {
                 GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -1414,7 +1548,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         }
 
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
+                getRequiredContext());
         metadataDb.open();
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -1611,7 +1745,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * @param databases database names
      */
     private void addInternalDatabases(Collection<String> databases) {
-        String[] databaseArray = context.databaseList();
+        String[] databaseArray = getRequiredContext().databaseList();
         for (String database : databaseArray) {
             if (!isTemporary(database)
                     && !database
@@ -1650,6 +1784,8 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     private boolean importGeoPackage(String database, boolean override,
                                      InputStream geoPackageStream, GeoPackageProgress progress) {
+
+        Context context = getRequiredContext();
 
         try {
 
@@ -1756,7 +1892,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         List<GeoPackageMetadata> metadata = null;
 
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
+                getRequiredContext());
         metadataDb.open();
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -1778,7 +1914,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         GeoPackageMetadata metadata = null;
 
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
+                getRequiredContext());
         metadataDb.open();
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -1800,7 +1936,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         GeoPackageMetadata metadata = null;
 
         GeoPackageMetadataDb metadataDb = new GeoPackageMetadataDb(
-                context);
+                getRequiredContext());
         metadataDb.open();
         try {
             GeoPackageMetadataDataSource dataSource = new GeoPackageMetadataDataSource(metadataDb);
@@ -1819,6 +1955,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * @return true if temporary
      */
     private boolean isTemporary(String database) {
+        Context context = getRequiredContext();
         return database.endsWith(context.getString(R.string.geopackage_db_rollback_journal_suffix))
                 || database.endsWith(context.getString(R.string.geopackage_db_write_ahead_log_suffix))
                 || database.endsWith(context.getString(R.string.geopackage_db_shared_memory_suffix));
@@ -1856,6 +1993,18 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      */
     private File getFile(DocumentFile file) {
         return new File(getFilePath(file));
+    }
+
+    /**
+     * Get a required context
+     *
+     * @return context
+     */
+    private Context getRequiredContext() {
+        if (context == null) {
+            throw new GeoPackageException("Operation requires an Android context");
+        }
+        return context;
     }
 
 }

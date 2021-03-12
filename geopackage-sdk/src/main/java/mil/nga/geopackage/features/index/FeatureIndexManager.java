@@ -17,9 +17,9 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.FeatureIndexer;
+import mil.nga.geopackage.extension.nga.index.FeatureTableIndex;
 import mil.nga.geopackage.extension.rtree.RTreeIndexExtension;
 import mil.nga.geopackage.extension.rtree.RTreeIndexTableDao;
-import mil.nga.geopackage.extension.nga.index.FeatureTableIndex;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
@@ -103,7 +103,11 @@ public class FeatureIndexManager {
     public FeatureIndexManager(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
         this.featureDao = featureDao;
         featureTableIndex = new FeatureTableIndex(geoPackage, featureDao.copy());
-        featureIndexer = new FeatureIndexer(context, featureDao.copy());
+        if (context != null) {
+            featureIndexer = new FeatureIndexer(context, featureDao.copy());
+        } else {
+            featureIndexer = null;
+        }
         RTreeIndexExtension rTreeExtension = new RTreeIndexExtension(geoPackage);
         rTreeIndexTableDao = rTreeExtension.getTableDao(featureDao.copy());
         manualFeatureQuery = new ManualFeatureQuery(featureDao.copy());
@@ -111,7 +115,9 @@ public class FeatureIndexManager {
         // Set the default indexed check and query order
         indexLocationQueryOrder.add(FeatureIndexType.RTREE);
         indexLocationQueryOrder.add(FeatureIndexType.GEOPACKAGE);
-        indexLocationQueryOrder.add(FeatureIndexType.METADATA);
+        if (featureIndexer != null) {
+            indexLocationQueryOrder.add(FeatureIndexType.METADATA);
+        }
     }
 
     /**
@@ -119,7 +125,9 @@ public class FeatureIndexManager {
      */
     public void close() {
         featureTableIndex.close();
-        featureIndexer.close();
+        if (featureIndexer != null) {
+            featureIndexer.close();
+        }
         // rTreeIndexTableDao.close();
     }
 
@@ -275,7 +283,9 @@ public class FeatureIndexManager {
      */
     public void setProgress(GeoPackageProgress progress) {
         featureTableIndex.setProgress(progress);
-        featureIndexer.setProgress(progress);
+        if (featureIndexer != null) {
+            featureIndexer.setProgress(progress);
+        }
         rTreeIndexTableDao.setProgress(progress);
     }
 
@@ -358,7 +368,7 @@ public class FeatureIndexManager {
                 count = featureTableIndex.index(force);
                 break;
             case METADATA:
-                count = featureIndexer.index(force);
+                count = getRequiredFeatureIndexer().index(force);
                 break;
             case RTREE:
                 boolean rTreeIndexed = rTreeIndexTableDao.has();
@@ -427,7 +437,7 @@ public class FeatureIndexManager {
                 indexed = featureTableIndex.index(row);
                 break;
             case METADATA:
-                indexed = featureIndexer.index(row);
+                indexed = getRequiredFeatureIndexer().index(row);
                 break;
             case RTREE:
                 // Updated by triggers, ignore for RTree
@@ -491,7 +501,7 @@ public class FeatureIndexManager {
                 deleted = featureTableIndex.deleteIndex();
                 break;
             case METADATA:
-                deleted = featureIndexer.deleteIndex();
+                deleted = getRequiredFeatureIndexer().deleteIndex();
                 break;
             case RTREE:
                 rTreeIndexTableDao.delete();
@@ -587,7 +597,7 @@ public class FeatureIndexManager {
                 deleted = featureTableIndex.deleteIndex(geomId) > 0;
                 break;
             case METADATA:
-                deleted = featureIndexer.deleteIndex(geomId);
+                deleted = getRequiredFeatureIndexer().deleteIndex(geomId);
                 break;
             case RTREE:
                 // Updated by triggers, ignore for RTree
@@ -657,7 +667,7 @@ public class FeatureIndexManager {
                     indexed = featureTableIndex.isIndexed();
                     break;
                 case METADATA:
-                    indexed = featureIndexer.isIndexed();
+                    indexed = getRequiredFeatureIndexer().isIndexed();
                     break;
                 case RTREE:
                     indexed = rTreeIndexTableDao.has();
@@ -717,7 +727,7 @@ public class FeatureIndexManager {
                     lastIndexed = featureTableIndex.getLastIndexed();
                     break;
                 case METADATA:
-                    lastIndexed = featureIndexer.getLastIndexed();
+                    lastIndexed = getRequiredFeatureIndexer().getLastIndexed();
                     break;
                 case RTREE:
                     if (rTreeIndexTableDao.has()) {
@@ -730,6 +740,18 @@ public class FeatureIndexManager {
             }
         }
         return lastIndexed;
+    }
+
+    /**
+     * Validate and get the feature indexer for required operations
+     *
+     * @return feature indexer
+     */
+    private FeatureIndexer getRequiredFeatureIndexer() {
+        if (featureIndexer == null) {
+            throw new GeoPackageException("Feature Index Type " + FeatureIndexType.METADATA + " requires an Android context");
+        }
+        return featureIndexer;
     }
 
     /**
