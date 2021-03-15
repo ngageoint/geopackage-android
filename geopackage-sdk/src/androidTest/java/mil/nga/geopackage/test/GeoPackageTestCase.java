@@ -26,7 +26,7 @@ public abstract class GeoPackageTestCase extends BaseTestCase {
 	/**
 	 * Get the geo package to test
 	 * 
-	 * @return
+	 * @return GeoPackage
 	 */
 	protected abstract GeoPackage getGeoPackage() throws Exception;
 

@@ -23,9 +23,6 @@ public abstract class ImportGeoPackageTestCase extends GeoPackageTestCase {
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @throws IOException
-	 * @throws SQLException
 	 */
 	@Override
 	protected GeoPackage getGeoPackage() throws Exception {

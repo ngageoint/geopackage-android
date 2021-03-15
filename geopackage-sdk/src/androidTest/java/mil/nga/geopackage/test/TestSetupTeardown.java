@@ -19,6 +19,7 @@ import java.util.UUID;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageConstants;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.attributes.AttributesColumn;
 import mil.nga.geopackage.attributes.AttributesDao;
@@ -41,7 +42,6 @@ import mil.nga.geopackage.extension.metadata.reference.MetadataReference;
 import mil.nga.geopackage.extension.metadata.reference.MetadataReferenceDao;
 import mil.nga.geopackage.extension.metadata.reference.ReferenceScopeType;
 import mil.nga.geopackage.extension.schema.SchemaExtension;
-import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureTable;
@@ -86,13 +86,13 @@ public class TestSetupTeardown {
     /**
      * Set up the create database
      *
-     * @param activity
-     * @param testContext
-     * @param features
-     * @param tiles
-     * @return
-     * @throws SQLException
-     * @throws IOException
+     * @param activity    activity
+     * @param testContext test context
+     * @param features    create features
+     * @param tiles       create tiles
+     * @return GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     public static GeoPackage setUpCreate(Activity activity,
                                          Context testContext, boolean features, boolean tiles)
@@ -103,14 +103,14 @@ public class TestSetupTeardown {
     /**
      * Set up the create database
      *
-     * @param activity
-     * @param testContext
-     * @param features
-     * @param allowEmptyFeatures
-     * @param tiles
-     * @return
-     * @throws SQLException
-     * @throws IOException
+     * @param activity           activity
+     * @param testContext        test context
+     * @param features           create features
+     * @param allowEmptyFeatures allow empty features
+     * @param tiles              create tiles
+     * @return GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     public static GeoPackage setUpCreate(Activity activity,
                                          Context testContext, boolean features, boolean allowEmptyFeatures, boolean tiles)
@@ -121,15 +121,15 @@ public class TestSetupTeardown {
     /**
      * Set up the create database
      *
-     * @param activity
-     * @param testContext
-     * @param features
-     * @param allowEmptyFeatures
-     * @param tiles
-     * @return
-     * @throws SQLException
-     * @throws IOException
-     * @parma name
+     * @param activity           activity
+     * @param testContext        test context
+     * @param name               database name
+     * @param features           create features
+     * @param allowEmptyFeatures allow empty features
+     * @param tiles              create tiles
+     * @return GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     public static GeoPackage setUpCreate(Activity activity,
                                          Context testContext, String name, boolean features, boolean allowEmptyFeatures, boolean tiles)
@@ -175,8 +175,8 @@ public class TestSetupTeardown {
     /**
      * Set up create common
      *
-     * @param geoPackage
-     * @throws SQLException
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
      */
     private static void setUpCreateCommon(GeoPackage geoPackage)
             throws SQLException {
@@ -391,9 +391,9 @@ public class TestSetupTeardown {
     /**
      * Set up create for features test
      *
-     * @param geoPackage
-     * @param allowEmptyFeatures
-     * @throws SQLException
+     * @param geoPackage         GeoPackage
+     * @param allowEmptyFeatures true to allow empty features
+     * @throws SQLException upon error
      */
     private static void setUpCreateFeatures(GeoPackage geoPackage, boolean allowEmptyFeatures)
             throws SQLException {
@@ -546,10 +546,10 @@ public class TestSetupTeardown {
     /**
      * Set up create for tiles test
      *
-     * @param testContext
-     * @param geoPackage
-     * @throws SQLException
-     * @throws IOException
+     * @param testContext test context
+     * @param geoPackage  GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     private static void setUpCreateTiles(Context testContext,
                                          GeoPackage geoPackage) throws SQLException, IOException {
@@ -646,8 +646,8 @@ public class TestSetupTeardown {
     /**
      * Tear down the create database
      *
-     * @param activity
-     * @param geoPackage
+     * @param activity   activity
+     * @param geoPackage GeoPackage
      */
     public static void tearDownCreate(Activity activity, GeoPackage geoPackage) {
 
@@ -664,9 +664,9 @@ public class TestSetupTeardown {
     /**
      * Set up the import database
      *
-     * @param activity
-     * @param testContext
-     * @return
+     * @param activity    activity
+     * @param testContext test context
+     * @return GeoPackage
      */
     public static GeoPackage setUpImport(Activity activity, Context testContext) {
 
@@ -696,8 +696,8 @@ public class TestSetupTeardown {
     /**
      * Tear down the import database
      *
-     * @param activity
-     * @param geoPackage
+     * @param activity   activity
+     * @param geoPackage GeoPackage
      */
     public static void tearDownImport(Activity activity, GeoPackage geoPackage) {
 
@@ -709,6 +709,54 @@ public class TestSetupTeardown {
         // Delete
         GeoPackageManager manager = GeoPackageFactory.getManager(activity);
         manager.delete(TestConstants.IMPORT_DB_NAME);
+
+        String importLocation = TestUtils.getAssetFileInternalStorageLocation(
+                activity, TestConstants.IMPORT_DB_FILE_NAME);
+        new File(importLocation).delete();
+    }
+
+    /**
+     * Set up the import database
+     *
+     * @param activity    activity
+     * @param testContext test context
+     * @return GeoPackage
+     */
+    public static GeoPackage setUpExternal(Activity activity, Context testContext) {
+
+        GeoPackageManager manager = GeoPackageFactory.getExternalManager();
+
+        // Copy the test db file from assets to the internal storage
+        TestUtils.copyAssetFileToInternalStorage(activity, testContext,
+                TestConstants.IMPORT_DB_FILE_NAME);
+
+        // Open
+        String externalLocation = TestUtils.getAssetFileInternalStorageLocation(
+                activity, TestConstants.IMPORT_DB_FILE_NAME);
+        GeoPackage geoPackage = manager.openExternal(externalLocation);
+        if (geoPackage == null) {
+            throw new GeoPackageException("Failed to open database");
+        }
+
+        return geoPackage;
+    }
+
+    /**
+     * Tear down the external database
+     *
+     * @param activity   activity
+     * @param geoPackage GeoPackage
+     */
+    public static void tearDownExternal(Activity activity, GeoPackage geoPackage) {
+
+        // Close
+        if (geoPackage != null) {
+            geoPackage.close();
+        }
+
+        String externalLocation = TestUtils.getAssetFileInternalStorageLocation(
+                activity, TestConstants.IMPORT_DB_FILE_NAME);
+        new File(externalLocation).delete();
     }
 
 }
