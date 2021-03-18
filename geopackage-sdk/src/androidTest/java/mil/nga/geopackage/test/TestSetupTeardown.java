@@ -724,8 +724,6 @@ public class TestSetupTeardown {
      */
     public static GeoPackage setUpExternal(Activity activity, Context testContext) {
 
-        GeoPackageManager manager = GeoPackageFactory.getExternalManager();
-
         // Copy the test db file from assets to the internal storage
         TestUtils.copyAssetFileToInternalStorage(activity, testContext,
                 TestConstants.IMPORT_DB_FILE_NAME);
@@ -733,7 +731,7 @@ public class TestSetupTeardown {
         // Open
         String externalLocation = TestUtils.getAssetFileInternalStorageLocation(
                 activity, TestConstants.IMPORT_DB_FILE_NAME);
-        GeoPackage geoPackage = manager.openExternal(externalLocation);
+        GeoPackage geoPackage = GeoPackageFactory.openExternal(externalLocation);
         if (geoPackage == null) {
             throw new GeoPackageException("Failed to open database");
         }

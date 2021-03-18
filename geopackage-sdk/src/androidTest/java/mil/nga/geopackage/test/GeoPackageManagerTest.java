@@ -809,6 +809,14 @@ public class GeoPackageManagerTest extends BaseTestCase {
         assertNotNull("Failed to open database", geoPackage);
         geoPackage.close();
 
+        geoPackage = GeoPackageFactory.openExternal(externalLocation);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
+        geoPackage = GeoPackageFactory.openExternal(externalFile);
+        assertNotNull("Failed to open database", geoPackage);
+        geoPackage.close();
+
         // Delete the file
         assertTrue("External file could not be deleted", externalFile.delete());
     }

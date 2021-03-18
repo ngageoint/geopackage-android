@@ -6,7 +6,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 5.1.0 (TBD)
 
-* Open external GeoPackage support, without a required Context
+* Open external GeoPackage support, without a required Context or Manager
 
 ## [5.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/5.0.0) (03-09-2021)
 
