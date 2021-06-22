@@ -7,8 +7,8 @@ import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.user.UserDao;
+import mil.nga.proj.Projection;
 import mil.nga.sf.GeometryType;
-import mil.nga.sf.proj.Projection;
 
 /**
  * Feature DAO for reading feature user data tables

@@ -36,7 +36,7 @@ import mil.nga.sf.MultiPolygon;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
 import mil.nga.sf.PolyhedralSurface;
-import mil.nga.sf.proj.ProjectionTransform;
+import mil.nga.sf.proj.GeometryTransform;
 
 /**
  * Default Feature Tiles implementation using Android Graphics to draw tiles
@@ -219,7 +219,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         FeatureTileCanvas canvas = new FeatureTileCanvas(tileWidth, tileHeight);
 
-        ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        GeometryTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
         BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
         boolean drawn = false;
@@ -249,7 +249,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         FeatureTileCanvas canvas = new FeatureTileCanvas(tileWidth, tileHeight);
 
-        ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        GeometryTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
         BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
         boolean drawn = false;
@@ -280,7 +280,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         FeatureTileCanvas canvas = new FeatureTileCanvas(tileWidth, tileHeight);
 
-        ProjectionTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
+        GeometryTransform transform = getProjectionToWebMercatorTransform(featureDao.getProjection());
         BoundingBox expandedBoundingBox = expandBoundingBox(boundingBox);
 
         boolean drawn = false;
@@ -312,7 +312,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param row                 feature row
      * @return true if at least one feature was drawn
      */
-    private boolean drawFeature(int zoom, BoundingBox boundingBox, BoundingBox expandedBoundingBox, ProjectionTransform transform, FeatureTileCanvas canvas, FeatureRow row) {
+    private boolean drawFeature(int zoom, BoundingBox boundingBox, BoundingBox expandedBoundingBox, GeometryTransform transform, FeatureTileCanvas canvas, FeatureRow row) {
 
         boolean drawn = false;
 
@@ -383,7 +383,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param geometry          feature geometry
      * @return true if drawn
      */
-    private boolean drawShape(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, FeatureTileCanvas canvas, FeatureRow featureRow, Geometry geometry) {
+    private boolean drawShape(double simplifyTolerance, BoundingBox boundingBox, GeometryTransform transform, FeatureTileCanvas canvas, FeatureRow featureRow, Geometry geometry) {
 
         boolean drawn = false;
 
@@ -515,7 +515,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param path              path
      * @param lineString        line string
      */
-    private void addLineString(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Path path, LineString lineString) {
+    private void addLineString(double simplifyTolerance, BoundingBox boundingBox, GeometryTransform transform, Path path, LineString lineString) {
 
         List<Point> points = lineString.getPoints();
 
@@ -549,7 +549,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param path              path
      * @param polygon           polygon
      */
-    private void addPolygon(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Path path, Polygon polygon) {
+    private void addPolygon(double simplifyTolerance, BoundingBox boundingBox, GeometryTransform transform, Path path, Polygon polygon) {
         List<LineString> rings = polygon.getRings();
         if (!rings.isEmpty()) {
 
@@ -580,7 +580,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param path              path
      * @param points            points
      */
-    private void addRing(double simplifyTolerance, BoundingBox boundingBox, ProjectionTransform transform, Path path, List<Point> points) {
+    private void addRing(double simplifyTolerance, BoundingBox boundingBox, GeometryTransform transform, Path path, List<Point> points) {
 
         // Try to simplify the number of points in the LineString
         points = simplifyPoints(simplifyTolerance, points);
@@ -611,7 +611,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param featureStyle feature style
      * @return true if drawn
      */
-    private boolean drawPoint(BoundingBox boundingBox, ProjectionTransform transform, FeatureTileCanvas canvas, Point point, FeatureStyle featureStyle) {
+    private boolean drawPoint(BoundingBox boundingBox, GeometryTransform transform, FeatureTileCanvas canvas, Point point, FeatureStyle featureStyle) {
 
         boolean drawn = false;
 

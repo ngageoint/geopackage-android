@@ -21,8 +21,8 @@ import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTable;
 import mil.nga.geopackage.tiles.user.TileTableMetadata;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionTransform;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionTransform;
 
 /**
  * Tiled Gridded Coverage Data, abstract Common Encoding, Extension

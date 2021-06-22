@@ -4,9 +4,12 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 5.1.1 (TBD)
+## 6.0.0 (TBD)
 
-* TBD
+* geopackage-core version 6.0.0
+* ormlite-android version 5.5
+* tiff version 2.0.3
+* appcompat version 1.3.0
 
 ## [5.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/5.1.0) (03-23-2021)
 

@@ -7,6 +7,7 @@ import org.junit.After;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.extension.coverage.CoverageDataTiff;
 import mil.nga.geopackage.extension.coverage.GriddedCoverage;
@@ -15,7 +16,6 @@ import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
-import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
@@ -25,7 +25,7 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTableMetadata;
-import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionConstants;
 
 /**
  * Abstract Test Case for Created TIFF Tiled Gridded Coverage Data GeoPackages

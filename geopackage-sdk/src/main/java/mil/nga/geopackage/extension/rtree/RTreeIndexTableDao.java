@@ -14,9 +14,9 @@ import mil.nga.geopackage.io.GeoPackageProgress;
 import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomRow;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionTransform;
 import mil.nga.sf.GeometryEnvelope;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * RTree Index Table DAO for reading geometry index ranges

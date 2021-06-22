@@ -2,7 +2,10 @@ package mil.nga.geopackage;
 
 import android.content.Context;
 
-import com.j256.ormlite.logger.LocalLog;
+import com.j256.ormlite.logger.Level;
+import com.j256.ormlite.logger.LocalLogBackend;
+import com.j256.ormlite.logger.LogBackendType;
+import com.j256.ormlite.logger.LoggerFactory;
 
 import java.io.File;
 
@@ -14,8 +17,10 @@ import java.io.File;
 public class GeoPackageFactory {
 
     static {
-        // Change the ORMLite log level
-        System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY, "INFO");
+        // Change the ORMLite log backend
+        System.setProperty(LocalLogBackend.LOCAL_LOG_LEVEL_PROPERTY,
+                Level.ERROR.name());
+        LoggerFactory.setLogBackendType(LogBackendType.ANDROID);
     }
 
     /**

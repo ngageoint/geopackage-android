@@ -12,7 +12,7 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.geopackage.tiles.user.TileTableMetadata;
-import mil.nga.sf.proj.Projection;
+import mil.nga.proj.Projection;
 
 /**
  * Tiled Gridded Coverage Data, PNG Encoding, Extension

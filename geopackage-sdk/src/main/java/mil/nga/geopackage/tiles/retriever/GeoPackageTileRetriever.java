@@ -4,9 +4,9 @@ import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.extension.nga.scale.TileScaling;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.user.TileDao;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionFactory;
 
 /**
  * GeoPackage Tile Retriever, retrieves a tile from a GeoPackage from XYZ coordinates

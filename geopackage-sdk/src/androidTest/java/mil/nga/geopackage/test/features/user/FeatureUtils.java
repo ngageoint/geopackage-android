@@ -37,6 +37,7 @@ import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.geom.GeoPackageGeometryDataUtils;
 import mil.nga.geopackage.user.ColumnValue;
+import mil.nga.proj.ProjectionConstants;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryCollection;
 import mil.nga.sf.GeometryType;
@@ -46,8 +47,6 @@ import mil.nga.sf.MultiPoint;
 import mil.nga.sf.MultiPolygon;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.util.ByteReader;
 import mil.nga.sf.wkb.GeometryReader;
 
 /**

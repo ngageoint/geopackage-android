@@ -21,11 +21,11 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
+import mil.nga.proj.ProjectionConstants;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.LineString;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
-import mil.nga.sf.proj.ProjectionConstants;
 import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**

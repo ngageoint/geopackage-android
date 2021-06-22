@@ -41,7 +41,7 @@ import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomTable;
 import mil.nga.geopackage.user.custom.UserCustomTableReader;
-import mil.nga.sf.proj.Projection;
+import mil.nga.proj.Projection;
 
 /**
  * A single GeoPackage database connection implementation

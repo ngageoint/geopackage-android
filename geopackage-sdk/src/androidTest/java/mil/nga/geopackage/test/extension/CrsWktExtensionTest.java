@@ -10,7 +10,7 @@ import mil.nga.geopackage.property.PropertyConstants;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.test.CreateGeoPackageTestCase;
-import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionConstants;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

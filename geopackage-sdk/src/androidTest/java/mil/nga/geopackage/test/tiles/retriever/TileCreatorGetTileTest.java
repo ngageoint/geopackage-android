@@ -10,15 +10,15 @@ import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.io.BitmapConverter;
-import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.LoadGeoPackageTestCase;
+import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.TileCreator;
 import mil.nga.geopackage.tiles.user.TileDao;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionFactory;
 
 /**
  * Test Tile Creator from a GeoPackage with tiles

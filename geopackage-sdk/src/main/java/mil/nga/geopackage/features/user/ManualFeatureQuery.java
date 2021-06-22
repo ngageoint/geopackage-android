@@ -7,9 +7,9 @@ import java.util.Map;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionTransform;
 import mil.nga.sf.GeometryEnvelope;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionTransform;
 
 /**
  * Performs manual brute force queries against feature rows. See
