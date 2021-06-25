@@ -7,7 +7,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 6.0.0 (TBD)
 
 * geopackage-core version 6.0.0
-* ormlite-android version 5.5
+* ormlite-android version 5.6
 * tiff version 2.0.3
 * appcompat version 1.3.0
 
