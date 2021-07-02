@@ -11,7 +11,7 @@ import mil.nga.sf.GeometryEnvelope;
 
 /**
  * RTree Index Extension
- * TODO User defined functions are not currently supported for Android
+ * TODO User defined functions that return values are not currently supported for Android
  *
  * https://www.geopackage.org/spec/#extension_rtree
  *
