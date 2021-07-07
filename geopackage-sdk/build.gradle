@@ -66,6 +66,11 @@ android {
         failOnError false
     }
 
+    afterEvaluate {
+        javadoc.classpath += files(android.libraryVariants.collect { variant ->
+            variant.getJavaCompileProvider().get().classpath.files
+        })}
+
     task javadocJar(type: Jar) {
         archiveClassifier.set("javadoc")
         from javadoc
