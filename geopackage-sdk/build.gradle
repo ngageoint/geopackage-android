@@ -47,6 +47,7 @@ android {
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         classpath += configurations.javadocDeps
+        options.source = "8"
         options.links "https://ngageoint.github.io/geopackage-core-java/docs/api/"
         options.links "https://ngageoint.github.io/projections-java/docs/api/"
         options.links "https://ngageoint.github.io/coordinate-reference-systems-java/docs/api/"
@@ -59,7 +60,6 @@ android {
         options.links "https://ngageoint.github.io/tiff-java/docs/api/"
         options.links "https://ormlite.com/javadoc/ormlite-core/"
         options.links "https://ormlite.com/javadoc/ormlite-android/"
-        options.links "https://docs.oracle.com/javase/8/docs/api/"
         options.links "https://hjg.com.ar/pngj/apidocs/"
         options.linksOffline "https://d.android.com/reference","${android.sdkDirectory}/docs/reference"
         destinationDir = file("../javadoc/")
