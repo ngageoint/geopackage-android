@@ -9,16 +9,15 @@ import org.junit.Test;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.io.BitmapConverter;
-import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.test.LoadGeoPackageTestCase;
+import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.TileCreator;
 import mil.nga.geopackage.tiles.user.TileDao;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionFactory;
 
 /**
  * Test Tile Creator from a GeoPackage with tiles
@@ -73,7 +72,7 @@ public class TileCreatorGetTileTest extends LoadGeoPackageTestCase {
 
         byte[] tileBytes = tile.getData();
         TestCase.assertNotNull(tileBytes);
-        Bitmap bitmap = BitmapConverter.toBitmap(tileBytes);
+        Bitmap bitmap = tile.getBitmap();
 
         TestCase.assertEquals(width, bitmap.getWidth());
         TestCase.assertEquals(height, bitmap.getHeight());
@@ -90,7 +89,7 @@ public class TileCreatorGetTileTest extends LoadGeoPackageTestCase {
 
         tileBytes = tile.getData();
         TestCase.assertNotNull(tileBytes);
-        bitmap = BitmapConverter.toBitmap(tileBytes);
+        bitmap = tile.getBitmap();
 
         TestCase.assertEquals(width, bitmap.getWidth());
         TestCase.assertEquals(height, bitmap.getHeight());

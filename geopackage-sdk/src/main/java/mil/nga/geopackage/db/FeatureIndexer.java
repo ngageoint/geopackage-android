@@ -22,10 +22,10 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureRowSync;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.GeoPackageProgress;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionTransform;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryEnvelope;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionTransform;
 import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**

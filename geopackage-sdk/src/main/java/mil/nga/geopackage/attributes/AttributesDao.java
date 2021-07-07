@@ -5,7 +5,7 @@ import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.user.UserDao;
-import mil.nga.sf.proj.Projection;
+import mil.nga.proj.Projection;
 
 /**
  * Attributes DAO for reading attributes user data tables

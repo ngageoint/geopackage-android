@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "5.1.1"
+version = "6.0.0"
 def remotePublish = false
 
 android {
@@ -48,6 +48,8 @@ android {
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         classpath += configurations.javadocDeps
         options.links "https://ngageoint.github.io/geopackage-core-java/docs/api/"
+        options.links "https://ngageoint.github.io/projections-java/docs/api/"
+        options.links "https://ngageoint.github.io/coordinate-reference-systems-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-wkb-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-wkt-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-geojson-java/docs/api/"
@@ -55,10 +57,10 @@ android {
         options.links "https://ngageoint.github.io/simple-features-java/docs/api/"
         options.links "https://ngageoint.github.io/ogc-api-features-json-java/docs/api/"
         options.links "https://ngageoint.github.io/tiff-java/docs/api/"
-        options.links "http://ormlite.com/javadoc/ormlite-core/"
-        options.links "http://ormlite.com/javadoc/ormlite-android/"
+        options.links "https://ormlite.com/javadoc/ormlite-core/"
+        options.links "https://ormlite.com/javadoc/ormlite-android/"
         options.links "https://docs.oracle.com/javase/8/docs/api/"
-        options.links "http://hjg.com.ar/pngj/apidocs/"
+        options.links "https://hjg.com.ar/pngj/apidocs/"
         options.linksOffline "https://d.android.com/reference","${android.sdkDirectory}/docs/reference"
         destinationDir = file("../javadoc/")
         failOnError false
@@ -153,17 +155,17 @@ android {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.2.0'
+    api 'androidx.appcompat:appcompat:1.3.0'
     api 'androidx.documentfile:documentfile:1.0.1'
-    api 'com.j256.ormlite:ormlite-android:5.3'
-    api 'mil.nga.geopackage:geopackage-core:5.0.0'
+    api 'com.j256.ormlite:ormlite-android:5.6'
+    api 'mil.nga.geopackage:geopackage-core:6.0.0'
     api 'ar.com.hjg:pngj:2.1.0'
-    api 'mil.nga:tiff:2.0.2'
-    api 'mil.nga:sqlite-android:3340100'
-    javadocDeps 'com.j256.ormlite:ormlite-android:5.3',
-            'mil.nga.geopackage:geopackage-core:5.0.0',
+    api 'mil.nga:tiff:2.0.3'
+    api 'mil.nga:sqlite-android:3360000'
+    javadocDeps 'com.j256.ormlite:ormlite-android:5.6',
+            'mil.nga.geopackage:geopackage-core:6.0.0',
             'ar.com.hjg:pngj:2.1.0',
-            'mil.nga:tiff:2.0.2'
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0'
+            'mil.nga:tiff:2.0.3'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
 }

@@ -65,7 +65,7 @@ import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomRow;
 import mil.nga.geopackage.user.custom.UserCustomTable;
-import mil.nga.sf.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionConstants;
 
 /**
  * Alter Table test utils

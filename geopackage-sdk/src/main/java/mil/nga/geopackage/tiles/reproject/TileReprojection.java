@@ -14,7 +14,7 @@ import mil.nga.geopackage.tiles.retriever.GeoPackageTile;
 import mil.nga.geopackage.tiles.retriever.TileCreator;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
-import mil.nga.sf.proj.Projection;
+import mil.nga.proj.Projection;
 
 /**
  * Tile Reprojection for reprojecting an existing tile table

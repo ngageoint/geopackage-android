@@ -15,9 +15,9 @@ import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionFactory;
 
 /**
  * Feature Preview for drawing a preview tile from a feature table

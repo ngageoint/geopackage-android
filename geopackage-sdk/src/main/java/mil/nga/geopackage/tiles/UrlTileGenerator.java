@@ -15,7 +15,7 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.R;
 import mil.nga.geopackage.io.GeoPackageIOUtils;
-import mil.nga.sf.proj.Projection;
+import mil.nga.proj.Projection;
 
 /**
  * Creates a set of tiles within a GeoPackage by downloading the tiles from a

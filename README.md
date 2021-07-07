@@ -112,6 +112,26 @@ try {
     tileCursor.close();
 }
 
+// Retrieve Tiles by XYZ
+GeoPackageTileRetriever retriever = new GeoPackageTileRetriever(tileDao);
+GeoPackageTile geoPackageTile = retriever.getTile(2, 2, 2);
+if(geoPackageTile != null) {
+    byte[] tileBytes = geoPackageTile.getData();
+    Bitmap tileBitmap = geoPackageTile.getBitmap();
+    // ...
+}
+
+// Retrieve Tiles by Bounding Box
+TileCreator tileCreator = new TileCreator(
+        tileDao, ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM));
+GeoPackageTile geoPackageTile2 = tileCreator.getTile(
+        new BoundingBox(-90.0, 0.0, 0.0, 66.513260));
+if(geoPackageTile2 != null) {
+    byte[] tileBytes = geoPackageTile2.getData();
+    Bitmap tileBitmap = geoPackageTile2.getBitmap();
+    // ...
+}
+
 // Index Features
 FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
 indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
@@ -130,7 +150,7 @@ Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG
 
 // URL Tile Generator (generate tiles from a URL)
 TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,
-        "url_tile_table", "http://url/{z}/{x}/{y}.png", 1, 2, boundingBox, projection);
+        "url_tile_table", "http://url/{z}/{x}/{y}.png", 0, 0, boundingBox, projection);
 int urlTileCount = urlTileGenerator.generateTiles();
 
 // Feature Tile Generator (generate tiles from features)
@@ -148,9 +168,9 @@ geoPackage.close();
 
 ### Installation ###
 
-Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|5.1.0|aar) (AAR, POM, Source, Javadoc)
+Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|6.0.0|aar) (AAR, POM, Source, Javadoc)
 
-    compile "mil.nga.geopackage:geopackage-android:5.1.0"
+    compile "mil.nga.geopackage:geopackage-android:6.0.0"
 
 ### Build ###
 
@@ -172,7 +192,7 @@ Include as repositories in your project build.gradle:
 
 Include the dependency in your module build.gradle with desired version number:
 
-    compile "mil.nga.geopackage:geopackage-android:5.1.0"
+    compile "mil.nga.geopackage:geopackage-android:6.0.0"
 
 As part of the build process, run the "uploadArchives" task on the geopackage-android Gradle script to update the Maven local repository.
 

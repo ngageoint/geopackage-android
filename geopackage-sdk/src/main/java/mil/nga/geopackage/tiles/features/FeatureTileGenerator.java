@@ -8,9 +8,9 @@ import mil.nga.geopackage.extension.nga.link.FeatureTileTableLinker;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
 import mil.nga.geopackage.tiles.TileGrid;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionTransform;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionTransform;
 
 /**
  * Creates a set of tiles within a GeoPackage by generating tiles from features

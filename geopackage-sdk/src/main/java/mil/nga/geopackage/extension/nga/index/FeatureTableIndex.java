@@ -16,8 +16,8 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureRowSync;
+import mil.nga.proj.Projection;
 import mil.nga.sf.GeometryEnvelope;
-import mil.nga.sf.proj.Projection;
 
 /**
  * Feature Table Index NGA Extension implementation. This extension is used to

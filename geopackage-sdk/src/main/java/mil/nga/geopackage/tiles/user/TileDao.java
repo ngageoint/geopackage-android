@@ -19,9 +19,9 @@ import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.user.UserDao;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionTransform;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionTransform;
 
 /**
  * Tile DAO for reading tile user tables

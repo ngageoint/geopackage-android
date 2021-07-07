@@ -26,8 +26,8 @@ import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.user.TileCursor;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileRow;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionTransform;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionTransform;
 
 /**
  * Tile Creator, creates a tile from a tile matrix to the desired projection

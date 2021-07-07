@@ -19,8 +19,8 @@ import mil.nga.geopackage.tiles.TileGrid;
 import mil.nga.geopackage.tiles.features.FeatureTileGenerator;
 import mil.nga.geopackage.tiles.features.FeatureTiles;
 import mil.nga.geopackage.tiles.features.custom.NumberFeaturesTile;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionFactory;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionFactory;
 
 import static org.junit.Assert.assertEquals;
 

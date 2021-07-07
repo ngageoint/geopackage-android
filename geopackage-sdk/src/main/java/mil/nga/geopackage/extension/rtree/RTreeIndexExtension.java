@@ -4,12 +4,14 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.db.GeoPackageConnection;
 import mil.nga.geopackage.db.GeoPackageDatabase;
 import mil.nga.geopackage.features.user.FeatureDao;
+import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.geopackage.user.custom.UserCustomTable;
+import mil.nga.sf.GeometryEnvelope;
 
 /**
  * RTree Index Extension
- * TODO User defined functions are not currently supported for Android
+ * TODO User defined functions that return values are not currently supported for Android
  *
  * https://www.geopackage.org/spec/#extension_rtree
  *
@@ -78,7 +80,17 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     @Override
     public void createMinXFunction() {
-        createFunction(MIN_X_FUNCTION);
+        createFunction(new GeometryFunction(MIN_X_FUNCTION) {
+            @Override
+            public Object execute(GeoPackageGeometryData data) {
+                Object value = null;
+                GeometryEnvelope envelope = getEnvelope(data);
+                if (envelope != null) {
+                    value = envelope.getMinX();
+                }
+                return value;
+            }
+        });
     }
 
     /**
@@ -86,7 +98,17 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     @Override
     public void createMaxXFunction() {
-        createFunction(MAX_X_FUNCTION);
+        createFunction(new GeometryFunction(MAX_X_FUNCTION) {
+            @Override
+            public Object execute(GeoPackageGeometryData data) {
+                Object value = null;
+                GeometryEnvelope envelope = getEnvelope(data);
+                if (envelope != null) {
+                    value = envelope.getMaxX();
+                }
+                return value;
+            }
+        });
     }
 
     /**
@@ -94,7 +116,17 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     @Override
     public void createMinYFunction() {
-        createFunction(MIN_Y_FUNCTION);
+        createFunction(new GeometryFunction(MIN_Y_FUNCTION) {
+            @Override
+            public Object execute(GeoPackageGeometryData data) {
+                Object value = null;
+                GeometryEnvelope envelope = getEnvelope(data);
+                if (envelope != null) {
+                    value = envelope.getMinY();
+                }
+                return value;
+            }
+        });
     }
 
     /**
@@ -102,7 +134,17 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     @Override
     public void createMaxYFunction() {
-        createFunction(MAX_Y_FUNCTION);
+        createFunction(new GeometryFunction(MAX_Y_FUNCTION) {
+            @Override
+            public Object execute(GeoPackageGeometryData data) {
+                Object value = null;
+                GeometryEnvelope envelope = getEnvelope(data);
+                if (envelope != null) {
+                    value = envelope.getMaxY();
+                }
+                return value;
+            }
+        });
     }
 
     /**
@@ -110,16 +152,36 @@ public class RTreeIndexExtension extends RTreeIndexCoreExtension {
      */
     @Override
     public void createIsEmptyFunction() {
-        createFunction(IS_EMPTY_FUNCTION);
+        createFunction(new GeometryFunction(IS_EMPTY_FUNCTION) {
+            @Override
+            public Object execute(GeoPackageGeometryData data) {
+                Object value = null;
+                if (data != null) {
+                    if (data.isEmpty() || data.getGeometry() == null) {
+                        value = 1;
+                    } else {
+                        value = 0;
+                    }
+                }
+                return value;
+            }
+        });
     }
 
     /**
      * Create the function for the connection
      *
-     * @param name function name
+     * @param function geometry function
      */
-    private void createFunction(String name) {
-        throw new UnsupportedOperationException("User defined SQL functions are not supported. name: " + name);
+    private void createFunction(GeometryFunction function) {
+        // TODO User defined functions that return values are not currently supported for Android
+        if (true) {
+            throw new UnsupportedOperationException(
+                    "User defined SQL functions that return values are not supported. name: "
+                            + function.getName());
+        }
+        database.getBindingsDb()
+                .addCustomFunction(function.getName(), 1, function);
     }
 
     /**

@@ -14,6 +14,7 @@ import java.util.Set;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.GeoPackageManager;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.contents.ContentsDao;
@@ -21,7 +22,6 @@ import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.extension.coverage.CoverageData;
-import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -35,10 +35,10 @@ import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileDao;
+import mil.nga.proj.Projection;
+import mil.nga.proj.ProjectionConstants;
+import mil.nga.proj.ProjectionFactory;
 import mil.nga.sf.GeometryType;
-import mil.nga.sf.proj.Projection;
-import mil.nga.sf.proj.ProjectionConstants;
-import mil.nga.sf.proj.ProjectionFactory;
 
 /**
  * GeoPackage Utility test methods
