@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## [6.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.0.0) (07-06-2021)
+## [6.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.0.0) (07-07-2021)
 
 * geopackage-core version 6.0.0
 * ormlite-android version 5.6
