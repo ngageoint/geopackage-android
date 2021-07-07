@@ -1,5 +1,9 @@
 package mil.nga.geopackage.tiles.retriever;
 
+import android.graphics.Bitmap;
+
+import mil.nga.geopackage.io.BitmapConverter;
+
 /**
  * GeoPackage tile wrapper containing tile dimensions and raw image bytes
  *
@@ -61,6 +65,20 @@ public class GeoPackageTile {
      */
     public byte[] getData() {
         return data;
+    }
+
+    /**
+     * Get image bitmap
+     *
+     * @return image bitmap
+     * @since 6.0.0
+     */
+    public Bitmap getBitmap() {
+        Bitmap bitmap = null;
+        if (data != null) {
+            bitmap = BitmapConverter.toBitmap(data);
+        }
+        return bitmap;
     }
 
 }

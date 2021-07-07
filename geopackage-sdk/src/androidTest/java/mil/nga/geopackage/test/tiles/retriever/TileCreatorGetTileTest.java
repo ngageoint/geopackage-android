@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.test.LoadGeoPackageTestCase;
 import mil.nga.geopackage.test.TestConstants;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
@@ -73,7 +72,7 @@ public class TileCreatorGetTileTest extends LoadGeoPackageTestCase {
 
         byte[] tileBytes = tile.getData();
         TestCase.assertNotNull(tileBytes);
-        Bitmap bitmap = BitmapConverter.toBitmap(tileBytes);
+        Bitmap bitmap = tile.getBitmap();
 
         TestCase.assertEquals(width, bitmap.getWidth());
         TestCase.assertEquals(height, bitmap.getHeight());
@@ -90,7 +89,7 @@ public class TileCreatorGetTileTest extends LoadGeoPackageTestCase {
 
         tileBytes = tile.getData();
         TestCase.assertNotNull(tileBytes);
-        bitmap = BitmapConverter.toBitmap(tileBytes);
+        bitmap = tile.getBitmap();
 
         TestCase.assertEquals(width, bitmap.getWidth());
         TestCase.assertEquals(height, bitmap.getHeight());

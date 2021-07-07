@@ -87,11 +87,11 @@ public class TileCreatorImageTest extends LoadGeoPackageTestCase {
 
         byte[] webMercatorTileBytes = webMercatorTile.getData();
         TestCase.assertNotNull(webMercatorTileBytes);
-        Bitmap webMercatorBitmap = BitmapConverter.toBitmap(webMercatorTileBytes);
+        Bitmap webMercatorBitmap = webMercatorTile.getBitmap();
 
         byte[] wgs84TileBytes = wgs84Tile.getData();
         TestCase.assertNotNull(wgs84TileBytes);
-        Bitmap wgs84Bitmap = BitmapConverter.toBitmap(wgs84TileBytes);
+        Bitmap wgs84Bitmap = wgs84Tile.getBitmap();
 
         TestCase.assertEquals(width, webMercatorBitmap.getWidth());
         TestCase.assertEquals(height, webMercatorBitmap.getHeight());
@@ -322,9 +322,9 @@ public class TileCreatorImageTest extends LoadGeoPackageTestCase {
                 .getTile(wgs84WebMercator);
         GeoPackageTile wgs84Tile = wgs84Creator.getTile(wgs84);
 
-        Bitmap image = BitmapConverter.toBitmap(tile.getData());
-        Bitmap wgs84WebMercatorImage = BitmapConverter.toBitmap(wgs84WebMercatorTile.getData());
-        Bitmap wgs84Image = BitmapConverter.toBitmap(wgs84Tile.getData());
+        Bitmap image = tile.getBitmap();
+        Bitmap wgs84WebMercatorImage = wgs84WebMercatorTile.getBitmap();
+        Bitmap wgs84Image = wgs84Tile.getBitmap();
 
         TestCase.assertEquals(image.getWidth(),
                 wgs84WebMercatorImage.getWidth());
