@@ -20,7 +20,9 @@ public class GeoPackageFactory {
         // Change the ORMLite log backend
         System.setProperty(LocalLogBackend.LOCAL_LOG_LEVEL_PROPERTY,
                 Level.ERROR.name());
-        LoggerFactory.setLogBackendType(LogBackendType.ANDROID);
+        if (LogBackendType.ANDROID.isAvailable()) {
+            LoggerFactory.setLogBackendType(LogBackendType.ANDROID);
+        }
     }
 
     /**
