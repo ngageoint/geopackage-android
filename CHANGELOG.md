@@ -4,10 +4,11 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.0.1 (TBD)
+## [6.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.0.1) (08-17-2021)
 
 * tiff version 2.0.4
-* TBD
+* Check for ORMLite Android backend log availability
+* appcompat version 1.3.1
 
 ## [6.0.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.0.0) (07-07-2021)
 
