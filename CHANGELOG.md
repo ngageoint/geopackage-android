@@ -6,7 +6,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.0.2 (TBD)
 
-* TBD
+* Fix for user cursor queries of columns with large blobs
 
 ## [6.0.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.0.1) (08-17-2021)
 

@@ -1,6 +1,7 @@
 package mil.nga.geopackage.user;
 
 import android.database.Cursor;
+import android.database.sqlite.SQLiteBlobTooBigException;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -32,6 +33,11 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      * Columns
      */
     private UserColumns<TColumn> columns;
+
+    /**
+     * Number of rows in the cursor
+     */
+    private Integer count = null;
 
     /**
      * Invalid cursor positions due to large sized blobs
@@ -204,21 +210,43 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     /**
      * Get the invalid positions found when retrieving rows
      *
-     * @return invalid positions
+     * @return invalid positions, empty if none, null if all invalid
      * @since 2.0.0
      */
     public List<Integer> getInvalidPositions() {
-        return new ArrayList<>(invalidPositions);
+        List<Integer> positions = null;
+        if (invalidPositions != null) {
+            positions = new ArrayList<>(invalidPositions);
+        }
+        return positions;
     }
 
     /**
-     * Determine if invalid positions were found when retrieving rows
+     * Determine if invalid positions were found when retrieving rows or if all are invalid (null)
      *
      * @return true if invalid positions
      * @since 2.0.0
      */
     public boolean hasInvalidPositions() {
-        return !invalidPositions.isEmpty();
+        return invalidPositions == null || !invalidPositions.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getCount() {
+        if (count == null) {
+            try {
+                count = super.getCount();
+            } catch (SQLiteBlobTooBigException e) {
+                // Treat all results as invalid to chunk read blobs
+                invalidPositions = null;
+                createInvalidCursor();
+                count = invalidCursor.getCount();
+            }
+        }
+        return count;
     }
 
     /**
@@ -226,11 +254,43 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      */
     @Override
     public boolean moveToNext() {
-        boolean hasNext = super.moveToNext();
-        if (!hasNext) {
-            hasNext = moveToNextInvalid();
+        boolean hasNext = false;
+        if (count == null) {
+            getCount();
+        }
+        if (invalidCursor == null) {
+            hasNext = super.moveToNext();
+            if (!hasNext) {
+                createInvalidCursor();
+            }
+        }
+        if (invalidCursor != null) {
+            hasNext = invalidCursor.moveToNext();
         }
         return hasNext;
+    }
+
+    /**
+     * Create an invalid cursor to requery invalid blob rows.
+     */
+    private void createInvalidCursor() {
+
+        // If requery has not been performed, a requery dao has been set, and there are invalid positions
+        if (invalidCursor == null && dao != null && hasInvalidPositions()) {
+
+            // Close the original cursor when performing an invalid cursor query
+            super.close();
+
+            // Set the blob columns to return as null
+            List<TColumn> blobColumns = columns.columnsOfType(GeoPackageDataType.BLOB);
+            String[] columnsAs = dao.buildColumnsAsNull(blobColumns);
+            query.set(UserQueryParamType.COLUMNS_AS, columnsAs);
+
+            // Query without blob columns and create an invalid cursor
+            UserCursor<TColumn, TTable, TRow> requeryCursor = dao.query(query);
+            invalidCursor = createInvalidCursor(dao, requeryCursor, getInvalidPositions(), blobColumns);
+        }
+
     }
 
     /**
@@ -333,38 +393,6 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      */
     protected void enableInvalidRequery(UserDao<TColumn, TTable, TRow, ? extends UserCursor<TColumn, TTable, TRow>> dao) {
         this.dao = dao;
-    }
-
-    /**
-     * Move to the next position of invalid rows to requery.  Perform the requery the first time.
-     *
-     * @return true if invalid rows are left
-     */
-    private boolean moveToNextInvalid() {
-
-        boolean hasNext = false;
-
-        // If requery has not been performed, a requery dao has been set, and there are invalid positions
-        if (invalidCursor == null && dao != null && hasInvalidPositions()) {
-
-            // Close the original cursor when performing an invalid cursor query
-            super.close();
-
-            // Set the blob columns to return as null
-            List<TColumn> blobColumns = columns.columnsOfType(GeoPackageDataType.BLOB);
-            String[] columnsAs = dao.buildColumnsAsNull(blobColumns);
-            query.set(UserQueryParamType.COLUMNS_AS, columnsAs);
-
-            // Query without blob columns and create an invalid cursor
-            UserCursor<TColumn, TTable, TRow> requeryCursor = dao.query(query);
-            invalidCursor = createInvalidCursor(dao, requeryCursor, getInvalidPositions(), blobColumns);
-        }
-
-        if (invalidCursor != null) {
-            hasNext = invalidCursor.moveToNext();
-        }
-
-        return hasNext;
     }
 
     /**

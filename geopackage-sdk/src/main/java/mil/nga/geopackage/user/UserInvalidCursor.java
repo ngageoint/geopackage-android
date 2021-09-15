@@ -12,6 +12,7 @@ import java.util.List;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageDataType;
+import mil.nga.geopackage.db.ResultUtils;
 
 /**
  * Abstract User Invalid Cursor for handling failed rows due to large blobs
@@ -78,9 +79,13 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
     public boolean moveToNext() {
         boolean hasNext = false;
         currentPosition++;
-        if (currentPosition < invalidPositions.size()) {
-            int invalidPosition = invalidPositions.get(currentPosition);
-            hasNext = cursor.moveToPosition(invalidPosition);
+        if (invalidPositions != null) {
+            if (currentPosition < invalidPositions.size()) {
+                int invalidPosition = invalidPositions.get(currentPosition);
+                hasNext = cursor.moveToPosition(invalidPosition);
+            }
+        } else {
+            hasNext = cursor.moveToNext();
         }
         return hasNext;
     }
@@ -111,7 +116,7 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
         try {
 
             byte[] blobChunk = new byte[]{0};
-            for (int i = 1; blobChunk.length > 0; i += CHUNK_SIZE) {
+            for (int i = 1; blobChunk != null && blobChunk.length > 0; i += CHUNK_SIZE) {
                 if (i > 1) {
                     byteStream.write(blobChunk);
                 }
@@ -129,8 +134,11 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
                     blobCursor.close();
                 }
             }
-            byte[] blob = byteStream.toByteArray();
-            row.setValue(column.getIndex(), blob);
+            if(byteStream.size() > 0) {
+                byte[] blob = byteStream.toByteArray();
+                row.setValue(column.getIndex(), blob);
+                row.getRowColumnTypes()[column.getIndex()] = ResultUtils.FIELD_TYPE_BLOB;
+            }
 
         } catch (IOException e) {
             Log.e(UserInvalidCursor.class.getSimpleName(), "Failed to read large blob value. Table: "
@@ -209,7 +217,14 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      */
     @Override
     public int getCount() {
-        return invalidPositions.size();
+        int count;
+        if (invalidPositions != null) {
+            count = invalidPositions.size();
+        } else {
+            count = cursor.getCount();
+        }
+
+        return count;
     }
 
     /**
@@ -227,10 +242,14 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
     @Override
     public boolean moveToPosition(int position) {
         boolean moved = false;
-        if (position < invalidPositions.size()) {
-            currentPosition = position;
-            int invalidPosition = invalidPositions.get(currentPosition);
-            moved = cursor.moveToPosition(invalidPosition);
+        if (invalidPositions != null) {
+            if (position < invalidPositions.size()) {
+                currentPosition = position;
+                int invalidPosition = invalidPositions.get(currentPosition);
+                moved = cursor.moveToPosition(invalidPosition);
+            }
+        } else {
+            cursor.moveToPosition(position);
         }
         return moved;
     }
