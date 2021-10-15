@@ -2,6 +2,8 @@ package mil.nga.geopackage.tiles;
 
 import android.content.Context;
 
+import org.locationtech.proj4j.units.Units;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -161,8 +163,15 @@ public class UrlTileGenerator extends TileGenerator {
      */
     private String replaceBoundingBox(String url, int z, long x, long y) {
 
-        BoundingBox boundingBox = TileBoundingBoxUtils.getProjectedBoundingBox(
-                projection, x, y, z);
+        BoundingBox boundingBox = null;
+
+        if (projection.isUnit(Units.DEGREES)) {
+            boundingBox = TileBoundingBoxUtils
+                    .getProjectedBoundingBoxFromWGS84(projection, x, y, z);
+        } else {
+            boundingBox = TileBoundingBoxUtils
+                    .getProjectedBoundingBox(projection, x, y, z);
+        }
 
         url = replaceBoundingBox(url, boundingBox);
 
