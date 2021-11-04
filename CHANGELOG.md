@@ -4,10 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.0.3 (TBD)
+## [6.1.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.1.0) (11-05-2021)
 
 * compile SDK version 31
-* geopackage-core version 6.0.1
+* geopackage-core version 6.1.0
 * tiff version 2.0.5
 * UrlTileGenerator URL bounds generation fix for degree projections (WGS84 WMS)
 
