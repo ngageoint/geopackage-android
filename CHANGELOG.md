@@ -10,6 +10,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * geopackage-core version 6.1.0
 * tiff version 2.0.5
 * UrlTileGenerator URL bounds generation fix for degree projections (WGS84 WMS)
+* Import GeoPackage fix where invalid file not deleted upon failed import
 
 ## [6.0.2](https://github.com/ngageoint/geopackage-android/releases/tag/6.0.2) (09-15-2021)
 
