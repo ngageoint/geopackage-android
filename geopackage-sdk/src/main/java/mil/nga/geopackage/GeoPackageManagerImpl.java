@@ -1643,7 +1643,14 @@ class GeoPackageManagerImpl implements GeoPackageManager {
                         "Invalid GeoPackage database file", e);
             }
 
-            GeoPackage geoPackage = open(database, false);
+            GeoPackage geoPackage = null;
+            try {
+                geoPackage = open(database, false);
+            } catch (Exception e) {
+                delete(database);
+                throw new GeoPackageException(
+                        "Invalid GeoPackage database file", e);
+            }
             if (geoPackage != null) {
                 try {
                     if (!geoPackage.getSpatialReferenceSystemDao()
