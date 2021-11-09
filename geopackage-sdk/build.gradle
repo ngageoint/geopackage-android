@@ -133,9 +133,11 @@ android {
                     def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
                     def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
                     url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                    def user = project.hasProperty('ossrhUsername') ? ossrhUsername : ""
+                    def pw = project.hasProperty('ossrhPassword') ? ossrhPassword : ""
                     credentials {
-                        username = ossrhUsername
-                        password = ossrhPassword
+                        username = user
+                        password = pw
                     }
                 }
             }
