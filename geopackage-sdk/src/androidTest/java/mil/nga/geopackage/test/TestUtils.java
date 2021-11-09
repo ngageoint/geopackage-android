@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -664,6 +665,23 @@ public class TestUtils {
         TestCase.assertNull(geoPackage.foreignKeyCheck());
         TestCase.assertNull(geoPackage.integrityCheck());
         TestCase.assertNull(geoPackage.quickCheck());
+    }
+
+    /**
+     * Get a random ordered list from the list with a max size
+     *
+     * @param list list
+     * @param size max size
+     * @param <T>  list type
+     * @return random list
+     */
+    public static <T> List<T> getRandomList(List<T> list, int size) {
+        List<T> random = new ArrayList<T>(list);
+        Collections.shuffle(random);
+        if (random.size() > size) {
+            random = random.subList(0, size);
+        }
+        return random;
     }
 
 }

@@ -70,6 +70,7 @@ public class TileUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 
@@ -412,6 +413,7 @@ public class TileUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 
@@ -737,6 +739,7 @@ public class TileUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 
@@ -897,6 +900,7 @@ public class TileUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 
@@ -951,6 +955,7 @@ public class TileUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 
@@ -1004,6 +1009,7 @@ public class TileUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 
@@ -1082,6 +1088,7 @@ public class TileUtils {
                     cursorCount = cursor != null ? cursor.getCount() : 0;
 
                     if (tileGrid != null) {
+                        cursorCount = Math.min(100, cursorCount);
                         int count = 0;
                         for (long column = tileGrid.getMinX(); column <= tileGrid
                                 .getMaxX(); column++) {
@@ -1091,7 +1098,13 @@ public class TileUtils {
                                         zoomLevel);
                                 if (tileRow != null) {
                                     count++;
+                                    if(count >= cursorCount){
+                                        break;
+                                    }
                                 }
+                            }
+                            if(count >= cursorCount){
+                                break;
                             }
                         }
                         TestCase.assertEquals(count, cursorCount);
@@ -1127,6 +1140,7 @@ public class TileUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 
@@ -1294,6 +1308,8 @@ public class TileUtils {
         if (tileMatrixSetDao.isTableExists()) {
 
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
+
             for (TileMatrixSet tileMatrixSet : results) {
 
                 threadedTileDaoError = false;

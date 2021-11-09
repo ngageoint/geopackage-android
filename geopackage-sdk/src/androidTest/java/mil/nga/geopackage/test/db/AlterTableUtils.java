@@ -53,6 +53,7 @@ import mil.nga.geopackage.features.index.FeatureIndexType;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.test.TestUtils;
 import mil.nga.geopackage.test.attributes.AttributesUtils;
 import mil.nga.geopackage.test.features.user.FeatureUtils;
 import mil.nga.geopackage.test.tiles.user.TileUtils;
@@ -818,6 +819,7 @@ public class AlterTableUtils {
 
         if (tileMatrixSetDao.isTableExists()) {
             List<TileMatrixSet> results = tileMatrixSetDao.queryForAll();
+            results = TestUtils.getRandomList(results, 3);
 
             for (TileMatrixSet tileMatrixSet : results) {
 

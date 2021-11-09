@@ -892,14 +892,16 @@ public class FeatureIndexManagerUtils {
                 timerCount.start();
                 long fullCount = featureIndexManager.count(envelope);
                 timerCount.end(percentage + "% Envelope Count Query");
-                TestCase.assertEquals(expectedCount, fullCount);
+                assertCounts(featureIndexManager, testEnvelope, type,
+                        outerPrecision, expectedCount, fullCount);
 
                 timerQuery.start();
                 FeatureIndexResults results = featureIndexManager.query(envelope);
                 timerQuery.end(percentage + "% Envelope Query");
                 iterateResults(timerIteration,
                         percentage + "% Envelope Query Iteration", results);
-                TestCase.assertEquals(expectedCount, results.count());
+                assertCounts(featureIndexManager, testEnvelope, type,
+                        outerPrecision, expectedCount, results.count());
                 results.close();
 
                 timerQuery.start();
@@ -908,21 +910,24 @@ public class FeatureIndexManagerUtils {
                 iterateResults(timerColumnsIteration,
                         percentage + "% Envelope Columns Query Iteration",
                         results);
-                TestCase.assertEquals(expectedCount, results.count());
+                assertCounts(featureIndexManager, testEnvelope, type,
+                        outerPrecision, expectedCount, results.count());
                 results.close();
 
                 BoundingBox boundingBox = new BoundingBox(envelope);
                 timerCount.start();
                 fullCount = featureIndexManager.count(boundingBox);
                 timerCount.end(percentage + "% Bounding Box Count Query");
-                TestCase.assertEquals(expectedCount, fullCount);
+                assertCounts(featureIndexManager, testEnvelope, type,
+                        outerPrecision, expectedCount, fullCount);
 
                 timerQuery.start();
                 results = featureIndexManager.query(boundingBox);
                 timerQuery.end(percentage + "% Bounding Box Query");
                 iterateResults(timerIteration,
                         percentage + "% Bounding Box Query Iteration", results);
-                TestCase.assertEquals(expectedCount, results.count());
+                assertCounts(featureIndexManager, testEnvelope, type,
+                        outerPrecision, expectedCount, results.count());
                 results.close();
 
                 timerQuery.start();
@@ -931,7 +936,8 @@ public class FeatureIndexManagerUtils {
                 iterateResults(timerColumnsIteration,
                         percentage + "% Bounding Box Columns Query Iteration",
                         results);
-                TestCase.assertEquals(expectedCount, results.count());
+                assertCounts(featureIndexManager, testEnvelope, type,
+                        outerPrecision, expectedCount, results.count());
                 results.close();
 
                 BoundingBox webMercatorBoundingBox = boundingBox
@@ -941,7 +947,8 @@ public class FeatureIndexManagerUtils {
                         webMercatorProjection);
                 timerCount.end(percentage + "% Projected Bounding Box Count Query");
                 if (compareProjectionCounts) {
-                    TestCase.assertEquals(expectedCount, fullCount);
+                    assertCounts(featureIndexManager, testEnvelope, type,
+                            outerPrecision, expectedCount, fullCount);
                 }
 
                 timerQuery.start();
@@ -952,7 +959,8 @@ public class FeatureIndexManagerUtils {
                         percentage + "% Projected Bounding Box Query Iteration",
                         results);
                 if (compareProjectionCounts) {
-                    TestCase.assertEquals(expectedCount, results.count());
+                    assertCounts(featureIndexManager, testEnvelope, type,
+                            outerPrecision, expectedCount, results.count());
                 }
                 results.close();
 
@@ -965,7 +973,8 @@ public class FeatureIndexManagerUtils {
                                 + "% Projected Bounding Box Columns Query Iteration",
                         results);
                 if (compareProjectionCounts) {
-                    TestCase.assertEquals(expectedCount, results.count());
+                    assertCounts(featureIndexManager, testEnvelope, type,
+                            outerPrecision, expectedCount, results.count());
                 }
                 results.close();
             }
@@ -992,6 +1001,45 @@ public class FeatureIndexManagerUtils {
                 FeatureRow featureRow : results) {
         }
         timerIteration.end(message);
+    }
+
+    private static void assertCounts(FeatureIndexManager featureIndexManager,
+                                     FeatureIndexTestEnvelope testEnvelope, FeatureIndexType type,
+                                     double precision, int expectedCount, long fullCount) {
+
+        switch (type) {
+            case RTREE:
+
+                if (expectedCount != fullCount) {
+                    int count = 0;
+                    FeatureIndexResults results = featureIndexManager.query(
+                            new String[]{featureIndexManager.getFeatureDao()
+                                    .getGeometryColumnName()},
+                            testEnvelope.envelope);
+                    for (FeatureRow featureRow : results) {
+                        GeometryEnvelope envelope = featureRow
+                                .getGeometryEnvelope();
+                        if (envelope.intersects(testEnvelope.envelope, true)) {
+                            count++;
+                        } else {
+                            GeometryEnvelope adjustedEnvelope = new GeometryEnvelope(
+                                    envelope.getMinX() - precision,
+                                    envelope.getMinY() - precision,
+                                    envelope.getMaxX() + precision,
+                                    envelope.getMaxY() + precision);
+                            TestCase.assertTrue(adjustedEnvelope
+                                    .intersects(testEnvelope.envelope, true));
+                        }
+                    }
+                    results.close();
+                    TestCase.assertEquals(expectedCount, count);
+                }
+
+                break;
+            default:
+                TestCase.assertEquals(expectedCount, fullCount);
+        }
+
     }
 
     private static void assertRange(double expected, double actual,
