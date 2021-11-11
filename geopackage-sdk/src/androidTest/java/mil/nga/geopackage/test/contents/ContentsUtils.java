@@ -91,8 +91,7 @@ public class ContentsUtils {
 
             // Query for field values
             Map<String, Object> fieldValues = new HashMap<String, Object>();
-            fieldValues.put(Contents.COLUMN_DATA_TYPE, contents.getDataType()
-                    .getName());
+            fieldValues.put(Contents.COLUMN_DATA_TYPE, contents.getDataTypeName());
             if (contents.getSrs() != null) {
                 fieldValues.put(Contents.COLUMN_SRS_ID, contents.getSrs()
                         .getSrsId());
