@@ -13,9 +13,14 @@ jobs:
     timeout-minutes: 720
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
+    - name: set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        java-version: 11
     - name: Run Tests
-      uses: reactivecircus/android-emulator-runner@v1
+      uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
         script: ./gradlew connectedAndroidTest
