@@ -75,6 +75,10 @@ android {
         from sourceSets.main.java.srcDirs
     }
 
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
     afterEvaluate {
 
         javadoc.classpath += files(android.libraryVariants.collect { variant ->
