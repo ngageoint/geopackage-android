@@ -6,7 +6,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.1.2 (TBD)
 
-* TBD
+* appcompat version 1.4.0
+* Additional large blob read attempt, fix for certain phones
 
 ## [6.1.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.1.1) (11-11-2021)
 

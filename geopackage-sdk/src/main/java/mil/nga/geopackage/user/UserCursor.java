@@ -2,13 +2,19 @@ package mil.nga.geopackage.user;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteBlobTooBigException;
+import android.util.Log;
 
+import com.j256.ormlite.misc.IOUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.CursorResult;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
@@ -23,6 +29,11 @@ import mil.nga.geopackage.db.ResultUtils;
  */
 public abstract class UserCursor<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>>
         extends CursorResult implements UserCoreResult<TColumn, TTable, TRow> {
+
+    /**
+     * Chunk size to read large blobs. Max supported Android cursor window size is currently 2 mb, using 1 mb to ensure space
+     */
+    private static final int CHUNK_SIZE = 1048576;
 
     /**
      * Table
@@ -321,13 +332,22 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
 
         boolean valid = true;
 
+        List<TColumn> nullBlobs = null;
+
         for (int index = 0; index < columns.columnCount(); index++) {
             TColumn column = columns.getColumn(index);
 
             int columnType = getType(index);
 
-            if (column.isPrimaryKey() && columnType == FIELD_TYPE_NULL) {
-                valid = false;
+            if (columnType == FIELD_TYPE_NULL) {
+                if (column.isPrimaryKey()) {
+                    valid = false;
+                } else if (column.getDataType() == GeoPackageDataType.BLOB) {
+                    if (nullBlobs == null) {
+                        nullBlobs = new ArrayList<>();
+                    }
+                    nullBlobs.add(column);
+                }
             }
 
             columnTypes[index] = columnType;
@@ -340,6 +360,10 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
         if (!valid) {
             invalidPositions.add(getPosition());
             row.setValid(false);
+        } else if (nullBlobs != null && dao != null && row.hasId()) {
+            for (UserColumn column : nullBlobs) {
+                readBlobValue(row, column);
+            }
         }
 
         return row;
@@ -406,5 +430,62 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
      */
     protected abstract UserInvalidCursor<TColumn, TTable, TRow, ? extends UserCursor<TColumn, TTable, TRow>, ? extends UserDao<TColumn, TTable, TRow, ? extends UserCursor<TColumn, TTable, TRow>>> createInvalidCursor(
             UserDao dao, UserCursor cursor, List<Integer> invalidPositions, List<TColumn> blobColumns);
+
+    /**
+     * Read the blob column value in chunks
+     *
+     * @param row    user row
+     * @param column user blob column
+     */
+    private void readBlobValue(UserRow row, UserColumn column) {
+        readBlobValue(dao, this, row, column);
+    }
+
+    /**
+     * Read the blob column value in chunks
+     *
+     * @param dao    user dao
+     * @param result user core result
+     * @param row    user row
+     * @param column user blob column
+     */
+    public static void readBlobValue(UserDao dao, UserCoreResult result, UserRow row, UserColumn column) {
+
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try {
+
+            byte[] blobChunk = new byte[]{0};
+            for (int i = 1; blobChunk != null && blobChunk.length > 0; i += CHUNK_SIZE) {
+                if (i > 1) {
+                    byteStream.write(blobChunk);
+                }
+                blobChunk = new byte[]{};
+                String query = "select substr(" +
+                        CoreSQLUtils.quoteWrap(column.getName()) + ", " + i + ", " + CHUNK_SIZE + ") from "
+                        + CoreSQLUtils.quoteWrap(dao.getTableName()) + " where "
+                        + CoreSQLUtils.quoteWrap(row.getPkColumn().getName()) + " = " + row.getId();
+                Cursor blobCursor = dao.getDatabaseConnection().getDb().rawQuery(query, null);
+                try {
+                    if (blobCursor.moveToNext()) {
+                        blobChunk = blobCursor.getBlob(0);
+                    }
+                } finally {
+                    blobCursor.close();
+                }
+            }
+            if (byteStream.size() > 0) {
+                byte[] blob = byteStream.toByteArray();
+                row.setValue(column.getIndex(), blob);
+                row.getRowColumnTypes()[column.getIndex()] = ResultUtils.FIELD_TYPE_BLOB;
+            }
+
+        } catch (IOException e) {
+            Log.e(UserInvalidCursor.class.getSimpleName(), "Failed to read large blob value. Table: "
+                    + dao.getTableName() + ", Column: " + column.getName() + ", Position: " + result.getPosition(), e);
+        } finally {
+            IOUtils.closeQuietly(byteStream);
+        }
+
+    }
 
 }

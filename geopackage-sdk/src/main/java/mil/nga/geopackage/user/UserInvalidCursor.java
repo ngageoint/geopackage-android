@@ -1,18 +1,9 @@
 package mil.nga.geopackage.user;
 
-import android.database.Cursor;
-import android.util.Log;
-
-import com.j256.ormlite.misc.IOUtils;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 import mil.nga.geopackage.GeoPackageException;
-import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageDataType;
-import mil.nga.geopackage.db.ResultUtils;
 
 /**
  * Abstract User Invalid Cursor for handling failed rows due to large blobs
@@ -26,11 +17,6 @@ import mil.nga.geopackage.db.ResultUtils;
  */
 public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TCursor extends UserCursor<TColumn, TTable, TRow>, TUserDao extends UserDao<TColumn, TTable, TRow, TCursor>>
         implements UserCoreResult<TColumn, TTable, TRow> {
-
-    /**
-     * Chunk size to read large blobs. Max supported Android cursor window size is currently 2 mb, using 1 mb to ensure space
-     */
-    private static final int CHUNK_SIZE = 1048576;
 
     /**
      * User DAO
@@ -111,41 +97,7 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
      * @param column user blob column
      */
     private void readBlobValue(UserRow row, UserColumn column) {
-
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try {
-
-            byte[] blobChunk = new byte[]{0};
-            for (int i = 1; blobChunk != null && blobChunk.length > 0; i += CHUNK_SIZE) {
-                if (i > 1) {
-                    byteStream.write(blobChunk);
-                }
-                blobChunk = new byte[]{};
-                String query = "select substr(" +
-                        CoreSQLUtils.quoteWrap(column.getName()) + ", " + i + ", " + CHUNK_SIZE + ") from "
-                        + CoreSQLUtils.quoteWrap(dao.getTableName()) + " where "
-                        + CoreSQLUtils.quoteWrap(row.getPkColumn().getName()) + " = " + row.getId();
-                Cursor blobCursor = dao.getDatabaseConnection().getDb().rawQuery(query, null);
-                try {
-                    if (blobCursor.moveToNext()) {
-                        blobChunk = blobCursor.getBlob(0);
-                    }
-                } finally {
-                    blobCursor.close();
-                }
-            }
-            if(byteStream.size() > 0) {
-                byte[] blob = byteStream.toByteArray();
-                row.setValue(column.getIndex(), blob);
-                row.getRowColumnTypes()[column.getIndex()] = ResultUtils.FIELD_TYPE_BLOB;
-            }
-
-        } catch (IOException e) {
-            Log.e(UserInvalidCursor.class.getSimpleName(), "Failed to read large blob value. Table: "
-                    + dao.getTableName() + ", Column: " + column.getName() + ", Position: " + getPosition(), e);
-        } finally {
-            IOUtils.closeQuietly(byteStream);
-        }
+        UserCursor.readBlobValue(dao, this, row, column);
     }
 
     /**
