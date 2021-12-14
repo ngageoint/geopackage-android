@@ -6,7 +6,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.1.3 (TBD)
 
-* TBD
+* UrlTileGenerator HTTP Method and Header field values support
+* gradle plugin updated to 7.0.4
 
 ## [6.1.2](https://github.com/ngageoint/geopackage-android/releases/tag/6.1.2) (11-22-2021)
 

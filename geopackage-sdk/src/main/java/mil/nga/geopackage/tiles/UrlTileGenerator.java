@@ -9,8 +9,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
@@ -46,6 +51,16 @@ public class UrlTileGenerator extends TileGenerator {
      * TMS URL flag, when true x,y,z converted to TMS when requesting the tile
      */
     private boolean tms = false;
+
+    /**
+     * HTTP request method, when null default is "GET"
+     */
+    private String httpMethod;
+
+    /**
+     * HTTP Header fields and field values
+     */
+    private Map<String, List<String>> httpHeader;
 
     /**
      * Constructor
@@ -99,6 +114,79 @@ public class UrlTileGenerator extends TileGenerator {
      */
     public void setTms(boolean tms) {
         this.tms = tms;
+    }
+
+    /**
+     * Get the HTTP request method, when null default is "GET"
+     *
+     * @return method
+     */
+    public String getHttpMethod() {
+        return httpMethod;
+    }
+
+    /**
+     * Set the HTTP request method
+     *
+     * @param httpMethod method ("GET", "POST")
+     */
+    public void setHttpMethod(String httpMethod) {
+        this.httpMethod = httpMethod;
+    }
+
+    /**
+     * Get the HTTP Header fields and field values
+     *
+     * @return header map
+     */
+    public Map<String, List<String>> getHttpHeader() {
+        return httpHeader;
+    }
+
+    /**
+     * Get the HTTP Header field values
+     *
+     * @param field field name
+     * @return field values
+     */
+    public List<String> getHttpHeaderValues(String field) {
+        List<String> fieldValues = null;
+        if (httpHeader != null) {
+            fieldValues = httpHeader.get(field);
+        }
+        return fieldValues;
+    }
+
+    /**
+     * Add a HTTP Header field value, appending to any existing values for the
+     * field
+     *
+     * @param field field name
+     * @param value field value
+     */
+    public void addHTTPHeaderValue(String field, String value) {
+        if (httpHeader == null) {
+            httpHeader = new HashMap<>();
+        }
+        List<String> values = httpHeader.get(field);
+        if (values == null) {
+            values = new ArrayList<>();
+            httpHeader.put(field, values);
+        }
+        values.add(value);
+    }
+
+    /**
+     * Add HTTP Header field values, appending to any existing values for the
+     * field
+     *
+     * @param field  field name
+     * @param values field values
+     */
+    public void addHTTPHeaderValues(String field, List<String> values) {
+        for (String value : values) {
+            addHTTPHeaderValue(field, value);
+        }
     }
 
     /**
@@ -250,6 +338,7 @@ public class UrlTileGenerator extends TileGenerator {
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) url.openConnection();
+            configureRequest(connection);
             connection.connect();
 
             int responseCode = connection.getResponseCode();
@@ -260,6 +349,7 @@ public class UrlTileGenerator extends TileGenerator {
                 connection.disconnect();
                 url = new URL(redirect);
                 connection = (HttpURLConnection) url.openConnection();
+                configureRequest(connection);
                 connection.connect();
             }
 
@@ -281,6 +371,34 @@ public class UrlTileGenerator extends TileGenerator {
         }
 
         return bytes;
+    }
+
+    /**
+     * Configure the connection HTTP method and header
+     *
+     * @param connection HTTP URL connection
+     * @throws ProtocolException upon configuration failure
+     */
+    private void configureRequest(HttpURLConnection connection)
+            throws ProtocolException {
+
+        if (httpMethod != null) {
+            connection.setRequestMethod(httpMethod);
+        }
+
+        if (httpHeader != null) {
+            for (Map.Entry<String, List<String>> fieldEntry : httpHeader
+                    .entrySet()) {
+                String field = fieldEntry.getKey();
+                List<String> values = fieldEntry.getValue();
+                if (values != null) {
+                    for (String value : values) {
+                        connection.addRequestProperty(field, value);
+                    }
+                }
+            }
+        }
+
     }
 
 }

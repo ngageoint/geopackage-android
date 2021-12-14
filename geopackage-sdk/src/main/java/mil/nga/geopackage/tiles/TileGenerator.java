@@ -878,7 +878,7 @@ public abstract class TileGenerator {
                         // Create the tile
                         byte[] tileBytes = createTile(zoomLevel, x, y);
 
-                        if (tileBytes != null) {
+                        if (tileBytes != null && tileBytes.length > 0) {
 
                             Bitmap bitmap = null;
 

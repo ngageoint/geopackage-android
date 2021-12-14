@@ -29,7 +29,6 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.tiles.TileGenerator;
 import mil.nga.geopackage.tiles.UrlTileGenerator;
@@ -163,7 +162,7 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         // Retrieve Tiles by XYZ
         GeoPackageTileRetriever retriever = new GeoPackageTileRetriever(tileDao);
         GeoPackageTile geoPackageTile = retriever.getTile(2, 2, 2);
-        if(geoPackageTile != null) {
+        if (geoPackageTile != null) {
             byte[] tileBytes = geoPackageTile.getData();
             Bitmap tileBitmap = geoPackageTile.getBitmap();
             // ...
@@ -174,7 +173,7 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
                 tileDao, ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM));
         GeoPackageTile geoPackageTile2 = tileCreator.getTile(
                 new BoundingBox(-90.0, 0.0, 0.0, 66.513260));
-        if(geoPackageTile2 != null) {
+        if (geoPackageTile2 != null) {
             byte[] tileBytes = geoPackageTile2.getData();
             Bitmap tileBitmap = geoPackageTile2.getBitmap();
             // ...
