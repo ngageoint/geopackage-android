@@ -343,28 +343,27 @@ public class TileCreator {
 
                     if (tileResults.getCount() > 0) {
 
-                        BoundingBox requestProjectedBoundingBox = requestBoundingBox.transform(transformRequestToTiles);
-
-                        // Determine the requested tile dimensions, or use the dimensions of a single tile matrix tile
-                        int requestedTileWidth = width != null ? width : (int) tileMatrix
-                                .getTileWidth();
-                        int requestedTileHeight = height != null ? height : (int) tileMatrix
-                                .getTileHeight();
+                        // Determine the tile dimensions
+                        int[] tileDimensions = tileDimensions(
+                                requestBoundingBox, tilesBoundingBox,
+                                tileMatrix);
+                        int requestedTileWidth = tileDimensions[0];
+                        int requestedTileHeight = tileDimensions[1];
 
                         // Determine the size of the tile to initially draw
                         int tileWidth = requestedTileWidth;
                         int tileHeight = requestedTileHeight;
                         if (!sameUnit) {
                             tileWidth = (int) Math.round(
-                                    (requestProjectedBoundingBox.getMaxLongitude() - requestProjectedBoundingBox.getMinLongitude())
+                                    (tilesBoundingBox.getMaxLongitude() - tilesBoundingBox.getMinLongitude())
                                             / tileMatrix.getPixelXSize());
                             tileHeight = (int) Math.round(
-                                    (requestProjectedBoundingBox.getMaxLatitude() - requestProjectedBoundingBox.getMinLatitude())
+                                    (tilesBoundingBox.getMaxLatitude() - tilesBoundingBox.getMinLatitude())
                                             / tileMatrix.getPixelYSize());
                         }
 
                         // Draw the resulting bitmap with the matching tiles
-                        Bitmap tileBitmap = drawTile(tileMatrix, tileResults, requestProjectedBoundingBox, tileWidth, tileHeight);
+                        Bitmap tileBitmap = drawTile(tileMatrix, tileResults, tilesBoundingBox, tileWidth, tileHeight);
 
                         // Create the tile
                         if (tileBitmap != null) {
@@ -401,16 +400,96 @@ public class TileCreator {
     }
 
     /**
+     * Determine the tile dimensions. Specified width and/or height values are
+     * used. When only one of width or height is specified, other is determined
+     * as a request ratio. When neither width or height is specified, determine
+     * from the tile matrix as a request ratio.
+     *
+     * @param requestBoundingBox request bounding box
+     * @param tilesBoundingBox   tiles bounding box
+     * @param tileMatrix         tile matrix
+     * @return tile dimensions array of size 2 [width, height]
+     */
+    private int[] tileDimensions(BoundingBox requestBoundingBox,
+                                 BoundingBox tilesBoundingBox, TileMatrix tileMatrix) {
+
+        // Determine the tile dimensions
+        int requestedTileWidth;
+        int requestedTileHeight;
+        if (width != null && height != null) {
+
+            // Requested dimensions
+            requestedTileWidth = width;
+            requestedTileHeight = height;
+
+        } else if (width == null && height == null) {
+
+            // Determine dimensions from a single tile matrix
+            // tile as a ratio to the requested bounds
+            double requestLonRange = requestBoundingBox.getLongitudeRange();
+            double requestLatRange = requestBoundingBox.getLatitudeRange();
+            double pixelXSize = tileMatrix.getPixelXSize();
+            double pixelYSize = tileMatrix.getPixelYSize();
+            if (requestProjection.isUnit(tilesProjection.getUnit())) {
+                // Same unit, use the pixel x and y size
+                requestedTileWidth = (int) Math
+                        .round(requestLonRange / pixelXSize);
+                requestedTileHeight = (int) Math
+                        .round(requestLatRange / pixelYSize);
+            } else {
+                // Use the max tile pixel length and adjust to
+                // the sides to the requested bounds ratio
+                double maxLength = Math.max(
+                        tilesBoundingBox.getLongitudeRange() / pixelXSize,
+                        tilesBoundingBox.getLatitudeRange() / pixelYSize);
+                if (requestLonRange < requestLatRange) {
+                    requestedTileWidth = (int) Math.round(
+                            maxLength * (requestLonRange / requestLatRange));
+                    requestedTileHeight = (int) Math.round(maxLength);
+                } else if (requestLatRange < requestLonRange) {
+                    requestedTileWidth = (int) Math.round(maxLength);
+                    requestedTileHeight = (int) Math.round(
+                            maxLength * (requestLatRange / requestLonRange));
+                } else {
+                    requestedTileWidth = (int) Math.round(maxLength);
+                    requestedTileHeight = requestedTileWidth;
+                }
+            }
+
+        } else if (width == null) {
+
+            // Requested height, determine width as a ratio from
+            // the requested bounds
+            requestedTileHeight = height;
+            requestedTileWidth = (int) Math
+                    .round(height * (requestBoundingBox.getLongitudeRange()
+                            / requestBoundingBox.getLatitudeRange()));
+
+        } else {
+
+            // Requested width, determine height as a ratio from
+            // the requested bounds
+            requestedTileWidth = width;
+            requestedTileHeight = (int) Math
+                    .round(width * (requestBoundingBox.getLatitudeRange()
+                            / requestBoundingBox.getLongitudeRange()));
+
+        }
+
+        return new int[]{requestedTileWidth, requestedTileHeight};
+    }
+
+    /**
      * Draw the tile from the tile results
      *
-     * @param tileMatrix
-     * @param tileResults
-     * @param requestProjectedBoundingBox
-     * @param tileWidth
-     * @param tileHeight
+     * @param tileMatrix         tile matrix
+     * @param tileResults        tile results
+     * @param requestBoundingBox projected request bounding box
+     * @param tileWidth          tile width
+     * @param tileHeight         tile height
      * @return tile bitmap
      */
-    private Bitmap drawTile(TileMatrix tileMatrix, TileCursor tileResults, BoundingBox requestProjectedBoundingBox, int tileWidth, int tileHeight) {
+    private Bitmap drawTile(TileMatrix tileMatrix, TileCursor tileResults, BoundingBox requestBoundingBox, int tileWidth, int tileHeight) {
 
         // Draw the resulting bitmap with the matching tiles
         Bitmap tileBitmap = null;
@@ -430,7 +509,7 @@ public class TileCreator {
 
             // Get the bounding box where the requested image and
             // tile overlap
-            BoundingBox overlap = requestProjectedBoundingBox.overlap(
+            BoundingBox overlap = requestBoundingBox.overlap(
                     tileBoundingBox);
 
             // If the tile overlaps with the requested box
@@ -446,7 +525,7 @@ public class TileCreator {
                 // the resulting image
                 RectF dest = TileBoundingBoxAndroidUtils
                         .getRoundedFloatRectangle(tileWidth, tileHeight,
-                                requestProjectedBoundingBox, overlap);
+                                requestBoundingBox, overlap);
 
                 // Create the bitmap first time through
                 if (tileBitmap == null) {
