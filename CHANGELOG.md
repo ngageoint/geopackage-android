@@ -4,6 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
+## 6.1.4 (TBD)
+
+* TBD
+
 ## [6.1.3](https://github.com/ngageoint/geopackage-android/releases/tag/6.1.3) (12-17-2021)
 
 * UrlTileGenerator HTTP Method and Header field values support
