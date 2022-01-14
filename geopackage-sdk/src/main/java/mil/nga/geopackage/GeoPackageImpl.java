@@ -3,9 +3,6 @@ package mil.nga.geopackage;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
-
 import java.sql.SQLException;
 import java.util.List;
 
@@ -18,9 +15,9 @@ import mil.nga.geopackage.contents.ContentsDao;
 import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.CoreSQLUtils;
 import mil.nga.geopackage.db.GeoPackageConnection;
-import mil.nga.geopackage.extension.rtree.RTreeIndexExtension;
 import mil.nga.geopackage.db.GeoPackageCursorFactory;
 import mil.nga.geopackage.db.GeoPackageCursorWrapper;
+import mil.nga.geopackage.extension.rtree.RTreeIndexExtension;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
@@ -29,8 +26,6 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.features.user.FeatureTableReader;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
-import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
-import mil.nga.geopackage.tiles.matrix.TileMatrixKey;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileCursor;
@@ -235,28 +230,19 @@ public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
 
         // Get the Tile Matrix collection, order by zoom level ascending & pixel
         // size descending per requirement 51
+        String tableName = tileMatrixSet.getTableName();
         List<TileMatrix> tileMatrices;
         try {
-            TileMatrixDao tileMatrixDao = getTileMatrixDao();
-            QueryBuilder<TileMatrix, TileMatrixKey> qb = tileMatrixDao
-                    .queryBuilder();
-            qb.where().eq(TileMatrix.COLUMN_TABLE_NAME,
-                    tileMatrixSet.getTableName());
-            qb.orderBy(TileMatrix.COLUMN_ZOOM_LEVEL, true);
-            qb.orderBy(TileMatrix.COLUMN_PIXEL_X_SIZE, false);
-            qb.orderBy(TileMatrix.COLUMN_PIXEL_Y_SIZE, false);
-            PreparedQuery<TileMatrix> query = qb.prepare();
-            tileMatrices = tileMatrixDao.query(query);
+            tileMatrices = getTileMatrixDao().queryForTableName(tableName);
         } catch (SQLException e) {
             throw new GeoPackageException("Failed to retrieve "
                     + TileDao.class.getSimpleName() + " for table name: "
-                    + tileMatrixSet.getTableName() + ". Exception retrieving "
+                    + tableName + ". Exception retrieving "
                     + TileMatrix.class.getSimpleName() + " collection.", e);
         }
 
         // Read the existing table and create the dao
-        TileTableReader tableReader = new TileTableReader(
-                tileMatrixSet.getTableName());
+        TileTableReader tableReader = new TileTableReader(tableName);
         final TileTable tileTable = tableReader.readTable(database);
         tileTable.setContents(tileMatrixSet.getContents());
         TileDao dao = new TileDao(getName(), database, tileMatrixSet, tileMatrices,

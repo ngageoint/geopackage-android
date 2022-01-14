@@ -155,17 +155,20 @@ android {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.4.0'
+    api 'androidx.appcompat:appcompat:1.4.1'
     api 'androidx.documentfile:documentfile:1.0.1'
-    api 'com.j256.ormlite:ormlite-android:5.6'
-    api 'mil.nga.geopackage:geopackage-core:6.1.1'
+    api 'com.j256.ormlite:ormlite-android:6.1'
+    api ('mil.nga.geopackage:geopackage-core:6.1.2'){
+        exclude module: 'ormlite-core'
+        exclude group: 'com.j256.ormlite'
+    }
     api 'ar.com.hjg:pngj:2.1.0'
-    api 'mil.nga:tiff:2.0.5'
+    api 'mil.nga:tiff:3.0.0'
     api 'mil.nga:sqlite-android:3360000'
-    javadocDeps 'com.j256.ormlite:ormlite-android:5.6',
-            'mil.nga.geopackage:geopackage-core:6.1.1',
+    javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
+            'mil.nga.geopackage:geopackage-core:6.1.2',
             'ar.com.hjg:pngj:2.1.0',
-            'mil.nga:tiff:2.0.5'
+            'mil.nga:tiff:3.0.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
 }

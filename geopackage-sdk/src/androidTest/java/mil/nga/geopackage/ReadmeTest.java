@@ -188,8 +188,8 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         featureTiles.setIndexManager(indexer); // Set index manager to query feature indices
         Bitmap tile = featureTiles.drawTile(2, 2, 2);
 
-        BoundingBox boundingBox = new BoundingBox();
-        Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+        BoundingBox boundingBox = BoundingBox.worldWebMercator();
+        Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
 
         // URL Tile Generator (generate tiles from a URL)
         TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,

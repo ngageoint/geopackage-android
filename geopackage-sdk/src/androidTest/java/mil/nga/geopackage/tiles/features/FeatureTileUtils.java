@@ -37,7 +37,7 @@ public class FeatureTileUtils {
      */
     public static FeatureDao createFeatureDao(GeoPackage geoPackage) {
 
-        BoundingBox boundingBox = new BoundingBox();
+        BoundingBox boundingBox = BoundingBox.worldWGS84();
 
         GeometryColumns geometryColumns = new GeometryColumns();
         geometryColumns.setId(new TableColumnKey("feature_tiles",

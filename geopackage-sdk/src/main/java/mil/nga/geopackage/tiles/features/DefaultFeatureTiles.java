@@ -27,7 +27,6 @@ import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.sf.CompoundCurve;
 import mil.nga.sf.Geometry;
 import mil.nga.sf.GeometryCollection;
-import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.LineString;
 import mil.nga.sf.MultiLineString;
@@ -327,7 +326,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 rowId = row.getId();
                 geomData = geometryCache.get(rowId);
                 if (geomData != null) {
-                    transformedBoundingBox = new BoundingBox(geomData.getEnvelope());
+                    transformedBoundingBox = geomData.getBoundingBox();
                 }
             }
 
@@ -341,8 +340,7 @@ public class DefaultFeatureTiles extends FeatureTiles {
                 if (geometry != null) {
 
                     if (transformedBoundingBox == null) {
-                        GeometryEnvelope envelope = geomData.getOrBuildEnvelope();
-                        BoundingBox geometryBoundingBox = new BoundingBox(envelope);
+                        BoundingBox geometryBoundingBox = geomData.getOrBuildBoundingBox();
                         transformedBoundingBox = geometryBoundingBox.transform(transform);
 
                         if (cacheGeometries) {

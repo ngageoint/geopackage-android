@@ -439,19 +439,21 @@ public class TileCreator {
             } else {
                 // Use the max tile pixel length and adjust to
                 // the sides to the requested bounds ratio
-                double maxLength = Math.max(
-                        tilesBoundingBox.getLongitudeRange() / pixelXSize,
-                        tilesBoundingBox.getLatitudeRange() / pixelYSize);
+                double tileWidth = tilesBoundingBox.getLongitudeRange()
+                        / pixelXSize;
+                double tileHeight = tilesBoundingBox.getLatitudeRange()
+                        / pixelYSize;
                 if (requestLonRange < requestLatRange) {
                     requestedTileWidth = (int) Math.round(
-                            maxLength * (requestLonRange / requestLatRange));
-                    requestedTileHeight = (int) Math.round(maxLength);
+                            tileHeight * (requestLonRange / requestLatRange));
+                    requestedTileHeight = (int) Math.round(tileHeight);
                 } else if (requestLatRange < requestLonRange) {
-                    requestedTileWidth = (int) Math.round(maxLength);
+                    requestedTileWidth = (int) Math.round(tileWidth);
                     requestedTileHeight = (int) Math.round(
-                            maxLength * (requestLatRange / requestLonRange));
+                            tileWidth * (requestLatRange / requestLonRange));
                 } else {
-                    requestedTileWidth = (int) Math.round(maxLength);
+                    requestedTileWidth = (int) Math
+                            .round(Math.max(tileWidth, tileHeight));
                     requestedTileHeight = requestedTileWidth;
                 }
             }

@@ -54,7 +54,7 @@ public class TileCreatorGetTileTest extends LoadGeoPackageTestCase {
         int height = 140;
         TileCreator tileCreator = new TileCreator(tileDao, width, height, wgs84);
 
-        BoundingBox boundingBox = new BoundingBox();
+        BoundingBox boundingBox = BoundingBox.worldWGS84();
         boundingBox = TileBoundingBoxUtils.boundWgs84BoundingBoxWithWebMercatorLimits(boundingBox);
         TestCase.assertFalse(tileCreator.hasTile(boundingBox));
 

@@ -22,7 +22,6 @@ import mil.nga.sf.Geometry;
 import mil.nga.sf.LineString;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
-import mil.nga.sf.util.GeometryEnvelopeBuilder;
 
 /**
  * For testing performance of feature inserts through duration logging and
@@ -115,8 +114,7 @@ public class GeoPackagePerformance extends BaseTestCase {
         geometryColumns.setM((byte) 0);
         geometryColumns.setSrs(srs);
 
-        BoundingBox boundingBox = new BoundingBox(
-                GeometryEnvelopeBuilder.buildEnvelope(geometry));
+        BoundingBox boundingBox = new BoundingBox(geometry);
 
         geoPackage.createFeatureTable(
                 FeatureTableMetadata.create(geometryColumns, boundingBox));

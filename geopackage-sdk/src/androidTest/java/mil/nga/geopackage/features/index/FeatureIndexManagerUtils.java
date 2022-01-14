@@ -483,7 +483,7 @@ public class FeatureIndexManagerUtils {
                 TestCase.assertTrue(lastIndexedAfter.after(lastIndexedBefore));
 
                 // Verify the index was updated for the feature row
-                envelope = GeometryEnvelopeBuilder.buildEnvelope(point);
+                envelope = point.getEnvelope();
                 resultCount = 0;
                 featureFound = false;
                 TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);

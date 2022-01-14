@@ -4,13 +4,13 @@ import com.j256.ormlite.dao.CloseableIterator;
 
 import junit.framework.TestCase;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.extension.ExtensionScopeType;
 import mil.nga.geopackage.extension.Extensions;
 import mil.nga.geopackage.extension.ExtensionsDao;
@@ -18,7 +18,6 @@ import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.io.TestGeoPackageProgress;
 import mil.nga.proj.Projection;
 import mil.nga.proj.ProjectionConstants;
@@ -39,9 +38,9 @@ public class FeatureTableIndexUtils {
      * Test read
      *
      * @param geoPackage
-     * @throws SQLException
+     * @throws Exception
      */
-    public static void testIndex(GeoPackage geoPackage) throws SQLException, IOException {
+    public static void testIndex(GeoPackage geoPackage) throws Exception {
 
         // Test indexing each feature table
         List<String> featureTables = geoPackage.getFeatureTables();
@@ -193,7 +192,7 @@ public class FeatureTableIndexUtils {
             TestCase.assertTrue(lastIndexedAfter.after(lastIndexedBefore));
 
             // Verify the index was updated for the feature row
-            envelope = GeometryEnvelopeBuilder.buildEnvelope(point);
+            envelope = point.getEnvelope();
             resultCount = 0;
             featureFound = false;
             TestCase.assertTrue(featureTableIndex.count(envelope) >= 1);

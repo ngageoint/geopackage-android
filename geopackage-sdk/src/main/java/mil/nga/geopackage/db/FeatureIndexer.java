@@ -263,7 +263,7 @@ public class FeatureIndexer {
             if (envelope == null) {
                 Geometry geometry = geomData.getGeometry();
                 if (geometry != null) {
-                    envelope = GeometryEnvelopeBuilder.buildEnvelope(geometry);
+                    envelope = geometry.getEnvelope();
                 }
             }
 

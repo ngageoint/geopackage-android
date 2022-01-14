@@ -2,7 +2,6 @@ package mil.nga.geopackage.extension.nga.index;
 
 import org.junit.Test;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import mil.nga.geopackage.ImportGeoPackageTestCase;
@@ -24,11 +23,10 @@ public class FeatureTableIndexImportTest extends ImportGeoPackageTestCase {
     /**
      * Test index
      *
-     * @throws SQLException upon error
-     * @throws IOException  upon error
+     * @throws Exception upon error
      */
     @Test
-    public void testIndex() throws SQLException, IOException {
+    public void testIndex() throws Exception {
 
         FeatureTableIndexUtils.testIndex(geoPackage);
 

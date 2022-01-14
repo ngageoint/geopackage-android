@@ -788,9 +788,9 @@ public class GeoPackageExample extends BaseTestCase {
         GeometryEnvelope envelope = null;
         for (Geometry geometry : geometries) {
             if (envelope == null) {
-                envelope = GeometryEnvelopeBuilder.buildEnvelope(geometry);
+                envelope = geometry.getEnvelope();
             } else {
-                GeometryEnvelopeBuilder.buildEnvelope(geometry, envelope);
+                geometry.expandEnvelope(envelope);
             }
         }
 
