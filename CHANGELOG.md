@@ -10,6 +10,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * ormlite-android version 6.1
 * tiff version 3.0.0
 * appcompat version 1.4.1
+* SQLite Android Bindings version 3370200
 * TileGenerator individual zoom level specifications
 * TileCreator dynamic separated tile width and height determination adjustment
 * Iterable row results
