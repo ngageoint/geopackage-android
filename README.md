@@ -63,7 +63,7 @@ GeometryColumnsDao geomColumnsDao = geoPackage.getGeometryColumnsDao();
 TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
 TileMatrixDao tileMatrixDao = geoPackage.getTileMatrixDao();
 SchemaExtension schemaExtension = new SchemaExtension(geoPackage);
-DataColumnsDao dao = schemaExtension.getDataColumnsDao();
+DataColumnsDao dataColumnsDao = schemaExtension.getDataColumnsDao();
 DataColumnConstraintsDao dataColumnConstraintsDao = schemaExtension
         .getDataColumnConstraintsDao();
 MetadataExtension metadataExtension = new MetadataExtension(geoPackage);
@@ -81,12 +81,11 @@ String featureTable = features.get(0);
 FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
 FeatureCursor featureCursor = featureDao.queryForAll();
 try {
-    while (featureCursor.moveToNext()) {
-        FeatureRow featureRow = featureCursor.getRow();
+    for (FeatureRow featureRow : featureCursor) {
         GeoPackageGeometryData geometryData = featureRow.getGeometry();
         if (geometryData != null && !geometryData.isEmpty()) {
-          Geometry geometry = geometryData.getGeometry();
-          // ...
+            Geometry geometry = geometryData.getGeometry();
+            // ...
         }
     }
 } finally {
@@ -98,8 +97,7 @@ String tileTable = tiles.get(0);
 TileDao tileDao = geoPackage.getTileDao(tileTable);
 TileCursor tileCursor = tileDao.queryForAll();
 try {
-    while (tileCursor.moveToNext()) {
-        TileRow tileRow = tileCursor.getRow();
+    for (TileRow tileRow : tileCursor) {
         byte[] tileBytes = tileRow.getTileData();
         Bitmap tileBitmap = tileRow.getTileDataBitmap();
         // ...
@@ -111,7 +109,7 @@ try {
 // Retrieve Tiles by XYZ
 GeoPackageTileRetriever retriever = new GeoPackageTileRetriever(tileDao);
 GeoPackageTile geoPackageTile = retriever.getTile(2, 2, 2);
-if(geoPackageTile != null) {
+if (geoPackageTile != null) {
     byte[] tileBytes = geoPackageTile.getData();
     Bitmap tileBitmap = geoPackageTile.getBitmap();
     // ...
@@ -122,16 +120,33 @@ TileCreator tileCreator = new TileCreator(
         tileDao, ProjectionFactory.getProjection(ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM));
 GeoPackageTile geoPackageTile2 = tileCreator.getTile(
         new BoundingBox(-90.0, 0.0, 0.0, 66.513260));
-if(geoPackageTile2 != null) {
+if (geoPackageTile2 != null) {
     byte[] tileBytes = geoPackageTile2.getData();
     Bitmap tileBitmap = geoPackageTile2.getBitmap();
     // ...
 }
 
+BoundingBox boundingBox = BoundingBox.worldWebMercator();
+Projection projection = ProjectionFactory
+        .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
+
 // Index Features
 FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
 indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
 int indexedCount = indexer.index();
+
+// Query Indexed Features in paginated chunks
+FeatureIndexResults indexResults = indexer.queryForChunk(boundingBox,
+        projection, 50);
+FeaturePaginatedCursor paginatedCursor = indexer
+        .paginate(indexResults);
+for (FeatureRow featureRow : paginatedCursor) {
+    GeoPackageGeometryData geometryData = featureRow.getGeometry();
+    if (geometryData != null && !geometryData.isEmpty()) {
+        Geometry geometry = geometryData.getGeometry();
+        // ...
+    }
+}
 
 // Draw tiles from features
 FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao, context.getResources().getDisplayMetrics().density);
@@ -141,9 +156,6 @@ featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count t
 featureTiles.setIndexManager(indexer); // Set index manager to query feature indices
 Bitmap tile = featureTiles.drawTile(2, 2, 2);
 
-BoundingBox boundingBox = BoundingBox.worldWebMercator();
-Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
-
 // URL Tile Generator (generate tiles from a URL)
 TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,
         "url_tile_table", "http://url/{z}/{x}/{y}.png", 0, 0, boundingBox, projection);
@@ -151,7 +163,7 @@ int urlTileCount = urlTileGenerator.generateTiles();
 
 // Feature Tile Generator (generate tiles from features)
 TileGenerator featureTileGenerator = new FeatureTileGenerator(context, geoPackage,
-        featureTable + "_tiles", featureTiles, 1, 2, boundingBox, projection);
+        "tiles_" + featureTable, featureTiles, 1, 2, boundingBox, projection);
 int featureTileCount = featureTileGenerator.generateTiles();
 
 // Close feature tiles (and indexer)

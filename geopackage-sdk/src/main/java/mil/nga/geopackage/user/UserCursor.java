@@ -9,6 +9,7 @@ import com.j256.ormlite.misc.IOUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -486,6 +487,47 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
             IOUtils.closeQuietly(byteStream);
         }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<TRow> iterator() {
+        return new Iterator<TRow>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean hasNext() {
+                return moveToNext();
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TRow next() {
+                return getRow();
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSql() {
+        return query.getOrBuildSql();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getSelectionArgs() {
+        return query.getSelectionArgs();
     }
 
 }

@@ -12,6 +12,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * appcompat version 1.4.1
 * TileGenerator individual zoom level specifications
 * TileCreator dynamic separated tile width and height determination adjustment
+* Iterable row results
+* Improved pagination query support
 
 ## [6.1.3](https://github.com/ngageoint/geopackage-android/releases/tag/6.1.3) (12-17-2021)
 

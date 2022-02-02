@@ -165,12 +165,12 @@ public class RelatedAttributesUtils {
             TestCase.assertTrue(attributesRelation.getId() >= 0);
             TestCase.assertEquals(attributesDao.getTableName(),
                     attributesRelation.getBaseTableName());
-            TestCase.assertEquals(attributesDao.getTable().getPkColumn()
-                    .getName(), attributesRelation.getBasePrimaryColumn());
+            TestCase.assertEquals(attributesDao.getPkColumnName(),
+                    attributesRelation.getBasePrimaryColumn());
             TestCase.assertEquals(attributesDao2.getTableName(),
                     attributesRelation.getRelatedTableName());
-            TestCase.assertEquals(attributesDao2.getTable().getPkColumn()
-                    .getName(), attributesRelation.getRelatedPrimaryColumn());
+            TestCase.assertEquals(attributesDao2.getPkColumnName(),
+                    attributesRelation.getRelatedPrimaryColumn());
             TestCase.assertEquals(RelationType.ATTRIBUTES.getName(),
                     attributesRelation.getRelationName());
             TestCase.assertEquals(mappingTableName,
@@ -211,12 +211,12 @@ public class RelatedAttributesUtils {
             TestCase.assertTrue(relation.getId() >= 0);
             TestCase.assertEquals(attributesDao.getTableName(),
                     relation.getBaseTableName());
-            TestCase.assertEquals(attributesDao.getTable().getPkColumn()
-                    .getName(), relation.getBasePrimaryColumn());
+            TestCase.assertEquals(attributesDao.getPkColumnName(),
+                    relation.getBasePrimaryColumn());
             TestCase.assertEquals(attributesDao2.getTableName(),
                     relation.getRelatedTableName());
-            TestCase.assertEquals(attributesDao2.getTable().getPkColumn()
-                    .getName(), relation.getRelatedPrimaryColumn());
+            TestCase.assertEquals(attributesDao2.getPkColumnName(),
+                    relation.getRelatedPrimaryColumn());
             TestCase.assertEquals(RelationType.ATTRIBUTES.getName(),
                     relation.getRelationName());
             TestCase.assertEquals(mappingTableName,

@@ -124,7 +124,7 @@ public abstract class CreateCoverageDataGeoPackageTestCase extends
             griddedCoverage.setPrecision(10.0 * Math.random());
             defaultPrecision = false;
         }
-        griddedCoverage.setDataNull(new Double(Short.MAX_VALUE
+        griddedCoverage.setDataNull(Double.valueOf(Short.MAX_VALUE
                 - Short.MIN_VALUE));
         GriddedCoverageEncodingType encoding;
         double randomEncoding = Math.random();

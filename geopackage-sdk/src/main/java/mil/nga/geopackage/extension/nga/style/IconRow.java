@@ -8,7 +8,7 @@ import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.user.custom.UserCustomRow;
 
 /**
- * Icon Row containing the values from a single result set row
+ * Icon Row containing the values from a single cursor row
  *
  * @author osbornb
  * @since 3.2.0

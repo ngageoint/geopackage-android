@@ -43,7 +43,7 @@ public class StyleMappingDao extends UserMappingDao {
     }
 
     /**
-     * Get the style mapping row from the current result set location
+     * Get the style mapping row from the current cursor location
      *
      * @param cursor cursor
      * @return style mapping row

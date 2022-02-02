@@ -28,12 +28,36 @@ public class FeatureIndexManagerCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test index
      *
-     * @throws SQLException
+     * @throws SQLException upon error
      */
     @Test
     public void testIndex() throws SQLException {
 
         FeatureIndexManagerUtils.testIndex(activity, geoPackage);
+
+    }
+
+    /**
+     * Test index chunk
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testIndexChunk() throws SQLException {
+
+        FeatureIndexManagerUtils.testIndexChunk(activity, geoPackage);
+
+    }
+
+    /**
+     * Test index pagination
+     *
+     * @throws SQLException upon error
+     */
+    @Test
+    public void testIndexPagination() throws SQLException {
+
+        FeatureIndexManagerUtils.testIndexPagination(activity, geoPackage);
 
     }
 

@@ -38,7 +38,7 @@ public class StyleDao extends AttributesDao {
     }
 
     /**
-     * Get the style row from the current result set location
+     * Get the style row from the current cursor location
      *
      * @param cursor cursor
      * @return style row

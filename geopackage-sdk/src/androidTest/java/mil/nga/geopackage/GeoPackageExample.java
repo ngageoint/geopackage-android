@@ -74,6 +74,7 @@ import mil.nga.geopackage.extension.nga.style.IconRow;
 import mil.nga.geopackage.extension.nga.style.StyleRow;
 import mil.nga.geopackage.extension.related.ExtendedRelation;
 import mil.nga.geopackage.extension.related.RelatedTablesExtension;
+import mil.nga.geopackage.extension.related.RelatedTablesUtils;
 import mil.nga.geopackage.extension.related.UserMappingDao;
 import mil.nga.geopackage.extension.related.UserMappingRow;
 import mil.nga.geopackage.extension.related.UserMappingTable;
@@ -109,7 +110,6 @@ import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.style.Color;
 import mil.nga.geopackage.style.ColorConstants;
-import mil.nga.geopackage.extension.related.RelatedTablesUtils;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
 import mil.nga.geopackage.tiles.TileGrid;
@@ -145,7 +145,6 @@ import mil.nga.sf.MultiLineString;
 import mil.nga.sf.MultiPolygon;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
-import mil.nga.sf.util.GeometryEnvelopeBuilder;
 import mil.nga.sf.wkb.GeometryCodes;
 
 /**
@@ -1508,7 +1507,7 @@ public class GeoPackageExample extends BaseTestCase {
         GriddedCoverage griddedCoverage = new GriddedCoverage();
         griddedCoverage.setTileMatrixSet(tileMatrixSet);
         griddedCoverage.setDataType(GriddedCoverageDataType.INTEGER);
-        griddedCoverage.setDataNull(new Double(Short.MAX_VALUE
+        griddedCoverage.setDataNull(Double.valueOf(Short.MAX_VALUE
                 - Short.MIN_VALUE));
         griddedCoverage
                 .setGridCellEncodingType(GriddedCoverageEncodingType.CENTER);
@@ -1759,8 +1758,7 @@ public class GeoPackageExample extends BaseTestCase {
 
         FeatureCursor featureCursor = featureDao.queryForLike(
                 TEXT_COLUMN, query);
-        while (featureCursor.moveToNext()) {
-            FeatureRow featureRow = featureCursor.getRow();
+        for (FeatureRow featureRow : featureCursor) {
             UserMappingRow userMappingRow = userMappingDao.newRow();
             userMappingRow.setBaseId(featureRow.getId());
             userMappingRow.setRelatedId(mediaRowId);
@@ -1864,16 +1862,13 @@ public class GeoPackageExample extends BaseTestCase {
                 .getRelatedTableName());
 
         FeatureCursor featureCursor1 = featureDao1.queryForAll();
-        while (featureCursor1.moveToNext()) {
+        for (FeatureRow featureRow1 : featureCursor1) {
 
-            FeatureRow featureRow1 = featureCursor1.getRow();
             String featureName = featureRow1.getValue(TEXT_COLUMN).toString();
 
             FeatureCursor featureCursor2 = featureDao2.queryForEq(
                     TEXT_COLUMN, featureName);
-            while (featureCursor2.moveToNext()) {
-
-                FeatureRow featureRow2 = featureCursor2.getRow();
+            for (FeatureRow featureRow2 : featureCursor2) {
 
                 UserMappingRow userMappingRow = userMappingDao.newRow();
                 userMappingRow.setBaseId(featureRow1.getId());
@@ -1941,8 +1936,7 @@ public class GeoPackageExample extends BaseTestCase {
         AttributesDao attributesDao = geoPackage.getAttributesDao(tableName);
 
         AttributesCursor attributesCursor = attributesDao.queryForAll();
-        while (attributesCursor.moveToNext()) {
-            AttributesRow attributesRow = attributesCursor.getRow();
+        for (AttributesRow attributesRow : attributesCursor) {
             long randomSimpleRowId = simpleAttributesIds.get((int) (Math
                     .random() * simpleAttributesIds.size()));
             SimpleAttributesRow simpleAttributesRow = simpleAttributesDao
@@ -2007,16 +2001,13 @@ public class GeoPackageExample extends BaseTestCase {
         TileDao tileDao = geoPackage.getTileDao(relation.getRelatedTableName());
 
         FeatureCursor featureCursor = featureDao.queryForAll();
-        while (featureCursor.moveToNext()) {
+        for (FeatureRow featureRow : featureCursor) {
 
-            FeatureRow featureRow = featureCursor.getRow();
             String featureName = featureRow.getValue(TEXT_COLUMN).toString();
 
             TileCursor tileCursor = tileDao
                     .queryForTile(tileDao.getMinZoom());
-            while (tileCursor.moveToNext()) {
-
-                TileRow tileRow = tileCursor.getRow();
+            for (TileRow tileRow : tileCursor) {
 
                 UserMappingRow userMappingRow = userMappingDao.newRow();
                 userMappingRow.setBaseId(featureRow.getId());
@@ -2200,8 +2191,7 @@ public class GeoPackageExample extends BaseTestCase {
         int polygonCount = 0;
 
         FeatureCursor features = featureDao.queryForAll();
-        while (features.moveToNext()) {
-            FeatureRow featureRow = features.getRow();
+        for (FeatureRow featureRow : features) {
             switch (featureRow.getGeometryType()) {
                 case POINT:
                     pointCount++;
@@ -2262,8 +2252,7 @@ public class GeoPackageExample extends BaseTestCase {
         geometry2Styles.createIconRelationship();
 
         FeatureCursor features = featureDao.queryForAll();
-        while (features.moveToNext()) {
-            FeatureRow featureRow = features.getRow();
+        for (FeatureRow featureRow : features) {
             switch (featureRow.getGeometryType()) {
                 case POINT:
                     geometry2Styles.setIcon(featureRow, icons.get(0));

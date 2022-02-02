@@ -14,20 +14,21 @@ import java.util.Map;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageTestUtils;
+import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
+import mil.nga.geopackage.features.user.FeaturePaginatedCursor;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.geopackage.srs.SpatialReferenceSystem;
-import mil.nga.geopackage.GeoPackageTestUtils;
-import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.io.TestGeoPackageProgress;
+import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.proj.Projection;
 import mil.nga.proj.ProjectionConstants;
 import mil.nga.proj.ProjectionFactory;
@@ -35,7 +36,7 @@ import mil.nga.proj.ProjectionTransform;
 import mil.nga.sf.GeometryEnvelope;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.Point;
-import mil.nga.sf.util.GeometryEnvelopeBuilder;
+import mil.nga.sf.proj.GeometryTransform;
 
 /**
  * Feature Index Manager Utility test methods
@@ -527,6 +528,1055 @@ public class FeatureIndexManagerUtils {
                         featureCursor.close();
                         TestCase.assertTrue(featureIndexManager
                                 .deleteIndex(featureRow));
+                        break;
+                    }
+                }
+                featureCursor.close();
+            }
+
+            featureIndexManager.deleteIndex();
+
+            TestCase.assertFalse(featureIndexManager.isIndexed());
+            everyOther = !everyOther;
+
+            featureIndexManager.close();
+        }
+
+    }
+
+    /**
+     * Test index chunks
+     *
+     * @param activity   activity
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     */
+    public static void testIndexChunk(Activity activity, GeoPackage geoPackage)
+            throws SQLException {
+        geoPackage.getCursorFactory().setDebugLogQueries(true);
+        testIndex(activity, geoPackage, FeatureIndexType.RTREE, true);
+        testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
+        testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);
+    }
+
+    private static void testIndexChunk(Activity activity, GeoPackage geoPackage,
+                                       FeatureIndexType type, boolean includeEmpty) throws SQLException {
+
+        // Test indexing each feature table
+        List<String> featureTables = geoPackage.getFeatureTables();
+        for (String featureTable : featureTables) {
+
+            FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+            FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
+                    geoPackage, featureDao);
+            featureIndexManager.setContinueOnError(false);
+            featureIndexManager.setIndexLocation(type);
+            featureIndexManager.deleteAllIndexes();
+
+            // Determine how many features have geometry envelopes or geometries
+            int expectedCount = 0;
+            FeatureRow testFeatureRow = null;
+            FeatureCursor featureCursor = featureDao.query();
+            while (featureCursor.moveToNext()) {
+                FeatureRow featureRow = featureCursor.getRow();
+                if (featureRow.getGeometryEnvelope() != null) {
+                    expectedCount++;
+                    // Randomly choose a feature row with Geometry for testing
+                    // queries later
+                    if (testFeatureRow == null) {
+                        testFeatureRow = featureRow;
+                    } else if (Math
+                            .random() < (1.0 / featureCursor.getCount())) {
+                        testFeatureRow = featureRow;
+                    }
+                } else if (includeEmpty) {
+                    expectedCount++;
+                }
+            }
+            featureCursor.close();
+
+            TestCase.assertFalse(featureIndexManager.isIndexed());
+
+            // Test indexing
+            int indexCount = featureIndexManager.index();
+            TestCase.assertEquals(expectedCount, indexCount);
+
+            TestCase.assertTrue(featureIndexManager.isIndexed());
+            TestCase.assertEquals(expectedCount, featureIndexManager.count());
+
+            // Query for all indexed geometries
+            int resultCount = 0;
+            int chunkLimit = 3;
+            long offset = 0;
+            int lastCount = -1;
+            while (lastCount != 0) {
+                lastCount = 0;
+                FeatureIndexResults featureIndexResults = featureIndexManager
+                        .queryForChunk(chunkLimit, offset);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow, null,
+                            includeEmpty);
+                    lastCount++;
+                }
+                TestCase.assertEquals(expectedCount,
+                        featureIndexResults.count());
+                featureIndexResults.close();
+                resultCount += lastCount;
+                offset += chunkLimit;
+            }
+            TestCase.assertEquals(expectedCount, resultCount);
+
+            // Query for all indexed geometries with columns
+            resultCount = 0;
+            chunkLimit = 5;
+            offset = 0;
+            lastCount = -1;
+            while (lastCount != 0) {
+                lastCount = 0;
+                FeatureIndexResults featureIndexResults = featureIndexManager
+                        .queryForChunk(featureDao.getIdAndGeometryColumnNames(),
+                                chunkLimit, offset);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow, null,
+                            includeEmpty);
+                    lastCount++;
+                }
+                TestCase.assertEquals(expectedCount,
+                        featureIndexResults.count());
+                featureIndexResults.close();
+                resultCount += lastCount;
+                offset += chunkLimit;
+            }
+            TestCase.assertEquals(expectedCount, resultCount);
+
+            // Test the query by envelope
+            GeometryEnvelope envelope = testFeatureRow.getGeometryEnvelope();
+            final double difference = .000001;
+            envelope.setMinX(envelope.getMinX() - difference);
+            envelope.setMaxX(envelope.getMaxX() + difference);
+            envelope.setMinY(envelope.getMinY() - difference);
+            envelope.setMaxY(envelope.getMaxY() + difference);
+            if (envelope.hasZ()) {
+                envelope.setMinZ(envelope.getMinZ() - difference);
+                envelope.setMaxZ(envelope.getMaxZ() + difference);
+            }
+            if (envelope.hasM()) {
+                envelope.setMinM(envelope.getMinM() - difference);
+                envelope.setMaxM(envelope.getMaxM() + difference);
+            }
+            boolean featureFound = false;
+            TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);
+            resultCount = 0;
+            chunkLimit = 2;
+            offset = 0;
+            lastCount = -1;
+            while (lastCount != 0) {
+                lastCount = 0;
+                FeatureIndexResults featureIndexResults = featureIndexManager
+                        .queryForChunk(envelope, chunkLimit, offset);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            envelope, includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    lastCount++;
+                }
+                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                featureIndexResults.close();
+                resultCount += lastCount;
+                offset += chunkLimit;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 4;
+            offset = 0;
+            lastCount = -1;
+            while (lastCount != 0) {
+                lastCount = 0;
+                FeatureIndexResults featureIndexResults = featureIndexManager
+                        .queryForChunk(featureDao.getIdAndGeometryColumnNames(),
+                                envelope, chunkLimit, offset);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            envelope, includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    lastCount++;
+                }
+                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                featureIndexResults.close();
+                resultCount += lastCount;
+                offset += chunkLimit;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+
+            // Test the query by envelope with id iteration
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 1;
+            offset = 0;
+            lastCount = -1;
+            TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);
+            while (lastCount != 0) {
+                lastCount = 0;
+                FeatureIndexResults featureIndexResults = featureIndexManager
+                        .queryForChunk(envelope, chunkLimit, offset);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            envelope, includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    lastCount++;
+                }
+                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                featureIndexResults.close();
+                resultCount += lastCount;
+                offset += chunkLimit;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+
+            // Pick a projection different from the feature dao and project the
+            // bounding box
+            BoundingBox boundingBox = new BoundingBox(envelope.getMinX() - 1,
+                    envelope.getMinY() - 1, envelope.getMaxX() + 1,
+                    envelope.getMaxY() + 1);
+            Projection projection = null;
+            if (!featureDao.getProjection().equals(
+                    ProjectionConstants.AUTHORITY_EPSG,
+                    ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)) {
+                projection = ProjectionFactory.getProjection(
+                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+            } else {
+                projection = ProjectionFactory
+                        .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
+            }
+            GeometryTransform transform = GeometryTransform
+                    .create(featureDao.getProjection(), projection);
+            BoundingBox transformedBoundingBox = boundingBox
+                    .transform(transform);
+
+            // Test the query by projected bounding box
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 10;
+            offset = 0;
+            lastCount = -1;
+            TestCase.assertTrue(featureIndexManager
+                    .count(transformedBoundingBox, projection) >= 1);
+            while (lastCount != 0) {
+                lastCount = 0;
+                FeatureIndexResults featureIndexResults = featureIndexManager
+                        .queryForChunk(transformedBoundingBox, projection,
+                                chunkLimit, offset);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    lastCount++;
+                }
+                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                featureIndexResults.close();
+                resultCount += lastCount;
+                offset += chunkLimit;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 100;
+            offset = 0;
+            lastCount = -1;
+            while (lastCount != 0) {
+                lastCount = 0;
+                FeatureIndexResults featureIndexResults = featureIndexManager
+                        .queryForChunk(featureDao.getIdAndGeometryColumnNames(),
+                                transformedBoundingBox, projection, chunkLimit,
+                                offset);
+                for (FeatureRow featureRow : featureIndexResults) {
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    lastCount++;
+                }
+                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                featureIndexResults.close();
+                resultCount += lastCount;
+                offset += chunkLimit;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+
+            // Test query by criteria
+            FeatureTable table = featureDao.getTable();
+            List<FeatureColumn> columns = table.getColumns();
+
+            Map<String, Number> numbers = new HashMap<>();
+            Map<String, String> strings = new HashMap<>();
+
+            for (FeatureColumn column : columns) {
+                if (column.isPrimaryKey() || column.isGeometry()) {
+                    continue;
+                }
+                GeoPackageDataType dataType = column.getDataType();
+                switch (dataType) {
+                    case DOUBLE:
+                    case FLOAT:
+                    case INT:
+                    case INTEGER:
+                    case TINYINT:
+                    case SMALLINT:
+                    case MEDIUMINT:
+                    case REAL:
+                        numbers.put(column.getName(), null);
+                        break;
+                    case TEXT:
+                        strings.put(column.getName(), null);
+                        break;
+                    default:
+
+                }
+            }
+
+            for (String number : numbers.keySet()) {
+                Object value = testFeatureRow.getValue(number);
+                numbers.put(number, (Number) value);
+            }
+
+            for (String string : strings.keySet()) {
+                String value = testFeatureRow.getValueString(string);
+                strings.put(string, value);
+            }
+
+            for (Map.Entry<String, Number> number : numbers.entrySet()) {
+
+                String column = number.getKey();
+                double value = number.getValue().doubleValue();
+
+                String where = column + " >= ? AND " + column + " <= ?";
+                String[] whereArgs = new String[]{
+                        String.valueOf(value - 0.001),
+                        String.valueOf(value + 0.001)};
+
+                long count = featureIndexManager.count(where, whereArgs);
+                TestCase.assertTrue(count >= 1);
+                resultCount = 0;
+                chunkLimit = 5;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(where, whereArgs, chunkLimit,
+                                    offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                ((Number) featureRow.getValue(column))
+                                        .doubleValue());
+                        lastCount++;
+                    }
+                    TestCase.assertEquals(count, featureIndexResults.count());
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+                resultCount = 0;
+                chunkLimit = 25;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(new String[]{column}, where,
+                                    whereArgs, chunkLimit, offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                ((Number) featureRow.getValue(column))
+                                        .doubleValue());
+                        lastCount++;
+                    }
+                    TestCase.assertEquals(count, featureIndexResults.count());
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+
+                count = featureIndexManager.count(transformedBoundingBox,
+                        projection, where, whereArgs);
+                TestCase.assertTrue(count >= 1);
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 1;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(transformedBoundingBox, projection,
+                                    where, whereArgs, chunkLimit, offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                ((Number) featureRow.getValue(column))
+                                        .doubleValue());
+                        validateFeatureRow(featureIndexManager, featureRow,
+                                boundingBox.buildEnvelope(), includeEmpty);
+                        if (featureRow.getId() == testFeatureRow.getId()) {
+                            featureFound = true;
+                        }
+                        lastCount++;
+                    }
+                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 3;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(new String[]{
+                                            featureDao.getGeometryColumnName(), column,
+                                            featureDao.getIdColumnName()},
+                                    transformedBoundingBox, projection, where,
+                                    whereArgs, chunkLimit, offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                ((Number) featureRow.getValue(column))
+                                        .doubleValue());
+                        validateFeatureRow(featureIndexManager, featureRow,
+                                boundingBox.buildEnvelope(), includeEmpty);
+                        if (featureRow.getId() == testFeatureRow.getId()) {
+                            featureFound = true;
+                        }
+                        lastCount++;
+                    }
+                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+            }
+
+            for (Map.Entry<String, String> string : strings.entrySet()) {
+
+                String column = string.getKey();
+                String value = string.getValue();
+
+                Map<String, Object> fieldValues = new HashMap<>();
+                fieldValues.put(column, value);
+
+                long count = featureIndexManager.count(fieldValues);
+                TestCase.assertTrue(count >= 1);
+                resultCount = 0;
+                chunkLimit = 4;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(fieldValues, chunkLimit, offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                featureRow.getValueString(column));
+                        lastCount++;
+                    }
+                    TestCase.assertEquals(count, featureIndexResults.count());
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+                resultCount = 0;
+                chunkLimit = 6;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(new String[]{column}, fieldValues,
+                                    chunkLimit, offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                featureRow.getValueString(column));
+                        lastCount++;
+                    }
+                    TestCase.assertEquals(count, featureIndexResults.count());
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+
+                count = featureIndexManager.count(transformedBoundingBox,
+                        projection, fieldValues);
+                TestCase.assertTrue(count >= 1);
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 2;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(transformedBoundingBox, projection,
+                                    fieldValues, chunkLimit, offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                featureRow.getValueString(column));
+                        validateFeatureRow(featureIndexManager, featureRow,
+                                boundingBox.buildEnvelope(), includeEmpty);
+                        if (featureRow.getId() == testFeatureRow.getId()) {
+                            featureFound = true;
+                        }
+                        lastCount++;
+                    }
+                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 2;
+                offset = 0;
+                lastCount = -1;
+                while (lastCount != 0) {
+                    lastCount = 0;
+                    FeatureIndexResults featureIndexResults = featureIndexManager
+                            .queryForChunk(
+                                    new String[]{column,
+                                            featureDao.getIdColumnName(),
+                                            featureDao
+                                                    .getGeometryColumnName()},
+                                    transformedBoundingBox, projection,
+                                    fieldValues, chunkLimit, offset);
+                    for (FeatureRow featureRow : featureIndexResults) {
+                        TestCase.assertEquals(value,
+                                featureRow.getValueString(column));
+                        validateFeatureRow(featureIndexManager, featureRow,
+                                boundingBox.buildEnvelope(), includeEmpty);
+                        if (featureRow.getId() == testFeatureRow.getId()) {
+                            featureFound = true;
+                        }
+                        lastCount++;
+                    }
+                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    featureIndexResults.close();
+                    resultCount += lastCount;
+                    offset += chunkLimit;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+            }
+
+            featureIndexManager.close();
+        }
+
+        // Delete the extensions
+        boolean everyOther = false;
+        for (String featureTable : featureTables) {
+            FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+            FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
+                    geoPackage, featureDao);
+            featureIndexManager.setIndexLocation(type);
+            TestCase.assertTrue(featureIndexManager.isIndexed());
+
+            // Test deleting a single geometry index
+            if (everyOther) {
+                FeatureCursor featureCursor = featureDao.query();
+                while (featureCursor.moveToNext()) {
+                    FeatureRow featureRow = featureCursor.getRow();
+                    if (featureRow.getGeometryEnvelope() != null) {
+                        featureCursor.close();
+                        TestCase.assertTrue(
+                                featureIndexManager.deleteIndex(featureRow));
+                        break;
+                    }
+                }
+                featureCursor.close();
+            }
+
+            featureIndexManager.deleteIndex();
+
+            TestCase.assertFalse(featureIndexManager.isIndexed());
+            everyOther = !everyOther;
+
+            featureIndexManager.close();
+        }
+
+    }
+
+    /**
+     * Test index pagination
+     *
+     * @param activity   activity
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     */
+    public static void testIndexPagination(Activity activity, GeoPackage geoPackage)
+            throws SQLException {
+        geoPackage.getCursorFactory().setDebugLogQueries(true);
+        testIndex(activity, geoPackage, FeatureIndexType.RTREE, true);
+        testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
+        testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);
+    }
+
+    private static void testIndexPagination(Activity activity, GeoPackage geoPackage,
+                                            FeatureIndexType type, boolean includeEmpty) throws SQLException {
+
+        // Test indexing each feature table
+        List<String> featureTables = geoPackage.getFeatureTables();
+        for (String featureTable : featureTables) {
+
+            FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+            FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
+                    geoPackage, featureDao);
+            featureIndexManager.setContinueOnError(false);
+            featureIndexManager.setIndexLocation(type);
+            featureIndexManager.deleteAllIndexes();
+
+            // Determine how many features have geometry envelopes or geometries
+            int expectedCount = 0;
+            FeatureRow testFeatureRow = null;
+            FeatureCursor featureCursor = featureDao.query();
+            while (featureCursor.moveToNext()) {
+                FeatureRow featureRow = featureCursor.getRow();
+                if (featureRow.getGeometryEnvelope() != null) {
+                    expectedCount++;
+                    // Randomly choose a feature row with Geometry for testing
+                    // queries later
+                    if (testFeatureRow == null) {
+                        testFeatureRow = featureRow;
+                    } else if (Math
+                            .random() < (1.0 / featureCursor.getCount())) {
+                        testFeatureRow = featureRow;
+                    }
+                } else if (includeEmpty) {
+                    expectedCount++;
+                }
+            }
+            featureCursor.close();
+
+            TestCase.assertFalse(featureIndexManager.isIndexed());
+
+            // Test indexing
+            int indexCount = featureIndexManager.index();
+            TestCase.assertEquals(expectedCount, indexCount);
+
+            TestCase.assertTrue(featureIndexManager.isIndexed());
+            TestCase.assertEquals(expectedCount, featureIndexManager.count());
+
+            // Query for all indexed geometries
+            int resultCount = 0;
+            int chunkLimit = 3;
+            FeaturePaginatedCursor paginatedResults = featureIndexManager
+                    .paginate(featureIndexManager.queryForChunk(chunkLimit));
+            for (FeatureRow featureRow : paginatedResults) {
+                validateFeatureRow(featureIndexManager, featureRow, null,
+                        includeEmpty);
+                resultCount++;
+            }
+            TestCase.assertEquals(expectedCount, resultCount);
+
+            // Query for all indexed geometries with columns
+            resultCount = 0;
+            chunkLimit = 5;
+            paginatedResults = featureIndexManager.paginate(featureIndexManager
+                    .queryForChunk(featureDao.getIdAndGeometryColumnNames(),
+                            chunkLimit));
+            for (FeatureRow featureRow : paginatedResults) {
+                validateFeatureRow(featureIndexManager, featureRow, null,
+                        includeEmpty);
+                resultCount++;
+            }
+            TestCase.assertEquals(expectedCount, resultCount);
+
+            // Test the query by envelope
+            GeometryEnvelope envelope = testFeatureRow.getGeometryEnvelope();
+            final double difference = .000001;
+            envelope.setMinX(envelope.getMinX() - difference);
+            envelope.setMaxX(envelope.getMaxX() + difference);
+            envelope.setMinY(envelope.getMinY() - difference);
+            envelope.setMaxY(envelope.getMaxY() + difference);
+            if (envelope.hasZ()) {
+                envelope.setMinZ(envelope.getMinZ() - difference);
+                envelope.setMaxZ(envelope.getMaxZ() + difference);
+            }
+            if (envelope.hasM()) {
+                envelope.setMinM(envelope.getMinM() - difference);
+                envelope.setMaxM(envelope.getMaxM() + difference);
+            }
+            boolean featureFound = false;
+            TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);
+            resultCount = 0;
+            chunkLimit = 2;
+            paginatedResults = featureIndexManager.paginate(
+                    featureIndexManager.queryForChunk(envelope, chunkLimit));
+            for (FeatureRow featureRow : paginatedResults) {
+                validateFeatureRow(featureIndexManager, featureRow, envelope,
+                        includeEmpty);
+                if (featureRow.getId() == testFeatureRow.getId()) {
+                    featureFound = true;
+                }
+                resultCount++;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 4;
+            paginatedResults = featureIndexManager.paginate(featureIndexManager
+                    .queryForChunk(featureDao.getIdAndGeometryColumnNames(),
+                            envelope, chunkLimit));
+            for (FeatureRow featureRow : paginatedResults) {
+                validateFeatureRow(featureIndexManager, featureRow, envelope,
+                        includeEmpty);
+                if (featureRow.getId() == testFeatureRow.getId()) {
+                    featureFound = true;
+                }
+                resultCount++;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+
+            // Test the query by envelope with id iteration
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 1;
+            TestCase.assertTrue(featureIndexManager.count(envelope) >= 1);
+            paginatedResults = featureIndexManager.paginate(
+                    featureIndexManager.queryForChunk(envelope, chunkLimit));
+            for (FeatureRow featureRow : paginatedResults) {
+                validateFeatureRow(featureIndexManager, featureRow, envelope,
+                        includeEmpty);
+                if (featureRow.getId() == testFeatureRow.getId()) {
+                    featureFound = true;
+                }
+                resultCount++;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+
+            // Pick a projection different from the feature dao and project the
+            // bounding box
+            BoundingBox boundingBox = new BoundingBox(envelope.getMinX() - 1,
+                    envelope.getMinY() - 1, envelope.getMaxX() + 1,
+                    envelope.getMaxY() + 1);
+            Projection projection = null;
+            if (!featureDao.getProjection().equals(
+                    ProjectionConstants.AUTHORITY_EPSG,
+                    ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM)) {
+                projection = ProjectionFactory.getProjection(
+                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+            } else {
+                projection = ProjectionFactory
+                        .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
+            }
+            GeometryTransform transform = GeometryTransform
+                    .create(featureDao.getProjection(), projection);
+            BoundingBox transformedBoundingBox = boundingBox
+                    .transform(transform);
+
+            // Test the query by projected bounding box
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 10;
+            TestCase.assertTrue(featureIndexManager
+                    .count(transformedBoundingBox, projection) >= 1);
+            paginatedResults = featureIndexManager.paginate(
+                    featureIndexManager.queryForChunk(transformedBoundingBox,
+                            projection, chunkLimit));
+            for (FeatureRow featureRow : paginatedResults) {
+                validateFeatureRow(featureIndexManager, featureRow,
+                        boundingBox.buildEnvelope(), includeEmpty);
+                if (featureRow.getId() == testFeatureRow.getId()) {
+                    featureFound = true;
+                }
+                resultCount++;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+            featureFound = false;
+            resultCount = 0;
+            chunkLimit = 100;
+            paginatedResults = featureIndexManager.paginate(featureIndexManager
+                    .queryForChunk(featureDao.getIdAndGeometryColumnNames(),
+                            transformedBoundingBox, projection, chunkLimit));
+            for (FeatureRow featureRow : paginatedResults) {
+                validateFeatureRow(featureIndexManager, featureRow,
+                        boundingBox.buildEnvelope(), includeEmpty);
+                if (featureRow.getId() == testFeatureRow.getId()) {
+                    featureFound = true;
+                }
+                resultCount++;
+            }
+            TestCase.assertTrue(featureFound);
+            TestCase.assertTrue(resultCount >= 1);
+
+            // Test query by criteria
+            FeatureTable table = featureDao.getTable();
+            List<FeatureColumn> columns = table.getColumns();
+
+            Map<String, Number> numbers = new HashMap<>();
+            Map<String, String> strings = new HashMap<>();
+
+            for (FeatureColumn column : columns) {
+                if (column.isPrimaryKey() || column.isGeometry()) {
+                    continue;
+                }
+                GeoPackageDataType dataType = column.getDataType();
+                switch (dataType) {
+                    case DOUBLE:
+                    case FLOAT:
+                    case INT:
+                    case INTEGER:
+                    case TINYINT:
+                    case SMALLINT:
+                    case MEDIUMINT:
+                    case REAL:
+                        numbers.put(column.getName(), null);
+                        break;
+                    case TEXT:
+                        strings.put(column.getName(), null);
+                        break;
+                    default:
+
+                }
+            }
+
+            for (String number : numbers.keySet()) {
+                Object value = testFeatureRow.getValue(number);
+                numbers.put(number, (Number) value);
+            }
+
+            for (String string : strings.keySet()) {
+                String value = testFeatureRow.getValueString(string);
+                strings.put(string, value);
+            }
+
+            for (Map.Entry<String, Number> number : numbers.entrySet()) {
+
+                String column = number.getKey();
+                double value = number.getValue().doubleValue();
+
+                String where = column + " >= ? AND " + column + " <= ?";
+                String[] whereArgs = new String[]{
+                        String.valueOf(value - 0.001),
+                        String.valueOf(value + 0.001)};
+
+                long count = featureIndexManager.count(where, whereArgs);
+                TestCase.assertTrue(count >= 1);
+                resultCount = 0;
+                chunkLimit = 5;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(where,
+                                whereArgs, chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            ((Number) featureRow.getValue(column))
+                                    .doubleValue());
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+                resultCount = 0;
+                chunkLimit = 25;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(
+                                new String[]{column}, where, whereArgs,
+                                chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            ((Number) featureRow.getValue(column))
+                                    .doubleValue());
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+
+                count = featureIndexManager.count(transformedBoundingBox,
+                        projection, where, whereArgs);
+                TestCase.assertTrue(count >= 1);
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 1;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(
+                                transformedBoundingBox, projection, where,
+                                whereArgs, chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            ((Number) featureRow.getValue(column))
+                                    .doubleValue());
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 3;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(
+                                new String[]{
+                                        featureDao.getGeometryColumnName(),
+                                        column, featureDao.getIdColumnName()},
+                                transformedBoundingBox, projection, where,
+                                whereArgs, chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            ((Number) featureRow.getValue(column))
+                                    .doubleValue());
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+            }
+
+            for (Map.Entry<String, String> string : strings.entrySet()) {
+
+                String column = string.getKey();
+                String value = string.getValue();
+
+                Map<String, Object> fieldValues = new HashMap<>();
+                fieldValues.put(column, value);
+
+                long count = featureIndexManager.count(fieldValues);
+                TestCase.assertTrue(count >= 1);
+                resultCount = 0;
+                chunkLimit = 4;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(fieldValues,
+                                chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            featureRow.getValueString(column));
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+                resultCount = 0;
+                chunkLimit = 6;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(
+                                new String[]{column}, fieldValues,
+                                chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            featureRow.getValueString(column));
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+
+                count = featureIndexManager.count(transformedBoundingBox,
+                        projection, fieldValues);
+                TestCase.assertTrue(count >= 1);
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 2;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(
+                                transformedBoundingBox, projection, fieldValues,
+                                chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            featureRow.getValueString(column));
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+                featureFound = false;
+                resultCount = 0;
+                chunkLimit = 2;
+                paginatedResults = featureIndexManager
+                        .paginate(featureIndexManager.queryForChunk(
+                                new String[]{column,
+                                        featureDao.getIdColumnName(),
+                                        featureDao.getGeometryColumnName()},
+                                transformedBoundingBox, projection, fieldValues,
+                                chunkLimit));
+                for (FeatureRow featureRow : paginatedResults) {
+                    TestCase.assertEquals(value,
+                            featureRow.getValueString(column));
+                    validateFeatureRow(featureIndexManager, featureRow,
+                            boundingBox.buildEnvelope(), includeEmpty);
+                    if (featureRow.getId() == testFeatureRow.getId()) {
+                        featureFound = true;
+                    }
+                    resultCount++;
+                }
+                TestCase.assertEquals(count, resultCount);
+                TestCase.assertTrue(featureFound);
+                TestCase.assertTrue(resultCount >= 1);
+
+            }
+
+            featureIndexManager.close();
+        }
+
+        // Delete the extensions
+        boolean everyOther = false;
+        for (String featureTable : featureTables) {
+            FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
+            FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
+                    geoPackage, featureDao);
+            featureIndexManager.setIndexLocation(type);
+            TestCase.assertTrue(featureIndexManager.isIndexed());
+
+            // Test deleting a single geometry index
+            if (everyOther) {
+                FeatureCursor featureCursor = featureDao.query();
+                while (featureCursor.moveToNext()) {
+                    FeatureRow featureRow = featureCursor.getRow();
+                    if (featureRow.getGeometryEnvelope() != null) {
+                        featureCursor.close();
+                        TestCase.assertTrue(
+                                featureIndexManager.deleteIndex(featureRow));
                         break;
                     }
                 }

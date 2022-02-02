@@ -20,9 +20,11 @@ import mil.nga.geopackage.extension.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraintsDao;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.index.FeatureIndexManager;
+import mil.nga.geopackage.features.index.FeatureIndexResults;
 import mil.nga.geopackage.features.index.FeatureIndexType;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
+import mil.nga.geopackage.features.user.FeaturePaginatedCursor;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
@@ -128,8 +130,7 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         FeatureDao featureDao = geoPackage.getFeatureDao(featureTable);
         FeatureCursor featureCursor = featureDao.queryForAll();
         try {
-            while (featureCursor.moveToNext()) {
-                FeatureRow featureRow = featureCursor.getRow();
+            for (FeatureRow featureRow : featureCursor) {
                 GeoPackageGeometryData geometryData = featureRow.getGeometry();
                 if (geometryData != null && !geometryData.isEmpty()) {
                     Geometry geometry = geometryData.getGeometry();
@@ -145,8 +146,7 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         TileDao tileDao = geoPackage.getTileDao(tileTable);
         TileCursor tileCursor = tileDao.queryForAll();
         try {
-            while (tileCursor.moveToNext()) {
-                TileRow tileRow = tileCursor.getRow();
+            for (TileRow tileRow : tileCursor) {
                 byte[] tileBytes = tileRow.getTileData();
                 Bitmap tileBitmap = tileRow.getTileDataBitmap();
                 // ...
@@ -175,10 +175,27 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
             // ...
         }
 
+        BoundingBox boundingBox = BoundingBox.worldWebMercator();
+        Projection projection = ProjectionFactory
+                .getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
+
         // Index Features
         FeatureIndexManager indexer = new FeatureIndexManager(context, geoPackage, featureDao);
         indexer.setIndexLocation(FeatureIndexType.GEOPACKAGE);
         int indexedCount = indexer.index();
+
+        // Query Indexed Features in paginated chunks
+        FeatureIndexResults indexResults = indexer.queryForChunk(boundingBox,
+                projection, 50);
+        FeaturePaginatedCursor paginatedCursor = indexer
+                .paginate(indexResults);
+        for (FeatureRow featureRow : paginatedCursor) {
+            GeoPackageGeometryData geometryData = featureRow.getGeometry();
+            if (geometryData != null && !geometryData.isEmpty()) {
+                Geometry geometry = geometryData.getGeometry();
+                // ...
+            }
+        }
 
         // Draw tiles from features
         FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao, context.getResources().getDisplayMetrics().density);
@@ -187,9 +204,6 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         featureTiles.setMaxFeaturesTileDraw(numberFeaturesTile); // Draw feature count tiles when max features passed
         featureTiles.setIndexManager(indexer); // Set index manager to query feature indices
         Bitmap tile = featureTiles.drawTile(2, 2, 2);
-
-        BoundingBox boundingBox = BoundingBox.worldWebMercator();
-        Projection projection = ProjectionFactory.getProjection(ProjectionConstants.EPSG_WEB_MERCATOR);
 
         // URL Tile Generator (generate tiles from a URL)
         TileGenerator urlTileGenerator = new UrlTileGenerator(context, geoPackage,

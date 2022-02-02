@@ -6,7 +6,7 @@ import mil.nga.geopackage.user.custom.UserCustomRow;
 import mil.nga.sf.GeometryType;
 
 /**
- * Style Mapping Row containing the values from a single result set row
+ * Style Mapping Row containing the values from a single cursor row
  *
  * @author osbornb
  * @since 3.2.0

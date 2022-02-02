@@ -8,7 +8,7 @@ import mil.nga.geopackage.attributes.AttributesRow;
 import mil.nga.geopackage.style.Color;
 
 /**
- * Style Row containing the values from a single result set row
+ * Style Row containing the values from a single cursor row
  *
  * @author osbornb
  * @since 3.2.0
@@ -215,7 +215,7 @@ public class StyleRow extends AttributesRow {
         Double opacity = null;
         if (color != null) {
             hex = color.getColorHexShorthand();
-            opacity = new Double(color.getOpacity());
+            opacity = Double.valueOf(color.getOpacity());
         }
         setColor(hex);
         setOpacity(opacity);
@@ -417,7 +417,7 @@ public class StyleRow extends AttributesRow {
         Double opacity = null;
         if (color != null) {
             hex = color.getColorHexShorthand();
-            opacity = new Double(color.getOpacity());
+            opacity = Double.valueOf(color.getOpacity());
         }
         setFillColor(hex);
         setFillOpacity(opacity);

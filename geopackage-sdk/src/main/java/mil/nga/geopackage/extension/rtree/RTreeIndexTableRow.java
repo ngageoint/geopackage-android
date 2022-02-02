@@ -3,7 +3,7 @@ package mil.nga.geopackage.extension.rtree;
 import mil.nga.geopackage.user.custom.UserCustomRow;
 
 /**
- * RTree Index Table Row containing the values from a single result set row
+ * RTree Index Table Row containing the values from a single cursor row
  *
  * @author osbornb
  * @since 3.1.0

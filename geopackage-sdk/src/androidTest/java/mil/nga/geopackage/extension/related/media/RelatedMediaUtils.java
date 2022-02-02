@@ -263,11 +263,11 @@ public class RelatedMediaUtils {
             TestCase.assertEquals(featureDao.getTableName(),
                     featureRelation.getBaseTableName());
             TestCase.assertEquals(
-                    featureDao.getTable().getPkColumn().getName(),
+                    featureDao.getPkColumnName(),
                     featureRelation.getBasePrimaryColumn());
             TestCase.assertEquals(mediaDao.getTableName(),
                     featureRelation.getRelatedTableName());
-            TestCase.assertEquals(mediaDao.getTable().getPkColumn().getName(),
+            TestCase.assertEquals(mediaDao.getPkColumnName(),
                     featureRelation.getRelatedPrimaryColumn());
             TestCase.assertEquals(MediaTable.RELATION_TYPE.getName(),
                     featureRelation.getRelationName());
@@ -351,11 +351,11 @@ public class RelatedMediaUtils {
             TestCase.assertEquals(featureDao.getTableName(),
                     mediaRelation.getBaseTableName());
             TestCase.assertEquals(
-                    featureDao.getTable().getPkColumn().getName(),
+                    featureDao.getPkColumnName(),
                     mediaRelation.getBasePrimaryColumn());
             TestCase.assertEquals(mediaDao.getTableName(),
                     mediaRelation.getRelatedTableName());
-            TestCase.assertEquals(mediaDao.getTable().getPkColumn().getName(),
+            TestCase.assertEquals(mediaDao.getPkColumnName(),
                     mediaRelation.getRelatedPrimaryColumn());
             TestCase.assertEquals(MediaTable.RELATION_TYPE.getName(),
                     mediaRelation.getRelationName());

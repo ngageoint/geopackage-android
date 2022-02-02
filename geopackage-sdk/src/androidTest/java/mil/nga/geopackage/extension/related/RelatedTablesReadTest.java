@@ -57,7 +57,7 @@ public class RelatedTablesReadTest extends LoadGeoPackageTestCase {
             Map<Long, List<Long>> baseIdMappings = new HashMap<>();
             FeatureDao baseDao = geoPackage.getFeatureDao(extendedRelation
                     .getBaseTableName());
-            FeatureColumn pkColumn = baseDao.getTable().getPkColumn();
+            FeatureColumn pkColumn = baseDao.getPkColumn();
             FeatureCursor frs = baseDao.queryForAll();
             while (frs.moveToNext()) {
                 long baseId = frs.getLong(pkColumn.getIndex());
@@ -72,7 +72,7 @@ public class RelatedTablesReadTest extends LoadGeoPackageTestCase {
             Map<Long, List<Long>> relatedIdMappings = new HashMap<>();
             AttributesDao relatedDao = geoPackage
                     .getAttributesDao(extendedRelation.getRelatedTableName());
-            AttributesColumn pkColumn2 = relatedDao.getTable().getPkColumn();
+            AttributesColumn pkColumn2 = relatedDao.getPkColumn();
             AttributesCursor ars = relatedDao.queryForAll();
             while (ars.moveToNext()) {
                 long relatedId = ars.getLong(pkColumn2.getIndex());

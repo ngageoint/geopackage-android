@@ -39,7 +39,7 @@ public class IconDao extends MediaDao {
     }
 
     /**
-     * Get the icon row from the current result set location
+     * Get the icon row from the current cursor location
      *
      * @param cursor cursor
      * @return icon row

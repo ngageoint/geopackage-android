@@ -173,11 +173,11 @@ public class RelatedTilesUtils {
             TestCase.assertEquals(featureDao.getTableName(),
                     featuresRelation.getBaseTableName());
             TestCase.assertEquals(
-                    featureDao.getTable().getPkColumn().getName(),
+                    featureDao.getPkColumnName(),
                     featuresRelation.getBasePrimaryColumn());
             TestCase.assertEquals(tileDao.getTableName(),
                     featuresRelation.getRelatedTableName());
-            TestCase.assertEquals(tileDao.getTable().getPkColumn().getName(),
+            TestCase.assertEquals(tileDao.getPkColumnName(),
                     featuresRelation.getRelatedPrimaryColumn());
             TestCase.assertEquals(RelationType.TILES.getName(),
                     featuresRelation.getRelationName());
@@ -219,11 +219,11 @@ public class RelatedTilesUtils {
             TestCase.assertEquals(featureDao.getTableName(),
                     relation.getBaseTableName());
             TestCase.assertEquals(
-                    featureDao.getTable().getPkColumn().getName(),
+                    featureDao.getPkColumnName(),
                     relation.getBasePrimaryColumn());
             TestCase.assertEquals(tileDao.getTableName(),
                     relation.getRelatedTableName());
-            TestCase.assertEquals(tileDao.getTable().getPkColumn().getName(),
+            TestCase.assertEquals(tileDao.getPkColumnName(),
                     relation.getRelatedPrimaryColumn());
             TestCase.assertEquals(RelationType.TILES.getName(),
                     relation.getRelationName());

@@ -3,6 +3,8 @@ package mil.nga.geopackage.user;
 import java.util.HashMap;
 import java.util.Map;
 
+import mil.nga.geopackage.db.SQLiteQueryBuilder;
+
 /**
  * User Query parameter types
  *
@@ -30,8 +32,23 @@ public class UserQuery {
      * @param selectionArgs selection arguments
      */
     public UserQuery(String sql, String[] selectionArgs) {
+        this(sql, null, selectionArgs);
+    }
+
+    /**
+     * Constructor for raw query
+     *
+     * @param sql           sql statement
+     * @param columns       columns
+     * @param selectionArgs selection arguments
+     * @since 6.1.4
+     */
+    public UserQuery(String sql, String[] columns, String[] selectionArgs) {
         if (sql != null) {
             set(UserQueryParamType.SQL, sql);
+        }
+        if (columns != null) {
+            set(UserQueryParamType.COLUMNS, columns);
         }
         if (selectionArgs != null) {
             set(UserQueryParamType.SELECTION_ARGS, selectionArgs);
@@ -354,6 +371,23 @@ public class UserQuery {
      */
     public String getLimit() {
         return (String) get(UserQueryParamType.LIMIT);
+    }
+
+    /**
+     * Get or build the SQL statement
+     *
+     * @return SQL statement
+     * @since 6.1.4
+     */
+    public String getOrBuildSql() {
+        String sql = getSql();
+        if (sql == null) {
+            sql = SQLiteQueryBuilder.buildQueryString(getDistinct(), getTable(), getColumns(),
+                    getColumnsAs(), getSelection(), getGroupBy(), getHaving(), getOrderBy(),
+                    getLimit());
+            set(UserQueryParamType.SQL, sql);
+        }
+        return sql;
     }
 
 }

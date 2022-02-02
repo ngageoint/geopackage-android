@@ -111,9 +111,8 @@ public class TileUtils {
                 TileCursor cursor = dao.queryForAll();
                 int count = cursor.getCount();
                 int manualCount = 0;
-                while (cursor.moveToNext()) {
+                for(TileRow tileRow: cursor) {
 
-                    TileRow tileRow = cursor.getRow();
                     validateTileRow(dao, columns, tileRow, manualCount < 5);
 
                     manualCount++;

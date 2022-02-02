@@ -80,6 +80,14 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
      * {@inheritDoc}
      */
     @Override
+    public TResult rawQuery(String sql, String[] columns, String[] selectionArgs) {
+        return query(new UserQuery(sql, columns, selectionArgs));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TResult query(String table, String[] columns, String selection,
                          String[] selectionArgs, String groupBy, String having,
                          String orderBy) {

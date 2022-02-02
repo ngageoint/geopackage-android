@@ -258,11 +258,11 @@ public class RelatedSimpleAttributesUtils {
             TestCase.assertTrue(attributesRelation.getId() >= 0);
             TestCase.assertEquals(attributesDao.getTableName(),
                     attributesRelation.getBaseTableName());
-            TestCase.assertEquals(attributesDao.getTable().getPkColumn()
-                    .getName(), attributesRelation.getBasePrimaryColumn());
+            TestCase.assertEquals(attributesDao.getPkColumnName(),
+                    attributesRelation.getBasePrimaryColumn());
             TestCase.assertEquals(simpleDao.getTableName(),
                     attributesRelation.getRelatedTableName());
-            TestCase.assertEquals(simpleDao.getTable().getPkColumn().getName(),
+            TestCase.assertEquals(simpleDao.getPkColumnName(),
                     attributesRelation.getRelatedPrimaryColumn());
             TestCase.assertEquals(
                     SimpleAttributesTable.RELATION_TYPE.getName(),
@@ -342,11 +342,11 @@ public class RelatedSimpleAttributesUtils {
             TestCase.assertTrue(simpleRelation.getId() >= 0);
             TestCase.assertEquals(attributesDao.getTableName(),
                     simpleRelation.getBaseTableName());
-            TestCase.assertEquals(attributesDao.getTable().getPkColumn()
-                    .getName(), simpleRelation.getBasePrimaryColumn());
+            TestCase.assertEquals(attributesDao.getPkColumnName(),
+                    simpleRelation.getBasePrimaryColumn());
             TestCase.assertEquals(simpleDao.getTableName(),
                     simpleRelation.getRelatedTableName());
-            TestCase.assertEquals(simpleDao.getTable().getPkColumn().getName(),
+            TestCase.assertEquals(simpleDao.getPkColumnName(),
                     simpleRelation.getRelatedPrimaryColumn());
             TestCase.assertEquals(
                     SimpleAttributesTable.RELATION_TYPE.getName(),

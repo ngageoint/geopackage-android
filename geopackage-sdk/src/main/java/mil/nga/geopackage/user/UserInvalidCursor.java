@@ -1,5 +1,6 @@
 package mil.nga.geopackage.user;
 
+import java.util.Iterator;
 import java.util.List;
 
 import mil.nga.geopackage.GeoPackageException;
@@ -344,6 +345,47 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
     @Override
     public boolean wasNull() {
         return cursor.wasNull();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<TRow> iterator() {
+        return new Iterator<TRow>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public boolean hasNext() {
+                return moveToNext();
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public TRow next() {
+                return getRow();
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSql() {
+        return cursor.getSql();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getSelectionArgs() {
+        return cursor.getSelectionArgs();
     }
 
 }
