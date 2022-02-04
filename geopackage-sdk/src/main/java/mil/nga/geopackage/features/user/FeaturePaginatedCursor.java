@@ -8,7 +8,7 @@ import mil.nga.geopackage.user.UserPaginatedCursor;
  * chunks
  *
  * @author osbornb
- * @since 6.1.4
+ * @since 6.2.0
  */
 public class FeaturePaginatedCursor extends
         UserPaginatedCursor<FeatureColumn, FeatureTable, FeatureRow, FeatureCursor> {

@@ -40,7 +40,7 @@ public class FeatureIndexFeatureResults implements FeatureIndexResults {
      * Get the cursor
      *
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor getCursor() {
         return cursor;

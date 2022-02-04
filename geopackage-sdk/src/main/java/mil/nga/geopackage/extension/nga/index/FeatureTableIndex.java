@@ -68,7 +68,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * Get the primary key column name
      *
      * @return primary key column name
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public String getPkColumnName() {
         return featureDao.getPkColumnName();
@@ -1828,7 +1828,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      *
      * @param limit chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(int limit) {
         return queryFeaturesForChunk(getPkColumnName(), limit);
@@ -1841,7 +1841,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit  chunk limit
      * @param offset chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(int limit, long offset) {
         return queryFeaturesForChunk(getPkColumnName(), limit, offset);
@@ -1854,7 +1854,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy order by
      * @param limit   chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String orderBy, int limit) {
         return featureDao.queryInForChunk(queryIdsSQL(), orderBy, limit);
@@ -1868,7 +1868,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit   chunk limit
      * @param offset  chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String orderBy, int limit,
                                                long offset) {
@@ -1883,7 +1883,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param distinct distinct rows
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct, int limit) {
         return queryFeaturesForChunk(distinct, getPkColumnName(), limit);
@@ -1897,7 +1897,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct, int limit,
                                                long offset) {
@@ -1913,7 +1913,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String orderBy, int limit) {
@@ -1930,7 +1930,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String orderBy, int limit, long offset) {
@@ -1945,7 +1945,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param columns columns
      * @param limit   chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns, int limit) {
         return queryFeaturesForChunk(columns, getPkColumnName(), limit);
@@ -1959,7 +1959,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit   chunk limit
      * @param offset  chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns, int limit,
                                                long offset) {
@@ -1974,7 +1974,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy order by
      * @param limit   chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String orderBy, int limit) {
@@ -1991,7 +1991,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit   chunk limit
      * @param offset  chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String orderBy, int limit, long offset) {
@@ -2007,7 +2007,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param columns  columns
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, int limit) {
@@ -2024,7 +2024,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, int limit, long offset) {
@@ -2041,7 +2041,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String orderBy, int limit) {
@@ -2059,7 +2059,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String orderBy, int limit, long offset) {
@@ -2074,7 +2074,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(
             Map<String, Object> fieldValues, int limit) {
@@ -2089,7 +2089,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(
             Map<String, Object> fieldValues, int limit, long offset) {
@@ -2105,7 +2105,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(
             Map<String, Object> fieldValues, String orderBy, int limit) {
@@ -2122,7 +2122,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(
             Map<String, Object> fieldValues, String orderBy, int limit,
@@ -2139,7 +2139,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                Map<String, Object> fieldValues, int limit) {
@@ -2156,7 +2156,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                Map<String, Object> fieldValues, int limit, long offset) {
@@ -2173,7 +2173,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                Map<String, Object> fieldValues, String orderBy, int limit) {
@@ -2191,7 +2191,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                Map<String, Object> fieldValues, String orderBy, int limit,
@@ -2208,7 +2208,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                Map<String, Object> fieldValues, int limit) {
@@ -2225,7 +2225,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                Map<String, Object> fieldValues, int limit, long offset) {
@@ -2242,7 +2242,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                Map<String, Object> fieldValues, String orderBy, int limit) {
@@ -2260,7 +2260,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                Map<String, Object> fieldValues, String orderBy, int limit,
@@ -2278,7 +2278,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, Map<String, Object> fieldValues, int limit) {
@@ -2296,7 +2296,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, Map<String, Object> fieldValues, int limit,
@@ -2315,7 +2315,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, Map<String, Object> fieldValues, String orderBy,
@@ -2335,7 +2335,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, Map<String, Object> fieldValues, String orderBy,
@@ -2351,7 +2351,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where where clause
      * @param limit chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String where,
                                                       int limit) {
@@ -2366,7 +2366,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit  chunk limit
      * @param offset chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String where,
                                                       int limit, long offset) {
@@ -2381,7 +2381,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy order by
      * @param limit   chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String where, String orderBy,
                                                int limit) {
@@ -2397,7 +2397,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit   chunk limit
      * @param offset  chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String where, String orderBy,
                                                int limit, long offset) {
@@ -2412,7 +2412,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where    where clause
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String where, int limit) {
@@ -2428,7 +2428,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String where, int limit, long offset) {
@@ -2445,7 +2445,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String where, String orderBy, int limit) {
@@ -2462,7 +2462,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String where, String orderBy, int limit, long offset) {
@@ -2478,7 +2478,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where   where clause
      * @param limit   chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       String where, int limit) {
@@ -2494,7 +2494,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit   chunk limit
      * @param offset  chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       String where, int limit, long offset) {
@@ -2511,7 +2511,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy order by
      * @param limit   chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String where, String orderBy, int limit) {
@@ -2528,7 +2528,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit   chunk limit
      * @param offset  chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String where, String orderBy, int limit, long offset) {
@@ -2545,7 +2545,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where    where clause
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, String where, int limit) {
@@ -2563,7 +2563,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, String where, int limit, long offset) {
@@ -2581,7 +2581,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String where, String orderBy, int limit) {
@@ -2600,7 +2600,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String where, String orderBy, int limit,
@@ -2617,7 +2617,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String where,
                                                String[] whereArgs, int limit) {
@@ -2634,7 +2634,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String where,
                                                String[] whereArgs, int limit, long offset) {
@@ -2651,7 +2651,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String where,
                                                String[] whereArgs, String orderBy, int limit) {
@@ -2669,7 +2669,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String where,
                                                String[] whereArgs, String orderBy, int limit, long offset) {
@@ -2686,7 +2686,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String where, String[] whereArgs, int limit) {
@@ -2704,7 +2704,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String where, String[] whereArgs, int limit, long offset) {
@@ -2722,7 +2722,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String where, String[] whereArgs, String orderBy, int limit) {
@@ -2741,7 +2741,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String where, String[] whereArgs, String orderBy, int limit,
@@ -2759,7 +2759,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String where, String[] whereArgs, int limit) {
@@ -2777,7 +2777,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String where, String[] whereArgs, int limit, long offset) {
@@ -2795,7 +2795,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String where, String[] whereArgs, String orderBy, int limit) {
@@ -2814,7 +2814,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                String where, String[] whereArgs, String orderBy, int limit,
@@ -2833,7 +2833,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String where, String[] whereArgs, int limit) {
@@ -2852,7 +2852,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String where, String[] whereArgs, int limit,
@@ -2872,7 +2872,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String where, String[] whereArgs, String orderBy,
@@ -2893,7 +2893,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, String where, String[] whereArgs, String orderBy,
@@ -2909,7 +2909,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox,
                                           int limit) {
@@ -2924,7 +2924,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox, int limit,
                                           long offset) {
@@ -2939,7 +2939,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox,
                                           String orderBy, int limit) {
@@ -2955,7 +2955,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox,
                                           String orderBy, int limit, long offset) {
@@ -2970,7 +2970,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, int limit) {
@@ -2986,7 +2986,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, int limit, long offset) {
@@ -3003,7 +3003,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, String orderBy, int limit) {
@@ -3021,7 +3021,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, String orderBy, int limit, long offset) {
@@ -3037,7 +3037,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, int limit) {
@@ -3053,7 +3053,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, int limit, long offset) {
@@ -3070,7 +3070,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, String orderBy, int limit) {
@@ -3087,7 +3087,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, String orderBy, int limit, long offset) {
@@ -3104,7 +3104,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, int limit) {
@@ -3122,7 +3122,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, int limit, long offset) {
@@ -3140,7 +3140,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, String orderBy, int limit) {
@@ -3159,7 +3159,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, String orderBy, int limit, long offset) {
@@ -3174,7 +3174,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                int limit) {
@@ -3189,7 +3189,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                int limit, long offset) {
@@ -3205,7 +3205,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String orderBy, int limit) {
@@ -3221,7 +3221,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String orderBy, int limit, long offset) {
@@ -3237,7 +3237,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, int limit) {
@@ -3254,7 +3254,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, int limit, long offset) {
@@ -3271,7 +3271,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String orderBy, int limit) {
@@ -3289,7 +3289,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String orderBy, int limit, long offset) {
@@ -3305,7 +3305,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, int limit) {
@@ -3322,7 +3322,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, int limit, long offset) {
@@ -3339,7 +3339,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String orderBy, int limit) {
@@ -3357,7 +3357,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String orderBy, int limit, long offset) {
@@ -3374,7 +3374,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param boundingBox bounding box
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, int limit) {
@@ -3392,7 +3392,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, int limit, long offset) {
@@ -3410,7 +3410,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String orderBy,
@@ -3430,7 +3430,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String orderBy,
@@ -3447,7 +3447,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Map<String, Object> fieldValues, int limit) {
@@ -3464,7 +3464,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Map<String, Object> fieldValues, int limit, long offset) {
@@ -3481,7 +3481,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Map<String, Object> fieldValues, String orderBy, int limit) {
@@ -3499,7 +3499,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Map<String, Object> fieldValues, String orderBy, int limit,
@@ -3517,7 +3517,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues,
@@ -3536,7 +3536,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues, int limit,
@@ -3555,7 +3555,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues,
@@ -3575,7 +3575,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues,
@@ -3593,7 +3593,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues,
@@ -3612,7 +3612,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues, int limit,
@@ -3631,7 +3631,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues,
@@ -3651,7 +3651,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Map<String, Object> fieldValues,
@@ -3670,7 +3670,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox,
@@ -3690,7 +3690,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox,
@@ -3710,7 +3710,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox,
@@ -3731,7 +3731,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox,
@@ -3750,7 +3750,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(
             BoundingBox boundingBox, String where, int limit) {
@@ -3767,7 +3767,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(
             BoundingBox boundingBox, String where, int limit, long offset) {
@@ -3784,7 +3784,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String where, String orderBy, int limit) {
@@ -3801,7 +3801,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String where, String orderBy, int limit, long offset) {
@@ -3818,7 +3818,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       BoundingBox boundingBox, String where, int limit) {
@@ -3836,7 +3836,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       BoundingBox boundingBox, String where, int limit, long offset) {
@@ -3854,7 +3854,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String where, String orderBy, int limit) {
@@ -3873,7 +3873,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String where, String orderBy, int limit,
@@ -3891,7 +3891,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       BoundingBox boundingBox, String where, int limit) {
@@ -3909,7 +3909,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       BoundingBox boundingBox, String where, int limit, long offset) {
@@ -3927,7 +3927,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String where, String orderBy, int limit) {
@@ -3946,7 +3946,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String where, String orderBy, int limit,
@@ -3965,7 +3965,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, BoundingBox boundingBox, String where,
@@ -3985,7 +3985,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, BoundingBox boundingBox, String where, int limit,
@@ -4005,7 +4005,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String where,
@@ -4026,7 +4026,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String where,
@@ -4044,7 +4044,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String where, String[] whereArgs, int limit) {
@@ -4062,7 +4062,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String where, String[] whereArgs, int limit, long offset) {
@@ -4080,7 +4080,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String where, String[] whereArgs, String orderBy, int limit) {
@@ -4099,7 +4099,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                String where, String[] whereArgs, String orderBy, int limit,
@@ -4118,7 +4118,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4138,7 +4138,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4158,7 +4158,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4179,7 +4179,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4198,7 +4198,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4218,7 +4218,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4238,7 +4238,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4259,7 +4259,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, String where, String[] whereArgs,
@@ -4279,7 +4279,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String where,
@@ -4300,7 +4300,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String where,
@@ -4321,7 +4321,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String where,
@@ -4343,7 +4343,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, String where,
@@ -4361,7 +4361,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox,
                                           Projection projection, int limit) {
@@ -4377,7 +4377,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox,
                                           Projection projection, int limit, long offset) {
@@ -4394,7 +4394,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox,
                                           Projection projection, String orderBy, int limit) {
@@ -4411,7 +4411,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(BoundingBox boundingBox,
                                           Projection projection, String orderBy, int limit, long offset) {
@@ -4428,7 +4428,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, Projection projection, int limit) {
@@ -4446,7 +4446,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, Projection projection, int limit,
@@ -4465,7 +4465,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4486,7 +4486,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4506,7 +4506,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, Projection projection, int limit) {
@@ -4524,7 +4524,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, Projection projection, int limit,
@@ -4543,7 +4543,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4563,7 +4563,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4582,7 +4582,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, Projection projection, int limit) {
@@ -4601,7 +4601,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, Projection projection, int limit,
@@ -4621,7 +4621,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4644,7 +4644,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4664,7 +4664,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, int limit) {
@@ -4682,7 +4682,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, int limit, long offset) {
@@ -4699,7 +4699,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String orderBy, int limit) {
@@ -4717,7 +4717,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String orderBy, int limit, long offset) {
@@ -4735,7 +4735,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, int limit) {
@@ -4754,7 +4754,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, int limit,
@@ -4773,7 +4773,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4795,7 +4795,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4816,7 +4816,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, int limit) {
@@ -4835,7 +4835,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, int limit,
@@ -4854,7 +4854,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4874,7 +4874,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String orderBy,
@@ -4894,7 +4894,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param projection  projection
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -4915,7 +4915,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -4935,7 +4935,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -4958,7 +4958,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -4979,7 +4979,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, Map<String, Object> fieldValues, int limit) {
@@ -4998,7 +4998,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, Map<String, Object> fieldValues, int limit,
@@ -5017,7 +5017,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, Map<String, Object> fieldValues,
@@ -5037,7 +5037,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, Map<String, Object> fieldValues,
@@ -5057,7 +5057,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection,
@@ -5078,7 +5078,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection,
@@ -5098,7 +5098,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection,
@@ -5121,7 +5121,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection,
@@ -5144,7 +5144,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection,
@@ -5165,7 +5165,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection,
@@ -5185,7 +5185,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection,
@@ -5206,7 +5206,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection,
@@ -5228,7 +5228,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5250,7 +5250,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5271,7 +5271,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5295,7 +5295,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5317,7 +5317,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(
             BoundingBox boundingBox, Projection projection, String where,
@@ -5337,7 +5337,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(
             BoundingBox boundingBox, Projection projection, String where,
@@ -5356,7 +5356,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String where, String orderBy, int limit) {
@@ -5375,7 +5375,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String where, String orderBy, int limit,
@@ -5395,7 +5395,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       BoundingBox boundingBox, Projection projection, String where,
@@ -5416,7 +5416,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       BoundingBox boundingBox, Projection projection, String where,
@@ -5436,7 +5436,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5457,7 +5457,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5477,7 +5477,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       BoundingBox boundingBox, Projection projection, String where,
@@ -5498,7 +5498,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       BoundingBox boundingBox, Projection projection, String where,
@@ -5518,7 +5518,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5539,7 +5539,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5560,7 +5560,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where       where clause
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5582,7 +5582,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5603,7 +5603,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5625,7 +5625,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5645,7 +5645,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String where, String[] whereArgs,
@@ -5666,7 +5666,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String where, String[] whereArgs, int limit,
@@ -5686,7 +5686,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String where, String[] whereArgs,
@@ -5707,7 +5707,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(BoundingBox boundingBox,
                                                Projection projection, String where, String[] whereArgs,
@@ -5728,7 +5728,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5750,7 +5750,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5771,7 +5771,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5795,7 +5795,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5818,7 +5818,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5840,7 +5840,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5861,7 +5861,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5883,7 +5883,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                BoundingBox boundingBox, Projection projection, String where,
@@ -5905,7 +5905,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs   where arguments
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5928,7 +5928,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5950,7 +5950,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5975,7 +5975,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, BoundingBox boundingBox, Projection projection,
@@ -5994,7 +5994,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(GeometryEnvelope envelope,
                                           int limit) {
@@ -6009,7 +6009,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(GeometryEnvelope envelope,
                                           int limit, long offset) {
@@ -6024,7 +6024,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(GeometryEnvelope envelope,
                                           String orderBy, int limit) {
@@ -6040,7 +6040,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(GeometryEnvelope envelope,
                                           String orderBy, int limit, long offset) {
@@ -6055,7 +6055,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           GeometryEnvelope envelope, int limit) {
@@ -6071,7 +6071,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           GeometryEnvelope envelope, int limit, long offset) {
@@ -6088,7 +6088,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           GeometryEnvelope envelope, String orderBy, int limit) {
@@ -6105,7 +6105,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct,
                                           GeometryEnvelope envelope, String orderBy, int limit, long offset) {
@@ -6120,7 +6120,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           GeometryEnvelope envelope, int limit) {
@@ -6136,7 +6136,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           GeometryEnvelope envelope, int limit, long offset) {
@@ -6153,7 +6153,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           GeometryEnvelope envelope, String orderBy, int limit) {
@@ -6170,7 +6170,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(String[] columns,
                                           GeometryEnvelope envelope, String orderBy, int limit, long offset) {
@@ -6186,7 +6186,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           GeometryEnvelope envelope, int limit) {
@@ -6204,7 +6204,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           GeometryEnvelope envelope, int limit, long offset) {
@@ -6222,7 +6222,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           GeometryEnvelope envelope, String orderBy, int limit) {
@@ -6240,7 +6240,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserCustomCursor queryForChunk(boolean distinct, String[] columns,
                                           GeometryEnvelope envelope, String orderBy, int limit, long offset) {
@@ -6255,7 +6255,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                int limit) {
@@ -6270,7 +6270,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                int limit, long offset) {
@@ -6286,7 +6286,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String orderBy, int limit) {
@@ -6302,7 +6302,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String orderBy, int limit, long offset) {
@@ -6317,7 +6317,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, int limit) {
@@ -6334,7 +6334,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, int limit, long offset) {
@@ -6351,7 +6351,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String orderBy, int limit) {
@@ -6368,7 +6368,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String orderBy, int limit, long offset) {
@@ -6384,7 +6384,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, int limit) {
@@ -6401,7 +6401,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, int limit, long offset) {
@@ -6418,7 +6418,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String orderBy, int limit) {
@@ -6435,7 +6435,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String orderBy, int limit, long offset) {
@@ -6452,7 +6452,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param envelope geometry envelope
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, int limit) {
@@ -6470,7 +6470,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, int limit,
@@ -6489,7 +6489,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String orderBy,
@@ -6509,7 +6509,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String orderBy,
@@ -6526,7 +6526,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                Map<String, Object> fieldValues, int limit) {
@@ -6543,7 +6543,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                Map<String, Object> fieldValues, int limit, long offset) {
@@ -6560,7 +6560,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                Map<String, Object> fieldValues, String orderBy, int limit) {
@@ -6578,7 +6578,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                Map<String, Object> fieldValues, String orderBy, int limit,
@@ -6596,7 +6596,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6615,7 +6615,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6634,7 +6634,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6654,7 +6654,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6672,7 +6672,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6691,7 +6691,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6710,7 +6710,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6730,7 +6730,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, Map<String, Object> fieldValues,
@@ -6749,7 +6749,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param fieldValues field values
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope,
@@ -6769,7 +6769,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope,
@@ -6789,7 +6789,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy     order by
      * @param limit       chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope,
@@ -6810,7 +6810,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit       chunk limit
      * @param offset      chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope,
@@ -6828,7 +6828,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where    where clause
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(
             GeometryEnvelope envelope, String where, int limit) {
@@ -6844,7 +6844,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(
             GeometryEnvelope envelope, String where, int limit, long offset) {
@@ -6861,7 +6861,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String where, String orderBy, int limit) {
@@ -6878,7 +6878,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String where, String orderBy, int limit, long offset) {
@@ -6895,7 +6895,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where    where clause
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       GeometryEnvelope envelope, String where, int limit) {
@@ -6913,7 +6913,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       GeometryEnvelope envelope, String where, int limit, long offset) {
@@ -6931,7 +6931,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String where, String orderBy,
@@ -6951,7 +6951,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String where, String orderBy, int limit,
@@ -6969,7 +6969,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where    where clause
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       GeometryEnvelope envelope, String where, int limit) {
@@ -6987,7 +6987,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(String[] columns,
                                                       GeometryEnvelope envelope, String where, int limit, long offset) {
@@ -7005,7 +7005,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String where, String orderBy,
@@ -7025,7 +7025,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String where, String orderBy, int limit,
@@ -7044,7 +7044,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param where    where clause
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, GeometryEnvelope envelope, String where,
@@ -7064,7 +7064,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunkIdOrder(boolean distinct,
                                                       String[] columns, GeometryEnvelope envelope, String where,
@@ -7084,7 +7084,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy  order by
      * @param limit    chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String where,
@@ -7105,7 +7105,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit    chunk limit
      * @param offset   chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String where,
@@ -7123,7 +7123,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String where, String[] whereArgs, int limit) {
@@ -7141,7 +7141,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String where, String[] whereArgs, int limit, long offset) {
@@ -7159,7 +7159,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String where, String[] whereArgs, String orderBy, int limit) {
@@ -7178,7 +7178,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(GeometryEnvelope envelope,
                                                String where, String[] whereArgs, String orderBy, int limit,
@@ -7197,7 +7197,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7217,7 +7217,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7237,7 +7237,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7258,7 +7258,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7277,7 +7277,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7297,7 +7297,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7317,7 +7317,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7338,7 +7338,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(String[] columns,
                                                GeometryEnvelope envelope, String where, String[] whereArgs,
@@ -7358,7 +7358,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param whereArgs where arguments
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String where,
@@ -7379,7 +7379,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String where,
@@ -7400,7 +7400,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param orderBy   order by
      * @param limit     chunk limit
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String where,
@@ -7422,7 +7422,7 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param limit     chunk limit
      * @param offset    chunk query offset
      * @return feature cursor
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public FeatureCursor queryFeaturesForChunk(boolean distinct,
                                                String[] columns, GeometryEnvelope envelope, String where,

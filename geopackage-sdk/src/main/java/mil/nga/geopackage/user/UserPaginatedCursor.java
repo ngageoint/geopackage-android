@@ -8,7 +8,7 @@ package mil.nga.geopackage.user;
  * @param <TRow>    row type
  * @param <TResult> result type
  * @author osbornb
- * @since 6.1.4
+ * @since 6.2.0
  */
 public abstract class UserPaginatedCursor<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TResult extends UserCursor<TColumn, TTable, TRow>>
         extends UserCorePaginatedResults<TColumn, TTable, TRow, TResult> {

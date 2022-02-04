@@ -41,7 +41,7 @@ public class UserQuery {
      * @param sql           sql statement
      * @param columns       columns
      * @param selectionArgs selection arguments
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public UserQuery(String sql, String[] columns, String[] selectionArgs) {
         if (sql != null) {
@@ -377,7 +377,7 @@ public class UserQuery {
      * Get or build the SQL statement
      *
      * @return SQL statement
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public String getOrBuildSql() {
         String sql = getSql();

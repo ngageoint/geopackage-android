@@ -8,7 +8,7 @@ import mil.nga.geopackage.user.UserPaginatedCursor;
  * in chunks
  *
  * @author osbornb
- * @since 6.1.4
+ * @since 6.2.0
  */
 public class UserCustomPaginatedCursor extends
         UserPaginatedCursor<UserCustomColumn, UserCustomTable, UserCustomRow, UserCustomCursor> {

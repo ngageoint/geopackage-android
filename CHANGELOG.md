@@ -4,13 +4,14 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.1.4 (TBD)
+## 6.2.0 (TBD)
 
-* geopackage-core version 6.1.2
+* geopackage-core version 6.2.0
 * ormlite-android version 6.1
 * tiff version 3.0.0
 * appcompat version 1.4.1
 * SQLite Android Bindings version 3370200
+* Removed INTERNET Android Manifest permission
 * TileGenerator individual zoom level specifications
 * TileCreator dynamic separated tile width and height determination adjustment
 * Iterable row results

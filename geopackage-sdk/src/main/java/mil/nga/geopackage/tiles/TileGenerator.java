@@ -160,7 +160,7 @@ public abstract class TileGenerator {
      * @param tableName   table name
      * @param boundingBox tiles bounding box
      * @param projection  tiles projection
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public TileGenerator(Context context, GeoPackage geoPackage, String tableName,
                          BoundingBox boundingBox, Projection projection) {
@@ -181,7 +181,7 @@ public abstract class TileGenerator {
      * @param zoomLevel   zoom level
      * @param boundingBox tiles bounding box
      * @param projection  tiles projection
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public TileGenerator(Context context, GeoPackage geoPackage, String tableName, int zoomLevel,
                          BoundingBox boundingBox, Projection projection) {
@@ -216,7 +216,7 @@ public abstract class TileGenerator {
      * @param zoomLevels  zoom levels
      * @param boundingBox tiles bounding box
      * @param projection  tiles projection
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public TileGenerator(Context context, GeoPackage geoPackage, String tableName,
                          Collection<Integer> zoomLevels, BoundingBox boundingBox,
@@ -234,7 +234,7 @@ public abstract class TileGenerator {
      * @param zoomLevels  zoom levels
      * @param boundingBox tiles bounding box
      * @param projection  tiles projection
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public TileGenerator(Context context, GeoPackage geoPackage, String tableName,
                          int[] zoomLevels, BoundingBox boundingBox, Projection projection) {
@@ -288,7 +288,7 @@ public abstract class TileGenerator {
      * Get the zoom levels (read only)
      *
      * @return zoom levels
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public SortedSet<Integer> getZoomLevels() {
         return Collections.unmodifiableSortedSet(zoomLevels);
@@ -299,7 +299,7 @@ public abstract class TileGenerator {
      *
      * @param zoomLevel zoom level
      * @return true if zoom level added
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public boolean addZoomLevel(int zoomLevel) {
         return zoomLevels.add(zoomLevel);
@@ -311,7 +311,7 @@ public abstract class TileGenerator {
      * @param minZoom min zoom level
      * @param maxZoom max zoom level
      * @return true if at least one zoom level added
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public boolean addZoomLevels(int minZoom, int maxZoom) {
         boolean added = false;
@@ -326,7 +326,7 @@ public abstract class TileGenerator {
      *
      * @param zoomLevels zoom levels
      * @return true if at least one zoom level added
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public boolean addZoomLevels(Collection<Integer> zoomLevels) {
         return this.zoomLevels.addAll(zoomLevels);
@@ -337,7 +337,7 @@ public abstract class TileGenerator {
      *
      * @param zoomLevels zoom levels
      * @return true if at least one zoom level added
-     * @since 6.1.4
+     * @since 6.2.0
      */
     public boolean addZoomLevels(int[] zoomLevels) {
         boolean added = false;

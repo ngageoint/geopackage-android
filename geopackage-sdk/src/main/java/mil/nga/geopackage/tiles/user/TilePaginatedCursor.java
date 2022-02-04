@@ -7,7 +7,7 @@ import mil.nga.geopackage.user.UserPaginatedCursor;
  * Tile Paginated Cursor for iterating and querying through tiles in chunks
  *
  * @author osbornb
- * @since 6.1.4
+ * @since 6.2.0
  */
 public class TilePaginatedCursor extends
         UserPaginatedCursor<TileColumn, TileTable, TileRow, TileCursor> {
