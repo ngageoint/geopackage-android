@@ -3980,7 +3980,8 @@ public class FeatureIndexManager {
         }
         if (results == null) {
             FeatureCursor featureCursor = manualFeatureQuery
-                    .query(distinct, columns, where, whereArgs);
+                    .queryForChunk(distinct, columns, where, whereArgs, orderBy,
+                            limit, offset);
             results = new FeatureIndexFeatureResults(featureCursor);
         }
         return results;
