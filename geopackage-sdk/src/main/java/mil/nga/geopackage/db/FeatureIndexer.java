@@ -7985,6 +7985,9 @@ public class FeatureIndexer {
      *
      * @param distinct distinct rows
      * @param idQuery  id query
+     * @param orderBy   order by
+     * @param limit     chunk limit
+     * @param offset    chunk query offset
      * @return feature cursor
      */
     private FeatureCursor queryForChunk(boolean distinct, FeatureIndexerIdQuery idQuery, String orderBy, int limit,
@@ -7998,6 +8001,9 @@ public class FeatureIndexer {
      * @param distinct distinct rows
      * @param columns  columns
      * @param idQuery  id query
+     * @param orderBy   order by
+     * @param limit     chunk limit
+     * @param offset    chunk query offset
      * @return feature cursor
      */
     private FeatureCursor queryForChunk(boolean distinct, String[] columns, FeatureIndexerIdQuery idQuery, String orderBy, int limit,
@@ -8012,6 +8018,9 @@ public class FeatureIndexer {
      * @param idQuery   id query
      * @param where     where statement
      * @param whereArgs where args
+     * @param orderBy   order by
+     * @param limit     chunk limit
+     * @param offset    chunk query offset
      * @return feature cursor
      */
     private FeatureCursor queryForChunk(boolean distinct, FeatureIndexerIdQuery idQuery, String where, String[] whereArgs, String orderBy, int limit,
@@ -8027,6 +8036,9 @@ public class FeatureIndexer {
      * @param idQuery   id query
      * @param where     where statement
      * @param whereArgs where args
+     * @param orderBy   order by
+     * @param limit     chunk limit
+     * @param offset    chunk query offset
      * @return feature cursor
      */
     private FeatureCursor queryForChunk(boolean distinct, String[] columns, FeatureIndexerIdQuery idQuery, String where, String[] whereArgs, String orderBy, int limit,
