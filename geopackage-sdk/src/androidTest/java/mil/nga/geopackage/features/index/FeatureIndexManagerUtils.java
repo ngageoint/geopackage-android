@@ -554,9 +554,9 @@ public class FeatureIndexManagerUtils {
     public static void testIndexChunk(Activity activity, GeoPackage geoPackage)
             throws SQLException {
         geoPackage.getCursorFactory().setDebugLogQueries(true);
-        testIndex(activity, geoPackage, FeatureIndexType.RTREE, true);
-        testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
-        testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);
+        testIndexChunk(activity, geoPackage, FeatureIndexType.RTREE, true);
+        testIndexChunk(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
+        testIndexChunk(activity, geoPackage, FeatureIndexType.METADATA, false);
     }
 
     private static void testIndexChunk(Activity activity, GeoPackage geoPackage,
@@ -571,7 +571,14 @@ public class FeatureIndexManagerUtils {
                     geoPackage, featureDao);
             featureIndexManager.setContinueOnError(false);
             featureIndexManager.setIndexLocation(type);
-            featureIndexManager.deleteAllIndexes();
+            if (type == FeatureIndexType.RTREE) {
+                if (!featureIndexManager.isIndexed(type)) {
+                    featureIndexManager.close();
+                    continue;
+                }
+            } else {
+                featureIndexManager.deleteAllIndexes();
+            }
 
             // Determine how many features have geometry envelopes or geometries
             int expectedCount = 0;
@@ -595,14 +602,18 @@ public class FeatureIndexManagerUtils {
             }
             featureCursor.close();
 
-            TestCase.assertFalse(featureIndexManager.isIndexed());
+            if (type != FeatureIndexType.RTREE) {
 
-            // Test indexing
-            int indexCount = featureIndexManager.index();
-            TestCase.assertEquals(expectedCount, indexCount);
+                TestCase.assertFalse(featureIndexManager.isIndexed());
 
-            TestCase.assertTrue(featureIndexManager.isIndexed());
-            TestCase.assertEquals(expectedCount, featureIndexManager.count());
+                // Test indexing
+                int indexCount = featureIndexManager.index();
+                TestCase.assertEquals(expectedCount, indexCount);
+
+                TestCase.assertTrue(featureIndexManager.isIndexed());
+                TestCase.assertEquals(expectedCount, featureIndexManager.count());
+
+            }
 
             // Query for all indexed geometries
             int resultCount = 0;
@@ -618,8 +629,7 @@ public class FeatureIndexManagerUtils {
                             includeEmpty);
                     lastCount++;
                 }
-                TestCase.assertEquals(expectedCount,
-                        featureIndexResults.count());
+                TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                 featureIndexResults.close();
                 resultCount += lastCount;
                 offset += chunkLimit;
@@ -641,8 +651,7 @@ public class FeatureIndexManagerUtils {
                             includeEmpty);
                     lastCount++;
                 }
-                TestCase.assertEquals(expectedCount,
-                        featureIndexResults.count());
+                TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                 featureIndexResults.close();
                 resultCount += lastCount;
                 offset += chunkLimit;
@@ -682,7 +691,7 @@ public class FeatureIndexManagerUtils {
                     }
                     lastCount++;
                 }
-                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                 featureIndexResults.close();
                 resultCount += lastCount;
                 offset += chunkLimit;
@@ -707,7 +716,7 @@ public class FeatureIndexManagerUtils {
                     }
                     lastCount++;
                 }
-                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                 featureIndexResults.close();
                 resultCount += lastCount;
                 offset += chunkLimit;
@@ -734,7 +743,7 @@ public class FeatureIndexManagerUtils {
                     }
                     lastCount++;
                 }
-                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                 featureIndexResults.close();
                 resultCount += lastCount;
                 offset += chunkLimit;
@@ -783,7 +792,7 @@ public class FeatureIndexManagerUtils {
                     }
                     lastCount++;
                 }
-                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                 featureIndexResults.close();
                 resultCount += lastCount;
                 offset += chunkLimit;
@@ -809,7 +818,7 @@ public class FeatureIndexManagerUtils {
                     }
                     lastCount++;
                 }
-                TestCase.assertTrue(featureIndexResults.count() >= 1);
+                TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                 featureIndexResults.close();
                 resultCount += lastCount;
                 offset += chunkLimit;
@@ -885,7 +894,7 @@ public class FeatureIndexManagerUtils {
                                         .doubleValue());
                         lastCount++;
                     }
-                    TestCase.assertEquals(count, featureIndexResults.count());
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -906,7 +915,7 @@ public class FeatureIndexManagerUtils {
                                         .doubleValue());
                         lastCount++;
                     }
-                    TestCase.assertEquals(count, featureIndexResults.count());
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -937,7 +946,7 @@ public class FeatureIndexManagerUtils {
                         }
                         lastCount++;
                     }
-                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -970,7 +979,7 @@ public class FeatureIndexManagerUtils {
                         }
                         lastCount++;
                     }
-                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -1003,7 +1012,7 @@ public class FeatureIndexManagerUtils {
                                 featureRow.getValueString(column));
                         lastCount++;
                     }
-                    TestCase.assertEquals(count, featureIndexResults.count());
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -1023,7 +1032,7 @@ public class FeatureIndexManagerUtils {
                                 featureRow.getValueString(column));
                         lastCount++;
                     }
-                    TestCase.assertEquals(count, featureIndexResults.count());
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -1053,7 +1062,7 @@ public class FeatureIndexManagerUtils {
                         }
                         lastCount++;
                     }
-                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -1087,7 +1096,7 @@ public class FeatureIndexManagerUtils {
                         }
                         lastCount++;
                     }
-                    TestCase.assertTrue(featureIndexResults.count() >= 1);
+                    TestCase.assertTrue(featureIndexResults.count() <= chunkLimit);
                     featureIndexResults.close();
                     resultCount += lastCount;
                     offset += chunkLimit;
@@ -1108,6 +1117,10 @@ public class FeatureIndexManagerUtils {
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
             featureIndexManager.setIndexLocation(type);
+            if (type == FeatureIndexType.RTREE) {
+                featureIndexManager.close();
+                continue;
+            }
             TestCase.assertTrue(featureIndexManager.isIndexed());
 
             // Test deleting a single geometry index
@@ -1145,9 +1158,9 @@ public class FeatureIndexManagerUtils {
     public static void testIndexPagination(Activity activity, GeoPackage geoPackage)
             throws SQLException {
         geoPackage.getCursorFactory().setDebugLogQueries(true);
-        testIndex(activity, geoPackage, FeatureIndexType.RTREE, true);
-        testIndex(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
-        testIndex(activity, geoPackage, FeatureIndexType.METADATA, false);
+        testIndexPagination(activity, geoPackage, FeatureIndexType.RTREE, true);
+        testIndexPagination(activity, geoPackage, FeatureIndexType.GEOPACKAGE, false);
+        testIndexPagination(activity, geoPackage, FeatureIndexType.METADATA, false);
     }
 
     private static void testIndexPagination(Activity activity, GeoPackage geoPackage,
@@ -1162,7 +1175,14 @@ public class FeatureIndexManagerUtils {
                     geoPackage, featureDao);
             featureIndexManager.setContinueOnError(false);
             featureIndexManager.setIndexLocation(type);
-            featureIndexManager.deleteAllIndexes();
+            if (type == FeatureIndexType.RTREE) {
+                if (!featureIndexManager.isIndexed(type)) {
+                    featureIndexManager.close();
+                    continue;
+                }
+            } else {
+                featureIndexManager.deleteAllIndexes();
+            }
 
             // Determine how many features have geometry envelopes or geometries
             int expectedCount = 0;
@@ -1186,14 +1206,18 @@ public class FeatureIndexManagerUtils {
             }
             featureCursor.close();
 
-            TestCase.assertFalse(featureIndexManager.isIndexed());
+            if (type != FeatureIndexType.RTREE) {
 
-            // Test indexing
-            int indexCount = featureIndexManager.index();
-            TestCase.assertEquals(expectedCount, indexCount);
+                TestCase.assertFalse(featureIndexManager.isIndexed());
 
-            TestCase.assertTrue(featureIndexManager.isIndexed());
-            TestCase.assertEquals(expectedCount, featureIndexManager.count());
+                // Test indexing
+                int indexCount = featureIndexManager.index();
+                TestCase.assertEquals(expectedCount, indexCount);
+
+                TestCase.assertTrue(featureIndexManager.isIndexed());
+                TestCase.assertEquals(expectedCount, featureIndexManager.count());
+
+            }
 
             // Query for all indexed geometries
             int resultCount = 0;
@@ -1566,6 +1590,10 @@ public class FeatureIndexManagerUtils {
             FeatureIndexManager featureIndexManager = new FeatureIndexManager(activity,
                     geoPackage, featureDao);
             featureIndexManager.setIndexLocation(type);
+            if (type == FeatureIndexType.RTREE) {
+                featureIndexManager.close();
+                continue;
+            }
             TestCase.assertTrue(featureIndexManager.isIndexed());
 
             // Test deleting a single geometry index
