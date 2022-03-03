@@ -72,6 +72,11 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     private UserInvalidCursor<TColumn, TTable, TRow, ? extends UserCursor<TColumn, TTable, TRow>, ? extends UserDao<TColumn, TTable, TRow, ? extends UserCursor<TColumn, TTable, TRow>>> invalidCursor;
 
     /**
+     * Indicates if the cursor was queried using the SQLite bindings connection or standard
+     */
+    private boolean useBindings = false;
+
+    /**
      * Constructor
      *
      * @param table  table
@@ -410,6 +415,26 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     }
 
     /**
+     * Set the cursor SQLite connection origination as bindings or standard
+     *
+     * @param useBindings true if bindings connection, false if standard
+     * @since 6.2.1
+     */
+    public void setUseBindings(boolean useBindings) {
+        this.useBindings = useBindings;
+    }
+
+    /**
+     * Get the cursor SQLite connection origination as bindings or standard
+     *
+     * @return true if bindings connection, false if standard
+     * @since 6.2.1
+     */
+    public boolean isUseBindings() {
+        return useBindings;
+    }
+
+    /**
      * Enable requery attempt of invalid rows after iterating through original query rows.
      * Only supported for {@link #moveToNext()} and {@link #getRow()} usage.
      *
@@ -528,6 +553,41 @@ public abstract class UserCursor<TColumn extends UserColumn, TTable extends User
     @Override
     public String[] getSelectionArgs() {
         return query.getSelectionArgs();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Long> ids() {
+        return new Iterable<Long>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> iterator() {
+                return new Iterator<Long>() {
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public boolean hasNext() {
+                        return moveToNext();
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public Long next() {
+                        return getId();
+                    }
+
+                };
+            }
+        };
     }
 
 }

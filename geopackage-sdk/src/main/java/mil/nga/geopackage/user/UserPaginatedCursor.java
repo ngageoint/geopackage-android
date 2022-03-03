@@ -22,6 +22,7 @@ public abstract class UserPaginatedCursor<TColumn extends UserColumn, TTable ext
     protected UserPaginatedCursor(UserDao<TColumn, TTable, TRow, TResult> dao,
                                   UserCursor<TColumn, TTable, TRow> results) {
         super(dao, results);
+        dao.setUseBindings(results.isUseBindings());
     }
 
     /**

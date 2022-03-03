@@ -316,6 +316,7 @@ public abstract class UserConnection<TColumn extends UserColumn, TTable extends 
     private TResult handleCursor(Cursor cursor, UserQuery query) {
         TResult result = convertCursor(cursor);
         result.setQuery(query);
+        result.setUseBindings(database.isUseBindings());
         if (table != null) {
             result.setTable(table);
             UserColumns<TColumn> userColumns;

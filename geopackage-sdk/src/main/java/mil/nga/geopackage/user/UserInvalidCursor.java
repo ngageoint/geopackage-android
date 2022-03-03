@@ -388,4 +388,39 @@ public abstract class UserInvalidCursor<TColumn extends UserColumn, TTable exten
         return cursor.getSelectionArgs();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Long> ids() {
+        return new Iterable<Long>() {
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public Iterator<Long> iterator() {
+                return new Iterator<Long>() {
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public boolean hasNext() {
+                        return moveToNext();
+                    }
+
+                    /**
+                     * {@inheritDoc}
+                     */
+                    @Override
+                    public Long next() {
+                        return getId();
+                    }
+
+                };
+            }
+        };
+    }
+
 }
