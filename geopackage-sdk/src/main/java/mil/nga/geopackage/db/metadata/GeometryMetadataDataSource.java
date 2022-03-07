@@ -679,6 +679,23 @@ public class GeometryMetadataDataSource {
     /**
      * Query for all table geometry metadata matching the envelope
      *
+     * @param geoPackage GeoPackage name
+     * @param tableName  table name
+     * @param distinct   distinct flag
+     * @param columns    queried columns
+     * @param envelope   geometry envelope
+     * @param orderBy    order by
+     * @param limit      limit
+     * @return cursor that must be closed
+     * @since 6.2.1
+     */
+    public Cursor query(String geoPackage, String tableName, boolean distinct, String[] columns, GeometryEnvelope envelope, String orderBy, String limit) {
+        return query(getGeoPackageId(geoPackage), tableName, distinct, columns, envelope, orderBy, limit);
+    }
+
+    /**
+     * Query for all table geometry metadata matching the envelope
+     *
      * @param geoPackageId GeoPackage id
      * @param tableName    table name
      * @param envelope     geometry envelope
@@ -728,6 +745,25 @@ public class GeometryMetadataDataSource {
      */
     public long count(long geoPackageId, String tableName, GeometryEnvelope envelope) {
         return DatabaseUtils.queryNumEntries(db.getAndroidSQLiteDatabase().getDb(), GeometryMetadata.TABLE_NAME, querySQL(envelope), querySQLArgs(envelope, geoPackageId, tableName));
+    }
+
+    /**
+     * Query for all table geometry metadata matching the envelope
+     *
+     * @param geoPackageId GeoPackage id
+     * @param tableName    table name
+     * @param distinct     distinct flag
+     * @param columns      queried columns
+     * @param envelope     geometry envelope
+     * @param orderBy      order by
+     * @param limit        limit
+     * @return cursor that must be closed
+     * @since 6.2.1
+     */
+    public Cursor query(long geoPackageId, String tableName, boolean distinct, String[] columns, GeometryEnvelope envelope, String orderBy, String limit) {
+        return db.query(distinct,
+                GeometryMetadata.TABLE_NAME,
+                columns, querySQL(envelope), querySQLArgs(envelope, geoPackageId, tableName), null, null, orderBy, limit);
     }
 
     /**
