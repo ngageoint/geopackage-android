@@ -6,7 +6,11 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.2.1 (TBD)
 
-* TBD
+* Iterable User Cursor ids
+* GeoPackage metadata Geometry Index query for chunk fixes
+* Manual feature rows query for chunk fix
+* GeoPackage Geometry Index extension feature rows query for chunk fixes
+* Paginated query fix for android binding RTree queries
 
 ## [6.2.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.2.0) (02-04-2022)
 
