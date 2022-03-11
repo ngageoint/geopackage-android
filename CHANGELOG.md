@@ -4,8 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.2.1 (TBD)
+## [6.2.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.2.1) (03-11-2022)
 
+* compile SDK version 32
+* geopackage-core version 6.2.1
 * Iterable User Cursor ids
 * GeoPackage metadata Geometry Index query for chunk fixes
 * Manual feature rows query for chunk fix
