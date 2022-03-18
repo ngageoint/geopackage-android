@@ -9,6 +9,7 @@ import mil.nga.geopackage.user.UserWrapperConnection;
  * GeoPackage Feature Cursor Wrapper Connection
  *
  * @author osbornb
+ * @deprecated use {@link FeatureDao} to query feature tables
  */
 public class FeatureWrapperConnection
         extends

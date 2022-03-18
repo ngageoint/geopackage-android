@@ -9,6 +9,7 @@ import mil.nga.geopackage.user.UserWrapperConnection;
  * GeoPackage Tile Cursor Wrapper Connection
  *
  * @author osbornb
+ * @deprecated use {@link TileDao} to query tile tables
  */
 public class TileWrapperConnection extends
         UserWrapperConnection<TileColumn, TileTable, TileRow, TileCursor> {

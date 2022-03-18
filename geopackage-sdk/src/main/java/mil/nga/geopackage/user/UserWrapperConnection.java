@@ -13,6 +13,7 @@ import mil.nga.geopackage.db.GeoPackageConnection;
  * @param <TRow>    row type
  * @param <TResult> result type
  * @author osbornb
+ * @deprecated use {@link UserDao} to query user tables
  */
 public abstract class UserWrapperConnection<TColumn extends UserColumn, TTable extends UserTable<TColumn>, TRow extends UserRow<TColumn, TTable>, TResult extends UserCursor<TColumn, TTable, TRow>>
         extends UserConnection<TColumn, TTable, TRow, TResult> {
