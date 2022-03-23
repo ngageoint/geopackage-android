@@ -6,7 +6,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.3.0 (TBD)
 
-* TBD
+* geopackage-core version 6.3.0
+* OGC Related Tables Extension additional mappings methods
+* NGA Feature Style Extension additional style and icon row methods
 
 ## [6.2.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.2.1) (03-11-2022)
 
