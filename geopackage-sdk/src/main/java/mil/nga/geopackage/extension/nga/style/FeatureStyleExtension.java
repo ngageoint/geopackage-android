@@ -1,19 +1,23 @@
 package mil.nga.geopackage.extension.nga.style;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.attributes.AttributesCursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.extension.related.RelatedTablesExtension;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.sf.GeometryType;
 
 /**
  * Feature Style extension for styling features
- *
- * http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html
+ * <p>
+ * <a href="http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html">http://ngageoint.github.io/GeoPackage/docs/extensions/feature-style.html</a>
  *
  * @author osbornb
  * @since 3.2.0
@@ -1804,6 +1808,568 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
     public void deleteIcon(String featureTable, long featureId,
                            GeometryType geometryType) {
         deleteMapping(getIconMappingDao(featureTable), featureId, geometryType);
+    }
+
+    /**
+     * Count the number of mappings to the style row
+     *
+     * @param styleRow style row
+     * @return mappings count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int countStyleRowMappings(StyleRow styleRow) throws SQLException {
+        return countStyleRowMappings(styleRow.getId());
+    }
+
+    /**
+     * Count the number of mappings to the style row id
+     *
+     * @param id style row id
+     * @return mappings count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int countStyleRowMappings(long id) throws SQLException {
+        return relatedTables.countMappingsToRelated(StyleTable.TABLE_NAME, id);
+    }
+
+    /**
+     * Determine if a mapping to the style row exists
+     *
+     * @param styleRow style row
+     * @return true if mapping exists
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public boolean hasStyleRowMapping(StyleRow styleRow) throws SQLException {
+        return hasStyleRowMapping(styleRow.getId());
+    }
+
+    /**
+     * Determine if a mapping to the style row id exists
+     *
+     * @param id style row id
+     * @return true if mapping exists
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public boolean hasStyleRowMapping(long id) throws SQLException {
+        return relatedTables.hasMappingToRelated(StyleTable.TABLE_NAME, id);
+    }
+
+    /**
+     * Delete style row mappings
+     *
+     * @param styleRow style row
+     * @return number of mapping rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRowMappings(StyleRow styleRow) throws SQLException {
+        return deleteStyleRowMappings(styleRow.getId());
+    }
+
+    /**
+     * Delete style row mappings
+     *
+     * @param id style row id
+     * @return number of mapping rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRowMappings(long id) throws SQLException {
+        return relatedTables.deleteMappingsToRelated(StyleTable.TABLE_NAME, id);
+    }
+
+    /**
+     * Delete a style row and mappings
+     *
+     * @param styleRow style row
+     * @return number of rows deleted between the style and mapping tables
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRow(StyleRow styleRow) throws SQLException {
+        return deleteStyleRow(styleRow.getId());
+    }
+
+    /**
+     * Delete a style row only if it has no mappings
+     *
+     * @param styleRow style row
+     * @return number of style rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRowNotMapped(StyleRow styleRow) throws SQLException {
+        return deleteStyleRowNotMapped(styleRow.getId());
+    }
+
+    /**
+     * Delete a style row by id and mappings
+     *
+     * @param id style row id
+     * @return number of rows deleted between the style and mapping tables
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRow(long id) throws SQLException {
+        int count = 0;
+        StyleDao styleDao = getStyleDao();
+        if (styleDao != null) {
+            count = deleteStyleRowMappings(id);
+            count += styleDao.deleteById(id);
+        }
+        return count;
+    }
+
+    /**
+     * Delete a style row by id only if it has no mappings
+     *
+     * @param id style row id
+     * @return number of style rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRowNotMapped(long id) throws SQLException {
+        int count = 0;
+        if (!hasStyleRowMapping(id)) {
+            count = deleteStyleRow(id);
+        }
+        return count;
+    }
+
+    /**
+     * Delete style rows matching the where clause and mappings to them
+     *
+     * @param whereClause where clause
+     * @param whereArgs   where arguments
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRows(String whereClause, String[] whereArgs)
+            throws SQLException {
+        int count = 0;
+        StyleDao styleDao = getStyleDao();
+        if (styleDao != null) {
+            count += deleteStyleRows(styleDao.query(whereClause, whereArgs));
+            count += styleDao.delete(whereClause, whereArgs);
+        }
+        return count;
+    }
+
+    /**
+     * Delete style rows matching the where clause if they have no mappings
+     *
+     * @param whereClause where clause
+     * @param whereArgs   where arguments
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRowsNotMapped(String whereClause, String[] whereArgs)
+            throws SQLException {
+        int count = 0;
+        StyleDao styleDao = getStyleDao();
+        if (styleDao != null) {
+            count += deleteStyleRowsNotMapped(
+                    styleDao.query(whereClause, whereArgs));
+        }
+        return count;
+    }
+
+    /**
+     * Delete style rows matching the field values and mappings to them
+     *
+     * @param fieldValues field values
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRows(Map<String, Object> fieldValues)
+            throws SQLException {
+        int count = 0;
+        StyleDao styleDao = getStyleDao();
+        if (styleDao != null) {
+            count += deleteStyleRows(styleDao.queryForFieldValues(fieldValues));
+            count += styleDao.delete(fieldValues);
+        }
+        return count;
+    }
+
+    /**
+     * Delete style rows matching the field values if they have no mappings
+     *
+     * @param fieldValues field values
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRowsNotMapped(Map<String, Object> fieldValues)
+            throws SQLException {
+        int count = 0;
+        StyleDao styleDao = getStyleDao();
+        if (styleDao != null) {
+            count += deleteStyleRowsNotMapped(
+                    styleDao.queryForFieldValues(fieldValues));
+        }
+        return count;
+    }
+
+    /**
+     * Delete all style rows and mappings to them
+     *
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRows() throws SQLException {
+        int count = 0;
+        StyleDao styleDao = getStyleDao();
+        if (styleDao != null) {
+            count += deleteStyleRows(styleDao.query());
+            count += styleDao.deleteAll();
+        }
+        return count;
+    }
+
+    /**
+     * Delete all style rows if they have no mappings
+     *
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteStyleRowsNotMapped() throws SQLException {
+        int count = 0;
+        StyleDao styleDao = getStyleDao();
+        if (styleDao != null) {
+            count += deleteStyleRowsNotMapped(styleDao.query());
+        }
+        return count;
+    }
+
+    /**
+     * Delete style rows from the results
+     *
+     * @param cursor cursor
+     * @return deleted count
+     * @throws SQLException upon failure
+     */
+    private int deleteStyleRows(AttributesCursor cursor)
+            throws SQLException {
+        int count = 0;
+        try {
+            for (long id : cursor.ids()) {
+                count += deleteStyleRowMappings(id);
+            }
+        } finally {
+            cursor.close();
+        }
+        return count;
+    }
+
+    /**
+     * Delete style rows from the results if they have no mappings
+     *
+     * @param cursor cursor
+     * @return deleted count
+     * @throws SQLException upon failure
+     */
+    private int deleteStyleRowsNotMapped(AttributesCursor cursor)
+            throws SQLException {
+        int count = 0;
+        try {
+            for (long id : cursor.ids()) {
+                count += deleteStyleRowNotMapped(id);
+            }
+        } finally {
+            cursor.close();
+        }
+        return count;
+    }
+
+    /**
+     * Count the number of mappings to the icon row
+     *
+     * @param iconRow icon row
+     * @return mappings count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int countIconRowMappings(IconRow iconRow) throws SQLException {
+        return countIconRowMappings(iconRow.getId());
+    }
+
+    /**
+     * Count the number of mappings to the icon row id
+     *
+     * @param id icon row id
+     * @return mappings count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int countIconRowMappings(long id) throws SQLException {
+        return relatedTables.countMappingsToRelated(IconTable.TABLE_NAME, id);
+    }
+
+    /**
+     * Determine if a mapping to the icon row exists
+     *
+     * @param iconRow icon row
+     * @return true if mapping exists
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public boolean hasIconRowMapping(IconRow iconRow) throws SQLException {
+        return hasIconRowMapping(iconRow.getId());
+    }
+
+    /**
+     * Determine if a mapping to the icon row id exists
+     *
+     * @param id icon row id
+     * @return true if mapping exists
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public boolean hasIconRowMapping(long id) throws SQLException {
+        return relatedTables.hasMappingToRelated(IconTable.TABLE_NAME, id);
+    }
+
+    /**
+     * Delete icon row mappings
+     *
+     * @param iconRow icon row
+     * @return number of mapping rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRowMappings(IconRow iconRow) throws SQLException {
+        return deleteIconRowMappings(iconRow.getId());
+    }
+
+    /**
+     * Delete icon row mappings
+     *
+     * @param id icon row id
+     * @return number of mapping rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRowMappings(long id) throws SQLException {
+        return relatedTables.deleteMappingsToRelated(IconTable.TABLE_NAME, id);
+    }
+
+    /**
+     * Delete an icon row and mappings
+     *
+     * @param iconRow icon row
+     * @return number of rows deleted between the icon and mapping tables
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRow(IconRow iconRow) throws SQLException {
+        return deleteIconRow(iconRow.getId());
+    }
+
+    /**
+     * Delete a icon row only if it has no mappings
+     *
+     * @param iconRow icon row
+     * @return number of icon rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRowNotMapped(IconRow iconRow) throws SQLException {
+        return deleteIconRowNotMapped(iconRow.getId());
+    }
+
+    /**
+     * Delete an icon row by id and mappings
+     *
+     * @param id icon row id
+     * @return number of rows deleted between the icon and mapping tables
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRow(long id) throws SQLException {
+        int count = 0;
+        IconDao iconDao = getIconDao();
+        if (iconDao != null) {
+            count = deleteIconRowMappings(id);
+            count += iconDao.deleteById(id);
+        }
+        return count;
+    }
+
+    /**
+     * Delete a icon row by id only if it has no mappings
+     *
+     * @param id icon row id
+     * @return number of icon rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRowNotMapped(long id) throws SQLException {
+        int count = 0;
+        if (!hasIconRowMapping(id)) {
+            count = deleteIconRow(id);
+        }
+        return count;
+    }
+
+    /**
+     * Delete icon rows matching the where clause and mappings to them
+     *
+     * @param whereClause where clause
+     * @param whereArgs   where arguments
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRows(String whereClause, String[] whereArgs)
+            throws SQLException {
+        int count = 0;
+        IconDao iconDao = getIconDao();
+        if (iconDao != null) {
+            count += deleteIconRows(iconDao.query(whereClause, whereArgs));
+            count += iconDao.delete(whereClause, whereArgs);
+        }
+        return count;
+    }
+
+    /**
+     * Delete icon rows matching the where clause if they have no mappings
+     *
+     * @param whereClause where clause
+     * @param whereArgs   where arguments
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRowsNotMapped(String whereClause, String[] whereArgs)
+            throws SQLException {
+        int count = 0;
+        IconDao iconDao = getIconDao();
+        if (iconDao != null) {
+            count += deleteIconRowsNotMapped(
+                    iconDao.query(whereClause, whereArgs));
+        }
+        return count;
+    }
+
+    /**
+     * Delete icon rows matching the field values and mappings to them
+     *
+     * @param fieldValues field values
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRows(Map<String, Object> fieldValues)
+            throws SQLException {
+        int count = 0;
+        IconDao iconDao = getIconDao();
+        if (iconDao != null) {
+            count += deleteIconRows(iconDao.queryForFieldValues(fieldValues));
+            count += iconDao.delete(fieldValues);
+        }
+        return count;
+    }
+
+    /**
+     * Delete icon rows matching the field values if they have no mappings
+     *
+     * @param fieldValues field values
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRowsNotMapped(Map<String, Object> fieldValues)
+            throws SQLException {
+        int count = 0;
+        IconDao iconDao = getIconDao();
+        if (iconDao != null) {
+            count += deleteIconRowsNotMapped(
+                    iconDao.queryForFieldValues(fieldValues));
+        }
+        return count;
+    }
+
+    /**
+     * Delete all icon rows and mappings to them
+     *
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRows() throws SQLException {
+        int count = 0;
+        IconDao iconDao = getIconDao();
+        if (iconDao != null) {
+            count += deleteIconRows(iconDao.query());
+            count += iconDao.deleteAll();
+        }
+        return count;
+    }
+
+    /**
+     * Delete all icon rows if they have no mappings
+     *
+     * @return deleted count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteIconRowsNotMapped() throws SQLException {
+        int count = 0;
+        IconDao iconDao = getIconDao();
+        if (iconDao != null) {
+            count += deleteIconRowsNotMapped(iconDao.query());
+        }
+        return count;
+    }
+
+    /**
+     * Delete icon rows from the results
+     *
+     * @param cursor cursor
+     * @return deleted count
+     * @throws SQLException upon failure
+     */
+    private int deleteIconRows(UserCustomCursor cursor)
+            throws SQLException {
+        int count = 0;
+        try {
+            for (long id : cursor.ids()) {
+                count += deleteIconRowMappings(id);
+            }
+        } finally {
+            cursor.close();
+        }
+        return count;
+    }
+
+    /**
+     * Delete icon rows from the results if they have no mappings
+     *
+     * @param cursor result set
+     * @return deleted count
+     * @throws SQLException upon failure
+     */
+    private int deleteIconRowsNotMapped(UserCustomCursor cursor)
+            throws SQLException {
+        int count = 0;
+        try {
+            for (long id : cursor.ids()) {
+                count += deleteIconRowNotMapped(id);
+            }
+        } finally {
+            cursor.close();
+        }
+        return count;
     }
 
     /**

@@ -15,14 +15,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.TestConstants;
+import mil.nga.geopackage.TestUtils;
+import mil.nga.geopackage.attributes.AttributesCursor;
+import mil.nga.geopackage.attributes.AttributesRow;
 import mil.nga.geopackage.extension.nga.contents.ContentsId;
 import mil.nga.geopackage.extension.nga.contents.ContentsIdExtension;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.style.Color;
-import mil.nga.geopackage.TestConstants;
-import mil.nga.geopackage.TestUtils;
+import mil.nga.geopackage.user.custom.UserCustomCursor;
+import mil.nga.geopackage.user.custom.UserCustomRow;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.util.GeometryUtils;
 
@@ -507,6 +511,16 @@ public class FeatureStylesUtils {
             Map<GeometryType, IconRow> geometryTypeIcons,
             Map<GeometryType, Map<GeometryType, ?>> geometryTypes)
             throws IOException {
+        validateTableIcons(featureTableStyles, iconRow, geometryTypeIcons,
+                geometryTypes, false);
+    }
+
+    private static void validateTableIcons(
+            FeatureTableStyles featureTableStyles, IconRow iconRow,
+            Map<GeometryType, IconRow> geometryTypeIcons,
+            Map<GeometryType, Map<GeometryType, ?>> geometryTypes,
+            boolean shared)
+            throws IOException {
 
         if (geometryTypes != null) {
             for (Entry<GeometryType, Map<GeometryType, ?>> type : geometryTypes
@@ -524,13 +538,15 @@ public class FeatureStylesUtils {
                     TestCase.assertTrue(iconImage.getWidth() > 0);
                     TestCase.assertTrue(iconImage.getHeight() > 0);
                 }
-                TestCase.assertEquals(typeIconRow.getId(), featureTableStyles
-                        .getTableIcon(type.getKey()).getId());
+                if (!shared) {
+                    TestCase.assertEquals(typeIconRow.getId(), featureTableStyles
+                            .getTableIcon(type.getKey()).getId());
+                }
                 @SuppressWarnings("unchecked")
                 Map<GeometryType, Map<GeometryType, ?>> childGeometryTypes = (Map<GeometryType, Map<GeometryType, ?>>) type
                         .getValue();
                 validateTableIcons(featureTableStyles, typeIconRow,
-                        geometryTypeIcons, childGeometryTypes);
+                        geometryTypeIcons, childGeometryTypes, shared);
             }
         }
     }
@@ -906,6 +922,514 @@ public class FeatureStylesUtils {
         }
 
         return allChildTypes;
+    }
+
+    /**
+     * Test Feature Styles shared between multiple tables
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
+    public static void testSharedFeatureStyles(GeoPackage geoPackage)
+            throws SQLException, IOException, NameNotFoundException {
+
+        geoPackage.getExtensionManager().deleteExtensions();
+
+        FeatureStyleExtension featureStyleExtension = new FeatureStyleExtension(
+                geoPackage);
+
+        TestCase.assertFalse(featureStyleExtension.has());
+
+        List<String> featureTables = geoPackage.getFeatureTables();
+
+        if (!featureTables.isEmpty()) {
+
+            featureStyleExtension.createStyleTable();
+            featureStyleExtension.createIconTable();
+
+            StyleDao styleDao = featureStyleExtension.getStyleDao();
+            IconDao iconDao = featureStyleExtension.getIconDao();
+
+            StyleRow tableStyleDefault = randomStyle();
+            Map<GeometryType, Map<GeometryType, ?>> geometryTypes = GeometryUtils
+                    .childHierarchy(GeometryType.GEOMETRY);
+            Map<GeometryType, StyleRow> geometryTypeTableStyles = randomStyles(
+                    geometryTypes);
+
+            IconRow tableIconDefault = randomIcon(geoPackage);
+            Map<GeometryType, IconRow> geometryTypeTableIcons = randomIcons(geoPackage,
+                    geometryTypes);
+
+            List<StyleRow> randomStyles = new ArrayList<>();
+            List<IconRow> randomIcons = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                StyleRow styleRow = randomStyle();
+                randomStyles.add(styleRow);
+                IconRow iconRow = randomIcon(geoPackage);
+                randomIcons.add(iconRow);
+
+                if (i % 2 == 0) {
+                    styleDao.insert(styleRow);
+                    iconDao.insert(iconRow);
+                }
+            }
+
+            int extraStyles = 2;
+            for (int i = 0; i < extraStyles; i++) {
+                styleDao.insert(randomStyle());
+            }
+
+            int extraIcons = 3;
+            for (int i = 0; i < extraIcons; i++) {
+                iconDao.insert(randomIcon(geoPackage));
+            }
+
+            TestCase.assertTrue(geoPackage.isTable(StyleTable.TABLE_NAME));
+            TestCase.assertTrue(geoPackage.isTable(IconTable.TABLE_NAME));
+            TestCase.assertFalse(geoPackage.isTable(ContentsId.TABLE_NAME));
+
+            for (String tableName : featureTables) {
+
+                TestCase.assertFalse(featureStyleExtension.has(tableName));
+
+                FeatureDao featureDao = geoPackage.getFeatureDao(tableName);
+
+                FeatureTableStyles featureTableStyles = new FeatureTableStyles(
+                        geoPackage, featureDao.getTable());
+                TestCase.assertFalse(featureTableStyles.has());
+
+                GeometryType geometryType = featureDao.getGeometryType();
+
+                TestCase.assertFalse(
+                        featureTableStyles.hasTableStyleRelationship());
+                TestCase.assertFalse(featureTableStyles.hasStyleRelationship());
+                TestCase.assertFalse(
+                        featureTableStyles.hasTableIconRelationship());
+                TestCase.assertFalse(featureTableStyles.hasIconRelationship());
+
+                TestCase.assertNotNull(featureTableStyles.getTableName());
+                TestCase.assertEquals(tableName,
+                        featureTableStyles.getTableName());
+                TestCase.assertNotNull(
+                        featureTableStyles.getFeatureStyleExtension());
+
+                TestCase.assertNull(featureTableStyles.getTableFeatureStyles());
+                TestCase.assertNull(featureTableStyles.getTableStyles());
+                TestCase.assertNull(featureTableStyles.getCachedTableStyles());
+                TestCase.assertNull(featureTableStyles.getTableStyleDefault());
+                TestCase.assertNull(featureTableStyles
+                        .getTableStyle(GeometryType.GEOMETRY));
+                TestCase.assertNull(featureTableStyles.getTableIcons());
+                TestCase.assertNull(featureTableStyles.getCachedTableIcons());
+                TestCase.assertNull(featureTableStyles.getTableIconDefault());
+                TestCase.assertNull(
+                        featureTableStyles.getTableIcon(GeometryType.GEOMETRY));
+
+                FeatureCursor featureCursor = featureDao.queryForAll();
+                while (featureCursor.moveToNext()) {
+                    FeatureRow featureRow = featureCursor.getRow();
+
+                    TestCase.assertNull(
+                            featureTableStyles.getFeatureStyles(featureRow));
+                    TestCase.assertNull(featureTableStyles
+                            .getFeatureStyles(featureRow.getId()));
+
+                    TestCase.assertNull(
+                            featureTableStyles.getFeatureStyle(featureRow));
+                    TestCase.assertNull(featureTableStyles
+                            .getFeatureStyleDefault(featureRow));
+                    TestCase.assertNull(featureTableStyles.getFeatureStyle(
+                            featureRow.getId(), featureRow.getGeometryType()));
+                    TestCase.assertNull(featureTableStyles
+                            .getFeatureStyleDefault(featureRow.getId()));
+
+                    TestCase.assertNull(
+                            featureTableStyles.getStyles(featureRow));
+                    TestCase.assertNull(
+                            featureTableStyles.getStyles(featureRow.getId()));
+
+                    TestCase.assertNull(
+                            featureTableStyles.getStyle(featureRow));
+                    TestCase.assertNull(
+                            featureTableStyles.getStyleDefault(featureRow));
+                    TestCase.assertNull(featureTableStyles.getStyle(
+                            featureRow.getId(), featureRow.getGeometryType()));
+                    TestCase.assertNull(featureTableStyles
+                            .getStyleDefault(featureRow.getId()));
+
+                    TestCase.assertNull(
+                            featureTableStyles.getIcons(featureRow));
+                    TestCase.assertNull(
+                            featureTableStyles.getIcons(featureRow.getId()));
+
+                    TestCase.assertNull(featureTableStyles.getIcon(featureRow));
+                    TestCase.assertNull(
+                            featureTableStyles.getIconDefault(featureRow));
+                    TestCase.assertNull(featureTableStyles.getIcon(
+                            featureRow.getId(), featureRow.getGeometryType()));
+                    TestCase.assertNull(featureTableStyles
+                            .getIconDefault(featureRow.getId()));
+                }
+                featureCursor.close();
+
+                // Table Styles
+                TestCase.assertFalse(
+                        featureTableStyles.hasTableStyleRelationship());
+                TestCase.assertFalse(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE,
+                                tableName)));
+
+                // Add a default table style
+                featureTableStyles.setTableStyleDefault(tableStyleDefault);
+
+                TestCase.assertTrue(featureStyleExtension.has());
+                TestCase.assertTrue(featureStyleExtension.has(tableName));
+                TestCase.assertTrue(featureTableStyles.has());
+                TestCase.assertTrue(
+                        featureTableStyles.hasTableStyleRelationship());
+                TestCase.assertTrue(geoPackage.isTable(StyleTable.TABLE_NAME));
+                TestCase.assertTrue(geoPackage.isTable(ContentsId.TABLE_NAME));
+                TestCase.assertTrue(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_TABLE_STYLE,
+                                tableName)));
+
+                // Add geometry type table styles
+                for (Entry<GeometryType, StyleRow> geometryTypeStyle : geometryTypeTableStyles
+                        .entrySet()) {
+                    featureTableStyles.setTableStyle(geometryTypeStyle.getKey(),
+                            geometryTypeStyle.getValue());
+                }
+
+                FeatureStyles featureStyles = featureTableStyles
+                        .getTableFeatureStyles();
+                TestCase.assertNotNull(featureStyles);
+                TestCase.assertNotNull(featureStyles.getStyles());
+                TestCase.assertNull(featureStyles.getIcons());
+
+                Styles tableStyles = featureTableStyles.getTableStyles();
+                TestCase.assertNotNull(tableStyles);
+                TestCase.assertNotNull(tableStyles.getDefault());
+                TestCase.assertEquals(tableStyleDefault.getId(),
+                        tableStyles.getDefault().getId());
+                TestCase.assertEquals(tableStyleDefault.getId(),
+                        featureTableStyles.getTableStyle(null).getId());
+                validateTableStyles(featureTableStyles, tableStyleDefault,
+                        geometryTypeTableStyles, geometryTypes);
+
+                // Table Icons
+                TestCase.assertFalse(
+                        featureTableStyles.hasTableIconRelationship());
+                TestCase.assertFalse(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON,
+                                tableName)));
+
+                // Create table icon relationship
+                TestCase.assertFalse(
+                        featureTableStyles.hasTableIconRelationship());
+                featureTableStyles.createTableIconRelationship();
+                TestCase.assertTrue(
+                        featureTableStyles.hasTableIconRelationship());
+
+                Icons createTableIcons = new Icons();
+                createTableIcons.setDefault(tableIconDefault);
+                IconRow baseGeometryTypeIcon = geometryTypeTableIcons
+                        .get(geometryType);
+                if (baseGeometryTypeIcon == null) {
+                    baseGeometryTypeIcon = randomIcon(geoPackage);
+                    geometryTypeTableIcons.put(geometryType,
+                            baseGeometryTypeIcon);
+                }
+                for (Entry<GeometryType, IconRow> geometryTypeIcon : geometryTypeTableIcons
+                        .entrySet()) {
+                    createTableIcons.setIcon(geometryTypeIcon.getValue(),
+                            geometryTypeIcon.getKey());
+                }
+
+                // Set the table icons
+                featureTableStyles.setTableIcons(createTableIcons);
+
+                TestCase.assertTrue(
+                        featureTableStyles.hasTableIconRelationship());
+                TestCase.assertTrue(geoPackage.isTable(IconTable.TABLE_NAME));
+                TestCase.assertTrue(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_TABLE_ICON,
+                                tableName)));
+
+                featureStyles = featureTableStyles.getTableFeatureStyles();
+                TestCase.assertNotNull(featureStyles);
+                TestCase.assertNotNull(featureStyles.getStyles());
+                Icons tableIcons = featureStyles.getIcons();
+                TestCase.assertNotNull(tableIcons);
+
+                TestCase.assertNotNull(tableIcons.getDefault());
+                TestCase.assertEquals(tableIconDefault.getId(),
+                        tableIcons.getDefault().getId());
+                TestCase.assertEquals(tableIconDefault.getId(),
+                        featureTableStyles.getTableIcon(null).getId());
+                TestCase.assertEquals(baseGeometryTypeIcon.getId(),
+                        featureTableStyles.getTableIcon(geometryType).getId());
+                validateTableIcons(featureTableStyles, baseGeometryTypeIcon,
+                        geometryTypeTableIcons, geometryTypes, true);
+
+                TestCase.assertFalse(featureTableStyles.hasStyleRelationship());
+                TestCase.assertFalse(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_STYLE,
+                                tableName)));
+                TestCase.assertFalse(featureTableStyles.hasIconRelationship());
+                TestCase.assertFalse(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_ICON,
+                                tableName)));
+
+                // Create style and icon relationship
+                featureTableStyles.createStyleRelationship();
+                TestCase.assertTrue(featureTableStyles.hasStyleRelationship());
+                TestCase.assertTrue(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_STYLE,
+                                tableName)));
+                featureTableStyles.createIconRelationship();
+                TestCase.assertTrue(featureTableStyles.hasIconRelationship());
+                TestCase.assertTrue(geoPackage.isTable(featureTableStyles
+                        .getFeatureStyleExtension().getMappingTableName(
+                                FeatureStyleExtension.TABLE_MAPPING_ICON,
+                                tableName)));
+
+                Map<Long, Map<GeometryType, StyleRow>> featureResultsStyles = new HashMap<>();
+                Map<Long, Map<GeometryType, IconRow>> featureResultsIcons = new HashMap<>();
+
+                featureCursor = featureDao.queryForAll();
+                while (featureCursor.moveToNext()) {
+
+                    double randomFeatureOption = Math.random();
+
+                    if (randomFeatureOption < .25) {
+                        continue;
+                    }
+
+                    FeatureRow featureRow = featureCursor.getRow();
+
+                    if (randomFeatureOption < .75) {
+
+                        // Feature Styles
+
+                        Map<GeometryType, StyleRow> featureRowStyles = new HashMap<>();
+                        featureResultsStyles.put(featureRow.getId(),
+                                featureRowStyles);
+
+                        // Add a default style
+                        StyleRow styleDefault = randomStyle(randomStyles);
+                        featureTableStyles.setStyleDefault(featureRow,
+                                styleDefault);
+                        featureRowStyles.put(null, styleDefault);
+
+                        // Add geometry type styles
+                        Map<GeometryType, StyleRow> geometryTypeStyles = randomStyles(
+                                geometryTypes, randomStyles);
+                        for (Entry<GeometryType, StyleRow> geometryTypeStyle : geometryTypeStyles
+                                .entrySet()) {
+                            featureTableStyles.setStyle(featureRow,
+                                    geometryTypeStyle.getKey(),
+                                    geometryTypeStyle.getValue());
+                            featureRowStyles.put(geometryTypeStyle.getKey(),
+                                    geometryTypeStyle.getValue());
+                        }
+
+                    }
+
+                    if (randomFeatureOption >= .5) {
+
+                        // Feature Icons
+
+                        Map<GeometryType, IconRow> featureRowIcons = new HashMap<>();
+                        featureResultsIcons.put(featureRow.getId(),
+                                featureRowIcons);
+
+                        // Add a default icon
+                        IconRow iconDefault = randomIcon(geoPackage, randomIcons);
+                        featureTableStyles.setIconDefault(featureRow,
+                                iconDefault);
+                        featureRowIcons.put(null, iconDefault);
+
+                        // Add geometry type icons
+                        Map<GeometryType, IconRow> geometryTypeIcons = randomIcons(
+                                geoPackage, geometryTypes, randomIcons);
+                        for (Entry<GeometryType, IconRow> geometryTypeIcon : geometryTypeIcons
+                                .entrySet()) {
+                            featureTableStyles.setIcon(featureRow,
+                                    geometryTypeIcon.getKey(),
+                                    geometryTypeIcon.getValue());
+                            featureRowIcons.put(geometryTypeIcon.getKey(),
+                                    geometryTypeIcon.getValue());
+                        }
+
+                    }
+
+                }
+                featureCursor.close();
+
+                featureCursor = featureDao.queryForAll();
+                while (featureCursor.moveToNext()) {
+
+                    FeatureRow featureRow = featureCursor.getRow();
+
+                    long featureRowId = featureRow.getId();
+                    Map<GeometryType, StyleRow> featureRowStyles = featureResultsStyles
+                            .get(featureRowId);
+                    boolean hasFeatureRowStyles = featureRowStyles != null;
+                    Map<GeometryType, IconRow> featureRowIcons = featureResultsIcons
+                            .get(featureRowId);
+                    boolean hasFeatureRowIcons = featureRowIcons != null;
+                    FeatureStyle featureStyle = featureTableStyles
+                            .getFeatureStyle(featureRow);
+                    TestCase.assertNotNull(featureStyle);
+                    TestCase.assertTrue(featureStyle.hasStyle());
+                    TestCase.assertNotNull(featureStyle.getStyle());
+                    TestCase.assertEquals(!hasFeatureRowStyles,
+                            featureStyle.getStyle().isTableStyle());
+                    StyleRow expectedStyleRow = getExpectedRowStyle(featureRow,
+                            featureRow.getGeometryType(), tableStyleDefault,
+                            geometryTypeTableStyles, featureResultsStyles);
+                    TestCase.assertEquals(expectedStyleRow.getId(),
+                            featureStyle.getStyle().getId());
+                    TestCase.assertTrue(featureStyle.hasIcon());
+                    TestCase.assertNotNull(featureStyle.getIcon());
+                    TestCase.assertEquals(!hasFeatureRowIcons,
+                            featureStyle.getIcon().isTableIcon());
+                    IconRow expectedIconRow = getExpectedRowIcon(featureRow,
+                            featureRow.getGeometryType(), tableIconDefault,
+                            geometryTypeTableIcons, featureResultsIcons);
+                    TestCase.assertEquals(expectedIconRow.getId(),
+                            featureStyle.getIcon().getId());
+                    TestCase.assertEquals(hasFeatureRowIcons || !hasFeatureRowStyles,
+                            featureStyle.useIcon());
+
+                    validateRowStyles(featureTableStyles, featureRow,
+                            tableStyleDefault, geometryTypeTableStyles,
+                            featureResultsStyles);
+
+                    validateRowIcons(featureTableStyles, featureRow,
+                            tableIconDefault, geometryTypeTableIcons,
+                            featureResultsIcons);
+
+                }
+                featureCursor.close();
+
+            }
+
+            TestCase.assertTrue(styleDao.count() > 0);
+            TestCase.assertTrue(iconDao.count() > 0);
+
+            int styleRowsWithNoMappings = 0;
+            AttributesCursor styleRows = styleDao.query();
+            try {
+                for (AttributesRow styleRow : styleRows) {
+                    if (!featureStyleExtension
+                            .hasStyleRowMapping(styleDao.getRow(styleRow))) {
+                        styleRowsWithNoMappings++;
+                    }
+                }
+            } finally {
+                styleRows.close();
+            }
+            TestCase.assertTrue(styleRowsWithNoMappings >= extraStyles);
+            TestCase.assertEquals(styleRowsWithNoMappings,
+                    featureStyleExtension.deleteStyleRowsNotMapped());
+
+            int iconRowsWithNoMappings = 0;
+            UserCustomCursor iconRows = iconDao.query();
+            try {
+                for (UserCustomRow iconRow : iconRows) {
+                    if (!featureStyleExtension
+                            .hasIconRowMapping(iconDao.getRow(iconRow))) {
+                        iconRowsWithNoMappings++;
+                    }
+                }
+            } finally {
+                iconRows.close();
+            }
+            TestCase.assertTrue(iconRowsWithNoMappings >= extraIcons);
+            TestCase.assertEquals(iconRowsWithNoMappings,
+                    featureStyleExtension.deleteIconRowsNotMapped());
+
+            TestCase.assertTrue(featureStyleExtension
+                    .deleteStyleRow(tableStyleDefault) >= 1);
+            for (StyleRow styleRow : geometryTypeTableStyles.values()) {
+                TestCase.assertTrue(featureStyleExtension.deleteStyleRow(styleRow) >= 1);
+            }
+
+            TestCase.assertTrue(
+                    featureStyleExtension.deleteIconRow(tableIconDefault) >= 1);
+            for (IconRow iconRow : geometryTypeTableIcons.values()) {
+                TestCase.assertTrue(featureStyleExtension.deleteIconRow(iconRow) >= 1);
+            }
+
+            TestCase.assertTrue(featureStyleExtension.deleteStyleRows() >= 1);
+            TestCase.assertTrue(featureStyleExtension.deleteIconRows() >= 1);
+
+            TestCase.assertEquals(0, styleDao.count());
+            TestCase.assertEquals(0, iconDao.count());
+
+            List<String> tables = featureStyleExtension.getTables();
+            TestCase.assertEquals(featureTables.size(), tables.size());
+
+            for (String tableName : featureTables) {
+
+                TestCase.assertTrue(tables.contains(tableName));
+
+                TestCase.assertNull(
+                        featureStyleExtension.getTableStyles(tableName));
+                TestCase.assertNull(
+                        featureStyleExtension.getTableIcons(tableName));
+
+                FeatureDao featureDao = geoPackage.getFeatureDao(tableName);
+                FeatureCursor featureCursor = featureDao.queryForAll();
+                while (featureCursor.moveToNext()) {
+
+                    FeatureRow featureRow = featureCursor.getRow();
+
+                    TestCase.assertNull(
+                            featureStyleExtension.getStyles(featureRow));
+                    TestCase.assertNull(
+                            featureStyleExtension.getIcons(featureRow));
+
+                }
+                featureCursor.close();
+
+                featureStyleExtension.deleteRelationships(tableName);
+                TestCase.assertFalse(featureStyleExtension.has(tableName));
+
+            }
+
+            TestCase.assertFalse(featureStyleExtension.has());
+
+            TestCase.assertTrue(geoPackage.isTable(StyleTable.TABLE_NAME));
+            TestCase.assertTrue(geoPackage.isTable(IconTable.TABLE_NAME));
+            TestCase.assertTrue(geoPackage.isTable(ContentsId.TABLE_NAME));
+
+            featureStyleExtension.removeExtension();
+
+            TestCase.assertFalse(geoPackage.isTable(StyleTable.TABLE_NAME));
+            TestCase.assertFalse(geoPackage.isTable(IconTable.TABLE_NAME));
+            TestCase.assertTrue(geoPackage.isTable(ContentsId.TABLE_NAME));
+
+            ContentsIdExtension contentsIdExtension = featureStyleExtension
+                    .getContentsId();
+            TestCase.assertEquals(featureTables.size(),
+                    contentsIdExtension.count());
+            TestCase.assertEquals(featureTables.size(),
+                    contentsIdExtension.deleteIds());
+            contentsIdExtension.removeExtension();
+            TestCase.assertFalse(geoPackage.isTable(ContentsId.TABLE_NAME));
+
+        }
+
     }
 
 }
