@@ -1648,6 +1648,31 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Calculate style pixel bounds
+     *
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculateStylePixelBounds() {
+        return calculateStylePixelBounds(density);
+    }
+
+    /**
+     * Calculate style pixel bounds
+     *
+     * @param density display density: {@link android.util.DisplayMetrics#density}
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculateStylePixelBounds(float density) {
+        PixelBounds pixelBounds = null;
+        if (featureTableStyles != null) {
+            pixelBounds = featureTableStyles.calculatePixelBounds(density);
+        }
+        return pixelBounds;
+    }
+
+    /**
      * Draw a tile bitmap from feature index results
      *
      * @param zoom                   zoom level

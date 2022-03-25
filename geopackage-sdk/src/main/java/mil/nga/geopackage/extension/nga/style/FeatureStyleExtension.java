@@ -1,6 +1,7 @@
 package mil.nga.geopackage.extension.nga.style;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,8 +10,10 @@ import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.attributes.AttributesCursor;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.extension.related.RelatedTablesExtension;
+import mil.nga.geopackage.extension.related.UserMappingTable;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.tiles.features.PixelBounds;
 import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.sf.GeometryType;
 
@@ -300,6 +303,128 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
             iconRow = tableIcons.getIcon(geometryType);
         }
         return iconRow;
+    }
+
+    /**
+     * Get all styles used by the feature table
+     *
+     * @param featureTable feature table
+     * @return style rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, StyleRow> getStyles(String featureTable) {
+
+        Map<Long, StyleRow> styles = new HashMap<>();
+
+        Styles tableStyles = getTableStyles(featureTable);
+        if (tableStyles != null) {
+            StyleRow defaultStyleRow = tableStyles.getDefault();
+            if (defaultStyleRow != null) {
+                styles.put(defaultStyleRow.getId(), defaultStyleRow);
+            }
+            for (StyleRow styleRow : tableStyles.getStyles().values()) {
+                styles.put(styleRow.getId(), styleRow);
+            }
+        }
+
+        styles.putAll(getFeatureStyles(featureTable));
+
+        return styles;
+    }
+
+    /**
+     * Get all styles used by feature rows in the table
+     *
+     * @param featureTable feature table
+     * @return style rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, StyleRow> getFeatureStyles(String featureTable) {
+
+        Map<Long, StyleRow> styles = new HashMap<>();
+
+        StyleMappingDao mappingDao = getStyleMappingDao(featureTable);
+        StyleDao styleDao = getStyleDao();
+
+        if (mappingDao != null && styleDao != null) {
+
+            UserCustomCursor cursor = mappingDao.query(true, new String[]{UserMappingTable.COLUMN_RELATED_ID});
+
+            try {
+                while (cursor.moveToNext()) {
+                    StyleMappingRow styleMappingRow = mappingDao.getRow(cursor);
+                    StyleRow styleRow = styleDao
+                            .queryForRow(styleMappingRow);
+                    styles.put(styleRow.getId(), styleRow);
+                }
+            } finally {
+                cursor.close();
+            }
+
+        }
+
+        return styles;
+    }
+
+    /**
+     * Get all icons used by the feature table
+     *
+     * @param featureTable feature table
+     * @return icon rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, IconRow> getIcons(String featureTable) {
+
+        Map<Long, IconRow> icons = new HashMap<>();
+
+        Icons tableIcons = getTableIcons(featureTable);
+        if (tableIcons != null) {
+            IconRow defaultIconRow = tableIcons.getDefault();
+            if (defaultIconRow != null) {
+                icons.put(defaultIconRow.getId(), defaultIconRow);
+            }
+            for (IconRow iconRow : tableIcons.getIcons().values()) {
+                icons.put(iconRow.getId(), iconRow);
+            }
+        }
+
+        icons.putAll(getFeatureIcons(featureTable));
+
+        return icons;
+    }
+
+    /**
+     * Get all icons used by feature rows in the table
+     *
+     * @param featureTable feature table
+     * @return icon rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, IconRow> getFeatureIcons(String featureTable) {
+
+        Map<Long, IconRow> icons = new HashMap<>();
+
+        StyleMappingDao mappingDao = getIconMappingDao(featureTable);
+        IconDao iconDao = getIconDao();
+
+        if (mappingDao != null && iconDao != null) {
+
+            UserCustomCursor cursor = mappingDao.query(true, new String[]{UserMappingTable.COLUMN_RELATED_ID});
+
+            try {
+                while (cursor.moveToNext()) {
+                    StyleMappingRow styleMappingRow = mappingDao.getRow(cursor);
+                    IconRow iconRow = iconDao
+                            .queryForRow(styleMappingRow);
+                    icons.put(iconRow.getId(), iconRow);
+                }
+            } finally {
+                cursor.close();
+            }
+
+        }
+
+        return icons;
     }
 
     /**
@@ -2507,6 +2632,59 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
             iconIds = mappingDao.uniqueRelatedIds();
         }
         return iconIds;
+    }
+
+    /**
+     * Calculate style pixel bounds
+     *
+     * @param featureTable feature table
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculatePixelBounds(String featureTable) {
+        return calculatePixelBounds(featureTable, 1.0f);
+    }
+
+    /**
+     * Calculate style pixel bounds for the feature table
+     *
+     * @param featureTable feature table
+     * @param density      display density: {@link android.util.DisplayMetrics#density}
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculatePixelBounds(String featureTable, float density) {
+
+        Map<Long, StyleRow> styles = getStyles(featureTable);
+        Map<Long, IconRow> icons = getIcons(featureTable);
+
+        PixelBounds pixelBounds = new PixelBounds();
+
+        for (StyleRow styleRow : styles.values()) {
+            double styleHalfWidth = density * (styleRow.getWidthOrDefault() / 2.0);
+            pixelBounds.expandLength(styleHalfWidth);
+        }
+
+        for (IconRow iconRow : icons.values()) {
+            double[] iconDimensions = iconRow.getDerivedDimensions();
+            double iconWidth = density * Math.ceil(iconDimensions[0]);
+            double iconHeight = density * Math.ceil(iconDimensions[1]);
+            double anchorU = iconRow.getAnchorUOrDefault();
+            double anchorV = iconRow.getAnchorVOrDefault();
+
+            double left = anchorU * iconWidth;
+            double right = iconWidth - left;
+            double top = anchorV * iconHeight;
+            double bottom = iconHeight - top;
+
+            // Expand in the opposite directions for queries
+            pixelBounds.expandLeft(right);
+            pixelBounds.expandRight(left);
+            pixelBounds.expandUp(bottom);
+            pixelBounds.expandDown(top);
+        }
+
+        return pixelBounds;
     }
 
 }

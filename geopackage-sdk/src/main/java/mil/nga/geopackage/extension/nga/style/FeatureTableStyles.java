@@ -1,6 +1,7 @@
 package mil.nga.geopackage.extension.nga.style;
 
 import java.util.List;
+import java.util.Map;
 
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
@@ -8,6 +9,7 @@ import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.tiles.features.PixelBounds;
 import mil.nga.sf.GeometryType;
 
 /**
@@ -401,6 +403,46 @@ public class FeatureTableStyles {
      */
     public IconRow getTableIconDefault() {
         return featureStyleExtension.getTableIconDefault(tableName);
+    }
+
+    /**
+     * Get all styles used by the feature table
+     *
+     * @return style rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, StyleRow> getStyles() {
+        return featureStyleExtension.getStyles(tableName);
+    }
+
+    /**
+     * Get all styles used by feature rows in the table
+     *
+     * @return style rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, StyleRow> getFeatureStyles() {
+        return featureStyleExtension.getFeatureStyles(tableName);
+    }
+
+    /**
+     * Get all icons used by the feature table
+     *
+     * @return icon rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, IconRow> getIcons() {
+        return featureStyleExtension.getIcons(tableName);
+    }
+
+    /**
+     * Get all icons used by feature rows in the table
+     *
+     * @return icon rows mapped by ids
+     * @since 6.3.0
+     */
+    public Map<Long, IconRow> getFeatureIcons() {
+        return featureStyleExtension.getFeatureIcons(tableName);
     }
 
     /**
@@ -1285,6 +1327,27 @@ public class FeatureTableStyles {
      */
     public List<Long> getAllIconIds() {
         return featureStyleExtension.getAllIconIds(tableName);
+    }
+
+    /**
+     * Calculate style pixel bounds
+     *
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculatePixelBounds() {
+        return calculatePixelBounds(1.0f);
+    }
+
+    /**
+     * Calculate style pixel bounds
+     *
+     * @param density display density: {@link android.util.DisplayMetrics#density}
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculatePixelBounds(float density) {
+        return featureStyleExtension.calculatePixelBounds(tableName, density);
     }
 
 }

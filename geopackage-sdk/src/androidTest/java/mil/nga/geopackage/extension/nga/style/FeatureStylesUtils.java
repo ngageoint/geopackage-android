@@ -371,6 +371,17 @@ public class FeatureStylesUtils {
                 }
                 featureCursor.close();
 
+                Map<Long, StyleRow> allStyles = featureTableStyles.getStyles();
+                Map<Long, StyleRow> allFeatureStyles = featureTableStyles.getFeatureStyles();
+                for(long styleId: allFeatureStyles.keySet()){
+                    TestCase.assertTrue(allStyles.containsKey(styleId));
+                }
+                Map<Long, IconRow> allIcons = featureTableStyles.getIcons();
+                Map<Long, IconRow> allFeatureIcons = featureTableStyles.getFeatureIcons();
+                for(long iconId: allFeatureIcons.keySet()){
+                    TestCase.assertTrue(allIcons.containsKey(iconId));
+                }
+
                 featureCursor = featureDao.queryForAll();
                 while (featureCursor.moveToNext()) {
 
