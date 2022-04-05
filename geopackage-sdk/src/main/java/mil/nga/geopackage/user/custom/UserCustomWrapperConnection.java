@@ -12,6 +12,7 @@ import mil.nga.geopackage.user.UserWrapperConnection;
  * @since 3.0.1
  * @deprecated use {@link UserCustomDao} to query user custom tables
  */
+@Deprecated
 public class UserCustomWrapperConnection
         extends
         UserWrapperConnection<UserCustomColumn, UserCustomTable, UserCustomRow, UserCustomCursor> {

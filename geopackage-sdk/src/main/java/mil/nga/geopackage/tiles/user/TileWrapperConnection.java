@@ -11,6 +11,7 @@ import mil.nga.geopackage.user.UserWrapperConnection;
  * @author osbornb
  * @deprecated use {@link TileDao} to query tile tables
  */
+@Deprecated
 public class TileWrapperConnection extends
         UserWrapperConnection<TileColumn, TileTable, TileRow, TileCursor> {
 

@@ -34,6 +34,7 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.style.Color;
+import mil.nga.geopackage.style.PixelBounds;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileUtils;
 import mil.nga.proj.Projection;

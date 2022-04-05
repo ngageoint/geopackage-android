@@ -12,6 +12,7 @@ import mil.nga.geopackage.user.UserWrapperConnection;
  * @since 1.3.1
  * @deprecated use {@link AttributesDao} to query attributes tables
  */
+@Deprecated
 public class AttributesWrapperConnection
         extends
         UserWrapperConnection<AttributesColumn, AttributesTable, AttributesRow, AttributesCursor> {

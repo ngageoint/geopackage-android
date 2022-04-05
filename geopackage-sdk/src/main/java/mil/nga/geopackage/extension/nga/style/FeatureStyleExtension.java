@@ -13,7 +13,7 @@ import mil.nga.geopackage.extension.related.RelatedTablesExtension;
 import mil.nga.geopackage.extension.related.UserMappingTable;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
-import mil.nga.geopackage.tiles.features.PixelBounds;
+import mil.nga.geopackage.style.PixelBounds;
 import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.sf.GeometryType;
 
