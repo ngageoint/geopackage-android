@@ -2661,30 +2661,126 @@ public class FeatureStyleExtension extends FeatureCoreStyleExtension {
         PixelBounds pixelBounds = new PixelBounds();
 
         for (StyleRow styleRow : styles.values()) {
-            double styleHalfWidth = density * (styleRow.getWidthOrDefault() / 2.0);
-            pixelBounds.expandLength(styleHalfWidth);
+            calculatePixelBounds(pixelBounds, styleRow, density);
         }
 
         for (IconRow iconRow : icons.values()) {
-            double[] iconDimensions = iconRow.getDerivedDimensions();
-            double iconWidth = density * Math.ceil(iconDimensions[0]);
-            double iconHeight = density * Math.ceil(iconDimensions[1]);
-            double anchorU = iconRow.getAnchorUOrDefault();
-            double anchorV = iconRow.getAnchorVOrDefault();
-
-            double left = anchorU * iconWidth;
-            double right = iconWidth - left;
-            double top = anchorV * iconHeight;
-            double bottom = iconHeight - top;
-
-            // Expand in the opposite directions for queries
-            pixelBounds.expandLeft(right);
-            pixelBounds.expandRight(left);
-            pixelBounds.expandUp(bottom);
-            pixelBounds.expandDown(top);
+            calculatePixelBounds(pixelBounds, iconRow, density);
         }
 
         return pixelBounds;
+    }
+
+    /**
+     * Calculate style pixel bounds for the style row
+     *
+     * @param styleRow style row
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public static PixelBounds calculatePixelBounds(StyleRow styleRow) {
+        return calculatePixelBounds(styleRow, 1.0f);
+    }
+
+    /**
+     * Calculate style pixel bounds for the style row
+     *
+     * @param styleRow style row
+     * @param density  display density: {@link android.util.DisplayMetrics#density}
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public static PixelBounds calculatePixelBounds(StyleRow styleRow, float density) {
+        PixelBounds pixelBounds = new PixelBounds();
+        calculatePixelBounds(pixelBounds, styleRow, density);
+        return pixelBounds;
+    }
+
+    /**
+     * Calculate style pixel bounds for the style row
+     *
+     * @param pixelBounds pixel bounds to expand
+     * @param styleRow    style row
+     * @since 6.3.0
+     */
+    public static void calculatePixelBounds(PixelBounds pixelBounds, StyleRow styleRow) {
+        calculatePixelBounds(pixelBounds, styleRow, 1.0f);
+    }
+
+    /**
+     * Calculate style pixel bounds for the style row
+     *
+     * @param pixelBounds pixel bounds to expand
+     * @param styleRow    style row
+     * @param density     display density: {@link android.util.DisplayMetrics#density}
+     * @since 6.3.0
+     */
+    public static void calculatePixelBounds(PixelBounds pixelBounds, StyleRow styleRow, float density) {
+        double styleHalfWidth = density * (styleRow.getWidthOrDefault() / 2.0);
+        pixelBounds.expandLength(styleHalfWidth);
+    }
+
+    /**
+     * Calculate style pixel bounds for the icon row
+     *
+     * @param iconRow icon row
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public static PixelBounds calculatePixelBounds(IconRow iconRow) {
+        return calculatePixelBounds(iconRow, 1.0f);
+    }
+
+    /**
+     * Calculate style pixel bounds for the icon row
+     *
+     * @param iconRow icon row
+     * @param density display density: {@link android.util.DisplayMetrics#density}
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public static PixelBounds calculatePixelBounds(IconRow iconRow, float density) {
+        PixelBounds pixelBounds = new PixelBounds();
+        calculatePixelBounds(pixelBounds, iconRow, density);
+        return pixelBounds;
+    }
+
+    /**
+     * Calculate style pixel bounds for the icon row
+     *
+     * @param pixelBounds pixel bounds to expand
+     * @param iconRow     icon row
+     * @since 6.3.0
+     */
+    public static void calculatePixelBounds(PixelBounds pixelBounds, IconRow iconRow) {
+        calculatePixelBounds(pixelBounds, iconRow, 1.0f);
+    }
+
+    /**
+     * Calculate style pixel bounds for the icon row
+     *
+     * @param pixelBounds pixel bounds to expand
+     * @param iconRow     icon row
+     * @param density     display density: {@link android.util.DisplayMetrics#density}
+     * @since 6.3.0
+     */
+    public static void calculatePixelBounds(PixelBounds pixelBounds, IconRow iconRow, float density) {
+        double[] iconDimensions = iconRow.getDerivedDimensions();
+        double iconWidth = density * Math.ceil(iconDimensions[0]);
+        double iconHeight = density * Math.ceil(iconDimensions[1]);
+        double anchorU = iconRow.getAnchorUOrDefault();
+        double anchorV = iconRow.getAnchorVOrDefault();
+
+        double left = anchorU * iconWidth;
+        double right = iconWidth - left;
+        double top = anchorV * iconHeight;
+        double bottom = iconHeight - top;
+
+        // Expand in the opposite directions for queries
+        pixelBounds.expandLeft(right);
+        pixelBounds.expandRight(left);
+        pixelBounds.expandUp(bottom);
+        pixelBounds.expandDown(top);
     }
 
 }
