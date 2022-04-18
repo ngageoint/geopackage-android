@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>mil.nga</groupId>
   <artifactId>sqlite-android</artifactId>
-  <version>3370200</version>
+  <version>3380200</version>
   <packaging>aar</packaging>
   <name>SQLite Android Bindings</name>
   <description>SQLite Android Bindings from https://sqlite.org</description>

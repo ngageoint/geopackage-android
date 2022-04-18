@@ -7,6 +7,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 6.3.0 (TBD)
 
 * geopackage-core version 6.3.0
+* SQLite Android Bindings version 3380200
 * OGC Related Tables Extension additional mappings methods
 * NGA Feature Style Extension additional style and icon row methods
 * Feature Style expanded pixel bounds
