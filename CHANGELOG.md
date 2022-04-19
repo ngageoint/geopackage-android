@@ -4,7 +4,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.3.0 (TBD)
+## [6.3.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.3.0) (04-19-2022)
 
 * geopackage-core version 6.3.0
 * SQLite Android Bindings version 3380200
@@ -12,6 +12,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * NGA Feature Style Extension additional style and icon row methods
 * Feature Style expanded pixel bounds
 * Deprecated WrapperConnection classes
+* gradle plugin updated to 7.1.3
 
 ## [6.2.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.2.1) (03-11-2022)
 
