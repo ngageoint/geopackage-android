@@ -27,7 +27,7 @@ import mil.nga.proj.ProjectionTransform;
 /**
  * Tiled Gridded Coverage Data, abstract Common Encoding, Extension
  * <p>
- * http://docs.opengeospatial.org/is/17-066r1/17-066r1.html
+ * <a href="http://docs.opengeospatial.org/is/17-066r1/17-066r1.html">http://docs.opengeospatial.org/is/17-066r1/17-066r1.html</a>
  *
  * @author osbornb
  * @since 2.0.1

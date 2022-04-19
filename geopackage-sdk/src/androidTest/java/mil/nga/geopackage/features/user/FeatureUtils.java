@@ -20,6 +20,7 @@ import java.util.UUID;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
@@ -27,9 +28,8 @@ import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
-import mil.nga.geopackage.srs.SpatialReferenceSystem;
-import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.geom.GeoPackageGeometryDataUtils;
+import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.user.ColumnValue;
 import mil.nga.proj.ProjectionConstants;
 import mil.nga.sf.Geometry;
@@ -60,7 +60,7 @@ public class FeatureUtils {
      *
      * @param geoPackage GeoPackage
      * @throws SQLException upon error
-     * @throws IOException upon error
+     * @throws IOException  upon error
      */
     public static void testRead(GeoPackage geoPackage) throws SQLException, IOException {
 
@@ -617,8 +617,9 @@ public class FeatureUtils {
      *
      * @param geoPackage GeoPackage
      * @throws SQLException upon error
+     * @throws IOException  upon error
      */
-    public static void testUpdate(GeoPackage geoPackage) throws SQLException {
+    public static void testUpdate(GeoPackage geoPackage) throws SQLException, IOException {
 
         GeometryColumnsDao geometryColumnsDao = geoPackage
                 .getGeometryColumnsDao();
@@ -641,9 +642,10 @@ public class FeatureUtils {
      *
      * @param geoPackage GeoPackage
      * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     public static void testUpdateAddColumns(GeoPackage geoPackage)
-            throws SQLException {
+            throws SQLException, IOException {
 
         GeometryColumnsDao geometryColumnsDao = geoPackage
                 .getGeometryColumnsDao();
@@ -774,8 +776,9 @@ public class FeatureUtils {
      * Test updates for the feature table
      *
      * @param dao feature dao
+     * @throws IOException upon error
      */
-    public static void testUpdate(FeatureDao dao) {
+    public static void testUpdate(FeatureDao dao) throws IOException {
 
         TestCase.assertNotNull(dao);
 
@@ -1258,8 +1261,9 @@ public class FeatureUtils {
      *
      * @param geoPackage GeoPackage
      * @throws SQLException upon error
+     * @throws IOException upon error
      */
-    public static void testCreate(GeoPackage geoPackage) throws SQLException {
+    public static void testCreate(GeoPackage geoPackage) throws SQLException, IOException {
 
         GeometryColumnsDao geometryColumnsDao = geoPackage
                 .getGeometryColumnsDao();

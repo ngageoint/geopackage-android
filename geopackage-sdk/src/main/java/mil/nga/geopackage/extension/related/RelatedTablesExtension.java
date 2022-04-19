@@ -1,6 +1,8 @@
 package mil.nga.geopackage.extension.related;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import mil.nga.geopackage.GeoPackage;
@@ -14,8 +16,8 @@ import mil.nga.geopackage.user.custom.UserCustomDao;
 
 /**
  * Related Tables extension
- *
- * http://docs.opengeospatial.org/is/18-000/18-000.html
+ * <p>
+ * <a href="http://docs.opengeospatial.org/is/18-000/18-000.html">http://docs.opengeospatial.org/is/18-000/18-000.html</a>
  *
  * @author osbornb
  * @since 3.0.1
@@ -244,6 +246,321 @@ public class RelatedTablesExtension extends RelatedTablesCoreExtension {
             cursor.close();
         }
         return has;
+    }
+
+    /**
+     * Count the number of mappings to the base table and id
+     *
+     * @param baseTable base table name
+     * @param baseId    base id
+     * @return mappings count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int countMappingsToBase(String baseTable, long baseId)
+            throws SQLException {
+        return countMappingsToBase(getBaseTableRelations(baseTable), baseId);
+    }
+
+    /**
+     * Determine if a mapping to the base table and id exists
+     *
+     * @param baseTable base table name
+     * @param baseId    base id
+     * @return true if mapping exists
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public boolean hasMappingToBase(String baseTable, long baseId)
+            throws SQLException {
+        return countMappingsToBase(baseTable, baseId) > 0;
+    }
+
+    /**
+     * Count the number of mappings in the extended relations to the base id
+     *
+     * @param extendedRelations extended relations
+     * @param baseId            base id
+     * @return mappings count
+     * @since 6.3.0
+     */
+    public int countMappingsToBase(
+            Collection<ExtendedRelation> extendedRelations, long baseId) {
+        int count = 0;
+        if (extendedRelations != null) {
+            for (ExtendedRelation extendedRelation : extendedRelations) {
+                count += countMappingsToBase(extendedRelation, baseId);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Determine if a mapping in the extended relations to the base id exists
+     *
+     * @param extendedRelations extended relations
+     * @param baseId            base id
+     * @return true if mapping exists
+     * @since 6.3.0
+     */
+    public boolean hasMappingToBase(
+            Collection<ExtendedRelation> extendedRelations, long baseId) {
+        return countMappingsToBase(extendedRelations, baseId) > 0;
+    }
+
+    /**
+     * Count the number of mappings in the extended relation to the base id
+     *
+     * @param extendedRelation extended relation
+     * @param baseId           base id
+     * @return mappings count
+     * @since 6.3.0
+     */
+    public int countMappingsToBase(ExtendedRelation extendedRelation,
+                                   long baseId) {
+        return getMappingDao(extendedRelation).countByBaseId(baseId);
+    }
+
+    /**
+     * Determine if a mapping in the extended relation to the base id exists
+     *
+     * @param extendedRelation extended relation
+     * @param baseId           base id
+     * @return true if mapping exists
+     * @since 6.3.0
+     */
+    public boolean hasMappingToBase(ExtendedRelation extendedRelation,
+                                    long baseId) {
+        return countMappingsToBase(extendedRelation, baseId) > 0;
+    }
+
+    /**
+     * Delete mappings to the base table and id
+     *
+     * @param baseTable base table name
+     * @param baseId    base id
+     * @return rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteMappingsToBase(String baseTable, long baseId)
+            throws SQLException {
+        return deleteMappingsToBase(getBaseTableRelations(baseTable), baseId);
+    }
+
+    /**
+     * Delete mappings in the extended relations to the base id
+     *
+     * @param extendedRelations extended relations
+     * @param baseId            base id
+     * @return rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteMappingsToBase(
+            Collection<ExtendedRelation> extendedRelations, long baseId)
+            throws SQLException {
+        int count = 0;
+        if (extendedRelations != null) {
+            for (ExtendedRelation extendedRelation : extendedRelations) {
+                count += deleteMappingsToBase(extendedRelation, baseId);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Delete mappings in the extended relation to the base id
+     *
+     * @param extendedRelation extended relation
+     * @param baseId           base id
+     * @return rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteMappingsToBase(ExtendedRelation extendedRelation,
+                                    long baseId) throws SQLException {
+        return getMappingDao(extendedRelation).deleteByBaseId(baseId);
+    }
+
+    /**
+     * Count the number of mappings to the related table and id
+     *
+     * @param relatedTable related table name
+     * @param relatedId    related id
+     * @return mappings count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int countMappingsToRelated(String relatedTable, long relatedId)
+            throws SQLException {
+        return countMappingsToRelated(getRelatedTableRelations(relatedTable),
+                relatedId);
+    }
+
+    /**
+     * Determine if a mapping to the related table and id exists
+     *
+     * @param relatedTable related table name
+     * @param relatedId    related id
+     * @return true if mapping exists
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public boolean hasMappingToRelated(String relatedTable, long relatedId)
+            throws SQLException {
+        return countMappingsToRelated(relatedTable, relatedId) > 0;
+    }
+
+    /**
+     * Count the number of mappings in the extended relations to the related id
+     *
+     * @param extendedRelations extended relations
+     * @param relatedId         related id
+     * @return mappings count
+     * @since 6.3.0
+     */
+    public int countMappingsToRelated(
+            Collection<ExtendedRelation> extendedRelations, long relatedId) {
+        int count = 0;
+        if (extendedRelations != null) {
+            for (ExtendedRelation extendedRelation : extendedRelations) {
+                count += countMappingsToRelated(extendedRelation, relatedId);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Determine if a mapping in the extended relations to the related id exists
+     *
+     * @param extendedRelations extended relations
+     * @param relatedId         related id
+     * @return true if mapping exists
+     * @since 6.3.0
+     */
+    public boolean hasMappingToRelated(
+            Collection<ExtendedRelation> extendedRelations, long relatedId) {
+        return countMappingsToRelated(extendedRelations, relatedId) > 0;
+    }
+
+    /**
+     * Count the number of mappings in the extended relation to the related id
+     *
+     * @param extendedRelation extended relation
+     * @param relatedId        related id
+     * @return mappings count
+     * @since 6.3.0
+     */
+    public int countMappingsToRelated(ExtendedRelation extendedRelation,
+                                      long relatedId) {
+        return getMappingDao(extendedRelation).countByRelatedId(relatedId);
+    }
+
+    /**
+     * Determine if a mapping in the extended relation to the related id exists
+     *
+     * @param extendedRelation extended relation
+     * @param relatedId        related id
+     * @return true if mapping exists
+     * @since 6.3.0
+     */
+    public boolean hasMappingToRelated(ExtendedRelation extendedRelation,
+                                       long relatedId) {
+        return countMappingsToRelated(extendedRelation, relatedId) > 0;
+    }
+
+    /**
+     * Delete mappings to the related table and id
+     *
+     * @param relatedTable related table name
+     * @param relatedId    related id
+     * @return rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteMappingsToRelated(String relatedTable, long relatedId)
+            throws SQLException {
+        return deleteMappingsToRelated(getRelatedTableRelations(relatedTable),
+                relatedId);
+    }
+
+    /**
+     * Delete mappings in the extended relations to the related id
+     *
+     * @param extendedRelations extended relations
+     * @param relatedId         related id
+     * @return rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteMappingsToRelated(
+            Collection<ExtendedRelation> extendedRelations, long relatedId)
+            throws SQLException {
+        int count = 0;
+        if (extendedRelations != null) {
+            for (ExtendedRelation extendedRelation : extendedRelations) {
+                count += deleteMappingsToRelated(extendedRelation, relatedId);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Delete mappings in the extended relation to the related id
+     *
+     * @param extendedRelation extended relation
+     * @param relatedId        related id
+     * @return rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteMappingsToRelated(ExtendedRelation extendedRelation,
+                                       long relatedId) throws SQLException {
+        return getMappingDao(extendedRelation).deleteByRelatedId(relatedId);
+    }
+
+    /**
+     * Count the number of mappings to the table and id
+     *
+     * @param table table name
+     * @param id    table id
+     * @return mappings count
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int countMappings(String table, long id) throws SQLException {
+        return countMappingsToBase(getBaseTableRelations(table), id)
+                + countMappingsToRelated(getRelatedTableRelations(table), id);
+    }
+
+    /**
+     * Determine if a mapping to the table and id exists
+     *
+     * @param table table name
+     * @param id    table id
+     * @return true if mapping exists
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public boolean hasMapping(String table, long id) throws SQLException {
+        return hasMappingToBase(getBaseTableRelations(table), id)
+                || hasMappingToRelated(getRelatedTableRelations(table), id);
+    }
+
+    /**
+     * Delete mappings to the table and id
+     *
+     * @param table table name
+     * @param id    table id
+     * @return rows deleted
+     * @throws SQLException upon failure
+     * @since 6.3.0
+     */
+    public int deleteMappings(String table, long id) throws SQLException {
+        int count = deleteMappingsToBase(getBaseTableRelations(table), id);
+        count += deleteMappingsToRelated(getRelatedTableRelations(table), id);
+        return count;
     }
 
 }

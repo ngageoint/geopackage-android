@@ -5,14 +5,21 @@ import junit.framework.TestCase;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.TestUtils;
+import mil.nga.geopackage.db.TableColumnKey;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
+import mil.nga.geopackage.features.user.FeatureRow;
+import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
 import mil.nga.proj.Projection;
@@ -35,6 +42,8 @@ import mil.nga.sf.TIN;
 import mil.nga.sf.Triangle;
 import mil.nga.sf.proj.GeometryTransform;
 import mil.nga.sf.wkb.GeometryCodes;
+import mil.nga.sf.wkb.GeometryReader;
+import mil.nga.sf.wkb.GeometryWriter;
 
 /**
  * GeoPackage Geometry Data test utils
@@ -42,6 +51,9 @@ import mil.nga.sf.wkb.GeometryCodes;
  * @author osbornb
  */
 public class GeoPackageGeometryDataUtils {
+
+    private static final String TABLE_NAME = "features";
+    private static final String COLUMN_NAME = "geom";
 
     /**
      * Test reading and writing (and comparing) geometry bytes
@@ -218,11 +230,12 @@ public class GeoPackageGeometryDataUtils {
     /**
      * Compare two geometry datas and verify they are equal
      *
-     * @param expected
-     * @param actual
+     * @param expected expected geometry data
+     * @param actual   actual geometry data
+     * @throws IOException upon error
      */
     public static void compareGeometryData(GeoPackageGeometryData expected,
-                                           GeoPackageGeometryData actual) {
+                                           GeoPackageGeometryData actual) throws IOException {
 
         // Compare geometry data attributes
         TestCase.assertEquals(expected.isExtended(), actual.isExtended());
@@ -662,6 +675,333 @@ public class GeoPackageGeometryDataUtils {
         }
 
         return equal;
+    }
+
+    /**
+     * Test inserting raw geometry bytes
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
+    public static void testInsertGeometryBytes(GeoPackage geoPackage)
+            throws SQLException, IOException {
+
+        final int geometryCount = 100;
+        final int commitChunk = 10;
+
+        List<byte[]> geometries = new ArrayList<>();
+
+        for (int i = 0; i < geometryCount; i++) {
+            geometries.add(GeometryWriter
+                    .writeGeometry(TestUtils.createPoint(false, false)));
+        }
+
+        FeatureDao dao = createFeatureTable(geoPackage);
+
+        dao.beginTransaction();
+
+        try {
+
+            for (int count = 0; count < geometries.size(); count++) {
+
+                byte[] geometry = geometries.get(count);
+
+                FeatureRow row = dao.newRow();
+
+                GeoPackageGeometryData geometryData = new GeoPackageGeometryData();
+                geometryData.setGeometryBytes(geometry);
+
+                row.setGeometry(geometryData);
+
+                dao.insert(row);
+
+                if (count % commitChunk == 0) {
+                    dao.commit();
+                }
+            }
+
+            dao.endTransaction();
+        } catch (Exception e) {
+            dao.failTransaction();
+            throw e;
+        }
+
+        TestCase.assertEquals(geometryCount, dao.count());
+
+        int count = 0;
+
+        FeatureCursor features = dao.query();
+        try {
+            for (FeatureRow row : features) {
+                GeoPackageGeometryData geometryData = row.getGeometry();
+                byte[] geometryBytes = geometries.get(count++);
+                GeoPackageGeometryDataUtils.compareByteArrays(geometryBytes,
+                        geometryData.getWkb());
+                TestCase.assertEquals(
+                        GeometryReader.readGeometry(geometryBytes),
+                        geometryData.getGeometry());
+            }
+        } finally {
+            features.close();
+        }
+
+    }
+
+    /**
+     * Test inserting raw header bytes
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
+    public static void testInsertHeaderBytes(GeoPackage geoPackage)
+            throws SQLException, IOException {
+
+        final int geometryCount = 100;
+        final int commitChunk = 7;
+
+        List<Geometry> geometries = new ArrayList<>();
+
+        for (int i = 0; i < geometryCount; i++) {
+            geometries.add(TestUtils.createLineString(false, false, false));
+        }
+
+        GeoPackageGeometryData geomData = new GeoPackageGeometryData(1234);
+        geomData.setByteOrder(ByteOrder.BIG_ENDIAN);
+        geomData.setEmpty(false);
+        geomData.setExtended(false);
+
+        byte[] header = geomData.getHeaderBytes();
+
+        FeatureDao dao = createFeatureTable(geoPackage);
+
+        dao.beginTransaction();
+
+        try {
+
+            for (int count = 0; count < geometries.size(); count++) {
+
+                Geometry geometry = geometries.get(count);
+
+                FeatureRow row = dao.newRow();
+
+                GeoPackageGeometryData geometryData = new GeoPackageGeometryData(
+                        geometry);
+                geometryData.setHeaderBytes(header);
+
+                row.setGeometry(geometryData);
+
+                dao.insert(row);
+
+                if (count % commitChunk == 0) {
+                    dao.commit();
+                }
+            }
+
+            dao.endTransaction();
+        } catch (Exception e) {
+            dao.failTransaction();
+            throw e;
+        }
+
+        TestCase.assertEquals(geometryCount, dao.count());
+
+        int count = 0;
+
+        FeatureCursor features = dao.query();
+        try {
+            for (FeatureRow row : features) {
+                GeoPackageGeometryData geometryData = row.getGeometry();
+                GeoPackageGeometryDataUtils.compareByteArrays(header,
+                        geometryData.getHeaderBytes());
+                Geometry geometry = geometries.get(count++);
+                GeoPackageGeometryDataUtils.compareByteArrays(
+                        GeometryWriter.writeGeometry(geometry),
+                        geometryData.getWkb());
+                TestCase.assertEquals(geometry, geometryData.getGeometry());
+            }
+        } finally {
+            features.close();
+        }
+
+    }
+
+    /**
+     * Test inserting raw header and geometry bytes
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
+    public static void testInsertHeaderAndGeometryBytes(GeoPackage geoPackage)
+            throws SQLException, IOException {
+
+        final int geometryCount = 100;
+        final int commitChunk = 13;
+
+        List<byte[]> geometries = new ArrayList<>();
+
+        for (int i = 0; i < geometryCount; i++) {
+            geometries.add(GeometryWriter
+                    .writeGeometry(TestUtils.createPolygon(false, false)));
+        }
+
+        GeoPackageGeometryData geomData = new GeoPackageGeometryData(1234);
+        geomData.setByteOrder(ByteOrder.BIG_ENDIAN);
+        geomData.setEmpty(false);
+        geomData.setExtended(false);
+
+        byte[] header = geomData.getHeaderBytes();
+
+        FeatureDao dao = createFeatureTable(geoPackage);
+
+        dao.beginTransaction();
+
+        try {
+
+            for (int count = 0; count < geometries.size(); count++) {
+
+                byte[] geometry = geometries.get(count);
+
+                FeatureRow row = dao.newRow();
+
+                GeoPackageGeometryData geometryData = new GeoPackageGeometryData();
+                geometryData.setHeaderBytes(header);
+                geometryData.setGeometryBytes(geometry);
+
+                row.setGeometry(geometryData);
+
+                dao.insert(row);
+
+                if (count % commitChunk == 0) {
+                    dao.commit();
+                }
+            }
+
+            dao.endTransaction();
+        } catch (Exception e) {
+            dao.failTransaction();
+            throw e;
+        }
+
+        TestCase.assertEquals(geometryCount, dao.count());
+
+        int count = 0;
+
+        FeatureCursor features = dao.query();
+        try {
+            for (FeatureRow row : features) {
+                GeoPackageGeometryData geometryData = row.getGeometry();
+                GeoPackageGeometryDataUtils.compareByteArrays(header,
+                        geometryData.getHeaderBytes());
+                byte[] geometryBytes = geometries.get(count++);
+                GeoPackageGeometryDataUtils.compareByteArrays(geometryBytes,
+                        geometryData.getWkb());
+                TestCase.assertEquals(
+                        GeometryReader.readGeometry(geometryBytes),
+                        geometryData.getGeometry());
+            }
+        } finally {
+            features.close();
+        }
+
+    }
+
+    /**
+     * Test inserting raw bytes
+     *
+     * @param geoPackage GeoPackage
+     * @throws SQLException upon error
+     * @throws IOException  upon error
+     */
+    public static void testInsertBytes(GeoPackage geoPackage)
+            throws SQLException, IOException {
+
+        final int geometryCount = 100;
+        final int commitChunk = 15;
+
+        List<byte[]> geometries = new ArrayList<>();
+
+        for (int i = 0; i < geometryCount; i++) {
+            geometries.add(new GeoPackageGeometryData(
+                    TestUtils.createPolygon(false, false)).toBytes());
+        }
+
+        FeatureDao dao = createFeatureTable(geoPackage);
+
+        dao.beginTransaction();
+
+        try {
+
+            for (int count = 0; count < geometries.size(); count++) {
+
+                byte[] geometry = geometries.get(count);
+
+                FeatureRow row = dao.newRow();
+
+                GeoPackageGeometryData geometryData = new GeoPackageGeometryData();
+                geometryData.setBytes(geometry);
+
+                row.setGeometry(geometryData);
+
+                dao.insert(row);
+
+                if (count % commitChunk == 0) {
+                    dao.commit();
+                }
+            }
+
+            dao.endTransaction();
+        } catch (Exception e) {
+            dao.failTransaction();
+            throw e;
+        }
+
+        TestCase.assertEquals(geometryCount, dao.count());
+
+        int count = 0;
+
+        FeatureCursor features = dao.query();
+        try {
+            for (FeatureRow row : features) {
+                GeoPackageGeometryData geometryData = row.getGeometry();
+                byte[] geometryDataBytes = geometries.get(count++);
+                GeoPackageGeometryDataUtils.compareByteArrays(geometryDataBytes,
+                        geometryData.getBytes());
+                TestCase.assertEquals(GeoPackageGeometryData
+                                .create(geometryDataBytes).getGeometry(),
+                        geometryData.getGeometry());
+            }
+        } finally {
+            features.close();
+        }
+
+    }
+
+    /**
+     * Create a feature table
+     *
+     * @param geoPackage GeoPackage
+     * @return feature dao
+     * @throws SQLException upon error
+     */
+    private static FeatureDao createFeatureTable(GeoPackage geoPackage)
+            throws SQLException {
+
+        SpatialReferenceSystem srs = geoPackage.getSpatialReferenceSystemDao()
+                .getOrCreateCode(ProjectionConstants.AUTHORITY_EPSG,
+                        ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
+        GeometryColumns geometryColumns = new GeometryColumns();
+        geometryColumns.setId(new TableColumnKey(TABLE_NAME, COLUMN_NAME));
+        geometryColumns.setGeometryType(GeometryType.POLYGON);
+        geometryColumns.setSrs(srs);
+
+        FeatureTable table = geoPackage.createFeatureTable(FeatureTableMetadata
+                .create(geometryColumns, BoundingBox.worldWGS84()));
+
+        return geoPackage.getFeatureDao(table);
     }
 
 }

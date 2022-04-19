@@ -26,13 +26,28 @@ public class FeatureStylesCreateTest extends CreateGeoPackageTestCase {
     /**
      * Test feature styles
      *
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException          upon error
+     * @throws IOException           upon error
+     * @throws NameNotFoundException upon error
      */
     @Test
     public void testFeatureStyles() throws SQLException, IOException, NameNotFoundException {
 
         FeatureStylesUtils.testFeatureStyles(geoPackage);
+
+    }
+
+    /**
+     * Test shared feature styles
+     *
+     * @throws SQLException          upon error
+     * @throws IOException           upon error
+     * @throws NameNotFoundException upon error
+     */
+    @Test
+    public void testSharedFeatureStyles() throws SQLException, IOException, NameNotFoundException {
+
+        FeatureStylesUtils.testSharedFeatureStyles(geoPackage);
 
     }
 

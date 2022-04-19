@@ -14,8 +14,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.attributes.AttributesTable;
+import mil.nga.geopackage.attributes.AttributesUtils;
 import mil.nga.geopackage.db.master.SQLiteMaster;
 import mil.nga.geopackage.db.master.SQLiteMasterColumn;
 import mil.nga.geopackage.db.master.SQLiteMasterQuery;
@@ -49,14 +51,12 @@ import mil.nga.geopackage.features.index.FeatureIndexType;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureTable;
-import mil.nga.geopackage.TestUtils;
-import mil.nga.geopackage.attributes.AttributesUtils;
 import mil.nga.geopackage.features.user.FeatureUtils;
-import mil.nga.geopackage.tiles.user.TileUtils;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileDao;
 import mil.nga.geopackage.tiles.user.TileTable;
+import mil.nga.geopackage.tiles.user.TileUtils;
 import mil.nga.geopackage.user.UserTable;
 import mil.nga.geopackage.user.custom.UserCustomColumn;
 import mil.nga.geopackage.user.custom.UserCustomDao;
@@ -78,8 +78,9 @@ public class AlterTableUtils {
      * @param context    context
      * @param geoPackage GeoPackage
      * @throws SQLException upon error
+     * @throws IOException  upon error
      */
-    public static void testColumns(Context context, GeoPackage geoPackage) throws SQLException {
+    public static void testColumns(Context context, GeoPackage geoPackage) throws SQLException, IOException {
 
         GeometryColumnsDao geometryColumnsDao = geoPackage
                 .getGeometryColumnsDao();
@@ -451,9 +452,10 @@ public class AlterTableUtils {
      * @param context    context
      * @param geoPackage GeoPackage
      * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     public static void testCopyFeatureTable(Context context, GeoPackage geoPackage)
-            throws SQLException {
+            throws SQLException, IOException {
 
         GeometryColumnsDao geometryColumnsDao = geoPackage
                 .getGeometryColumnsDao();

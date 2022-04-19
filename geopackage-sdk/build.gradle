@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.2.2"
+version = "6.3.0"
 
 android {
     compileSdkVersion 32
@@ -79,94 +79,98 @@ android {
         archives javadocJar, sourcesJar
     }
 
-    afterEvaluate {
+    publishing {
+        singleVariant("release")
+    }
 
-        javadoc.classpath += files(android.libraryVariants.collect { variant ->
-            variant.getJavaCompileProvider().get().classpath.files
-        })
+}
 
-        publishing {
-            publications {
-                maven(MavenPublication) {
-                    from components.release
-                    artifact javadocJar
-                    artifact sourcesJar
+afterEvaluate {
 
-                    groupId = group
-                    artifactId = archivesBaseName
-                    version = version
-                    pom {
-                        name = 'GeoPackage Android'
-                        packaging = 'aar'
-                        description = 'GeoPackage Android implementation'
-                        url = 'https://github.com/ngageoint/geopackage-android'
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.getJavaCompileProvider().get().classpath.files
+    })
 
-                        scm {
-                            url = 'git@github.com:ngageoint/geopackage-android.git'
-                            connection = 'scm:git:git@github.com:ngageoint/geopackage-android.git'
-                            developerConnection = 'scm:git:git@github.com:ngageoint/geopackage-android.git'
-                        }
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.release
+                artifact javadocJar
+                artifact sourcesJar
 
-                        licenses {
-                            license {
-                                name = 'The MIT License (MIT)'
-                                url = 'https://github.com/ngageoint/geopackage-android/blob/master/LICENSE.txt'
-                                distribution = 'repo'
-                            }
-                        }
+                groupId = group
+                artifactId = archivesBaseName
+                version = version
+                pom {
+                    name = 'GeoPackage Android'
+                    packaging = 'aar'
+                    description = 'GeoPackage Android implementation'
+                    url = 'https://github.com/ngageoint/geopackage-android'
 
-                        organization {
-                            name = 'National Geospatial-Intelligence Agency'
-                            url = 'https://www.nga.mil'
-                        }
+                    scm {
+                        url = 'git@github.com:ngageoint/geopackage-android.git'
+                        connection = 'scm:git:git@github.com:ngageoint/geopackage-android.git'
+                        developerConnection = 'scm:git:git@github.com:ngageoint/geopackage-android.git'
+                    }
 
-                        developers {
-                            developer {
-                                id = 'bosborn'
-                                name = 'Brian Osborn'
-                                email = 'bosborn@caci.com'
-                                organizationUrl = 'https://www.caci.com/bit-systems'
-                                timezone = 'UTC-07'
-                            }
+                    licenses {
+                        license {
+                            name = 'The MIT License (MIT)'
+                            url = 'https://github.com/ngageoint/geopackage-android/blob/master/LICENSE.txt'
+                            distribution = 'repo'
                         }
                     }
-                }
-            }
-            repositories {
-                maven {
-                    def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                    def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-                    url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                    def user = project.hasProperty('ossrhUsername') ? ossrhUsername : ""
-                    def pw = project.hasProperty('ossrhPassword') ? ossrhPassword : ""
-                    credentials {
-                        username = user
-                        password = pw
+
+                    organization {
+                        name = 'National Geospatial-Intelligence Agency'
+                        url = 'https://www.nga.mil'
+                    }
+
+                    developers {
+                        developer {
+                            id = 'bosborn'
+                            name = 'Brian Osborn'
+                            email = 'bosborn@caci.com'
+                            organizationUrl = 'https://www.caci.com/bit-systems'
+                            timezone = 'UTC-07'
+                        }
                     }
                 }
             }
         }
-
-        signing {
-            sign publishing.publications.maven
+        repositories {
+            maven {
+                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                def user = project.hasProperty('ossrhUsername') ? ossrhUsername : ""
+                def pw = project.hasProperty('ossrhPassword') ? ossrhPassword : ""
+                credentials {
+                    username = user
+                    password = pw
+                }
+            }
         }
     }
 
+    signing {
+        sign publishing.publications.maven
+    }
 }
 
 dependencies {
     api 'androidx.appcompat:appcompat:1.4.1'
     api 'androidx.documentfile:documentfile:1.0.1'
     api 'com.j256.ormlite:ormlite-android:6.1'
-    api ('mil.nga.geopackage:geopackage-core:6.2.1'){
+    api ('mil.nga.geopackage:geopackage-core:6.3.0'){
         exclude module: 'ormlite-core'
         exclude group: 'com.j256.ormlite'
     }
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:3.0.0'
-    api 'mil.nga:sqlite-android:3370200'
+    api 'mil.nga:sqlite-android:3380200'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
-            'mil.nga.geopackage:geopackage-core:6.2.1',
+            'mil.nga.geopackage:geopackage-core:6.3.0',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:3.0.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'

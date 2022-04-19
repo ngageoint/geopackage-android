@@ -18,9 +18,10 @@ public class AlterTableExternalTest extends ExternalGeoPackageTestCase {
      * Test column alters
      *
      * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     @Test
-    public void testColumns() throws SQLException {
+    public void testColumns() throws SQLException, IOException {
         AlterTableUtils.testColumns(activity, geoPackage);
     }
 
@@ -28,9 +29,10 @@ public class AlterTableExternalTest extends ExternalGeoPackageTestCase {
      * Test copy feature table
      *
      * @throws SQLException upon error
+     * @throws IOException  upon error
      */
     @Test
-    public void testCopyFeatureTable() throws SQLException {
+    public void testCopyFeatureTable() throws SQLException, IOException {
         AlterTableUtils.testCopyFeatureTable(activity, geoPackage);
     }
 

@@ -34,6 +34,7 @@ import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.style.Color;
+import mil.nga.geopackage.style.PixelBounds;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileUtils;
 import mil.nga.proj.Projection;
@@ -1645,6 +1646,31 @@ public abstract class FeatureTiles {
             emptyImage.recycle();
         }
         emptyImage = createNewBitmap();
+    }
+
+    /**
+     * Calculate style pixel bounds
+     *
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculateStylePixelBounds() {
+        return calculateStylePixelBounds(density);
+    }
+
+    /**
+     * Calculate style pixel bounds
+     *
+     * @param density display density: {@link android.util.DisplayMetrics#density}
+     * @return pixel bounds
+     * @since 6.3.0
+     */
+    public PixelBounds calculateStylePixelBounds(float density) {
+        PixelBounds pixelBounds = null;
+        if (featureTableStyles != null) {
+            pixelBounds = featureTableStyles.calculatePixelBounds(density);
+        }
+        return pixelBounds;
     }
 
     /**

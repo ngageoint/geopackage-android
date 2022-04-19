@@ -26,7 +26,7 @@ import mil.nga.sf.GeometryEnvelope;
  * implementation when a SQLite version is used before SpatialLite support
  * (Android).
  * <p>
- * http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html
+ * <a href="http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html">http://ngageoint.github.io/GeoPackage/docs/extensions/geometry-index.html</a>
  *
  * @author osbornb
  * @since 1.1.0
