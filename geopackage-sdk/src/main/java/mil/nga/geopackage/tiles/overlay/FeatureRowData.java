@@ -203,24 +203,23 @@ public class FeatureRowData {
      */
     public Object jsonCompatible(boolean includePoints, boolean includeGeometries) {
 
-        Map<String, Object> jsonValues = new HashMap<>();
+        Map<String, Object> jsonValues = new HashMap<>(values);
 
-        for (String key : values.keySet()) {
-            Object jsonValue = null;
-            Object value = values.get(key);
-            if (key.equals(geometryColumn)) {
-                GeoPackageGeometryData geometryData = (GeoPackageGeometryData) value;
-                if (geometryData.getGeometry() != null) {
-                    if (includeGeometries || (includePoints && geometryData.getGeometry().getGeometryType() == GeometryType.POINT)) {
-                        jsonValue = FeatureConverter.toMap(geometryData.getGeometry());
+        if (geometryColumn != null && jsonValues.containsKey(geometryColumn)) {
+
+            if (includeGeometries || includePoints) {
+                Geometry geometry = getGeometry();
+                if (geometry != null) {
+                    if (includeGeometries || (includePoints && geometry.getGeometryType() == GeometryType.POINT)) {
+                        jsonValues.put(geometryColumn, FeatureConverter.toMap(geometry));
+                    } else {
+                        jsonValues.put(geometryColumn, null);
                     }
-                } else {
-                    jsonValue = value;
                 }
-                if (jsonValue != null) {
-                    jsonValues.put(key, jsonValue);
-                }
+            } else {
+                jsonValues.put(geometryColumn, null);
             }
+
         }
 
         return jsonValues;
