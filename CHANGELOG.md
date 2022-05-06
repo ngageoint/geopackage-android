@@ -4,9 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.3.1 (TBD)
+## [6.3.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.3.1) (05-06-2022)
 
 * geopackage-core version 6.3.1
+* SQLite Android Bindings version 3380400
 * FeatureRowData id, geometry type, and envelope support
 
 ## [6.3.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.3.0) (04-19-2022)
