@@ -6,6 +6,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.3.1 (TBD)
 
+* geopackage-core version 6.3.1
 * FeatureRowData id, geometry type, and envelope support
 
 ## [6.3.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.3.0) (04-19-2022)

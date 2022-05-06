@@ -162,7 +162,7 @@ dependencies {
     api 'androidx.appcompat:appcompat:1.4.1'
     api 'androidx.documentfile:documentfile:1.0.1'
     api 'com.j256.ormlite:ormlite-android:6.1'
-    api ('mil.nga.geopackage:geopackage-core:6.3.0'){
+    api ('mil.nga.geopackage:geopackage-core:6.3.1'){
         exclude module: 'ormlite-core'
         exclude group: 'com.j256.ormlite'
     }
@@ -170,7 +170,7 @@ dependencies {
     api 'mil.nga:tiff:3.0.0'
     api 'mil.nga:sqlite-android:3380200'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
-            'mil.nga.geopackage:geopackage-core:6.3.0',
+            'mil.nga.geopackage:geopackage-core:6.3.1',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:3.0.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'
