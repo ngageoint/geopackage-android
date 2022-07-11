@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import mil.nga.color.Color;
+import mil.nga.color.ColorConstants;
 import mil.nga.geopackage.attributes.AttributesColumn;
 import mil.nga.geopackage.attributes.AttributesCursor;
 import mil.nga.geopackage.attributes.AttributesDao;
@@ -108,8 +110,6 @@ import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
-import mil.nga.geopackage.style.Color;
-import mil.nga.geopackage.style.ColorConstants;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGenerator;
 import mil.nga.geopackage.tiles.TileGrid;
@@ -2137,7 +2137,7 @@ public class GeoPackageExample extends BaseTestCase {
         icon1.setName("Building");
         icon1.setDescription("Building Icon");
         icon1.setData(BitmapFactory.decodeFile(
-                TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "building.png")),
+                        TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "building.png")),
                 Bitmap.CompressFormat.PNG);
         icon1.setContentType("image/png");
         icon1.setWidth(32.0);
@@ -2150,7 +2150,7 @@ public class GeoPackageExample extends BaseTestCase {
         icon2.setName("College");
         icon2.setDescription("College Icon");
         icon2.setData(BitmapFactory.decodeFile(
-                TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "college.png")),
+                        TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "college.png")),
                 Bitmap.CompressFormat.PNG);
         icon2.setContentType("image/png");
         icon2.setWidth(32.0);
@@ -2162,7 +2162,7 @@ public class GeoPackageExample extends BaseTestCase {
         icon3.setName("Tractor");
         icon3.setDescription("Tractor Icon");
         icon3.setData(BitmapFactory.decodeFile(
-                TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "tractor.png")),
+                        TestUtils.getAssetFileInternalStorageLocation(geoPackage.getContext(), "tractor.png")),
                 Bitmap.CompressFormat.PNG);
         icon3.setContentType("image/png");
         icon3.setAnchorV(1.0);

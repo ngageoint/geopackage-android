@@ -2,10 +2,10 @@ package mil.nga.geopackage.extension.nga.style;
 
 import java.util.regex.Pattern;
 
+import mil.nga.color.Color;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.attributes.AttributesColumn;
 import mil.nga.geopackage.attributes.AttributesRow;
-import mil.nga.geopackage.style.Color;
 
 /**
  * Style Row containing the values from a single cursor row

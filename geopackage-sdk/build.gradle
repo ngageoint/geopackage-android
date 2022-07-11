@@ -4,14 +4,14 @@ apply plugin: 'signing'
 
 group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.3.2"
+version = "6.4.0"
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 32
+        targetSdkVersion 33
 
         testApplicationId 'mil.nga.geopackage.test'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -56,6 +56,7 @@ android {
         options.links "https://ngageoint.github.io/simple-features-proj-java/docs/api/"
         options.links "https://ngageoint.github.io/simple-features-java/docs/api/"
         options.links "https://ngageoint.github.io/ogc-api-features-json-java/docs/api/"
+        options.links "https://ngageoint.github.io/color-java/docs/api/"
         options.links "https://ngageoint.github.io/tiff-java/docs/api/"
         options.links "https://ormlite.com/javadoc/ormlite-core/"
         options.links "https://ormlite.com/javadoc/ormlite-android/"
@@ -159,18 +160,18 @@ afterEvaluate {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.4.1'
+    api 'androidx.appcompat:appcompat:1.4.2'
     api 'androidx.documentfile:documentfile:1.0.1'
     api 'com.j256.ormlite:ormlite-android:6.1'
-    api ('mil.nga.geopackage:geopackage-core:6.3.1'){
+    api ('mil.nga.geopackage:geopackage-core:6.4.0'){
         exclude module: 'ormlite-core'
         exclude group: 'com.j256.ormlite'
     }
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:3.0.0'
-    api 'mil.nga:sqlite-android:3380400'
+    api 'mil.nga:sqlite-android:3390000'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
-            'mil.nga.geopackage:geopackage-core:6.3.1',
+            'mil.nga.geopackage:geopackage-core:6.4.0',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:3.0.0'
     androidTestImplementation 'androidx.test:runner:1.4.0'

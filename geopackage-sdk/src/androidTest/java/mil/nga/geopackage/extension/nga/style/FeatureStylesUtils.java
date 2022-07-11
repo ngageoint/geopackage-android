@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import mil.nga.color.Color;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.TestConstants;
 import mil.nga.geopackage.TestUtils;
@@ -24,7 +25,6 @@ import mil.nga.geopackage.extension.nga.contents.ContentsIdExtension;
 import mil.nga.geopackage.features.user.FeatureCursor;
 import mil.nga.geopackage.features.user.FeatureDao;
 import mil.nga.geopackage.features.user.FeatureRow;
-import mil.nga.geopackage.style.Color;
 import mil.nga.geopackage.user.custom.UserCustomCursor;
 import mil.nga.geopackage.user.custom.UserCustomRow;
 import mil.nga.sf.GeometryType;
@@ -373,12 +373,12 @@ public class FeatureStylesUtils {
 
                 Map<Long, StyleRow> allStyles = featureTableStyles.getStyles();
                 Map<Long, StyleRow> allFeatureStyles = featureTableStyles.getFeatureStyles();
-                for(long styleId: allFeatureStyles.keySet()){
+                for (long styleId : allFeatureStyles.keySet()) {
                     TestCase.assertTrue(allStyles.containsKey(styleId));
                 }
                 Map<Long, IconRow> allIcons = featureTableStyles.getIcons();
                 Map<Long, IconRow> allFeatureIcons = featureTableStyles.getFeatureIcons();
-                for(long iconId: allFeatureIcons.keySet()){
+                for (long iconId : allFeatureIcons.keySet()) {
                     TestCase.assertTrue(allIcons.containsKey(iconId));
                 }
 
