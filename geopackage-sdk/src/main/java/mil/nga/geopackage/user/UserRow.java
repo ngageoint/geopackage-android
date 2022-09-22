@@ -123,7 +123,8 @@ public abstract class UserRow<TColumn extends UserColumn, TTable extends UserTab
                         Long.class);
                 contentValues.put(columnName, (Short) value);
             } else if (value instanceof Integer) {
-                validateValue(column, value, Integer.class, Long.class);
+                validateValue(column, value, Integer.class, Long.class,
+                        Byte.class, Short.class);
                 contentValues.put(columnName, (Integer) value);
             } else if (value instanceof Long) {
                 validateValue(column, value, Long.class, Double.class);

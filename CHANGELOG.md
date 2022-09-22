@@ -4,9 +4,12 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.4.1 (TBD)
+## [6.5.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.5.0) (09-23-2022)
 
-* TBD
+* geopackage-core version 6.5.0
+* SQLite Android Bindings version 3390300
+* appcompat version 1.5.1
+* Allow user row integer value truncation to byte and short
 
 ## [6.4.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.4.0) (07-11-2022)
 

@@ -176,9 +176,9 @@ geoPackage.close();
 
 ### Installation ###
 
-Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|6.4.0|aar) (AAR, POM, Source, Javadoc)
+Pull from the [Maven Central Repository](http://search.maven.org/#artifactdetails|mil.nga.geopackage|geopackage-android|6.5.0|aar) (AAR, POM, Source, Javadoc)
 
-    api 'mil.nga.geopackage:geopackage-android:6.4.0'
+    api 'mil.nga.geopackage:geopackage-android:6.5.0'
 
 ### Build ###
 
@@ -201,7 +201,7 @@ Include as repositories in your project build.gradle:
 
 Include the dependency in your module build.gradle with desired version number:
 
-    api 'mil.nga.geopackage:geopackage-android:6.4.0'
+    api 'mil.nga.geopackage:geopackage-android:6.5.0'
 
 As part of the build process, run the "publishToMavenLocal" task on the geopackage-android Gradle script to update the Maven local repository.
 

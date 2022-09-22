@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.4.1"
+version = "6.5.0"
 
 android {
     compileSdkVersion 33
@@ -12,6 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 33
+        multiDexEnabled true
 
         testApplicationId 'mil.nga.geopackage.test'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -160,20 +161,21 @@ afterEvaluate {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.4.2'
+    api 'androidx.appcompat:appcompat:1.5.1'
     api 'androidx.documentfile:documentfile:1.0.1'
     api 'com.j256.ormlite:ormlite-android:6.1'
-    api ('mil.nga.geopackage:geopackage-core:6.4.0'){
+    api ('mil.nga.geopackage:geopackage-core:6.5.0'){
         exclude module: 'ormlite-core'
         exclude group: 'com.j256.ormlite'
     }
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:3.0.0'
-    api 'mil.nga:sqlite-android:3390000'
+    api 'mil.nga:sqlite-android:3390300'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
-            'mil.nga.geopackage:geopackage-core:6.4.0',
+            'mil.nga.geopackage:geopackage-core:6.5.0',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:3.0.0'
+    testImplementation 'androidx.multidex:multidex:2.0.1'
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
 }

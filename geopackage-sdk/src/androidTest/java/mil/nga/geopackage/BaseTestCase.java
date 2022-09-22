@@ -4,23 +4,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.StrictMode;
+
 import androidx.test.rule.ActivityTestRule;
 
 import org.junit.Before;
 import org.junit.Rule;
 
 import mil.nga.geopackage.db.metadata.GeoPackageMetadataDb;
-import mil.nga.geopackage.test.BuildConfig;
 
 /**
  * Abstract Base Test Case
  *
  * @author osbornb
  */
-public abstract class BaseTestCase{
+public abstract class BaseTestCase {
 
     @Rule
-    public ActivityTestRule<GeoPackageActivity> rule  = new ActivityTestRule<GeoPackageActivity>(GeoPackageActivity.class);
+    public ActivityTestRule<GeoPackageActivity> rule = new ActivityTestRule<GeoPackageActivity>(GeoPackageActivity.class);
 
     /**
      * Activity
