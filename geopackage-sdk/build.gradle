@@ -4,13 +4,13 @@ apply plugin: 'signing'
 
 group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.5.1"
+version = "6.6.0"
 
 android {
     compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 23
         targetSdkVersion 33
         multiDexEnabled true
 
@@ -161,7 +161,6 @@ afterEvaluate {
 }
 
 dependencies {
-    api 'androidx.appcompat:appcompat:1.5.1'
     api 'androidx.documentfile:documentfile:1.0.1'
     api 'com.j256.ormlite:ormlite-android:6.1'
     api ('mil.nga.geopackage:geopackage-core:6.5.0'){

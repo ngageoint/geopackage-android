@@ -4,9 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.5.1 (TBD)
+## [6.6.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.6.0) (09-26-2022)
 
-* TBD
+* min SDK version updated to 23
+* Removed appcompat dependency
 
 ## [6.5.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.5.0) (09-23-2022)
 

@@ -12,8 +12,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import androidx.core.content.ContextCompat;
-
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -472,7 +470,7 @@ public class GeoPackageExample extends BaseTestCase {
 
     private static void exportGeoPackage(Context context) throws IOException {
 
-        if (ContextCompat.checkSelfPermission(context,
+        if (context.checkSelfPermission(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
             GeoPackageManager manager = GeoPackageFactory.getManager(context);
