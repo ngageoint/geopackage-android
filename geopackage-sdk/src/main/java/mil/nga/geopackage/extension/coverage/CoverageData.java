@@ -925,10 +925,8 @@ public abstract class CoverageData<TImage extends CoverageDataImage> extends Cov
             // Get the tile distance
             BoundingBox projectedBoundingBox = request
                     .getProjectedBoundingBox();
-            double distanceWidth = projectedBoundingBox.getMaxLongitude()
-                    - projectedBoundingBox.getMinLongitude();
-            double distanceHeight = projectedBoundingBox.getMaxLatitude()
-                    - projectedBoundingBox.getMinLatitude();
+            double distanceWidth = projectedBoundingBox.getLongitudeRange();
+            double distanceHeight = projectedBoundingBox.getLatitudeRange();
 
             // Get the zoom level to request based upon the tile size
             Long zoomLevel = tileDao.getClosestZoomLevel(distanceWidth,

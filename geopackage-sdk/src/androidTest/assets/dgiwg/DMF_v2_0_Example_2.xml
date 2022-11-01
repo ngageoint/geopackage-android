@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--................................-->
+<!-- DMF 2.0 sample for OSM vector Data in GeoPackage 	-->
+<!--       Encoding: ISO 19139      					-->
+<!--         Date: 2019-10-2        					-->
+<!--           Version : 1          					-->
+<!--          Author: DGIWG         					-->
+<!--...................................................	-->
+<gmd:MD_Metadata xsi:schemaLocation="
+urn:dgiwg:xmlns:dmf:2.0:iso-g1:profile:all www.dgiwg.org\xmlns\dmf\2.0\iso-g1\profile\all\all.xsd" xmlns:all="http://www.dgiwg.org/xmlns/dmf/iso-g1/all/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:egco=" http://www.dgiwg.org/xmlns/dmf/iso-g1/egco/1.0" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gmi="http://www.isotc211.org/2005/gmi" xmlns:ngmp="urn:int:nato:geometoc:geo:metadata:ngmp:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:sensor="http://www.opengis.net/spec/spec/sensorml/2.0/req/core">
+
+		<!-- MDDLOC.language [1] -->
+		<gmd:language>
+			<gmd:LanguageCode codeList="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
+		</gmd:language>
+		<!-- MDDLOC.encoding [1] -->
+		<gmd:characterSet>
+			<gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+		</gmd:characterSet>
+
+	<!-- MDRPTY [1..*] -->
+	<gmd:contact>
+		<!-- MDRPTY.party [1] -->
+		<gmd:CI_ResponsibleParty>
+			<!-- MDRPTY.party.orgName [0..1] -->
+			<gmd:organisationName>
+				<gco:CharacterString>DGIWG</gco:CharacterString>
+			</gmd:organisationName>
+			<gmd:contactInfo>
+				<gmd:CI_Contact>
+					<gmd:phone>
+						<gmd:CI_Telephone>
+							<!-- MDRPTY.party.phone [0..*] -->
+							<gmd:voice>
+								<gco:CharacterString>001 571-557-5450</gco:CharacterString>
+							</gmd:voice>
+						</gmd:CI_Telephone>
+					</gmd:phone>
+					<gmd:address>
+			 		<!-- MDRPTY.party.address [0..*] -->
+						<gmd:CI_Address>
+							<gmd:deliveryPoint>
+								<gco:CharacterString>NGA Visitor Center, 7500 GEOINT Dr, Springfield, VA 22150</gco:CharacterString>
+							</gmd:deliveryPoint>
+							<!-- MDRPTY.party.city [0..1] -->
+							<gmd:city>
+								<gco:CharacterString>Springfield</gco:CharacterString>
+							</gmd:city>
+							<!-- MDRPTY.party.postalCode [0..1] -->
+							<gmd:postalCode>
+								<gco:CharacterString>22150</gco:CharacterString>
+							</gmd:postalCode>
+							<!-- MDRPTY.party.country [0..1] -->
+							<gmd:country>
+								<gco:CharacterString>United States (USA)</gco:CharacterString>
+							</gmd:country>
+							<!-- MDRPTY.party.email [0..*] -->
+							<!-- <gmd:electronicMailAddress> -->
+								<!-- <gco:CharacterString>christopherstow594@mod.gov.uk</gco:CharacterString> -->
+							<!-- </gmd:electronicMailAddress> -->
+						</gmd:CI_Address>
+					</gmd:address>
+				</gmd:CI_Contact>
+			</gmd:contactInfo>
+			<!-- MDRPTY.role [1] -->
+			<gmd:role>
+				<gmd:CI_RoleCode codeList="http://api.nsgreg.nga.mil/codelist/RoleCode" codeListValue="originator">Originator</gmd:CI_RoleCode>
+			</gmd:role>
+		</gmd:CI_ResponsibleParty>
+	</gmd:contact>
+
+		<!-- MDDATE [1] -->
+		<gmd:dateStamp>
+			<gco:Date>20201201T12:58:03Z</gco:Date>
+		</gmd:dateStamp>
+
+		<!-- MDSTD [1] -->
+		<!-- MDSTD.title [1] -->
+		<gmd:metadataStandardName>
+			<gmx:Anchor>urn:dgiwg:metadata:dmf:2.0:profile:all</gmx:Anchor>
+		</gmd:metadataStandardName>
+		<!-- MDSTD.version [1] -->
+		<gmd:metadataStandardVersion>
+			<gco:CharacterString>2.0</gco:CharacterString>
+		</gmd:metadataStandardVersion>
+
+		<!-- RSTITLE [1] -->
+		<gmd:title>
+			<gco:CharacterString>Puerto Rico Sample</gco:CharacterString>
+		</gmd:title>
+
+		<!-- RSABSTR [1] -->
+		<gmd:abstract>
+			<gco:CharacterString>OSM Vector Dataset created composed of waterbodies, roads and points of interest (POI) from OSM data downloaded from Geofabrik.</gco:CharacterString>
+		</gmd:abstract>
+
+		<!-- RSPURP [1] -->
+		<gmd:purpose>
+		<gco:CharacterString>The purpose of this dataset is to provide a sample dataset for GeoPackage development and use.</gco:CharacterString>
+		</gmd:purpose>
+
+		<!-- RSED [0..1] -->
+		<gmd:edition>
+			<gco:CharacterString>OSM</gco:CharacterString>
+		</gmd:edition>
+
+		<!-- RSEDDAT [0..1] -->
+		<gmd:editionDate>
+			<gco:Date>20201201</gco:Date>
+		</gmd:editionDate>
+
+		<!-- RSID [0..*] -->
+		<gmd:identifier>
+			<gmd:RS_Identifier>
+				<!-- RSID.code [1] -->
+				<gmd:code>
+					<gco:CharacterString>Geofabrik OSM</gco:CharacterString>
+				</gmd:code>
+			</gmd:RS_Identifier>
+		</gmd:identifier>
+
+		<!-- RSSRES [0..*] -->
+		<gmd:spatialResolution>
+			<gmd:MD_Resolution>
+			<!-- RSSRES.equivalentScale [0..1] -->
+				<gmd:equivalentScale>
+					<gmd:MD_RepresentativeFraction>
+						<gmd:denominator>
+							<gco:Integer>25000</gco:Integer>
+						</gmd:denominator>
+					</gmd:MD_RepresentativeFraction>
+				</gmd:equivalentScale>
+				<!--RSSRES.distance [0..1] not set -->
+			</gmd:MD_Resolution>
+		</gmd:spatialResolution>
+
+		<!-- RSRPTP [0..1] -->
+		<gmd:spatialRepresentationType>
+			<gmd:MD_SpatialRepresentationTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_RoleCode" codeListValue="vector">Vector</gmd:MD_SpatialRepresentationTypeCode>
+		</gmd:spatialRepresentationType>
+
+		<!-- RSDLOC [1] -->
+		<!-- RSDLOC.language [1] -->
+		<gmd:language>
+			<gmd:LanguageCode codeList="http://www.isotc211.org/2005/resources/Codelist/ML_gmxCodelists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
+		</gmd:language>
+		<!-- RSDLOC.encoding [1] -->
+		<gmd:characterSet>
+			<gmd:MD_CharacterSetCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+		</gmd:characterSet>
+
+		<!-- DGITYP.keyword [1..*] -->
+		<gmd:descriptiveKeywords>
+			<gmd:MD_Keywords>
+			<!-- DGITYP.keyword [1..*] -->
+				<gmd:keyword>
+					<ngmp:NGMP_GeospatialInformationTypeCode codeList="http://www.dgiwg.org/resources/Codelist/dgiwgCodelists.xml#MD_GeospatialInformationTypeCode" codeListValue="vector2D">Vector 2D</ngmp:NGMP_GeospatialInformationTypeCode>
+				</gmd:keyword>
+				<!-- DGITYP.thesaurus [0..1] -->
+				<gmd:thesaurusName>
+					<gmd:CI_Citation>
+						<!-- DGITYP.thesaurus.title [1] -->
+						<gmd:title>
+							<gco:CharacterString>NGMP_GeospatialInformationTypeCode</gco:CharacterString>
+						</gmd:title>
+						<!-- DGITYP.thesaurus.referenceDate [0..*] -->
+						<gmd:date>
+							<gmd:CI_Date>
+						<!-- DGITYP.thesaurus.referenceDate.date [1] -->
+								<gmd:date>
+									<gco:Date>20110916</gco:Date>
+								</gmd:date>
+								<!-- DGITYP.thesaurus.referenceDate.type [1] -->
+								<gmd:dateType>
+									<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode" codeListValue="creation">Creation</gmd:CI_DateTypeCode>
+								</gmd:dateType>
+							</gmd:CI_Date>
+						</gmd:date>
+					</gmd:CI_Citation>
+				</gmd:thesaurusName>
+			</gmd:MD_Keywords>
+		</gmd:descriptiveKeywords>
+
+		<!-- RSGFLV [0..1] -->
+		<gmd:descriptiveKeywords>
+			<gmd:MD_Keywords>
+			<!-- RSGFLV.keyword [1..*] -->
+				<gmd:keyword>
+					<ngmp:NGMP_GeoreferencingLevelCode codeList="http://www.dgiwg.org/resources/Codelist/dgiwgCodelists.xml#MD_GeopositioningLevelCode" codeListValue="georectified">georectified</ngmp:NGMP_GeoreferencingLevelCode>
+				</gmd:keyword>
+				<!-- RSGFLV.thesaurus [0..1] -->
+				<gmd:thesaurusName>
+					<gmd:CI_Citation>
+						<!-- RSGFLV.thesaurus.title [1] -->
+						<gmd:title>
+							<gco:CharacterString>NGMP_GeoreferencingLevelCode</gco:CharacterString>
+						</gmd:title>
+						<!-- RSGFLV.thesaurus.referenceDate [0..*] -->
+						<gmd:date>
+							<gmd:CI_Date>
+								<!-- RSGFLV.thesaurus.referenceDate.date [1] -->
+								<gmd:date>
+									<gco:Date>20190125</gco:Date>
+								</gmd:date>
+								<!-- RSGFLV.thesaurus.referenceDate.type [1] -->
+								<gmd:dateType>
+									<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode" codeListValue="creation">Creation</gmd:CI_DateTypeCode>
+								</gmd:dateType>
+							</gmd:CI_Date>
+						</gmd:date>
+					</gmd:CI_Citation>
+				</gmd:thesaurusName>
+			</gmd:MD_Keywords>
+		</gmd:descriptiveKeywords>
+
+		<!-- RSTHEME [0..1] -->
+		<gmd:descriptiveKeywords>
+			<gmd:MD_Keywords>
+				<!-- RSTHEME.keyword [1..*] -->
+				<gmd:keyword>
+					<ngmp:NGMP_ThematicCode codeList="http://www.dgiwg.org/resources/Codelist/dgiwgCodelists.xml#RS_ThematicCode" codeListValue="extraction">Extraction</ngmp:NGMP_ThematicCode>
+				</gmd:keyword>
+				<gmd:keyword>
+					<ngmp:NGMP_ThematicCode codeList="http://www.dgiwg.org/resources/Codelist/dgiwgCodelists.xml#RS_ThematicCode" codeListValue="associatedSupportStruct">Associated Support Structures</ngmp:NGMP_ThematicCode>
+				</gmd:keyword>
+				<!-- RSTHEME.thesaurus [0..1] -->
+				<gmd:thesaurusName>
+					<gmd:CI_Citation>
+						<!-- RSTHEME.thesaurus.title [1] -->
+						<gmd:title>
+							<gco:CharacterString>NGMP_ThematicCode</gco:CharacterString>
+						</gmd:title>
+						<!-- RSTHEME.thesaurus.referenceDate [0..*] -->
+						<gmd:date>
+							<gmd:CI_Date>
+								<!-- RSTHEME.thesaurus.referenceDate.date [1] -->
+								<gmd:date>
+									<gco:Date>20190125</gco:Date>
+								</gmd:date>
+								<!-- RSTHEME.thesaurus.referenceDate.type [1] -->
+								<gmd:dateType>
+									<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode" codeListValue="creation">Creation</gmd:CI_DateTypeCode>
+								</gmd:dateType>
+							</gmd:CI_Date>
+						</gmd:date>
+					</gmd:CI_Citation>
+				</gmd:thesaurusName>
+			</gmd:MD_Keywords>
+		</gmd:descriptiveKeywords>
+
+		<!-- RSEXT [0..*] -->
+		<gmd:extent>
+			<gmd:EX_Extent>
+				<gmd:geographicElement>
+					<!-- RSEXT.boundingBox [0..*] -->
+					<gmd:EX_GeographicBoundingBox>
+						<!-- RSEXT.boundingBox.west [1] -->
+						<gmd:westBoundLongitude>
+							<gco:Decimal>-67.010729</gco:Decimal>
+						</gmd:westBoundLongitude>
+						<!-- RSEXT.boundingBox.east [1] -->
+						<gmd:eastBoundLongitude>
+							<gco:Decimal>-66.408509</gco:Decimal>
+						</gmd:eastBoundLongitude>
+						<!-- RSEXT.boundingBox.south [1] -->
+						<gmd:southBoundLatitude>
+							<gco:Decimal>18.408509</gco:Decimal>
+						</gmd:southBoundLatitude>
+						<!-- RSEXT.boundingBox.north [1] -->
+						<gmd:northBoundLatitude>
+							<gco:Decimal>18.500550</gco:Decimal>
+						</gmd:northBoundLatitude>
+					</gmd:EX_GeographicBoundingBox>
+				</gmd:geographicElement>
+			</gmd:EX_Extent>
+		</gmd:extent>
+
+		<!-- RSRSYS (horizontal) [0..*] -->
+		<gmd:MD_ReferenceSystem>
+			<gmd:referenceSystemIdentifier>
+				<gmd:RS_Identifier>
+				<!-- RSRSYS.code [1] -->
+					<gmd:code>
+						<gco:CharacterString>http://www.opengis.net/def/crs/EPSG/0/4326</gco:CharacterString>
+					</gmd:code>
+					<!-- RSRSYS.namespace [0..1] -->
+					<gmd:codeSpace>
+						<gco:CharacterString>//www.opengis.net/def/crs/EPSG</gco:CharacterString>
+					</gmd:codeSpace>
+					<!-- RSRSYS.description [0..1] not set -->
+				</gmd:RS_Identifier>
+			</gmd:referenceSystemIdentifier>
+		</gmd:MD_ReferenceSystem>
+
+			<!-- DMF/Core -->
+			<!-- RSRSYS (vertical) [0..*] -->
+		<gmd:referenceSystemInfo>
+			<gmd:MD_ReferenceSystem>
+				<gmd:referenceSystemIdentifier>
+					<gmd:RS_Identifier>
+					<!-- RSRSYS.code [1] -->
+						<gmd:code>
+							<gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/5773">EGM96</gmx:Anchor>
+						</gmd:code>
+						<!-- RSRSYS.namespace [0..1] not set -->
+						<!-- RSRSYS.description [0..1] not set -->
+					</gmd:RS_Identifier>
+				</gmd:referenceSystemIdentifier>
+			</gmd:MD_ReferenceSystem>
+		</gmd:referenceSystemInfo>
+
+		<!-- DMF/Core -->
+		<!-- RSDATE [1..*] -->
+		<gmd:date>
+			<gmd:CI_Date>
+				<!-- RSDATE.date [1] -->
+				<gmd:date>
+					<gco:Date>20201201</gco:Date>
+				</gmd:date>
+				<!-- RSDATE.type [1] -->
+				<gmd:dateType>
+					<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_DateTypeCode" codeListValue="creation">Creation</gmd:CI_DateTypeCode>
+				</gmd:dateType>
+			</gmd:CI_Date>
+		</gmd:date>
+
+		<!-- DMF/Core -->
+		<!-- RSRPTY [0..*] -->
+		<gmd:pointOfContact>
+		<!-- RSRPTY.party [1] -->
+			<gmd:CI_ResponsibleParty>
+				<!-- RSRPTY.party.orgName [0..1] -->
+				<gmd:organisationName>
+					<gco:CharacterString>"DGIWG"</gco:CharacterString>
+				</gmd:organisationName>
+				<gmd:contactInfo>
+					<gmd:CI_Contact>
+						<gmd:phone>
+							<gmd:CI_Telephone>
+								<!-- RSRPTY.party.phone [0..*] -->
+								<gmd:voice>
+									<gco:CharacterString>See web site for contact details</gco:CharacterString>
+								</gmd:voice>
+							</gmd:CI_Telephone>
+						</gmd:phone>
+					</gmd:CI_Contact>
+				</gmd:contactInfo>
+				<!-- RSRPTY.role [1] -->
+				<gmd:role>
+					<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_RoleCode" codeListValue="originator">Originator</gmd:CI_RoleCode>
+				</gmd:role>
+			</gmd:CI_ResponsibleParty>
+		</gmd:pointOfContact>
+
+		<!-- RSSCST [0..*] -->
+		<gmd:resourceConstraints>
+			<gmd:MD_SecurityConstraints>
+				<!-- RSSCST.level [1] -->
+				<gmd:classification>
+					<gmd:MD_ClassificationCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode" codeListValue="unclassified">Unclassified</gmd:MD_ClassificationCode>
+				</gmd:classification>
+				<!-- RSSCST.system [0..1] -->
+				<gmd:classificationSystem>
+					<gco:CharacterString>USA</gco:CharacterString>
+				</gmd:classificationSystem>
+			</gmd:MD_SecurityConstraints>
+		</gmd:resourceConstraints>
+		<gmd:resourceConstraints>
+
+		<!-- DMF/Core -->
+		<!-- RSUSE [0..*] -->
+			<gmd:MD_Constraints>
+				<gmd:useLimitation>
+					<gco:CharacterString>For evaluation only</gco:CharacterString>
+				</gmd:useLimitation>
+			</gmd:MD_Constraints>
+		</gmd:resourceConstraints>
+
+		<!-- RSLCST [0..*] -->
+		<gmd:resourceConstraints>
+			<gmd:MD_LegalConstraints>
+			<!-- RSLCST.statement [0..*] not set -->
+				<!-- RSLCST.access [0..*] -->
+				<gmd:accessConstraints>
+					<gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_RestrictionCode" codeListValue="restricted"/>
+				</gmd:accessConstraints>
+				<!-- RSLCST.use [0..*] -->
+				<gmd:useConstraints>
+					<gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#MD_RestrictionCode" codeListValue="copyright"/>
+				</gmd:useConstraints>
+				<!-- RSLCST.other [0..*] -->
+				<gmd:otherConstraints>
+					<gco:CharacterString>DGIWG use only</gco:CharacterString>
+				</gmd:otherConstraints>
+			</gmd:MD_LegalConstraints>
+		</gmd:resourceConstraints>
+
+		<!-- RSLING [1] -->
+			<gmd:lineage>
+				<gmd:LI_Lineage>
+					<gmd:statement>
+						<gco:CharacterString>Features created by Open Street Map open source community using various imagery sources and collection methods.</gco:CharacterString>
+					</gmd:statement>
+					<gmd:processStep>
+						<gmd:LI_ProcessStep>
+					 	<!-- DMF/Common -->
+							<!-- RSPRST [0..*] -->
+							<!-- RSPRST.description [1] -->
+							<gmd:description>
+								<gco:CharacterString>Download and generate data vector datasets in GeoPackage format</gco:CharacterString>
+							</gmd:description>
+							<!-- RSPRST.rationale [0..1] -->
+							<gmd:rationale>
+								<gco:CharacterString>Time constraints</gco:CharacterString>
+							</gmd:rationale>
+							<!-- RSPRST.date [0..1] -->
+							<gmd:dateTime>
+								<gco:DateTime>2019-01-25T12:58:03Z</gco:DateTime>
+							</gmd:dateTime>
+							<!-- RSPRST.processor [0..*] -->
+							<gmd:processor>
+					 		<!-- RSPRST.processor.party [1] -->
+								<gmd:CI_ResponsibleParty>
+									<!-- RSPRST.processor.party.orgName [0..1] -->
+									<gmd:organisationName>
+										<gco:CharacterString>"USA"</gco:CharacterString>
+									</gmd:organisationName>
+									<!-- RSPRST.processor.party.phone [0..*] -->
+									<gmd:contactInfo>
+										<gmd:CI_Contact>
+											<gmd:phone>
+												<gmd:CI_Telephone>
+													<gmd:voice>
+														<gco:CharacterString>+001 571-557-5450</gco:CharacterString>
+													</gmd:voice>
+												</gmd:CI_Telephone>
+											</gmd:phone>
+										</gmd:CI_Contact>
+									</gmd:contactInfo>
+									<!-- RSPRST.processor.role [1] -->
+									<gmd:role>
+										<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19115/resources/Codelists/cat/codelists.xml#CI_RoleCode" codeListValue="processor">Processor</gmd:CI_RoleCode>
+									</gmd:role>
+								</gmd:CI_ResponsibleParty>
+							</gmd:processor>
+						</gmd:LI_ProcessStep>
+					</gmd:processStep>
+				</gmd:LI_Lineage>
+			</gmd:lineage>
+
+		<!-- RSDFMT [1..*] -->
+		<gmd:distributionInfo>
+			<gmd:MD_Distribution>
+				<gmd:distributionFormat>
+				<!-- RSDFMT.citation.title [1] -->
+					<gmd:MD_Format>
+						<gmd:name>
+							<gco:CharacterString>GeoPackage</gco:CharacterString>
+						</gmd:name>
+						<!-- RSDFMT.citation.version [0..1] -->
+						<gmd:version>
+							<gco:CharacterString>OGC</gco:CharacterString>
+						</gmd:version>
+						<!-- RSDFMT.decompression [0..1] -->
+						<gmd:fileDecompressionTechnique>
+							<gco:CharacterString>zip</gco:CharacterString>
+						</gmd:fileDecompressionTechnique>
+					</gmd:MD_Format>
+				</gmd:distributionFormat>
+			</gmd:MD_Distribution>
+		</gmd:distributionInfo>
+
+		<!-- RSONLLC [0..*] -->
+		<gmd:transferOptions>
+			<gmd:MD_DigitalTransferOptions>
+				<gmd:onLine>
+					<gmd:CI_OnlineResource>
+						<!-- RSONLLC.location [1] -->
+						<gmd:linkage>
+							<gmd:URL>https://www.arcgis.com/apps/webappviewer/index.html?id=10fc70d81a97452fa232336637d69313</gmd:URL>
+						</gmd:linkage>
+						<!-- RSONLLC.function [0..1] -->
+						<gmd:function>
+							<gmd:CI_OnLineFunctionCode codeList="http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">Download</gmd:CI_OnLineFunctionCode>
+						</gmd:function>
+					</gmd:CI_OnlineResource>
+				</gmd:onLine>
+			</gmd:MD_DigitalTransferOptions>
+		</gmd:transferOptions>
+</gmd:MD_Metadata>

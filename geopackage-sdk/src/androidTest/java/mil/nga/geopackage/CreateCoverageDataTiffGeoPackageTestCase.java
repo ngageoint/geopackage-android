@@ -11,9 +11,9 @@ import mil.nga.geopackage.extension.coverage.GriddedCoverageDataType;
 import mil.nga.geopackage.extension.coverage.GriddedCoverageEncodingType;
 import mil.nga.geopackage.extension.coverage.GriddedTile;
 import mil.nga.geopackage.extension.coverage.GriddedTileDao;
+import mil.nga.geopackage.geom.GeoPackageGeometryDataUtils;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
-import mil.nga.geopackage.geom.GeoPackageGeometryDataUtils;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
@@ -204,10 +204,10 @@ public abstract class CreateCoverageDataTiffGeoPackageTestCase extends
             tileMatrix.setMatrixWidth(width);
             tileMatrix.setTileHeight(tileHeight);
             tileMatrix.setTileWidth(tileWidth);
-            tileMatrix.setPixelXSize((bbox.getMaxLongitude() - bbox
-                    .getMinLongitude()) / width / tileWidth);
-            tileMatrix.setPixelYSize((bbox.getMaxLatitude() - bbox
-                    .getMinLatitude()) / height / tileHeight);
+            tileMatrix.setPixelXSize(
+                    bbox.getLongitudeRange() / width / tileWidth);
+            tileMatrix.setPixelYSize(
+                    bbox.getLatitudeRange() / height / tileHeight);
             tileMatrix.setZoomLevel(zoomLevel);
             TestCase.assertEquals(1, tileMatrixDao.create(tileMatrix));
 

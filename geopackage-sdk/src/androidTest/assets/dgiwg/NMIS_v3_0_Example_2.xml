@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ********************************************************************************************************************************
+* This is an example XML document that conforms to the NSG Application Schema (NAS) under
+* NSG Metadata Foundation (NMF) 3.0 Identification and Access Profile of the NAS.  This example includes IC-ISM
+* security markings and defines Resource Geographic Location by geographic description with a temporal extent
+* expressed as a period.
+************************************************************************************************************************************-->
+<nas:MD_Metadata xmlns:nas="https://nsgreg-api.nga.mil/schema/nas/8.0"
+xmlns:cit="http://standards.iso.org/iso/19115/-3/cit/1.0"
+xmlns:gco="http://standards.iso.org/iso/19115/-3/gco/1.0"
+xmlns:gex="http://standards.iso.org/iso/19115/-3/gex/1.0"
+xmlns:lan="http://standards.iso.org/iso/19115/-3/lan/1.0"
+xmlns:mcc="http://standards.iso.org/iso/19115/-3/mcc/1.0"
+xmlns:mco="http://standards.iso.org/iso/19115/-3/mco/1.0"
+xmlns:mdb="http://standards.iso.org/iso/19115/-3/mdb/1.0"
+xmlns:mri="http://standards.iso.org/iso/19115/-3/mri/1.0"
+xmlns:mrs="http://standards.iso.org/iso/19115/-3/mrs/1.0"
+xmlns:gml="http://www.opengis.net/gml/3.2"
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:ism="urn:us:gov:ic:ism"
+xmlns:ntk="urn:us:gov:ic:ntk"
+xmlns:rr="urn:us:gov:ic:revrecall"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="https://nsgreg-api.nga.mil/schema/nas/8.0 ./nmis.xsd"
+ism:DESVersion="13"
+ism:ISMCATCESVersion="2"
+ntk:DESVersion="10"
+rr:DESVersion="1"
+ism:resourceElement="true" ism:createDate="2016-05-30" ism:classification="U" ism:ownerProducer="USA" ism:compliesWith="USGov">
+	<mdb:defaultLocale>
+		<lan:PT_Locale>
+			<lan:language>
+				<lan:LanguageCode codeList="https://nsgreg-api.nga.mil/codelist/iso639-2" codeListValue="eng"/>
+			</lan:language>
+			<lan:country>
+				<lan:CountryCode codeList="http://api.nsgreg.nga.mil/N2L?" codeListValue="ge:GENC:3:3-3:USA"/>
+			</lan:country>
+			<lan:characterEncoding>
+				<lan:MD_CharacterSetCode codeList="https://nsgreg-api.nga.mil/codelist/IANACharset" codeListValue="UTF-8"/>
+			</lan:characterEncoding>
+		</lan:PT_Locale>
+	</mdb:defaultLocale>
+	<mdb:parentMetadata>
+		<cit:CI_Citation>
+			<cit:title>
+				<gco:CharacterString>LTDS_39N078W_A-P</gco:CharacterString>
+			</cit:title>
+		</cit:CI_Citation>
+	</mdb:parentMetadata>
+	<mdb:metadataScope>
+		<mdb:MD_MetadataScope>
+			<mdb:resourceScope>
+				<mcc:MD_ScopeCode codeList="https://nsgreg-api.nga.mil/codelist/ScopeCode" codeListValue="dataset"/>
+			</mdb:resourceScope>
+			<mdb:name>
+				<gco:CharacterString>cell</gco:CharacterString>
+			</mdb:name>
+		</mdb:MD_MetadataScope>
+	</mdb:metadataScope>
+	<mdb:contact xlink:href="#NgaOrganization"/>
+	<mdb:dateInfo>
+		<cit:CI_Date>
+			<cit:date>
+				<gco:DateTime>2016-05-30T09:30:47Z</gco:DateTime>
+			</cit:date>
+			<cit:dateType>
+				<cit:CI_DateTypeCode codeList="https://nsgreg-apih.nga.mil/codelist/DateTypeCode" codeListValue="creation"/>
+			</cit:dateType>
+		</cit:CI_Date>
+	</mdb:dateInfo>
+	<mdb:metadataStandard>
+		<cit:CI_Citation>
+			<cit:title>
+				<gco:CharacterString>National System for Geospatial Intelligence (NSG) Application Schema (NAS)</gco:CharacterString>
+			</cit:title>
+			<cit:alternateTitle>
+				<gco:CharacterString>NAS</gco:CharacterString>
+			</cit:alternateTitle>
+			<cit:edition>
+				<gco:CharacterString>8.0</gco:CharacterString>
+			</cit:edition>
+		</cit:CI_Citation>
+	</mdb:metadataStandard>
+	<mdb:identificationInfo>
+		<nas:DataIdentification>
+			<mri:citation>
+				<cit:CI_Citation>
+					<cit:title>
+						<gco:CharacterString>Local Topographic Data Store (LTDS) data sample for cell 39N078WA.</gco:CharacterString>
+					</cit:title>
+					<cit:date>
+						<cit:CI_Date>
+							<cit:date>
+								<gco:DateTime>2016-05-30T09:30:47Z</gco:DateTime>
+							</cit:date>
+							<cit:dateType>
+								<cit:CI_DateTypeCode codeList="https://nsgreg-api.nga.mil/codelist/DateTypeCode" codeListValue="distribution"/>
+							</cit:dateType>
+						</cit:CI_Date>
+					</cit:date>
+					<cit:identifier>
+						<mcc:MD_Identifier>
+							<mcc:authority>
+								<cit:CI_Citation>
+									<cit:title>
+										<gco:CharacterString>NGA/S2 Topographic Feature Data Management (TFDM) system.</gco:CharacterString>
+									</cit:title>
+									<cit:date>
+										<cit:CI_Date>
+											<cit:date>
+												<gco:DateTime>2016-04-15T09:30:47Z</gco:DateTime>
+											</cit:date>
+											<cit:dateType>
+												<cit:CI_DateTypeCode codeList="https://nsgreg-api.nga.mil/codelist/DateTypeCode" codeListValue="creation"/>
+											</cit:dateType>
+										</cit:CI_Date>
+									</cit:date>
+								</cit:CI_Citation>
+							</mcc:authority>
+							<mcc:code>
+								<gco:CharacterString>urn:uuid:65ab5357-d6cf-4b25-a73a-8d76ed6aj367</gco:CharacterString>
+							</mcc:code>
+						</mcc:MD_Identifier>
+					</cit:identifier>
+					<cit:series>
+						<cit:CI_Series>
+							<cit:name>
+								<gco:CharacterString>Local Topographic Data Store (LTDS) data samples for cell 39N078W.</gco:CharacterString>
+							</cit:name>
+						</cit:CI_Series>
+					</cit:series>
+				</cit:CI_Citation>
+			</mri:citation>
+			<mri:abstract>
+				<gco:CharacterString>A small-footprint sample of NAS-conformant data located in the southern region of New Jersey, USA. It contains a variety of urban, terrain, shoreline, and littoral vector-based feature data, some of which are vertical obstructions to aircraft.</gco:CharacterString>
+			</mri:abstract>
+			<mri:pointOfContact>
+				<cit:CI_Responsibility>
+					<cit:role>
+						<cit:CI_RoleCode codeList="https://nsgreg-api.nga.mil/codelist/RoleCode" codeListValue="originator"/>
+					</cit:role>
+					<cit:party>
+						<cit:CI_Organisation>
+							<cit:name>
+								<gco:CharacterString>US National Geospatial-Intelligence Agency</gco:CharacterString>
+							</cit:name>
+						</cit:CI_Organisation>
+					</cit:party>
+				</cit:CI_Responsibility>
+			</mri:pointOfContact>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>boundaries</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>intelligenceMilitary</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>inlandWaters</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>location</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>oceans</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>structure</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>transportation</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:topicCategory>
+				<mri:MD_TopicCategoryCode>utilitiesCommunication</mri:MD_TopicCategoryCode>
+			</mri:topicCategory>
+			<mri:extent>
+				<gex:EX_Extent>
+					<gex:geographicElement>
+						<gex:EX_GeographicDescription>
+							<gex:geographicIdentifier>
+								<mcc:MD_Identifier>
+									<mcc:authority xlink:href="#NewJerseyGazetteer"/>
+									<mcc:code>
+										<gco:CharacterString>Southern New Jersey</gco:CharacterString>
+									</mcc:code>
+								</mcc:MD_Identifier>
+							</gex:geographicIdentifier>
+						</gex:EX_GeographicDescription>
+					</gex:geographicElement>
+					<gex:temporalElement>
+						<gex:EX_TemporalExtent>
+							<gex:extent>
+								<gml:TimePeriod gml:id="ResourceTemporalExtent">
+									<gml:begin>
+										<gml:TimeInstant gml:id="ResourceTemporalExtentBegin">
+											<gml:timePosition indeterminatePosition="unknown"/>
+										</gml:TimeInstant>
+									</gml:begin>
+									<gml:end>
+										<gml:TimeInstant gml:id="ResourceTemporalExtentEnd">
+											<gml:timePosition>2010-01-01</gml:timePosition>
+										</gml:TimeInstant>
+									</gml:end>
+								</gml:TimePeriod>
+							</gex:extent>
+						</gex:EX_TemporalExtent>
+					</gex:temporalElement>
+				</gex:EX_Extent>
+			</mri:extent>
+			<mri:descriptiveKeywords>
+				<mri:MD_Keywords>
+					<mri:keyword>
+						<gco:CharacterString>Boundaries and Lines</gco:CharacterString>
+					</mri:keyword>
+					<mri:keyword>
+						<gco:CharacterString>General Structures</gco:CharacterString>
+					</mri:keyword>
+				</mri:MD_Keywords>
+			</mri:descriptiveKeywords>
+			<mri:descriptiveKeywords>
+				<mri:MD_Keywords>
+					<mri:keyword>
+						<gco:CharacterString>Woeful Weeping Willow</gco:CharacterString>
+					</mri:keyword>
+					<mri:keyword>
+						<gco:CharacterString>Conspicuously Cheerful Charthouse</gco:CharacterString>
+					</mri:keyword>
+				</mri:MD_Keywords>
+			</mri:descriptiveKeywords>
+			<mri:resourceConstraints>
+				<mco:MD_SecurityConstraints>
+					<mco:classification>
+						<mco:MD_ClassificationCode codeList="https://nsgreg-api.nga.mil/codelist/ClassificationCode" codeListValue="unclassified"/>
+					</mco:classification>
+					<mco:classificationSystem>
+						<gco:CharacterString>USA</gco:CharacterString>
+					</mco:classificationSystem>
+				</mco:MD_SecurityConstraints>
+			</mri:resourceConstraints>
+			<mri:defaultLocale>
+				<lan:PT_Locale>
+					<lan:language>
+						<lan:LanguageCode codeList="https://nsgreg-api.nga.mil/codelist/ISO639-2" codeListValue="eng"/>
+					</lan:language>
+					<lan:country>
+						<lan:CountryCode codeList="http://api.nsgreg.nga.mil/N2L?" codeListValue="ge:GENC:3:3-3:USA"/>
+					</lan:country>
+					<lan:characterEncoding>
+						<lan:MD_CharacterSetCode codeList="https://nsgreg-api.nga.mil/codelist/IANACharset" codeListValue="UTF-8"/>
+					</lan:characterEncoding>
+				</lan:PT_Locale>
+			</mri:defaultLocale>
+			<nas:resourceCategory codeSpace="https://nsgreg-api.nga.mil/codelist/ResourceCategoryCode">topographicFeatures</nas:resourceCategory>
+		</nas:DataIdentification>
+	</mdb:identificationInfo>
+</nas:MD_Metadata>

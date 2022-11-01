@@ -363,6 +363,7 @@ public class SpatialReferenceSystemUtils {
                 copySrs.getDescription());
         TestCase.assertEquals(querySrs.getDefinition_12_063(),
                 copySrs.getDefinition_12_063());
+        TestCase.assertEquals(querySrs.getEpoch(), copySrs.getEpoch());
 
         // Change pk
         long copySrsId = 654321l;

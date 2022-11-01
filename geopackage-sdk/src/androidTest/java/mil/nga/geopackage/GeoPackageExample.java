@@ -39,6 +39,7 @@ import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.extension.CrsWktExtension;
+import mil.nga.geopackage.extension.CrsWktExtensionVersion;
 import mil.nga.geopackage.extension.ExtensionsDao;
 import mil.nga.geopackage.extension.GeometryExtensions;
 import mil.nga.geopackage.extension.WebPExtension;
@@ -296,8 +297,13 @@ public class GeoPackageExample extends BaseTestCase {
                 && !extensionsDao
                 .queryByExtension(WebPExtension.EXTENSION_NAME)
                 .isEmpty());
+        CrsWktExtension crsWktExtension = new CrsWktExtension(geoPackage);
         TestCase.assertEquals(has && CRS_WKT,
-                new CrsWktExtension(geoPackage).has());
+                crsWktExtension.has(CrsWktExtensionVersion.V_1)
+                        && crsWktExtension.has(CrsWktExtensionVersion.V_1_1)
+                        && crsWktExtension.has(CrsWktExtensionVersion.LATEST)
+                        && crsWktExtension
+                        .hasMinimum(CrsWktExtensionVersion.LATEST));
 
     }
 
@@ -425,8 +431,9 @@ public class GeoPackageExample extends BaseTestCase {
                 createTileScalingExtension(geoPackage);
             }
 
-            Log.i(LOG_NAME, "Related Tables Tiles Extension: " + RELATED_TABLES_TILES);
-            if (RELATED_TABLES_TILES) {
+            boolean relatedTablesTiles = RELATED_TABLES_TILES && FEATURES;
+            Log.i(LOG_NAME, "Related Tables Tiles Extension: " + relatedTablesTiles);
+            if (relatedTablesTiles) {
                 createRelatedTablesTilesExtension(geoPackage);
             }
 
@@ -1384,6 +1391,7 @@ public class GeoPackageExample extends BaseTestCase {
         testSrs.setDefinition(srs.getDefinition());
         testSrs.setDescription(srs.getDescription());
         testSrs.setDefinition_12_063(srs.getDefinition_12_063());
+        testSrs.setEpoch(srs.getEpoch());
         srsDao.create(testSrs);
 
         SpatialReferenceSystem testSrs2 = new SpatialReferenceSystem();
@@ -1540,11 +1548,8 @@ public class GeoPackageExample extends BaseTestCase {
         tileMatrix.setMatrixWidth(width);
         tileMatrix.setTileHeight(tileHeight);
         tileMatrix.setTileWidth(tileWidth);
-        tileMatrix.setPixelXSize((bbox.getMaxLongitude() - bbox
-                .getMinLongitude()) / width / tileWidth);
-        tileMatrix
-                .setPixelYSize((bbox.getMaxLatitude() - bbox.getMinLatitude())
-                        / height / tileHeight);
+        tileMatrix.setPixelXSize(bbox.getLongitudeRange() / width / tileWidth);
+        tileMatrix.setPixelYSize(bbox.getLatitudeRange() / height / tileHeight);
         tileMatrix.setZoomLevel(15);
         tileMatrixDao.create(tileMatrix);
 
@@ -1643,11 +1648,8 @@ public class GeoPackageExample extends BaseTestCase {
         tileMatrix.setMatrixWidth(width);
         tileMatrix.setTileHeight(tileHeight);
         tileMatrix.setTileWidth(tileWidth);
-        tileMatrix.setPixelXSize((bbox.getMaxLongitude() - bbox
-                .getMinLongitude()) / width / tileWidth);
-        tileMatrix
-                .setPixelYSize((bbox.getMaxLatitude() - bbox.getMinLatitude())
-                        / height / tileHeight);
+        tileMatrix.setPixelXSize(bbox.getLongitudeRange() / width / tileWidth);
+        tileMatrix.setPixelYSize(bbox.getLatitudeRange() / height / tileHeight);
         tileMatrix.setZoomLevel(15);
         tileMatrixDao.create(tileMatrix);
 
