@@ -62,7 +62,8 @@ public class GeoPackageFactory {
      *
      * @param path     full file path
      * @param writable true to open as writable, false as read only
-     * @return 5.1.0
+     * @return open GeoPackage
+     * @since 5.1.0
      */
     public static GeoPackage openExternal(File path, boolean writable) {
         return openExternal(path.getAbsolutePath(), path.getName(), writable);
@@ -84,7 +85,8 @@ public class GeoPackageFactory {
      *
      * @param path     full file path
      * @param writable true to open as writable, false as read only
-     * @return 5.1.0
+     * @return open GeoPackage
+     * @since 5.1.0
      */
     public static GeoPackage openExternal(String path, boolean writable) {
         return openExternal(path, null, writable);
