@@ -70,7 +70,7 @@ public class GeoPackageImpl extends GeoPackageCoreImpl implements GeoPackage {
      * @param cursorFactory cursor factory
      * @param writable      writable flag
      */
-    GeoPackageImpl(Context context, String name, String path, GeoPackageConnection database,
+    protected GeoPackageImpl(Context context, String name, String path, GeoPackageConnection database,
                    GeoPackageCursorFactory cursorFactory, boolean writable) {
         super(name, path, database, writable);
         this.context = context;

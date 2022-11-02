@@ -50,7 +50,7 @@ import mil.nga.geopackage.validate.GeoPackageValidate;
  *
  * @author osbornb
  */
-class GeoPackageManagerImpl implements GeoPackageManager {
+public class GeoPackageManagerImpl implements GeoPackageManager {
 
     /**
      * Context
@@ -87,7 +87,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      *
      * @param context
      */
-    GeoPackageManagerImpl(Context context) {
+    protected GeoPackageManagerImpl(Context context) {
         this.context = context;
 
         if (context != null) {
@@ -568,7 +568,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
 
         if (database == null) {
             // Get the database name
-            database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
+            database = getDatabase(file);
         }
 
         if (exists(database)) {
@@ -691,7 +691,7 @@ class GeoPackageManagerImpl implements GeoPackageManager {
         if (name != null) {
             database = name;
         } else {
-            database = GeoPackageIOUtils.getFileNameWithoutExtension(file);
+            database = getDatabase(file);
         }
 
         boolean success = false;
@@ -1794,8 +1794,18 @@ class GeoPackageManagerImpl implements GeoPackageManager {
      * @param file document file
      * @return file
      */
-    private File getFile(DocumentFile file) {
+    protected File getFile(DocumentFile file) {
         return new File(getFilePath(file));
+    }
+
+    /**
+     * Get the database name from the file
+     *
+     * @param file file
+     * @return database name
+     */
+    protected String getDatabase(File file) {
+        return GeoPackageIOUtils.getFileNameWithoutExtension(file);
     }
 
     /**
