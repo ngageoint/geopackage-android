@@ -13,7 +13,6 @@ import mil.nga.geopackage.db.GeoPackageCursorFactory;
 import mil.nga.geopackage.extension.metadata.Metadata;
 import mil.nga.geopackage.extension.metadata.MetadataScopeType;
 import mil.nga.geopackage.extension.metadata.reference.MetadataReference;
-import mil.nga.geopackage.extension.rtree.RTreeIndexExtension;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
@@ -591,8 +590,9 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
                 this, table, identifier, description, bounds, geometryType,
                 dataType, columns, srs);
 
-        RTreeIndexExtension extension = new RTreeIndexExtension(this);
-        extension.create(getFeatureDao(geometryColumns).getTable());
+        // TODO RTree write functionality currently not supported in Android
+        // RTreeIndexExtension extension = new RTreeIndexExtension(this);
+        // extension.create(getFeatureDao(geometryColumns).getTable());
 
         return geometryColumns;
     }

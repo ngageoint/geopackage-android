@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.db.DateConverter;
 import mil.nga.geopackage.db.GeoPackageDataType;
@@ -38,6 +36,7 @@ import mil.nga.geopackage.features.user.FeatureRow;
 import mil.nga.geopackage.features.user.FeatureTable;
 import mil.nga.geopackage.geom.GeoPackageGeometryData;
 import mil.nga.geopackage.io.ContextIOUtils;
+import mil.nga.geopackage.io.GeoPackageIOUtils;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
 import mil.nga.geopackage.tiles.user.TileColumn;
 import mil.nga.geopackage.tiles.user.TileDao;
@@ -82,7 +81,7 @@ public class TestUtils {
      *
      * @param context context
      * @return test context
-     * @throws NameNotFoundException
+     * @throws NameNotFoundException upon error
      */
     public static Context getTestContext(Context context)
             throws NameNotFoundException {
@@ -93,8 +92,8 @@ public class TestUtils {
     /**
      * Copy the asset file to the internal memory storage
      *
-     * @param context
-     * @param assetPath
+     * @param context   context
+     * @param assetPath asset path
      */
     public static void copyAssetFileToInternalStorage(Context context,
                                                       Context testContext, String assetPath) {
@@ -113,9 +112,9 @@ public class TestUtils {
     /**
      * Get the internal storage location of the asset file
      *
-     * @param context
-     * @param assetPath
-     * @return
+     * @param context   context
+     * @param assetPath asset path
+     * @return file path
      */
     public static String getAssetFileInternalStorageLocation(Context context,
                                                              String assetPath) {
@@ -125,10 +124,10 @@ public class TestUtils {
     /**
      * Copy the asset file to the provided file path
      *
-     * @param testContext
-     * @param assetPath
-     * @param filePath
-     * @throws IOException
+     * @param testContext test context
+     * @param assetPath   asset path
+     * @param filePath    file path
+     * @throws IOException upon error
      */
     private static void copyAssetFile(Context testContext, String assetPath,
                                       String filePath) throws IOException {
@@ -152,10 +151,10 @@ public class TestUtils {
     /**
      * Get asset file bytes
      *
-     * @param testContext
-     * @param assetPath
-     * @return
-     * @throws IOException
+     * @param testContext test context
+     * @param assetPath   asset path
+     * @return bytes
+     * @throws IOException upon error
      */
     public static byte[] getAssetFileBytes(Context testContext, String assetPath)
             throws IOException {
@@ -179,12 +178,25 @@ public class TestUtils {
     }
 
     /**
+     * Get asset file String
+     *
+     * @param testContext test context
+     * @param assetPath   asset path
+     * @return string
+     * @throws IOException upon error
+     */
+    public static String getAssetFileString(Context testContext, String assetPath) throws IOException {
+        InputStream assetFile = getAssetFileStream(testContext, assetPath);
+        return GeoPackageIOUtils.streamString(assetFile);
+    }
+
+    /**
      * Get the asset file input stream
      *
-     * @param testContext
-     * @param assetPath
-     * @return
-     * @throws IOException
+     * @param testContext test context
+     * @param assetPath   asset path
+     * @return input stream
+     * @throws IOException upon error
      */
     public static InputStream getAssetFileStream(Context testContext,
                                                  String assetPath) throws IOException {

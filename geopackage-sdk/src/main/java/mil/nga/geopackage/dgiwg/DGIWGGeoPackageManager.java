@@ -253,7 +253,7 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
     public DGIWGGeoPackage open(String database, boolean writable, boolean validate) {
 
         DGIWGGeoPackage geoPackage = new DGIWGGeoPackage(
-                open(database, writable));
+                super.open(database, writable));
 
         if (validate) {
             validate(geoPackage);
