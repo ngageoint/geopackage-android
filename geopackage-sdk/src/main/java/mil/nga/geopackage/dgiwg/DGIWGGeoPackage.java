@@ -47,7 +47,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
         super(geoPackage.getContext(), geoPackage.getName(), geoPackage.getPath(),
                 geoPackage.getConnection(), geoPackage.getCursorFactory(),
                 geoPackage.isWritable());
-        this.file = new GeoPackageFile(geoPackage.getPath());
+        this.file = new GeoPackageFile(getPath(), getName());
     }
 
     /**

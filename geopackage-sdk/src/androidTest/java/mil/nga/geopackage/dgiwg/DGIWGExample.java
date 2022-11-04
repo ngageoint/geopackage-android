@@ -229,7 +229,7 @@ public class DGIWGExample extends BaseTestCase {
         GeoPackageFile file = create(fileName, create);
 
         DGIWGGeoPackageManager manager = DGIWGGeoPackageFactory.getManager(activity);
-        GeoPackage geoPackage = manager.open(fileName.getName());
+        GeoPackage geoPackage = manager.open(file);
         TestCase.assertNotNull(geoPackage);
         geoPackage.close();
 
@@ -386,9 +386,9 @@ public class DGIWGExample extends BaseTestCase {
 
         manager.delete(geoPackageName);
 
-        manager.create(geoPackageName, getMetadata(context, TestConstants.DGIWG_METADATA_1));
+        GeoPackageFile file = manager.create(geoPackageName, getMetadata(context, TestConstants.DGIWG_METADATA_1));
 
-        DGIWGGeoPackage geoPackage = manager.open(geoPackageName);
+        DGIWGGeoPackage geoPackage = manager.open(file);
         if (geoPackage == null) {
             throw new GeoPackageException("Failed to open database");
         }

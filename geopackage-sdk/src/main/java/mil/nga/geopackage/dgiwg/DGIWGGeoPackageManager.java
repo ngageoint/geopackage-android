@@ -6,9 +6,11 @@ import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 
+import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageManagerImpl;
 import mil.nga.geopackage.extension.CrsWktExtension;
 import mil.nga.geopackage.extension.CrsWktExtensionVersion;
+import mil.nga.geopackage.io.GeoPackageIOUtils;
 
 /**
  * DGIWG (Defence Geospatial Information Working Group) GeoPackage Manager used
@@ -33,9 +35,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      *
      * @param database database name
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean create(String database, String metadata) {
+    public GeoPackageFile create(String database, String metadata) {
         return create(database, DGIWGConstants.DMF_DEFAULT_URI, metadata);
     }
 
@@ -45,14 +47,14 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param database database name
      * @param uri      URI
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean create(String database, String uri, String metadata) {
-        boolean created = super.create(database);
-        if (created) {
-            createDGIWG(database, null, uri, metadata);
+    public GeoPackageFile create(String database, String uri, String metadata) {
+        GeoPackageFile geoPackageFile = null;
+        if (super.create(database)) {
+            geoPackageFile = createDGIWG(database, null, uri, metadata);
         }
-        return created;
+        return geoPackageFile;
     }
 
     /**
@@ -61,9 +63,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param database database name
      * @param path     directory path
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createAtPath(String database, File path, String metadata) {
+    public GeoPackageFile createAtPath(String database, File path, String metadata) {
         return createAtPath(database, path, DGIWGConstants.DMF_DEFAULT_URI, metadata);
     }
 
@@ -74,14 +76,14 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param path     directory path
      * @param uri      URI
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createAtPath(String database, File path, String uri, String metadata) {
-        boolean created = super.createAtPath(database, path);
-        if (created) {
-            createDGIWG(database, path, uri, metadata);
+    public GeoPackageFile createAtPath(String database, File path, String uri, String metadata) {
+        GeoPackageFile geoPackageFile = null;
+        if (super.createAtPath(database, path)) {
+            geoPackageFile = createDGIWG(database, path, uri, metadata);
         }
-        return created;
+        return geoPackageFile;
     }
 
     /**
@@ -89,9 +91,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      *
      * @param file     GeoPackage file path
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(File file, String metadata) {
+    public GeoPackageFile createFile(File file, String metadata) {
         return createFile(file, DGIWGConstants.DMF_DEFAULT_URI, metadata);
     }
 
@@ -101,9 +103,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param file     GeoPackage file path
      * @param uri      URI
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(File file, String uri, String metadata) {
+    public GeoPackageFile createFile(File file, String uri, String metadata) {
         return createFile(null, file, uri, metadata);
     }
 
@@ -113,9 +115,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param database database name
      * @param file     GeoPackage file path
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(String database, File file, String metadata) {
+    public GeoPackageFile createFile(String database, File file, String metadata) {
         return createFile(database, file, DGIWGConstants.DMF_DEFAULT_URI, metadata);
     }
 
@@ -126,14 +128,14 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param file     GeoPackage file path
      * @param uri      URI
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(String database, File file, String uri, String metadata) {
-        boolean created = super.createFile(database, file);
-        if (created) {
-            createDGIWG(database, file, uri, metadata);
+    public GeoPackageFile createFile(String database, File file, String uri, String metadata) {
+        GeoPackageFile geoPackageFile = null;
+        if (super.createFile(database, file)) {
+            geoPackageFile = createDGIWG(database, file, uri, metadata);
         }
-        return created;
+        return geoPackageFile;
     }
 
     /**
@@ -141,9 +143,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      *
      * @param file     GeoPackage document file
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(DocumentFile file, String metadata) {
+    public GeoPackageFile createFile(DocumentFile file, String metadata) {
         return createFile(file, DGIWGConstants.DMF_DEFAULT_URI, metadata);
     }
 
@@ -153,9 +155,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param file     GeoPackage document file
      * @param uri      URI
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(DocumentFile file, String uri, String metadata) {
+    public GeoPackageFile createFile(DocumentFile file, String uri, String metadata) {
         return createFile(file.getName(), file, uri, metadata);
     }
 
@@ -165,9 +167,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param database database name
      * @param file     GeoPackage document file
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(String database, DocumentFile file, String metadata) {
+    public GeoPackageFile createFile(String database, DocumentFile file, String metadata) {
         return createFile(database, file, DGIWGConstants.DMF_DEFAULT_URI, metadata);
     }
 
@@ -178,9 +180,9 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param file     GeoPackage document file
      * @param uri      URI
      * @param metadata metadata
-     * @return true if created
+     * @return GeoPackage file if created
      */
-    public boolean createFile(String database, DocumentFile file, String uri, String metadata) {
+    public GeoPackageFile createFile(String database, DocumentFile file, String uri, String metadata) {
         return createFile(database, getFile(file), uri, metadata);
     }
 
@@ -191,23 +193,34 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      * @param file     GeoPackage file path
      * @param uri      URI
      * @param metadata metadata
+     * @return GeoPackage file
      */
-    private void createDGIWG(String database, File file, String uri, String metadata) {
+    private GeoPackageFile createDGIWG(String database, File file, String uri, String metadata) {
+
+        GeoPackageFile geoPackageFile = null;
 
         if (database == null) {
             // Get the database name
             database = getDatabase(file);
+        } else {
+            database = GeoPackageIOUtils.getFileNameWithoutExtension(database);
         }
 
         try (DGIWGGeoPackage geoPackage = open(false, database)) {
 
-            CrsWktExtension wktExtension = new CrsWktExtension(geoPackage);
-            wktExtension.getOrCreate(CrsWktExtensionVersion.V_1);
+            if (geoPackage != null) {
 
-            geoPackage.createGeoPackageDatasetMetadata(uri, metadata);
+                CrsWktExtension wktExtension = new CrsWktExtension(geoPackage);
+                wktExtension.getOrCreate(CrsWktExtensionVersion.V_1);
 
+                geoPackage.createGeoPackageDatasetMetadata(uri, metadata);
+
+                geoPackageFile = geoPackage.getFile();
+
+            }
         }
 
+        return geoPackageFile;
     }
 
     /**
@@ -252,14 +265,74 @@ public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
      */
     public DGIWGGeoPackage open(String database, boolean writable, boolean validate) {
 
-        DGIWGGeoPackage geoPackage = new DGIWGGeoPackage(
-                super.open(database, writable));
+        DGIWGGeoPackage geoPackage = null;
 
-        if (validate) {
-            validate(geoPackage);
+        GeoPackage gp = super.open(database, writable);
+        if (gp != null) {
+
+            geoPackage = new DGIWGGeoPackage(gp);
+
+            if (validate) {
+                validate(geoPackage);
+            }
+
         }
 
         return geoPackage;
+    }
+
+    /**
+     * Open the database
+     *
+     * @param file GeoPackage file
+     * @return open GeoPackage
+     */
+    public DGIWGGeoPackage open(GeoPackageFile file) {
+        return open(file, true, true);
+    }
+
+    /**
+     * Open the database
+     *
+     * @param file     GeoPackage file
+     * @param writable true to open as writable, false as read only
+     * @return open GeoPackage
+     */
+    public DGIWGGeoPackage open(GeoPackageFile file, boolean writable) {
+        return open(file, writable, true);
+    }
+
+    /**
+     * Open the database
+     *
+     * @param validate validate the GeoPackage
+     * @param file     GeoPackage file
+     * @return open GeoPackage
+     */
+    public DGIWGGeoPackage open(boolean validate, GeoPackageFile file) {
+        return open(file, true, validate);
+    }
+
+    /**
+     * Open the database
+     *
+     * @param file     GeoPackage file
+     * @param writable true to open as writable, false as read only
+     * @param validate validate the GeoPackage
+     * @return open GeoPackage
+     */
+    public DGIWGGeoPackage open(GeoPackageFile file, boolean writable, boolean validate) {
+        return open(file.getName(), writable, validate);
+    }
+
+    /**
+     * Delete the database
+     *
+     * @param file GeoPackage file
+     * @return true if deleted
+     */
+    public boolean delete(GeoPackageFile file) {
+        return super.delete(file.getName());
     }
 
     /**
