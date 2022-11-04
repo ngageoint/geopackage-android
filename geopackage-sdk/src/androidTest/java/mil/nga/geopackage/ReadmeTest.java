@@ -73,7 +73,7 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         File geoPackageFile = new File(importLocation);
 
         try {
-            testGeoPackage(activity, geoPackageFile);
+            testGeoPackage(activity, geoPackageFile, TestConstants.IMPORT_DB_NAME);
         } finally {
             manager.delete(TestConstants.IMPORT_DB_NAME);
         }
@@ -85,10 +85,11 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
      *
      * @param context        context
      * @param geoPackageFile GeoPackage file
+     * @param name           database name
      * @throws IOException  upon error
      * @throws SQLException upon error
      */
-    private void testGeoPackage(Context context, File geoPackageFile) throws IOException, SQLException {
+    private void testGeoPackage(Context context, File geoPackageFile, String name) throws IOException, SQLException {
 
         // Context context = ...;
         // File geoPackageFile = ...;
@@ -103,7 +104,7 @@ public class ReadmeTest extends ImportGeoPackageTestCase {
         List<String> databases = manager.databases();
 
         // Open database
-        GeoPackage geoPackage = manager.open(databases.get(0));
+        GeoPackage geoPackage = manager.open(name);
 
         // GeoPackage Table DAOs
         SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();

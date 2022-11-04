@@ -54,7 +54,7 @@ boolean imported = manager.importGeoPackage(geoPackageFile);
 List<String> databases = manager.databases();
 
 // Open database
-GeoPackage geoPackage = manager.open(databases.get(0));
+GeoPackage geoPackage = manager.open(name);
 
 // GeoPackage Table DAOs
 SpatialReferenceSystemDao srsDao = geoPackage.getSpatialReferenceSystemDao();

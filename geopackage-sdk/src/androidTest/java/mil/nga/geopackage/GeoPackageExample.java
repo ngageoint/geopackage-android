@@ -1,10 +1,8 @@
 package mil.nga.geopackage;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -477,25 +475,18 @@ public class GeoPackageExample extends BaseTestCase {
 
     private static void exportGeoPackage(Context context) throws IOException {
 
-        if (context.checkSelfPermission(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        GeoPackageManager manager = GeoPackageFactory.getManager(context);
 
-            GeoPackageManager manager = GeoPackageFactory.getManager(context);
+        String name = GeoPackageValidate.addGeoPackageExtension(GEOPACKAGE_NAME + "-" + System.currentTimeMillis());
+        manager.exportGeoPackage(GEOPACKAGE_NAME,
+                name,
+                Environment.DIRECTORY_DOCUMENTS,
+                MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL));
 
-            String name = GeoPackageValidate.addGeoPackageExtension(GEOPACKAGE_NAME + "-" + System.currentTimeMillis());
-            manager.exportGeoPackage(GEOPACKAGE_NAME,
-                    name,
-                    Environment.DIRECTORY_DOCUMENTS,
-                    MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL));
-
-            String path = "/storage/emulated/0/Documents/" + name;
-            Log.i(LOG_NAME, "Created: " + path);
-            Log.i(LOG_NAME, "To copy GeoPackage, run: "
-                    + "adb pull " + path + " " + GeoPackageValidate.addGeoPackageExtension(GEOPACKAGE_NAME));
-        } else {
-            Log.w(LOG_NAME,
-                    "To export the GeoPackage, grant GeoPackageSDKTests Storage permission on the emulator or phone");
-        }
+        String path = "/storage/emulated/0/Documents/" + name;
+        Log.i(LOG_NAME, "Created: " + path);
+        Log.i(LOG_NAME, "To copy GeoPackage, run: "
+                + "adb pull " + path + " " + GeoPackageValidate.addGeoPackageExtension(GEOPACKAGE_NAME));
 
     }
 
