@@ -12,7 +12,7 @@ import mil.nga.geopackage.GeoPackageManager;
  * DGIWG GeoPackage Factory to get a DGIWG GeoPackage Manager
  *
  * @author osbornb
- * @since 6.5.1
+ * @since 6.7.0
  */
 public class DGIWGGeoPackageFactory extends GeoPackageFactory {
 

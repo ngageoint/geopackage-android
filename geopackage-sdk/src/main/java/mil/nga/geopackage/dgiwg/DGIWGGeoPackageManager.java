@@ -17,7 +17,7 @@ import mil.nga.geopackage.io.GeoPackageIOUtils;
  * to create and open GeoPackages
  *
  * @author osbornb
- * @since 6.5.1
+ * @since 6.7.0
  */
 public class DGIWGGeoPackageManager extends GeoPackageManagerImpl {
 

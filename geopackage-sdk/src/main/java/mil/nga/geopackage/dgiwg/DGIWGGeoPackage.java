@@ -24,7 +24,7 @@ import mil.nga.sf.GeometryType;
  * implementation
  *
  * @author osbornb
- * @since 6.5.1
+ * @since 6.7.0
  */
 public class DGIWGGeoPackage extends GeoPackageImpl {
 

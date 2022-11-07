@@ -85,7 +85,7 @@ public class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * Constructor
      *
-     * @param context
+     * @param context context
      */
     protected GeoPackageManagerImpl(Context context) {
         this.context = context;
