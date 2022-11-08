@@ -388,6 +388,9 @@ public class SpatialReferenceSystemUtils {
                 queryCopiedSrs.getDefinition());
         TestCase.assertEquals(querySrs.getDescription(),
                 queryCopiedSrs.getDescription());
+        TestCase.assertEquals(querySrs.getDefinition_12_063(),
+                copySrs.getDefinition_12_063());
+        TestCase.assertEquals(querySrs.getEpoch(), copySrs.getEpoch());
 
     }
 
