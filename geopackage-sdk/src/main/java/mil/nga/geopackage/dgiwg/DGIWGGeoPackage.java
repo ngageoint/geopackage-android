@@ -273,7 +273,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
     }
 
     /**
-     * Create a tile matrix for a zoom level
+     * Create tile matrices for zoom levels
      *
      * @param tileMatrixSet tile matrix set
      * @param minZoom       min zoom level
@@ -289,7 +289,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
     }
 
     /**
-     * Create a tile matrix for a zoom level
+     * Create tile matrices for zoom levels
      *
      * @param table        table name
      * @param boundingBox  bounding box
@@ -305,7 +305,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
     }
 
     /**
-     * Create a tile matrix for a zoom level
+     * Create tile matrices for zoom levels
      *
      * @param tileMatrixSet tile matrix set
      * @param zoomLevels    zoom levels
@@ -320,7 +320,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
     }
 
     /**
-     * Create a tile matrix for a zoom level
+     * Create tile matrices for zoom levels
      *
      * @param table        table name
      * @param boundingBox  bounding box
@@ -342,9 +342,9 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param matrixWidth   matrix width
      * @param matrixHeight  matrix height
      */
-    public void createTileMatrices(TileMatrixSet tileMatrixSet, long zoom,
-                                   long matrixWidth, long matrixHeight) {
-        createTileMatrices(tileMatrixSet.getTableName(),
+    public void createTileMatrix(TileMatrixSet tileMatrixSet, long zoom,
+                                 long matrixWidth, long matrixHeight) {
+        createTileMatrix(tileMatrixSet.getTableName(),
                 tileMatrixSet.getBoundingBox(), zoom, matrixWidth,
                 matrixHeight);
     }
@@ -358,9 +358,9 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param matrixWidth  matrix width
      * @param matrixHeight matrix height
      */
-    public void createTileMatrices(String table, BoundingBox boundingBox,
-                                   long zoom, long matrixWidth, long matrixHeight) {
-        DGIWGGeoPackageUtils.createTileMatrices(this, table, boundingBox, zoom,
+    public void createTileMatrix(String table, BoundingBox boundingBox,
+                                 long zoom, long matrixWidth, long matrixHeight) {
+        DGIWGGeoPackageUtils.createTileMatrix(this, table, boundingBox, zoom,
                 matrixWidth, matrixHeight);
     }
 
