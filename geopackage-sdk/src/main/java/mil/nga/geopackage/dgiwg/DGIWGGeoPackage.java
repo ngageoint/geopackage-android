@@ -51,22 +51,6 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
     }
 
     /**
-     * Constructor
-     *
-     * @param context       context
-     * @param name          GeoPackage name
-     * @param path          database path
-     * @param database      database connection
-     * @param cursorFactory cursor factory
-     * @param writable      writable flag
-     */
-    protected DGIWGGeoPackage(Context context, String name, String path, GeoPackageConnection database,
-                              GeoPackageCursorFactory cursorFactory, boolean writable) {
-        super(context, name, path, database, cursorFactory, writable);
-        this.file = new GeoPackageFile(path);
-    }
-
-    /**
      * Get the DGIWG file
      *
      * @return DGIWG file
