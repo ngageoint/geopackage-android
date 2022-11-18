@@ -1,15 +1,11 @@
 package mil.nga.geopackage.dgiwg;
 
-import android.content.Context;
-
 import java.util.Collection;
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageImpl;
-import mil.nga.geopackage.db.GeoPackageConnection;
-import mil.nga.geopackage.db.GeoPackageCursorFactory;
 import mil.nga.geopackage.extension.metadata.Metadata;
 import mil.nga.geopackage.extension.metadata.MetadataScopeType;
 import mil.nga.geopackage.extension.metadata.reference.MetadataReference;
@@ -370,7 +366,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param table        table name
      * @param geometryType geometry type
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table,
                                           GeometryType geometryType, CoordinateReferenceSystem crs) {
@@ -384,7 +380,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param geometryType geometry type
      * @param columns      feature columns
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table,
                                           GeometryType geometryType, List<FeatureColumn> columns,
@@ -400,7 +396,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param description  contents description
      * @param geometryType geometry type
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, String identifier,
                                           String description, GeometryType geometryType,
@@ -418,7 +414,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param geometryType geometry type
      * @param columns      feature columns
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, String identifier,
                                           String description, GeometryType geometryType,
@@ -436,7 +432,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param bounds       contents bounds
      * @param geometryType geometry type
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, BoundingBox bounds,
                                           GeometryType geometryType, CoordinateReferenceSystem crs) {
@@ -451,7 +447,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param geometryType geometry type
      * @param columns      feature columns
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, BoundingBox bounds,
                                           GeometryType geometryType, List<FeatureColumn> columns,
@@ -469,7 +465,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param bounds       contents bounds
      * @param geometryType geometry type
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, String identifier,
                                           String description, BoundingBox bounds, GeometryType geometryType,
@@ -488,7 +484,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param geometryType geometry type
      * @param columns      feature columns
      * @param crs          coordinate reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, String identifier,
                                           String description, BoundingBox bounds, GeometryType geometryType,
@@ -507,7 +503,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param geometryType geometry type
      * @param dataType     data type
      * @param srs          spatial reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, BoundingBox bounds,
                                           GeometryType geometryType, DataType dataType,
@@ -524,7 +520,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param dataType     data type
      * @param columns      feature columns
      * @param srs          spatial reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, BoundingBox bounds,
                                           GeometryType geometryType, DataType dataType,
@@ -543,7 +539,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param geometryType geometry type
      * @param dataType     data type
      * @param srs          spatial reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, String identifier,
                                           String description, BoundingBox bounds, GeometryType geometryType,
@@ -563,7 +559,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @param dataType     data type
      * @param columns      feature columns
      * @param srs          spatial reference system
-     * @return created tile matrix set
+     * @return created geometry columns
      */
     public GeometryColumns createFeatures(String table, String identifier,
                                           String description, BoundingBox bounds, GeometryType geometryType,
