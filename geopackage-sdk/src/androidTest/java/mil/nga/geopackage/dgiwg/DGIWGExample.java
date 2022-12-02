@@ -25,7 +25,6 @@ import java.util.List;
 
 import mil.nga.geopackage.BaseTestCase;
 import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageFactory;
 import mil.nga.geopackage.GeoPackageManager;
@@ -228,11 +227,11 @@ public class DGIWGExample extends BaseTestCase {
         GeoPackageFile file = create(fileName, create);
 
         DGIWGGeoPackageManager manager = DGIWGGeoPackageFactory.getManager(activity);
-        GeoPackage geoPackage = manager.open(file);
+        DGIWGGeoPackage geoPackage = manager.open(file);
         TestCase.assertNotNull(geoPackage);
         geoPackage.close();
 
-        TestCase.assertTrue(manager.delete(fileName.getName()));
+        TestCase.assertTrue(manager.delete(file));
     }
 
     /**
