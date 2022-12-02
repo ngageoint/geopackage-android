@@ -548,11 +548,11 @@ public class DGIWGGeoPackageTest extends BaseTestCase {
 
             assertEquals(3, featureDao.count());
 
-            DGIWGValidationErrors errors = geoPackage.validate();
+            DGIWGValidationErrors errors = geoPackage.validate(table);
             if (errors.hasErrors()) {
-                for (DGIWGValidationError error : errors) {
-                    assertEquals(RTreeIndexCoreExtension.EXTENSION_NAME, error.getValue());
-                }
+                assertEquals(1, errors.numErrors());
+                DGIWGValidationError error = errors.getError(0);
+                assertEquals(RTreeIndexCoreExtension.EXTENSION_NAME, error.getValue());
             } else {
                 assertTrue(geoPackage.isValid());
             }
