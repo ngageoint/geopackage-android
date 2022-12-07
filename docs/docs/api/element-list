@@ -2,6 +2,7 @@ mil.nga.geopackage
 mil.nga.geopackage.attributes
 mil.nga.geopackage.db
 mil.nga.geopackage.db.metadata
+mil.nga.geopackage.dgiwg
 mil.nga.geopackage.extension.coverage
 mil.nga.geopackage.extension.nga.index
 mil.nga.geopackage.extension.nga.link
