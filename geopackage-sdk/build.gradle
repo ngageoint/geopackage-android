@@ -4,7 +4,7 @@ apply plugin: 'signing'
 
 group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.7.0"
+version = "6.7.1"
 
 android {
     compileSdkVersion 33
