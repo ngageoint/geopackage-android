@@ -163,18 +163,18 @@ afterEvaluate {
 dependencies {
     api 'androidx.documentfile:documentfile:1.0.1'
     api 'com.j256.ormlite:ormlite-android:6.1'
-    api ('mil.nga.geopackage:geopackage-core:6.6.0'){
+    api ('mil.nga.geopackage:geopackage-core:6.6.1'){
         exclude module: 'ormlite-core'
         exclude group: 'com.j256.ormlite'
     }
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:3.0.0'
-    api 'mil.nga:sqlite-android:3390400'
+    api 'mil.nga:sqlite-android:3400000'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
-            'mil.nga.geopackage:geopackage-core:6.6.0',
+            'mil.nga.geopackage:geopackage-core:6.6.1',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:3.0.0'
     testImplementation 'androidx.multidex:multidex:2.0.1'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test:runner:1.5.1'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
 }

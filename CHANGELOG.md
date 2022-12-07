@@ -4,9 +4,10 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.7.0 (TBD)
+## [6.7.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.7.0) (12-07-2022)
 
-* geopackage-core version 6.6.0
+* geopackage-core version 6.6.1
+* SQLite Android Bindings version 3400000
 * DGIWG (Defence Geospatial Information Working Group) GeoPackage Profile support
 
 ## [6.6.0](https://github.com/ngageoint/geopackage-android/releases/tag/6.6.0) (09-26-2022)
