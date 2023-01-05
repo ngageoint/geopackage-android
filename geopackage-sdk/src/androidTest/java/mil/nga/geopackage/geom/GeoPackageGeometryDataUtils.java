@@ -249,14 +249,48 @@ public class GeoPackageGeometryDataUtils {
         // Compare header bytes
         compareByteArrays(expected.getHeaderBytes(), actual.getHeaderBytes());
 
+        Geometry expectedGeometry = expected.getGeometry();
+        Geometry actualGeometry = actual.getGeometry();
+
+        byte[] expectedWKB = expected.getWkb();
+        byte[] actualWKB = actual.getWkb();
+
+        byte[] expectedBytes = expected.getBytes();
+        byte[] actualBytes = actual.getBytes();
+
+        if (expectedGeometry != null && actualGeometry != null
+                && expectedGeometry
+                .getGeometryType() == GeometryType.MULTILINESTRING) {
+            if (!(actualGeometry instanceof MultiLineString)) {
+                @SuppressWarnings("unchecked")
+                GeometryCollection<LineString> geomCollection = (GeometryCollection<LineString>) actualGeometry;
+                MultiLineString multiLineString = new MultiLineString();
+                multiLineString.addGeometries(geomCollection.getGeometries());
+                actualGeometry = multiLineString;
+                int wkbLocation;
+                int byteLocation;
+                if (actual.getByteOrder() == ByteOrder.BIG_ENDIAN) {
+                    wkbLocation = 4;
+                    byteLocation = 12;
+                } else {
+                    wkbLocation = 1;
+                    byteLocation = 9;
+                }
+                byte code = (byte) GeometryCodes
+                        .getCode(GeometryType.MULTICURVE);
+                actualWKB[wkbLocation] = code;
+                actualBytes[byteLocation] = code;
+            }
+        }
+
         // Compare geometries
-        compareGeometries(expected.getGeometry(), actual.getGeometry());
+        compareGeometries(expectedGeometry, actualGeometry);
 
         // Compare well-known binary geometries
-        compareByteArrays(expected.getWkb(), actual.getWkb());
+        compareByteArrays(expectedWKB, actualWKB);
 
         // Compare all bytes
-        compareByteArrays(expected.getBytes(), actual.getBytes());
+        compareByteArrays(expectedBytes, actualBytes);
 
     }
 

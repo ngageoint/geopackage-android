@@ -41,6 +41,7 @@ import mil.nga.sf.MultiPoint;
 import mil.nga.sf.MultiPolygon;
 import mil.nga.sf.Point;
 import mil.nga.sf.Polygon;
+import mil.nga.sf.wkb.GeometryCodes;
 import mil.nga.sf.wkb.GeometryReader;
 
 /**
@@ -117,7 +118,11 @@ public class FeatureUtils {
                         Geometry geometryFromBytes = GeometryReader
                                 .readGeometry(wkbBytes);
                         TestCase.assertNotNull(geometryFromBytes);
-                        TestCase.assertEquals(geometry.getGeometryType(),
+                        GeometryType type = GeometryCodes.getWKBGeometryType(geometry);
+                        if (type == GeometryType.MULTICURVE) {
+                            type = GeometryType.GEOMETRYCOLLECTION;
+                        }
+                        TestCase.assertEquals(type,
                                 geometryFromBytes.getGeometryType());
                         validateGeometry(geometryType, geometryFromBytes);
 
@@ -130,7 +135,7 @@ public class FeatureUtils {
                         Geometry geometryFromBytes2 = GeometryReader
                                 .readGeometry(wkbBytes2);
                         TestCase.assertNotNull(geometryFromBytes2);
-                        TestCase.assertEquals(geometry.getGeometryType(),
+                        TestCase.assertEquals(type,
                                 geometryFromBytes2.getGeometryType());
                         validateGeometry(geometryType, geometryFromBytes2);
                     }
