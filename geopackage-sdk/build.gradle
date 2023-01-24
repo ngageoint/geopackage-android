@@ -170,7 +170,7 @@ dependencies {
     }
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:3.0.0'
-    api 'mil.nga:sqlite-android:3400000'
+    api 'mil.nga:sqlite-android:3400100'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
             'mil.nga.geopackage:geopackage-core:6.6.2',
             'ar.com.hjg:pngj:2.1.0',

@@ -26,15 +26,15 @@ import java.util.concurrent.TimeUnit;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
 import mil.nga.geopackage.GeoPackageException;
+import mil.nga.geopackage.TestConstants;
+import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.contents.ContentsDao;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.ResultUtils;
 import mil.nga.geopackage.extension.coverage.CoverageData;
-import mil.nga.geopackage.io.BitmapConverter;
-import mil.nga.geopackage.TestConstants;
-import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.geom.GeoPackageGeometryDataUtils;
+import mil.nga.geopackage.io.BitmapConverter;
 import mil.nga.geopackage.tiles.TileBoundingBoxUtils;
 import mil.nga.geopackage.tiles.TileGrid;
 import mil.nga.geopackage.tiles.matrix.TileMatrix;
@@ -111,7 +111,7 @@ public class TileUtils {
                 TileCursor cursor = dao.queryForAll();
                 int count = cursor.getCount();
                 int manualCount = 0;
-                for(TileRow tileRow: cursor) {
+                for (TileRow tileRow : cursor) {
 
                     validateTileRow(dao, columns, tileRow, manualCount < 5);
 
@@ -585,7 +585,7 @@ public class TileUtils {
                                         updatedLimitedBytes = new byte[tileColumn
                                                 .getMax().intValue()];
                                         ByteBuffer.wrap(updatedBytes, 0,
-                                                tileColumn.getMax().intValue())
+                                                        tileColumn.getMax().intValue())
                                                 .get(updatedLimitedBytes);
                                     } else {
                                         updatedLimitedBytes = updatedBytes;
@@ -1092,12 +1092,12 @@ public class TileUtils {
                                         zoomLevel);
                                 if (tileRow != null) {
                                     count++;
-                                    if(count >= cursorCount){
+                                    if (count >= cursorCount) {
                                         break;
                                     }
                                 }
                             }
-                            if(count >= cursorCount){
+                            if (count >= cursorCount) {
                                 break;
                             }
                         }
@@ -1284,6 +1284,7 @@ public class TileUtils {
     }
 
     static boolean threadedTileDaoError = false;
+    static boolean threadedTileDaoStop = false;
 
     /**
      * Test threaded tile dao
@@ -1307,6 +1308,7 @@ public class TileUtils {
             for (TileMatrixSet tileMatrixSet : results) {
 
                 threadedTileDaoError = false;
+                threadedTileDaoStop = false;
 
                 final String tableName = tileMatrixSet.getTableName();
 
@@ -1317,6 +1319,11 @@ public class TileUtils {
                         for (int i = 0; i < attemptsPerThread; i++) {
 
                             try {
+
+                                if (threadedTileDaoStop) {
+                                    break;
+                                }
+
                                 ContentsDao contentsDao = geoPackage
                                         .getContentsDao();
                                 Contents contents = contentsDao
@@ -1327,12 +1334,17 @@ public class TileUtils {
                                                     + tableName);
                                 }
 
+                                if (threadedTileDaoStop) {
+                                    break;
+                                }
+
                                 TileDao dao = geoPackage.getTileDao(tableName);
                                 if (dao == null) {
                                     throw new Exception(
                                             "Tile DAO was null, table name: "
                                                     + tableName);
                                 }
+
                             } catch (Exception e) {
                                 threadedTileDaoError = true;
                                 e.printStackTrace();
@@ -1351,6 +1363,15 @@ public class TileUtils {
                 executor.shutdown();
                 try {
                     executor.awaitTermination(60, TimeUnit.SECONDS);
+                    threadedTileDaoStop = true;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    TestCase.fail("Waiting for threads terminated: "
+                            + e.getMessage());
+                }
+
+                try {
+                    executor.awaitTermination(10, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     TestCase.fail("Waiting for threads terminated: "

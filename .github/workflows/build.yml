@@ -20,17 +20,19 @@ jobs:
         string: "${{ github.repository }}"
         replace-with: '$1-core-java'
     - name: Checkout Core Repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
       with:
         repository: ${{ steps.core-repository.outputs.replaced }}
         ref: ${{ github.ref }}
+        path: geopackage-core-java
     - name: set up JDK 11
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v3
       with:
+        distribution: 'temurin'
         java-version: 11
     - name: Build & Install Core
-      run: mvn -f ../geopackage-core-java clean install -DskipTests
+      run: mvn -f geopackage-core-java clean install -DskipTests
     - name: Checkout Repository
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
     - name: Build with Gradle
       run: ./gradlew build -x lint
