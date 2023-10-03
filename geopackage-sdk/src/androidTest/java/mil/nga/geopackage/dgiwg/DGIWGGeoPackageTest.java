@@ -267,7 +267,7 @@ public class DGIWGGeoPackageTest extends BaseTestCase {
         final String table = "dgiwg_tiles";
 
         long epsg = 3978;
-        String name = "NAD83 / Canada Atlas Lambert";
+        String name = CoordinateReferenceSystem.epsgURL(epsg);
         CRSType crsType = CRSType.GEOGRAPHIC;
         GeoDatums datum = GeoDatums.NAD83;
         double standardParallel1 = 49;

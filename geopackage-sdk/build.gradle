@@ -8,11 +8,11 @@ archivesBaseName = "geopackage-android"
 version = "6.7.2"
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 33
+        targetSdkVersion 34
         multiDexEnabled true
 
         testApplicationId 'mil.nga.geopackage.test'
@@ -164,7 +164,7 @@ afterEvaluate {
 dependencies {
     api 'androidx.documentfile:documentfile:1.0.1'
     api 'com.j256.ormlite:ormlite-android:6.1'
-    api ('mil.nga.geopackage:geopackage-core:6.6.2'){
+    api ('mil.nga.geopackage:geopackage-core:6.6.4'){
         exclude module: 'ormlite-core'
         exclude group: 'com.j256.ormlite'
     }
@@ -172,7 +172,7 @@ dependencies {
     api 'mil.nga:tiff:3.0.0'
     api 'mil.nga:sqlite-android:3400100'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1',
-            'mil.nga.geopackage:geopackage-core:6.6.2',
+            'mil.nga.geopackage:geopackage-core:6.6.4',
             'ar.com.hjg:pngj:2.1.0',
             'mil.nga:tiff:3.0.0'
     testImplementation 'androidx.multidex:multidex:2.0.1'

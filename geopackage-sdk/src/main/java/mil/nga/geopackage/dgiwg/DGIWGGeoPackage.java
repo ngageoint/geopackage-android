@@ -1,11 +1,15 @@
 package mil.nga.geopackage.dgiwg;
 
+import android.graphics.Bitmap;
+
 import java.util.Collection;
 import java.util.List;
 
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.GeoPackageImpl;
+import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.extension.metadata.Metadata;
 import mil.nga.geopackage.extension.metadata.MetadataScopeType;
 import mil.nga.geopackage.extension.metadata.reference.MetadataReference;
@@ -13,6 +17,9 @@ import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.user.FeatureColumn;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
+import mil.nga.geopackage.tiles.user.TileCursor;
+import mil.nga.geopackage.tiles.user.TileDao;
+import mil.nga.geopackage.tiles.user.TileRow;
 import mil.nga.sf.GeometryType;
 
 /**
@@ -80,6 +87,7 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      */
     public DGIWGValidationErrors validate() {
         errors = DGIWGValidate.validate(this);
+        validate(errors, getTables());
         return errors;
     }
 
@@ -99,7 +107,9 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @return validation errors
      */
     public DGIWGValidationErrors validate(String table) {
-        return DGIWGValidate.validate(this, table);
+        DGIWGValidationErrors errors = DGIWGValidate.validate(this, table);
+        validate(errors, table);
+        return errors;
     }
 
     /**
@@ -109,7 +119,95 @@ public class DGIWGGeoPackage extends GeoPackageImpl {
      * @return validation errors
      */
     public DGIWGValidationErrors validate(List<String> tables) {
-        return DGIWGValidate.validate(this, tables);
+        DGIWGValidationErrors errors = DGIWGValidate.validate(this, tables);
+        validate(errors, tables);
+        return errors;
+    }
+
+    /**
+     * Validate the GeoPackage table names for non core tested requirements
+     *
+     * @param errors
+     *            validation errors
+     * @param tables
+     *            table names
+     */
+    private void validate(DGIWGValidationErrors errors, List<String> tables) {
+        for (String table : tables) {
+            validate(errors, table);
+        }
+    }
+
+    /**
+     * Validate the GeoPackage table name for non core tested requirements
+     *
+     * @param errors
+     *            validation errors
+     * @param table
+     *            table name
+     */
+    private void validate(DGIWGValidationErrors errors, String table) {
+        ContentsDataType dataType = getTableCoreDataType(table);
+        if (dataType != null) {
+            switch (dataType) {
+                case TILES:
+                    validateTileTable(errors, table);
+                    break;
+                default:
+            }
+        }
+    }
+
+    /**
+     * Validate the GeoPackage tile table name for non core tested requirements
+     *
+     * @param errors
+     *            validation errors
+     * @param table
+     *            table name
+     */
+    private void validateTileTable(DGIWGValidationErrors errors, String table) {
+
+        // Validate the size of just the first tile
+        TileDao tileDao = getTileDao(table);
+        TileCursor cursor = tileDao.query();
+        try {
+            if (cursor.moveToNext()) {
+                TileRow tileRow = cursor.getRow();
+                Bitmap tile = tileRow.getTileDataBitmap();
+
+                if (tile == null
+                        || tile.getWidth() != DGIWGConstants.TILE_WIDTH) {
+                    errors.add(new DGIWGValidationError(table,
+                            tileRow.getTileDataColumn().getName(),
+                            tile != null ? tile.getWidth() : null,
+                            "Tile width of " + DGIWGConstants.TILE_WIDTH,
+                            DGIWGRequirement.TILE_SIZE_DATA,
+                            new DGIWGValidationKey(
+                                    tileRow.getPkColumn().getName(),
+                                    tileRow.getId())));
+                }
+
+                if (tile == null
+                        || tile.getHeight() != DGIWGConstants.TILE_HEIGHT) {
+                    errors.add(new DGIWGValidationError(table,
+                            tileRow.getTileDataColumn().getName(),
+                            tile != null ? tile.getHeight() : null,
+                            "Tile height of " + DGIWGConstants.TILE_HEIGHT,
+                            DGIWGRequirement.TILE_SIZE_DATA,
+                            new DGIWGValidationKey(
+                                    tileRow.getPkColumn().getName(),
+                                    tileRow.getId())));
+                }
+            }
+
+        } catch (Exception e) {
+            throw new GeoPackageException(
+                    "Failed to query tile table: " + table, e);
+        } finally {
+            cursor.close();
+        }
+
     }
 
     /**
