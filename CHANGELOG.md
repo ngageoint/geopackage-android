@@ -6,7 +6,11 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.7.2 (TBD)
 
-* TBD
+* compile and target SDK version 34
+* geopackage-core version 6.6.4
+* SQLite Android Bindings version 3430100
+* DGIWG example update for coverage data
+* DGIWG validation of first tile size
 
 ## [6.7.1](https://github.com/ngageoint/geopackage-android/releases/tag/6.7.1) (01-24-2023)
 
