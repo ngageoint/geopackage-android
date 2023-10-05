@@ -46,10 +46,9 @@ android {
         }
     }
 
-    task javadoc(type: Javadoc) {
+    tasks.register('javadoc', Javadoc) {
         title = "$archivesBaseName $version API"
         source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
         classpath += configurations.javadocDeps
         options.source = "11"
         options.links "https://ngageoint.github.io/geopackage-core-java/docs/api/"
@@ -66,17 +65,17 @@ android {
         options.links "https://ormlite.com/javadoc/ormlite-core/"
         options.links "https://ormlite.com/javadoc/ormlite-android/"
         options.links "https://hjg.com.ar/pngj/apidocs/"
-        options.linksOffline "https://d.android.com/reference","${android.sdkDirectory}/docs/reference"
+        options.linksOffline "https://d.android.com/reference", "${android.sdkDirectory}/docs/reference"
         destinationDir = file("../javadoc/")
         failOnError false
     }
 
-    task javadocJar(type: Jar) {
+    tasks.register('javadocJar', Jar) {
         archiveClassifier.set("javadoc")
         from javadoc
     }
 
-    task sourcesJar(type: Jar) {
+    tasks.register('sourcesJar', Jar) {
         archiveClassifier.set("sources")
         from sourceSets.main.java.srcDirs
     }
