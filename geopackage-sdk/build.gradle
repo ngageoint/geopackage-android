@@ -50,6 +50,7 @@ android {
         title = "$archivesBaseName $version API"
         source = android.sourceSets.main.java.srcDirs
         dependsOn("generateDebugRFile")
+        dependsOn("generateReleaseRFile")
         classpath += configurations.javadocDeps
         options.source = "11"
         options.links "https://ngageoint.github.io/geopackage-core-java/docs/api/"
