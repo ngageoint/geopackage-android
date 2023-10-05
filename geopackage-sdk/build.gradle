@@ -8,7 +8,10 @@ archivesBaseName = "geopackage-android"
 version = "6.7.2"
 
 android {
-    compileSdkVersion 34
+    namespace 'mil.nga.geopackage'
+    testNamespace "mil.nga.geopackage.test"
+
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 23

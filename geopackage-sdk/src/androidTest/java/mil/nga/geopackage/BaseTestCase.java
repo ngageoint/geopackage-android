@@ -46,7 +46,7 @@ public abstract class BaseTestCase {
         activity = rule.getActivity();
         testContext = TestUtils.getTestContext(activity);
 
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= 11) {
+        if (Build.VERSION.SDK_INT >= 11) {
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
