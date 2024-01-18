@@ -43,6 +43,9 @@ import mil.nga.geopackage.tiles.matrix.TileMatrixKey;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.user.ColumnValue;
+import mil.nga.geopackage.user.custom.UserCustomCursor;
+import mil.nga.geopackage.user.custom.UserCustomDao;
+import mil.nga.geopackage.user.custom.UserCustomRow;
 import mil.nga.proj.ProjectionConstants;
 import mil.nga.proj.ProjectionFactory;
 
@@ -1385,6 +1388,235 @@ public class TileUtils {
             }
 
         }
+    }
+
+    /**
+     * Test bounds query on any table as a user custom dao
+     *
+     * @param geoPackage
+     *            GeoPackage
+     * @throws SQLException
+     *             upon error
+     */
+    public static void testBoundsQuery(GeoPackage geoPackage)
+            throws SQLException {
+
+        TileMatrixSetDao tileMatrixSetDao = geoPackage.getTileMatrixSetDao();
+
+        if (tileMatrixSetDao.isTableExists()) {
+
+            UserCustomDao dao = geoPackage
+                    .getUserCustomDao(TileMatrixSet.TABLE_NAME);
+
+            List<TileMatrixSet> tileMatrixSets = tileMatrixSetDao.queryForAll();
+
+            for (TileMatrixSet tileMatrixSet : tileMatrixSets) {
+
+                String tableName = tileMatrixSet.getTableName();
+
+                final BoundingBox boundingBox = tileMatrixSet.getBoundingBox();
+
+                UserCustomCursor results = query(dao, boundingBox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                double midLon = boundingBox.getMinLongitude()
+                        + ((boundingBox.getMaxLongitude()
+                        - boundingBox.getMinLongitude()) / 2.0);
+                double midLat = boundingBox.getMinLatitude()
+                        + ((boundingBox.getMaxLatitude()
+                        - boundingBox.getMinLatitude()) / 2.0);
+
+                BoundingBox bbox = boundingBox.copy();
+                bbox.setMaxLongitude(midLon);
+                bbox.setMaxLatitude(midLat);
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(midLon);
+                bbox.setMinLatitude(midLat);
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(midLon - 0.000001);
+                bbox.setMinLatitude(midLat - 0.000001);
+                bbox.setMaxLongitude(midLon + 0.000001);
+                bbox.setMaxLatitude(midLat + 0.000001);
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(midLon);
+                bbox.setMinLatitude(boundingBox.getMinLatitude() - 0.000001);
+                bbox.setMaxLongitude(boundingBox.getMaxLongitude() + 0.000001);
+                bbox.setMaxLatitude(midLat);
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(boundingBox.getMinLongitude() - 0.000001);
+                bbox.setMinLatitude(midLat);
+                bbox.setMaxLongitude(midLon);
+                bbox.setMaxLatitude(boundingBox.getMaxLatitude() + 0.000001);
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLatitude(boundingBox.getMaxLatitude());
+                bbox.setMaxLatitude(boundingBox.getMaxLatitude() + 0.000001);
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLatitude(boundingBox.getMaxLatitude() + 0.000001);
+                bbox.setMaxLatitude(boundingBox.getMaxLatitude() + 1.0);
+
+                results = query(dao, bbox);
+                TestCase.assertFalse(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(boundingBox.getMinLongitude() - 0.000001);
+                bbox.setMaxLongitude(boundingBox.getMinLongitude());
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(boundingBox.getMinLongitude() - 1.0);
+                bbox.setMaxLongitude(boundingBox.getMinLongitude() - 0.000001);
+
+                results = query(dao, bbox);
+                TestCase.assertFalse(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(boundingBox.getMinLongitude() - 0.000001);
+                bbox.setMinLatitude(boundingBox.getMinLatitude() - 0.000001);
+                bbox.setMaxLongitude(boundingBox.getMaxLongitude() + 0.000001);
+                bbox.setMaxLatitude(boundingBox.getMaxLatitude() + 0.000001);
+
+                results = query(dao, bbox);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(midLon - 0.000001);
+                bbox.setMinLatitude(boundingBox.getMaxLatitude() + 0.000001);
+                bbox.setMaxLongitude(midLon + 0.000001);
+                bbox.setMaxLatitude(boundingBox.getMaxLatitude() + 1.0);
+
+                results = query(dao, bbox);
+                TestCase.assertFalse(contains(results, tableName));
+
+                results = query(dao, bbox, null, 0.000001);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(boundingBox.getMinLongitude() - 1.0);
+                bbox.setMinLatitude(midLat - 0.000001);
+                bbox.setMaxLongitude(boundingBox.getMinLongitude() - 0.000001);
+                bbox.setMaxLatitude(midLat + 0.000001);
+
+                results = query(dao, bbox);
+                TestCase.assertFalse(contains(results, tableName));
+
+                results = query(dao, bbox, 0.000001, null);
+                TestCase.assertTrue(contains(results, tableName));
+
+                bbox = boundingBox.copy();
+                bbox.setMinLongitude(boundingBox.getMinLongitude() - 2.0);
+                bbox.setMinLatitude(boundingBox.getMaxLatitude() + 1.0);
+                bbox.setMaxLongitude(boundingBox.getMinLongitude() - 1.0);
+                bbox.setMaxLatitude(boundingBox.getMaxLatitude() + 2.0);
+
+                results = query(dao, bbox);
+                TestCase.assertFalse(contains(results, tableName));
+
+                results = query(dao, bbox, null, 1.0);
+                TestCase.assertFalse(contains(results, tableName));
+
+                results = query(dao, bbox, 1.0, null);
+                TestCase.assertFalse(contains(results, tableName));
+
+                results = query(dao, bbox, 1.0, 1.0);
+                TestCase.assertTrue(contains(results, tableName));
+
+            }
+        }
+
+    }
+
+    /**
+     * Query for the bounding box
+     *
+     * @param dao
+     *            data access object
+     * @param boundingBox
+     *            bounding box
+     * @return results
+     */
+    private static UserCustomCursor query(UserCustomDao dao,
+                                             BoundingBox boundingBox) {
+        return query(dao, boundingBox, null, null);
+    }
+
+    /**
+     * Query for the bounding box
+     *
+     * @param dao
+     *            data access object
+     * @param boundingBox
+     *            bounding box
+     * @param lonTolerance
+     *            longitude tolerance
+     * @param latTolerance
+     *            latitude tolerance
+     * @return results
+     */
+    private static UserCustomCursor query(UserCustomDao dao,
+                                             BoundingBox boundingBox, Double lonTolerance, Double latTolerance) {
+
+        String where = dao.buildWhere(TileMatrixSet.COLUMN_MIN_X,
+                TileMatrixSet.COLUMN_MIN_Y, TileMatrixSet.COLUMN_MAX_X,
+                TileMatrixSet.COLUMN_MAX_Y, boundingBox);
+        String[] args = dao.buildWhereArgs(boundingBox, lonTolerance,
+                latTolerance);
+
+        return dao.query(where, args);
+    }
+
+    /**
+     * Check if the table name was found in the results
+     *
+     * @param results
+     *            results
+     * @param tableName
+     *            table name
+     * @return true if in results
+     */
+    private static boolean contains(UserCustomCursor results,
+                                    String tableName) {
+
+        boolean found = false;
+
+        try {
+            for (UserCustomRow row : results) {
+                if (row.getValue(TileMatrixSet.COLUMN_TABLE_NAME)
+                        .equals(tableName)) {
+                    found = true;
+                    break;
+                }
+            }
+        } finally {
+            results.close();
+        }
+
+        return found;
     }
 
 }

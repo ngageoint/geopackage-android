@@ -118,4 +118,16 @@ public class TileExternalTest extends ExternalGeoPackageTestCase {
 
     }
 
+    /**
+     * Test bounds query on any table as a user custom dao
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void testBoundsQuery() throws SQLException {
+
+        TileUtils.testBoundsQuery(geoPackage);
+
+    }
+
 }
