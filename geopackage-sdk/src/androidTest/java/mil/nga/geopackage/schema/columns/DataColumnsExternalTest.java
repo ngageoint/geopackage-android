@@ -68,4 +68,28 @@ public class DataColumnsExternalTest extends ExternalGeoPackageTestCase {
 
     }
 
+    /**
+     * Test create column titles
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void testColumnTitles() throws SQLException {
+
+        DataColumnsUtils.testColumnTitles(geoPackage);
+
+    }
+
+    /**
+     * Test save and load schema
+     *
+     * @throws SQLException
+     */
+    @Test
+    public void testSaveLoadSchema() throws SQLException {
+
+        DataColumnsUtils.testSaveLoadSchema(geoPackage);
+
+    }
+
 }

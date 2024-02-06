@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackage;
+import mil.nga.geopackage.GeoPackageTestUtils;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.contents.ContentsDao;
 import mil.nga.geopackage.contents.ContentsDataType;
@@ -25,11 +27,16 @@ import mil.nga.geopackage.extension.schema.columns.DataColumnsDao;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraintType;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraints;
 import mil.nga.geopackage.extension.schema.constraints.DataColumnConstraintsDao;
+import mil.nga.geopackage.features.columns.GeometryColumns;
+import mil.nga.geopackage.features.user.FeatureColumn;
+import mil.nga.geopackage.features.user.FeatureTable;
+import mil.nga.geopackage.features.user.FeatureTableMetadata;
 import mil.nga.geopackage.srs.SpatialReferenceSystem;
 import mil.nga.geopackage.srs.SpatialReferenceSystemDao;
 import mil.nga.geopackage.TestConstants;
 import mil.nga.geopackage.TestUtils;
 import mil.nga.geopackage.tiles.user.TileTable;
+import mil.nga.proj.ProjectionConstants;
 import mil.nga.sf.GeometryType;
 
 /**
@@ -445,6 +452,151 @@ public class DataColumnsUtils {
                 }
             }
         }
+    }
+
+    /**
+     * Test create column titles
+     *
+     * @param geoPackage
+     * @throws SQLException
+     */
+    public static void testColumnTitles(GeoPackage geoPackage)
+            throws SQLException {
+
+        SpatialReferenceSystemDao srsDao = geoPackage
+                .getSpatialReferenceSystemDao();
+        SpatialReferenceSystem srs = srsDao.getOrCreateFromEpsg(
+                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
+        SchemaExtension schemaExtension = new SchemaExtension(geoPackage);
+        schemaExtension.createDataColumnsTable();
+        DataColumnsDao dao = schemaExtension.getDataColumnsDao();
+        TestCase.assertTrue(dao.isTableExists());
+
+        long count = dao.countOf();
+
+        List<FeatureColumn> columns = GeoPackageTestUtils.getFeatureColumns();
+
+        GeometryColumns geometryColumns = new GeometryColumns();
+        geometryColumns.setId(new TableColumnKey("features", "geom"));
+        geometryColumns.setGeometryType(GeometryType.GEOMETRY);
+        geometryColumns.setZ((byte) 0);
+        geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
+
+        BoundingBox boundingBox = BoundingBox.worldWGS84();
+        FeatureTableMetadata metadata = FeatureTableMetadata
+                .create(geometryColumns, columns, boundingBox);
+        FeatureTable table = geoPackage.createFeatureTable(metadata);
+        Contents contents = table.getContents();
+
+        for (FeatureColumn column : columns) {
+            DataColumns dataColumns = new DataColumns();
+            dataColumns.setContents(contents);
+            dataColumns.setColumnName(column.getName());
+            dataColumns.setName(column.getName() + " title");
+            dataColumns.setTitle(column.getName() + " title");
+            dao.create(dataColumns);
+        }
+
+        long newCount = dao.countOf();
+        TestCase.assertEquals(count + columns.size(), newCount);
+
+        for (FeatureColumn column : columns) {
+
+            DataColumns dataColumns = dao.getDataColumn(table.getTableName(),
+                    column.getName());
+            TestCase.assertEquals(column.getName() + " title",
+                    dataColumns.getName());
+            TestCase.assertEquals(column.getName() + " title",
+                    dataColumns.getTitle());
+
+        }
+
+    }
+
+    /**
+     * Test save and load schema
+     *
+     * @param geoPackage
+     * @throws SQLException
+     */
+    public static void testSaveLoadSchema(GeoPackage geoPackage)
+            throws SQLException {
+
+        SpatialReferenceSystemDao srsDao = geoPackage
+                .getSpatialReferenceSystemDao();
+        SpatialReferenceSystem srs = srsDao.getOrCreateFromEpsg(
+                ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
+
+        SchemaExtension schemaExtension = new SchemaExtension(geoPackage);
+        schemaExtension.createDataColumnsTable();
+        DataColumnsDao dao = schemaExtension.getDataColumnsDao();
+        TestCase.assertTrue(dao.isTableExists());
+
+        long count = dao.countOf();
+
+        List<FeatureColumn> columns = GeoPackageTestUtils.getFeatureColumns();
+        for (FeatureColumn column : columns) {
+            DataColumns dataColumns = new DataColumns();
+            dataColumns.setName(column.getName() + " title");
+            dataColumns.setTitle(column.getName() + " title");
+            column.setSchema(dataColumns);
+        }
+
+        GeometryColumns geometryColumns = new GeometryColumns();
+        geometryColumns.setId(new TableColumnKey("features", "geom"));
+        geometryColumns.setGeometryType(GeometryType.GEOMETRY);
+        geometryColumns.setZ((byte) 0);
+        geometryColumns.setM((byte) 0);
+        geometryColumns.setSrs(srs);
+
+        BoundingBox boundingBox = BoundingBox.worldWGS84();
+        FeatureTableMetadata metadata = FeatureTableMetadata
+                .create(geometryColumns, columns, boundingBox);
+        FeatureTable table = geoPackage.createFeatureTable(metadata);
+
+        dao.saveSchema(table);
+
+        long newCount = dao.countOf();
+        TestCase.assertEquals(count + columns.size(), newCount);
+
+        for (FeatureColumn column : columns) {
+
+            DataColumns dataColumns = dao.getDataColumn(table.getTableName(),
+                    column.getName());
+            TestCase.assertEquals(column.getName() + " title",
+                    dataColumns.getName());
+            TestCase.assertEquals(column.getName() + " title",
+                    dataColumns.getTitle());
+
+        }
+
+        FeatureTable table2 = geoPackage.getFeatureDao(table.getTableName())
+                .getTable();
+
+        for (FeatureColumn column : table2.getColumns()) {
+            TestCase.assertNull(column.getSchema());
+        }
+
+        dao.loadSchema(table2);
+
+        for (FeatureColumn column : columns) {
+            FeatureColumn column2 = table2.getColumn(column.getName());
+            DataColumns schema = column2.getSchema();
+            TestCase.assertNotNull(schema);
+            TestCase.assertEquals(column.getName() + " title",
+                    schema.getName());
+            TestCase.assertEquals(column.getName() + " title",
+                    schema.getTitle());
+            DataColumns schema2 = dao.getSchema(table.getTableName(),
+                    column.getName());
+            TestCase.assertEquals(column.getName() + " title",
+                    schema2.getName());
+            TestCase.assertEquals(column.getName() + " title",
+                    schema2.getTitle());
+        }
+
     }
 
 }
