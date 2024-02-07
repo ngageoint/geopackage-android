@@ -530,11 +530,10 @@ public class DataColumnsUtils {
                 ProjectionConstants.EPSG_WORLD_GEODETIC_SYSTEM);
 
         SchemaExtension schemaExtension = new SchemaExtension(geoPackage);
-        schemaExtension.createDataColumnsTable();
-        DataColumnsDao dao = schemaExtension.getDataColumnsDao();
-        TestCase.assertTrue(dao.isTableExists());
+        schemaExtension.removeExtension();
 
-        long count = dao.countOf();
+        DataColumnsDao dao = schemaExtension.getDataColumnsDao();
+        TestCase.assertFalse(dao.isTableExists());
 
         List<FeatureColumn> columns = GeoPackageTestUtils.getFeatureColumns();
         for (FeatureColumn column : columns) {
@@ -556,10 +555,9 @@ public class DataColumnsUtils {
                 .create(geometryColumns, columns, boundingBox);
         FeatureTable table = geoPackage.createFeatureTable(metadata);
 
-        dao.saveSchema(table);
-
+        TestCase.assertTrue(dao.isTableExists());
         long newCount = dao.countOf();
-        TestCase.assertEquals(count + columns.size(), newCount);
+        TestCase.assertEquals(columns.size(), newCount);
 
         for (FeatureColumn column : columns) {
 
