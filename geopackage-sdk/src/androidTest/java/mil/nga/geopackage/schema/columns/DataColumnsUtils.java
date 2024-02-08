@@ -573,12 +573,6 @@ public class DataColumnsUtils {
         FeatureTable table2 = geoPackage.getFeatureDao(table.getTableName())
                 .getTable();
 
-        for (FeatureColumn column : table2.getColumns()) {
-            TestCase.assertNull(column.getSchema());
-        }
-
-        dao.loadSchema(table2);
-
         for (FeatureColumn column : columns) {
             FeatureColumn column2 = table2.getColumn(column.getName());
             DataColumns schema = column2.getSchema();
