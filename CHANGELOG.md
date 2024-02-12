@@ -7,6 +7,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 6.7.4 (TBD)
 
 * geopackage-core version 6.6.7
+* Ignored internal databases support for non GeoPackages (preconfigured to ignore ue3.db for Google Maps)
 
 ## [6.7.3](https://github.com/ngageoint/geopackage-android/releases/tag/6.7.3) (11-30-2023)
 

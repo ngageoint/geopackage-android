@@ -878,6 +878,39 @@ public interface GeoPackageManager {
     public void setSqliteWriteAheadLogging(boolean enabled);
 
     /**
+     * Get the ignored internal databases
+     *
+     * @return databases
+     * @since 6.7.4
+     */
+    public Set<String> getIgnoredInternals();
+
+    /**
+     * Is the database an ignored internal database by name
+     *
+     * @param database database name
+     * @return true if ignored
+     * @since 6.7.4
+     */
+    public boolean isIgnoredInternal(String database);
+
+    /**
+     * Ignore an internal database by name
+     *
+     * @param database database name
+     * @since 6.7.4
+     */
+    public void ignoreInternal(String database);
+
+    /**
+     * Do not ignore an internal database by name
+     *
+     * @param database database name
+     * @since 6.7.4
+     */
+    public void includeInternal(String database);
+
+    /**
      * Validate the database header and integrity.
      *
      * @param database database name

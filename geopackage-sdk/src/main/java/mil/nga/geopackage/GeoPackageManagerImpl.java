@@ -26,6 +26,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -83,6 +84,11 @@ public class GeoPackageManagerImpl implements GeoPackageManager {
     private boolean sqliteWriteAheadLogging = false;
 
     /**
+     * Ignore internal database names
+     */
+    private Set<String> ignoredInternals = new HashSet<>();
+
+    /**
      * Constructor
      *
      * @param context context
@@ -97,6 +103,11 @@ public class GeoPackageManagerImpl implements GeoPackageManager {
             openHeaderValidation = resources.getBoolean(R.bool.manager_validation_open_header);
             openIntegrityValidation = resources.getBoolean(R.bool.manager_validation_open_integrity);
             sqliteWriteAheadLogging = resources.getBoolean(R.bool.sqlite_write_ahead_logging);
+
+            ignoreInternal(GeoPackageMetadataDb.DATABASE_NAME);
+            for (String database: resources.getStringArray(R.array.geopackage_ignored_internals)) {
+                ignoreInternal(database);
+            }
         }
     }
 
@@ -1248,6 +1259,34 @@ public class GeoPackageManagerImpl implements GeoPackageManager {
     /**
      * {@inheritDoc}
      */
+    public Set<String> getIgnoredInternals(){
+        return Collections.unmodifiableSet(ignoredInternals);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isIgnoredInternal(String database){
+        return ignoredInternals.contains(database.toLowerCase());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void ignoreInternal(String database){
+        ignoredInternals.add(database.toLowerCase());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void includeInternal(String database){
+        ignoredInternals.remove(database.toLowerCase());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean validate(String database) {
         return isValid(database, true, true);
@@ -1544,8 +1583,7 @@ public class GeoPackageManagerImpl implements GeoPackageManager {
         String[] databaseArray = getRequiredContext().databaseList();
         for (String database : databaseArray) {
             if (!isTemporary(database)
-                    && !database
-                    .equalsIgnoreCase(GeoPackageMetadataDb.DATABASE_NAME)) {
+                    && !isIgnoredInternal(database)) {
                 databases.add(database);
             }
         }

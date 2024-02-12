@@ -6,6 +6,10 @@
     <string name="geopackage_db_write_ahead_log_suffix">-wal</string>
     <string name="geopackage_db_shared_memory_suffix">-shm</string>
 
+    <array name="geopackage_ignored_internals">
+        <item>ue3.db</item>
+    </array>
+
     <string name="tile_generator_variable_z">\\{z\\}</string>
     <string name="tile_generator_variable_x">\\{x\\}</string>
     <string name="tile_generator_variable_y">\\{y\\}</string>
