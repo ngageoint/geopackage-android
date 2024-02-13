@@ -12,15 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import mil.nga.geopackage.BoundingBox;
-import mil.nga.geopackage.GeoPackage;
-import mil.nga.geopackage.GeoPackageFactory;
-import mil.nga.geopackage.GeoPackageManager;
+import mil.nga.geopackage.attributes.AttributesDao;
 import mil.nga.geopackage.contents.Contents;
 import mil.nga.geopackage.contents.ContentsDao;
 import mil.nga.geopackage.contents.ContentsDataType;
 import mil.nga.geopackage.db.GeoPackageDataType;
 import mil.nga.geopackage.db.TableColumnKey;
+import mil.nga.geopackage.db.table.TableInfo;
 import mil.nga.geopackage.extension.coverage.CoverageData;
 import mil.nga.geopackage.features.columns.GeometryColumns;
 import mil.nga.geopackage.features.columns.GeometryColumnsDao;
@@ -35,6 +33,8 @@ import mil.nga.geopackage.tiles.matrix.TileMatrixDao;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSet;
 import mil.nga.geopackage.tiles.matrixset.TileMatrixSetDao;
 import mil.nga.geopackage.tiles.user.TileDao;
+import mil.nga.geopackage.user.UserDao;
+import mil.nga.geopackage.user.custom.UserCustomDao;
 import mil.nga.proj.Projection;
 import mil.nga.proj.ProjectionConstants;
 import mil.nga.proj.ProjectionFactory;
@@ -705,6 +705,54 @@ public class GeoPackageTestUtils {
             }
 
             previousType = type;
+        }
+
+    }
+
+    /**
+     * Test user daos
+     *
+     * @param geoPackage
+     *            GeoPackage
+     * @throws SQLException
+     *             upon error
+     */
+    public static void testUserDao(GeoPackage geoPackage) throws SQLException {
+
+        List<String> tables = geoPackage.getTables();
+        for (String table : tables) {
+            UserDao<?, ?, ?, ?> dao = geoPackage.getUserDao(table);
+            TestCase.assertNotNull(dao);
+            ContentsDataType dataType = geoPackage.getTableCoreDataType(table);
+            TableInfo tableInfo = TableInfo.info(geoPackage.getConnection(),
+                    table);
+            TestCase.assertEquals(tableInfo.numColumns(), dao.columnCount());
+            Contents contents = dao.getContents();
+            TestCase.assertNotNull(contents);
+            if (dataType == null) {
+                TestCase.assertTrue(dao instanceof UserCustomDao);
+                TestCase.assertNotNull(contents.getDataTypeName());
+            } else {
+                switch (dataType) {
+                    case ATTRIBUTES:
+                        TestCase.assertTrue(dao instanceof AttributesDao);
+                        TestCase.assertEquals(ContentsDataType.ATTRIBUTES,
+                                contents.getDataType());
+                        break;
+                    case FEATURES:
+                        TestCase.assertTrue(dao instanceof FeatureDao);
+                        TestCase.assertEquals(ContentsDataType.FEATURES,
+                                contents.getDataType());
+                        break;
+                    case TILES:
+                        TestCase.assertTrue(dao instanceof TileDao);
+                        TestCase.assertEquals(ContentsDataType.TILES,
+                                contents.getDataType());
+                        break;
+                    default:
+                        TestCase.fail("Unsupported data type: " + dataType);
+                }
+            }
         }
 
     }

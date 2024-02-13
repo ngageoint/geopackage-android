@@ -121,4 +121,17 @@ public class GeoPackageCreateTest extends CreateGeoPackageTestCase {
 
 	}
 
+	/**
+	 * Test user daos
+	 *
+	 * @throws SQLException
+	 *             upon error
+	 */
+	@Test
+	public void testUserDao() throws SQLException {
+
+		GeoPackageTestUtils.testUserDao(geoPackage);
+
+	}
+
 }
