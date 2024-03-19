@@ -10,6 +10,7 @@ import mil.nga.geopackage.features.index.FeatureIndexManager;
 import mil.nga.proj.Projection;
 import mil.nga.proj.ProjectionTransform;
 import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.proj.ProjectionGeometryUtils;
 
 /**
  * Performs manual brute force queries against feature rows. See
@@ -36,12 +37,29 @@ public class ManualFeatureQuery {
     protected double tolerance = .00000000000001;
 
     /**
+     * Index geometries using geodesic lines
+     */
+    private boolean geodesic = false;
+
+    /**
      * Constructor
      *
      * @param featureDao feature DAO
      */
     public ManualFeatureQuery(FeatureDao featureDao) {
+        this(featureDao, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param featureDao feature DAO
+     * @param geodesic index using geodesic bounds
+     * @since 6.7.4
+     */
+    public ManualFeatureQuery(FeatureDao featureDao, boolean geodesic) {
         this.featureDao = featureDao;
+        this.geodesic = geodesic;
     }
 
     /**
@@ -87,6 +105,27 @@ public class ManualFeatureQuery {
      */
     public void setTolerance(double tolerance) {
         this.tolerance = tolerance;
+    }
+
+    /**
+     * Geometries indexed using geodesic lines
+     *
+     * @return geodesic flag
+     * @since 6.7.4
+     */
+    public boolean isGeodesic() {
+        return geodesic;
+    }
+
+    /**
+     * Set the geodestic flag, true to index geodesic geometries
+     *
+     * @param geodesic
+     *            index geodesic geometries flag
+     * @since 6.7.4
+     */
+    public void setGeodesic(boolean geodesic) {
+        this.geodesic = geodesic;
     }
 
     /**
@@ -478,6 +517,12 @@ public class ManualFeatureQuery {
                     GeometryEnvelope featureEnvelope = featureRow
                             .getGeometryEnvelope();
                     if (featureEnvelope != null) {
+
+                        if (geodesic) {
+                            featureEnvelope = ProjectionGeometryUtils
+                                    .geodesicEnvelope(featureEnvelope,
+                                            featureDao.getProjection());
+                        }
 
                         if (envelope == null) {
                             envelope = featureEnvelope;
@@ -1763,6 +1808,11 @@ public class ManualFeatureQuery {
                             .getGeometryEnvelope();
                     if (envelope != null) {
 
+                        if (geodesic) {
+                            envelope = ProjectionGeometryUtils.geodesicEnvelope(
+                                    envelope, featureDao.getProjection());
+                        }
+
                         double minXMax = Math.max(minX, envelope.getMinX());
                         double maxXMin = Math.min(maxX, envelope.getMaxX());
                         double minYMax = Math.max(minY, envelope.getMinY());
@@ -2897,6 +2947,11 @@ public class ManualFeatureQuery {
                     GeometryEnvelope envelope = featureRow
                             .getGeometryEnvelope();
                     if (envelope != null) {
+
+                        if (geodesic) {
+                            envelope = ProjectionGeometryUtils.geodesicEnvelope(
+                                    envelope, featureDao.getProjection());
+                        }
 
                         double minXMax = Math.max(minX, envelope.getMinX());
                         double maxXMin = Math.min(maxX, envelope.getMaxX());

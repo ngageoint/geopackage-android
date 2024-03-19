@@ -29,11 +29,13 @@ public class RTreeIndexExtensionUtils {
      * Test RTree
      *
      * @param geoPackage GeoPackage
+     * @param geodesic index using geodesic bounds
      * @throws SQLException upon error
      */
-    public static void testRTree(GeoPackage geoPackage) throws SQLException {
+    public static void testRTree(GeoPackage geoPackage, boolean geodesic) throws SQLException {
 
-        RTreeIndexExtension extension = new RTreeIndexExtension(geoPackage);
+        RTreeIndexExtension extension = new RTreeIndexExtension(geoPackage,
+                geodesic);
 
         List<String> featureTables = geoPackage.getFeatureTables();
         for (String featureTable : featureTables) {

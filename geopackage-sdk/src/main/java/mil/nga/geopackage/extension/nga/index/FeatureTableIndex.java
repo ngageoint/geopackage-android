@@ -50,8 +50,21 @@ public class FeatureTableIndex extends FeatureTableCoreIndex {
      * @param featureDao feature dao
      */
     public FeatureTableIndex(GeoPackage geoPackage, FeatureDao featureDao) {
+        this(geoPackage, featureDao, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param geodesic index using geodesic bounds
+     * @since 6.7.4
+     */
+    public FeatureTableIndex(GeoPackage geoPackage, FeatureDao featureDao,
+                             boolean geodesic) {
         super(geoPackage, featureDao.getTableName(), featureDao
-                .getGeometryColumnName());
+                .getGeometryColumnName(), geodesic);
         this.featureDao = featureDao;
     }
 

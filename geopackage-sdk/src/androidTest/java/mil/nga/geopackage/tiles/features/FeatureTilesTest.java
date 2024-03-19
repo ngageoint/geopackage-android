@@ -37,7 +37,17 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
      */
     @Test
     public void testFeatureTiles() throws SQLException {
-        testFeatureTiles(false);
+        testFeatureTiles(false, false);
+    }
+
+    /**
+     * Test feature tiles
+     *
+     * @throws java.sql.SQLException
+     */
+    @Test
+    public void testFeatureTilesWithGeodesic() throws SQLException {
+        testFeatureTiles(false, true);
     }
 
     /**
@@ -47,7 +57,7 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
      */
     @Test
     public void testFeatureTilesWithIcon() throws SQLException {
-        testFeatureTiles(true);
+        testFeatureTiles(true, false);
     }
 
     /**
@@ -55,23 +65,37 @@ public class FeatureTilesTest extends CreateGeoPackageTestCase {
      *
      * @throws java.sql.SQLException
      */
-    public void testFeatureTiles(boolean useIcon) throws SQLException {
+    @Test
+    public void testFeatureTilesWithIconGeodesic() throws SQLException {
+        testFeatureTiles(true, true);
+    }
+
+    /**
+     * Test feature tiles
+     *
+     * @param useIcon true to use an icon instead of the default point
+     * @param geodesic draw geometries using geodesic lines
+     * @throws java.sql.SQLException
+     */
+    public void testFeatureTiles(boolean useIcon, boolean geodesic) throws SQLException {
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
 
         int num = FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
-        FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(activity, geoPackage, featureDao, useIcon);
+        FeatureTiles featureTiles = FeatureTileUtils
+                .createFeatureTiles(activity, geoPackage, featureDao, useIcon, geodesic);
 
         try {
-            FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
+            FeatureIndexer indexer = new FeatureIndexer(activity, featureDao, geodesic);
             try {
                 indexer.index();
             } finally {
                 indexer.close();
             }
 
-            FeatureIndexManager indexManager = new FeatureIndexManager(activity, geoPackage, featureDao);
+            FeatureIndexManager indexManager = new FeatureIndexManager(activity,
+                    geoPackage, featureDao, geodesic);
             featureTiles.setIndexManager(indexManager);
 
             indexManager.setIndexLocation(FeatureIndexType.GEOPACKAGE);

@@ -7,7 +7,9 @@ import android.database.DatabaseUtils;
 import mil.nga.geopackage.BoundingBox;
 import mil.nga.geopackage.GeoPackageException;
 import mil.nga.geopackage.db.GeoPackageDatabase;
+import mil.nga.proj.Projection;
 import mil.nga.sf.GeometryEnvelope;
+import mil.nga.sf.proj.ProjectionGeometryUtils;
 
 /**
  * Table metadata Data Source
@@ -25,6 +27,15 @@ public class GeometryMetadataDataSource {
      * Query range tolerance
      */
     protected double tolerance = .00000000000001;
+    /**
+     * Index geometries using geodesic lines
+     */
+    private boolean geodesic = false;
+
+    /**
+     * Features projection
+     */
+    private Projection projection;
 
     /**
      * Constructor
@@ -33,6 +44,20 @@ public class GeometryMetadataDataSource {
      */
     public GeometryMetadataDataSource(GeoPackageMetadataDb db) {
         this.db = db.getDb();
+    }
+
+    /**
+     * Constructor
+     *
+     * @param db metadata db
+     * @param geodesic    index geodesic geometries flag
+     * @param projection  feature projection
+     * @since 6.7.4
+     */
+    public GeometryMetadataDataSource(GeoPackageMetadataDb db, boolean geodesic, Projection projection) {
+        this(db);
+        this.geodesic = geodesic;
+        this.projection = projection;
     }
 
     /**
@@ -60,6 +85,45 @@ public class GeometryMetadataDataSource {
      */
     public void setTolerance(double tolerance) {
         this.tolerance = tolerance;
+    }
+
+    /**
+     * Geometries indexed using geodesic lines
+     *
+     * @return geodesic flag
+     * @since 6.7.4
+     */
+    public boolean isGeodesic() {
+        return geodesic;
+    }
+
+    /**
+     * Set the geodestic flag, true to index geodesic geometries
+     *
+     * @param geodesic
+     *            index geodesic geometries flag
+     * @since 6.7.4
+     */
+    public void setGeodesic(boolean geodesic) {
+        this.geodesic = geodesic;
+    }
+
+    /**
+     * Get the feature projection
+     * @return projection
+     * @since 6.7.4
+     */
+    public Projection getProjection(){
+        return projection;
+    }
+
+    /**
+     * Set the feature projection
+     * @param projection projection
+     * @since 6.7.4
+     */
+    public void setProjection(Projection projection){
+        this.projection = projection;
     }
 
     /**
@@ -814,6 +878,11 @@ public class GeometryMetadataDataSource {
         }
         if (envelope.hasM()) {
             args += 2;
+        }
+
+        if (geodesic) {
+            envelope = ProjectionGeometryUtils.geodesicEnvelope(
+                    envelope, projection);
         }
 
         double minX = envelope.getMinX() - tolerance;

@@ -48,12 +48,32 @@ public class FeatureIndexerTest extends CreateGeoPackageTestCase {
      */
     @Test
     public void testIndexer() throws SQLException {
+        testIndexer(false);
+    }
+
+    /**
+     * Test indexer
+     *
+     * @throws java.sql.SQLException
+     */
+    @Test
+    public void testIndexerGeodesic() throws SQLException {
+        testIndexer(true);
+    }
+
+    /**
+     * Test indexer
+     *
+     * @param geodesic index using geodesic bounds
+     * @throws java.sql.SQLException
+     */
+    private void testIndexer(boolean geodesic) throws SQLException {
 
         FeatureDao featureDao = FeatureTileUtils.createFeatureDao(geoPackage);
 
         int initialFeatures = FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
-        FeatureIndexer indexer = new FeatureIndexer(activity, featureDao);
+        FeatureIndexer indexer = new FeatureIndexer(activity, featureDao, geodesic);
 
         GeoPackageMetadataDb db = new GeoPackageMetadataDb(activity);
         db.open();

@@ -44,6 +44,7 @@ import mil.nga.proj.ProjectionTransform;
 import mil.nga.sf.GeometryType;
 import mil.nga.sf.Point;
 import mil.nga.sf.proj.GeometryTransform;
+import mil.nga.sf.proj.ProjectionGeometryUtils;
 import mil.nga.sf.util.GeometryUtils;
 
 /**
@@ -197,6 +198,11 @@ public abstract class FeatureTiles {
     protected boolean simplifyGeometries = true;
 
     /**
+     * Draw geometries using geodesic lines
+     */
+    protected boolean geodesic = false;
+
+    /**
      * Tile density based upon the device-independent pixels {@link TileUtils#TILE_DP}
      */
     protected float density = 1.0f;
@@ -208,7 +214,19 @@ public abstract class FeatureTiles {
      * @param featureDao feature dao
      */
     public FeatureTiles(Context context, FeatureDao featureDao) {
-        this(context, null, featureDao);
+        this(context, featureDao, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public FeatureTiles(Context context, FeatureDao featureDao, boolean geodesic) {
+        this(context, null, featureDao, geodesic);
     }
 
     /**
@@ -220,7 +238,20 @@ public abstract class FeatureTiles {
      * @since 3.2.0
      */
     public FeatureTiles(Context context, FeatureDao featureDao, float density) {
-        this(context, null, featureDao, density);
+        this(context, featureDao, density, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public FeatureTiles(Context context, FeatureDao featureDao, float density, boolean geodesic) {
+        this(context, null, featureDao, density, geodesic);
     }
 
     /**
@@ -233,7 +264,22 @@ public abstract class FeatureTiles {
      * @since 3.2.0
      */
     public FeatureTiles(Context context, FeatureDao featureDao, int width, int height) {
-        this(context, null, featureDao, width, height);
+        this(context, featureDao, width, height, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public FeatureTiles(Context context, FeatureDao featureDao, int width, int height,
+                        boolean geodesic) {
+        this(context, null, featureDao, width, height, geodesic);
     }
 
     /**
@@ -245,7 +291,21 @@ public abstract class FeatureTiles {
      * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
-        this(context, geoPackage, featureDao, TileUtils.TILE_PIXELS_HIGH, TileUtils.TILE_PIXELS_HIGH);
+        this(context, geoPackage, featureDao, false);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                        boolean geodesic) {
+        this(context, geoPackage, featureDao, TileUtils.TILE_PIXELS_HIGH, TileUtils.TILE_PIXELS_HIGH, geodesic);
     }
 
     /**
@@ -258,7 +318,23 @@ public abstract class FeatureTiles {
      * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density) {
-        this(context, geoPackage, featureDao, density, TileUtils.tileLength(density), TileUtils.tileLength(density));
+        this(context, geoPackage, featureDao, density, false);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                        float density, boolean geodesic) {
+        this(context, geoPackage, featureDao, density, TileUtils.tileLength(density),
+                TileUtils.tileLength(density), geodesic);
     }
 
     /**
@@ -272,7 +348,23 @@ public abstract class FeatureTiles {
      * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width, int height) {
-        this(context, geoPackage, featureDao, TileUtils.density(width, height), width, height);
+        this(context, geoPackage, featureDao, width, height, false);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width,
+                        int height, boolean geodesic) {
+        this(context, geoPackage, featureDao, TileUtils.density(width, height), width, height, geodesic);
     }
 
     /**
@@ -287,6 +379,23 @@ public abstract class FeatureTiles {
      * @since 3.2.0
      */
     public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density, int width, int height) {
+        this(context, geoPackage, featureDao, density, width, height, false);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public FeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                        float density, int width, int height, boolean geodesic) {
 
         this.context = context;
         this.featureDao = featureDao;
@@ -298,6 +407,8 @@ public abstract class FeatureTiles {
 
         tileWidth = width;
         tileHeight = height;
+
+        this.geodesic = geodesic;
 
         createEmptyImage();
 
@@ -324,7 +435,7 @@ public abstract class FeatureTiles {
 
         if (geoPackage != null) {
 
-            indexManager = new FeatureIndexManager(context, geoPackage, featureDao);
+            indexManager = new FeatureIndexManager(context, geoPackage, featureDao, geodesic);
             if (!indexManager.isIndexed()) {
                 indexManager.close();
                 indexManager = null;
@@ -1036,6 +1147,27 @@ public abstract class FeatureTiles {
     }
 
     /**
+     * Are geometries drawn using geodesic lines? Default is false
+     *
+     * @return geodesic flag
+     * @since 6.7.4
+     */
+    public boolean isGeodesic() {
+        return geodesic;
+    }
+
+    /**
+     * Set the geodestic flag, true to draw geodesic geometries
+     *
+     * @param geodesic
+     *            draw geodesic geometries flag
+     * @since 6.7.4
+     */
+    public void setGeodesic(boolean geodesic) {
+        this.geodesic = geodesic;
+    }
+
+    /**
      * Draw the tile and get the bytes from the x, y, and zoom level
      *
      * @param x    x coordinate
@@ -1403,6 +1535,27 @@ public abstract class FeatureTiles {
         }
 
         return simplifiedPoints;
+    }
+
+    /**
+     * When geodesic is enabled, create a geodesic path of points
+     *
+     * @param maxDistance
+     *            max distance allowed between path points
+     * @param points
+     *            ordered points
+     * @return geodesic path points
+     * @since 6.7.4
+     */
+    protected List<Point> geodesicPath(double maxDistance, List<Point> points) {
+
+        List<Point> geodesicPath = points;
+        if (geodesic) {
+            geodesicPath = ProjectionGeometryUtils.geodesicPath(points,
+                    maxDistance, projection);
+        }
+
+        return geodesicPath;
     }
 
     /**

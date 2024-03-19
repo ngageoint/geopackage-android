@@ -10,6 +10,8 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Ignored internal databases support for non GeoPackages (preconfigured to ignore ue3.db for Google Maps)
 * Get abstract User DAO by table name
 * Set User Custom DAO contents
+* Feature Tiles geodesic draw support
+* Feature Index Manager, RTree Index, Feature Table Index, Feature Indexer, and Manual query geodesic support
 
 ## [6.7.3](https://github.com/ngageoint/geopackage-android/releases/tag/6.7.3) (11-30-2023)
 

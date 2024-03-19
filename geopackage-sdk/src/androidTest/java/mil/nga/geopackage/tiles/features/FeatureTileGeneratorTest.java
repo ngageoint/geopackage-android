@@ -44,7 +44,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      */
     @Test
     public void testTileGenerator() throws IOException, SQLException {
-        testTileGenerator(false, false, false);
+        testTileGenerator(false, false, false, false);
     }
 
     /**
@@ -55,7 +55,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      */
     @Test
     public void testTileGeneratorWithIndex() throws IOException, SQLException {
-        testTileGenerator(true, false, false);
+        testTileGenerator(true, false, false, false);
     }
 
     /**
@@ -66,7 +66,7 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
      */
     @Test
     public void testTileGeneratorWithIcon() throws IOException, SQLException {
-        testTileGenerator(false, true, false);
+        testTileGenerator(false, true, false, false);
     }
 
     /**
@@ -78,7 +78,19 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
     @Test
     public void testTileGeneratorWithMaxFeatures() throws IOException,
             SQLException {
-        testTileGenerator(false, false, true);
+        testTileGenerator(false, false, true, false);
+    }
+
+    /**
+     * Test tile generator
+     *
+     * @throws java.io.IOException
+     * @throws java.sql.SQLException
+     */
+    @Test
+    public void testTileGeneratorWithGeodesic()
+            throws IOException, SQLException {
+        testTileGenerator(false, false, false, true);
     }
 
     /**
@@ -90,7 +102,19 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
     @Test
     public void testTileGeneratorWithIndexAndIcon() throws IOException,
             SQLException {
-        testTileGenerator(true, true, false);
+        testTileGenerator(true, true, false, false);
+    }
+
+    /**
+     * Test tile generator
+     *
+     * @throws java.io.IOException
+     * @throws java.sql.SQLException
+     */
+    @Test
+    public void testTileGeneratorWithIndexAndIconAndGeodesic()
+            throws IOException, SQLException {
+        testTileGenerator(true, true, false, true);
     }
 
     /**
@@ -102,20 +126,34 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
     @Test
     public void testTileGeneratorWithIndexAndIconAndMaxFeatures()
             throws IOException, SQLException {
-        testTileGenerator(true, true, true);
+        testTileGenerator(true, true, true, false);
     }
 
     /**
      * Test tile generator
      *
-     * @param index
-     * @param useIcon
-     * @param maxFeatures
      * @throws java.io.IOException
      * @throws java.sql.SQLException
      */
+    @Test
+    public void testTileGeneratorWithIndexAndIconAndMaxFeaturesAndGeodesic()
+            throws IOException, SQLException {
+        testTileGenerator(true, true, true, true);
+    }
+
+    /**
+     * Test tile generator
+     *
+     * @param index index features
+     * @param useIcon true to use an icon instead of the default point
+     * @param maxFeatures set max features
+     * @param geodesic draw geometries using geodesic lines
+     * @throws java.io.IOException upon error
+     * @throws java.sql.SQLException upon error
+     */
     public void testTileGenerator(boolean index, boolean useIcon,
-                                  boolean maxFeatures) throws IOException, SQLException {
+                                  boolean maxFeatures, boolean geodesic)
+                                  throws IOException, SQLException {
 
         int minZoom = 0;
         int maxZoom = 4;
@@ -125,11 +163,12 @@ public class FeatureTileGeneratorTest extends CreateGeoPackageTestCase {
         int num = FeatureTileUtils.insertFeatures(geoPackage, featureDao);
 
         FeatureTiles featureTiles = FeatureTileUtils.createFeatureTiles(
-                activity, geoPackage, featureDao, useIcon);
+                activity, geoPackage, featureDao, useIcon, geodesic);
         try {
 
             if (index) {
-                FeatureIndexManager indexManager = new FeatureIndexManager(activity, geoPackage, featureDao);
+                FeatureIndexManager indexManager = new FeatureIndexManager(
+                        activity, geoPackage, featureDao, geodesic);
                 featureTiles.setIndexManager(indexManager);
                 indexManager.setIndexLocation(FeatureIndexType.GEOPACKAGE);
                 int indexed = indexManager.index();

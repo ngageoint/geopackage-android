@@ -28,7 +28,20 @@ public class FeatureTableIndexExternalTest extends ExternalGeoPackageTestCase {
     @Test
     public void testIndex() throws Exception {
 
-        FeatureTableIndexUtils.testIndex(geoPackage);
+        FeatureTableIndexUtils.testIndex(geoPackage, false);
+
+    }
+
+    /**
+     * Test index
+     *
+     * @throws Exception
+     *             upon error
+     */
+    @Test
+    public void testIndexGeodesic() throws Exception {
+
+        FeatureTableIndexUtils.testIndex(geoPackage, true);
 
     }
 

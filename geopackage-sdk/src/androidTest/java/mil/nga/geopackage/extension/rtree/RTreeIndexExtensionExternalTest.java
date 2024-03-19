@@ -28,7 +28,20 @@ public class RTreeIndexExtensionExternalTest extends ExternalGeoPackageTestCase 
     @Test
     public void testRTree() throws SQLException {
 
-        RTreeIndexExtensionUtils.testRTree(geoPackage);
+        RTreeIndexExtensionUtils.testRTree(geoPackage, false);
+
+    }
+
+    /**
+     * Test RTree with geodesic
+     *
+     * @throws SQLException
+     *             upon error
+     */
+    @Test
+    public void testRTreeGeodesic() throws SQLException {
+
+        RTreeIndexExtensionUtils.testRTree(geoPackage, true);
 
     }
 

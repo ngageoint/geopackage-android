@@ -74,11 +74,23 @@ public class FeatureIndexer {
      * @param featureDao feature dao
      */
     public FeatureIndexer(Context context, FeatureDao featureDao) {
+        this(context, featureDao, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param geodesic index using geodesic bounds
+     * @since 6.7.4
+     */
+    public FeatureIndexer(Context context, FeatureDao featureDao, boolean geodesic) {
         this.context = context;
         this.featureDao = featureDao;
         db = new GeoPackageMetadataDb(context);
         db.open();
-        geometryMetadataDataSource = new GeometryMetadataDataSource(db);
+        geometryMetadataDataSource = new GeometryMetadataDataSource(db, geodesic, featureDao.getProjection());
     }
 
     /**
@@ -127,6 +139,27 @@ public class FeatureIndexer {
      */
     public void setChunkLimit(int chunkLimit) {
         this.chunkLimit = chunkLimit;
+    }
+
+    /**
+     * Geometries indexed using geodesic lines
+     *
+     * @return geodesic flag
+     * @since 6.7.4
+     */
+    public boolean isGeodesic() {
+        return geometryMetadataDataSource.isGeodesic();
+    }
+
+    /**
+     * Set the geodestic flag, true to index geodesic geometries
+     *
+     * @param geodesic
+     *            index geodesic geometries flag
+     * @since 6.7.4
+     */
+    public void setGeodesic(boolean geodesic) {
+        geometryMetadataDataSource.setGeodesic(geodesic);
     }
 
     /**

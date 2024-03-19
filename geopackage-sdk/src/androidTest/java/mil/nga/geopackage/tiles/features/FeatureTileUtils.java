@@ -94,9 +94,12 @@ public class FeatureTileUtils {
      *
      * @return
      */
-    public static FeatureTiles createFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, boolean useIcon) {
+    public static FeatureTiles createFeatureTiles(Context context, GeoPackage geoPackage,
+                                                  FeatureDao featureDao, boolean useIcon,
+                                                  boolean geodesic) {
 
-        FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao, context.getResources().getDisplayMetrics().density);
+        FeatureTiles featureTiles = new DefaultFeatureTiles(context, featureDao,
+                context.getResources().getDisplayMetrics().density, geodesic);
 
         Paint pointPaint = featureTiles.getPointPaint();
         if (useIcon) {

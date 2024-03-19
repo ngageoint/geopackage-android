@@ -83,6 +83,11 @@ public class FeatureIndexManager {
     private boolean continueOnError = true;
 
     /**
+     * Index geometries using geodesic lines
+     */
+    private boolean geodesic = false;
+
+    /**
      * Constructor
      *
      * @param context      context
@@ -102,16 +107,48 @@ public class FeatureIndexManager {
      * @param featureDao feature DAO
      */
     public FeatureIndexManager(Context context, GeoPackage geoPackage, FeatureDao featureDao) {
+        this(context, geoPackage, featureDao, false);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context      context
+     * @param geoPackage   GeoPackage
+     * @param featureTable feature table
+     * @param geodesic     index using geodesic bounds
+     * @since 6.7.4
+     */
+    public FeatureIndexManager(Context context, GeoPackage geoPackage, String featureTable,
+                               boolean geodesic) {
+        this(context, geoPackage, geoPackage.getFeatureDao(featureTable), geodesic);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature DAO
+     * @param geodesic   index using geodesic bounds
+     * @since 6.7.4
+     */
+    public FeatureIndexManager(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               boolean geodesic) {
         this.featureDao = featureDao;
-        featureTableIndex = new FeatureTableIndex(geoPackage, featureDao.copy());
+        this.geodesic = geodesic;
+        featureTableIndex = new FeatureTableIndex(geoPackage, featureDao.copy(),
+                geodesic);
         if (context != null) {
-            featureIndexer = new FeatureIndexer(context, featureDao.copy());
+            featureIndexer = new FeatureIndexer(context, featureDao.copy(),
+                    geodesic);
         } else {
             featureIndexer = null;
         }
-        RTreeIndexExtension rTreeExtension = new RTreeIndexExtension(geoPackage);
+        RTreeIndexExtension rTreeExtension = new RTreeIndexExtension(geoPackage,
+                geodesic);
         rTreeIndexTableDao = rTreeExtension.getTableDao(featureDao.copy());
-        manualFeatureQuery = new ManualFeatureQuery(featureDao.copy());
+        manualFeatureQuery = new ManualFeatureQuery(featureDao.copy(), geodesic);
 
         // Set the default indexed check and query order
         indexLocationQueryOrder.add(FeatureIndexType.RTREE);
@@ -207,6 +244,33 @@ public class FeatureIndexManager {
      */
     public void setContinueOnError(boolean continueOnError) {
         this.continueOnError = continueOnError;
+    }
+
+    /**
+     * Geometries indexed using geodesic lines
+     *
+     * @return geodesic flag
+     * @since 6.7.4
+     */
+    public boolean isGeodesic() {
+        return geodesic;
+    }
+
+    /**
+     * Set the geodestic flag, true to index geodesic geometries
+     *
+     * @param geodesic
+     *            index geodesic geometries flag
+     * @since 6.7.4
+     */
+    public void setGeodesic(boolean geodesic) {
+        this.geodesic = geodesic;
+        featureTableIndex.setGeodesic(geodesic);
+        if (featureIndexer != null) {
+            featureIndexer.setGeodesic(geodesic);
+        }
+        rTreeIndexTableDao.getRTreeIndexExtension().setGeodesic(geodesic);
+        manualFeatureQuery.setGeodesic(geodesic);
     }
 
     /**

@@ -78,11 +78,37 @@ public class DefaultFeatureTiles extends FeatureTiles {
      *
      * @param context    context
      * @param featureDao feature dao
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public DefaultFeatureTiles(Context context, FeatureDao featureDao, boolean geodesic) {
+        super(context, featureDao, geodesic);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
      * @param density    display density: {@link android.util.DisplayMetrics#density}
      * @since 3.2.0
      */
     public DefaultFeatureTiles(Context context, FeatureDao featureDao, float density) {
         super(context, featureDao, density);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public DefaultFeatureTiles(Context context, FeatureDao featureDao, float density,
+                               boolean geodesic) {
+        super(context, featureDao, density, geodesic);
     }
 
     /**
@@ -96,6 +122,21 @@ public class DefaultFeatureTiles extends FeatureTiles {
      */
     public DefaultFeatureTiles(Context context, FeatureDao featureDao, int width, int height) {
         super(context, featureDao, width, height);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param context    context
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public DefaultFeatureTiles(Context context, FeatureDao featureDao, int width, int height,
+                               boolean geodesic) {
+        super(context, featureDao, width, height, geodesic);
     }
 
     /**
@@ -116,10 +157,25 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param context    context
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               boolean geodesic) {
+        super(context, geoPackage, featureDao, geodesic);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
      * @param density    display density: {@link android.util.DisplayMetrics#density}
      * @since 3.2.0
      */
-    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density) {
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               float density) {
         super(context, geoPackage, featureDao, density);
     }
 
@@ -129,12 +185,44 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param context    context
      * @param geoPackage GeoPackage
      * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               float density, boolean geodesic) {
+        super(context, geoPackage, featureDao, density, geodesic);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
      * @param width      drawn tile width
      * @param height     drawn tile height
      * @since 3.2.0
      */
-    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, int width, int height) {
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               int width, int height) {
         super(context, geoPackage, featureDao, width, height);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               int width, int height, boolean geodesic) {
+        super(context, geoPackage, featureDao, width, height, geodesic);
     }
 
     /**
@@ -148,8 +236,26 @@ public class DefaultFeatureTiles extends FeatureTiles {
      * @param height     drawn tile height
      * @since 3.2.0
      */
-    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao, float density, int width, int height) {
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               float density, int width, int height) {
         super(context, geoPackage, featureDao, density, width, height);
+    }
+
+    /**
+     * Constructor, auto creates the index manager for indexed tables and feature styles for styled tables
+     *
+     * @param context    context
+     * @param geoPackage GeoPackage
+     * @param featureDao feature dao
+     * @param density    display density: {@link android.util.DisplayMetrics#density}
+     * @param width      drawn tile width
+     * @param height     drawn tile height
+     * @param geodesic   draw geometries using geodesic lines
+     * @since 6.7.4
+     */
+    public DefaultFeatureTiles(Context context, GeoPackage geoPackage, FeatureDao featureDao,
+                               float density, int width, int height, boolean geodesic) {
+        super(context, geoPackage, featureDao, density, width, height, geodesic);
     }
 
     /**
@@ -522,6 +628,9 @@ public class DefaultFeatureTiles extends FeatureTiles {
             // Try to simplify the number of points in the LineString
             points = simplifyPoints(simplifyTolerance, points);
 
+            // Create a geodesic path of points if needed
+            points = geodesicPath(simplifyTolerance, points);
+
             for (int i = 0; i < points.size(); i++) {
                 Point point = points.get(i);
                 Point webMercatorPoint = transform.transform(point);
@@ -582,6 +691,9 @@ public class DefaultFeatureTiles extends FeatureTiles {
 
         // Try to simplify the number of points in the LineString
         points = simplifyPoints(simplifyTolerance, points);
+
+        // Create a geodesic path of points if needed
+        points = geodesicPath(simplifyTolerance, points);
 
         for (int i = 0; i < points.size(); i++) {
             Point point = points.get(i);
