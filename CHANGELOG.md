@@ -12,6 +12,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 * Set User Custom DAO contents
 * Feature Tiles geodesic draw support
 * Feature Index Manager, RTree Index, Feature Table Index, Feature Indexer, and Manual query geodesic support
+* gradle plugin updated to 8.3.1
 
 ## [6.7.3](https://github.com/ngageoint/geopackage-android/releases/tag/6.7.3) (11-30-2023)
 
