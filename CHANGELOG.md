@@ -7,6 +7,7 @@ Adheres to [Semantic Versioning](http://semver.org/).
 ## 6.7.4 (TBD)
 
 * geopackage-core version 6.6.7
+* SQLite Android Bindings version 3450200
 * Ignored internal databases support for non GeoPackages (preconfigured to ignore ue3.db for Google Maps)
 * Get abstract User DAO by table name
 * Set User Custom DAO contents
