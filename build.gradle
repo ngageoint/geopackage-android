@@ -17,6 +17,9 @@ plugins {
     id 'signing'
 }
 
+group = "mil.nga.geopackage"
+version = "6.7.5"
+
 allprojects {
     repositories {
         google()

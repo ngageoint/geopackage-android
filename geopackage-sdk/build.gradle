@@ -4,9 +4,7 @@ plugins {
     id "maven-publish"
 }
 
-group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.7.5"
 
 android {
     namespace 'mil.nga.geopackage'
