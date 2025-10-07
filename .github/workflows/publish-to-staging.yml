@@ -33,4 +33,4 @@ jobs:
         run: |
           # publishToSonatype: Uploads artifacts to a new staging repository.
           # closeSonatypeRepository: Closes the staging repository, running validations and making it visible in the portal.
-          ./gradlew publishToSonatype closeSonatypeRepository --no-scan
+          ./gradlew publishToSonatype closeSonatypeStagingRepository --no-scan
