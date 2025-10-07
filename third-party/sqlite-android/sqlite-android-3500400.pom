@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>mil.nga</groupId>
   <artifactId>sqlite-android</artifactId>
-  <version>3450200</version>
+  <version>3500400</version>
   <packaging>aar</packaging>
   <name>SQLite Android Bindings</name>
   <description>SQLite Android Bindings from https://sqlite.org</description>
@@ -20,14 +20,14 @@
   </organization>
   <developers>
     <developer>
-      <id>bosborn</id>
-      <name>Brian Osborn</name>
-      <email>bosborn@caci.com</email>
-      <organizationUrl>https://www.caci.com/bit-systems</organizationUrl>
+      <id>nruss11-om</id>
+      <name>Nathan Russell</name>
+      <email>nathan.russell@omnifederal.com</email>
+      <organizationUrl>https://omnifederal.com/</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
-      <timezone>UTC-07</timezone>
+      <timezone>UTC-05</timezone>
     </developer>
   </developers>
   <scm>
@@ -35,4 +35,10 @@
     <developerConnection>scm:fossil:https://www.sqlite.org/src</developerConnection>
     <url>https://www.sqlite.org/src</url>
   </scm>
+  <distributionManagement>
+     <repository>
+         <id>ossrh-staging-api</id>
+         <url>https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/</url>
+     </repository>
+  </distributionManagement>
 </project>
