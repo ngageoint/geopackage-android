@@ -105,7 +105,7 @@ afterEvaluate {
 
                 groupId = group
                 artifactId = archivesBaseName
-                version = version
+
                 pom {
                     name = 'GeoPackage Android'
                     packaging = 'aar'
