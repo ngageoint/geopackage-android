@@ -1,4 +1,4 @@
-name: Publish to Maven Central (Staged)
+name: Publish and close to staging repo
 #Uploads to a new staging repository and closes it, making it available for viewing on the Maven portal
 #The repo will then need to be manually released on the portal before it is available on Maven Central
 on:
