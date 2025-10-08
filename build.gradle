@@ -46,5 +46,6 @@ signing {
 
     if (signingKey != null && signingPassword != null) {
         useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications)
     }
 }
