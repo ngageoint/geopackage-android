@@ -4,9 +4,7 @@ plugins {
     id "maven-publish"
 }
 
-group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.7.5"
 
 android {
     namespace 'mil.nga.geopackage'
@@ -107,7 +105,7 @@ afterEvaluate {
 
                 groupId = group
                 artifactId = archivesBaseName
-                version = version
+
                 pom {
                     name = 'GeoPackage Android'
                     packaging = 'aar'

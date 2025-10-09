@@ -14,10 +14,12 @@ buildscript {
 
 plugins {
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-    id 'signing'
 }
 
 allprojects {
+    group = "mil.nga.geopackage"
+    version = "6.7.5"
+
     repositories {
         google()
         mavenCentral()
@@ -36,11 +38,17 @@ nexusPublishing {
     }
 }
 
-signing {
-    def signingKey = System.getenv("GPG_PRIVATE_KEY")
-    def signingPassword = System.getenv("GPG_PASSWORD")
+subprojects {
+    apply plugin: 'signing' //apply signing plugin to all subprojects
 
-    if (signingKey != null && signingPassword != null) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
+    afterEvaluate {
+        def signingKey = System.getenv("GPG_PRIVATE_KEY")
+        def signingPassword = System.getenv("GPG_PASSWORD")
+        if (signingKey != null && signingPassword != null) {
+            signing {
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign publishing.publications
+            }
+        }
     }
 }

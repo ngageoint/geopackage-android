@@ -1,5 +1,6 @@
-name: Publish to Maven Central (Staged)
-
+name: Publish and close to staging repo
+#Uploads to a new staging repository and closes it, making it available for viewing on the Maven portal
+#The repo will then need to be manually released on the portal before it is available on Maven Central
 on:
   release:
     types: [published]
@@ -23,13 +24,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Publish to Sonatype Staging Repository
+      - name: Publish and Close Sonatype Staging Repository
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSWORD: ${{ secrets.GPG_PASSWORD }}
         run: |
-          # Use --no-scan to prevent sending build data to Gradle's servers
-          # The publishToSonatype task uploads to the staging repo, but does not close it
-          ./gradlew publishToSonatype --no-scan
+          # publishToSonatype: Uploads artifacts to a new staging repository.
+          # closeSonatypeRepository: Closes the staging repository, running validations and making it visible in the portal.
+          ./gradlew publishToSonatype closeSonatypeStagingRepository --no-scan
