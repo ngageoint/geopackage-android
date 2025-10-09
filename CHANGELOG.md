@@ -4,9 +4,9 @@ Adheres to [Semantic Versioning](http://semver.org/).
 
 ---
 
-## 6.7.5 (TBD)
+## 6.7.5
 
-* TBD
+* SQLite Android Bindings version 3500400
 
 ## [6.7.4](https://github.com/ngageoint/geopackage-android/releases/tag/6.7.4) (04-05-2024)
 

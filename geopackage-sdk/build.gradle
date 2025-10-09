@@ -1,11 +1,10 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
+plugins {
+    id "com.android.library"
+    id "kotlin-android"
+    id "maven-publish"
+}
 
-group = "mil.nga.geopackage"
 archivesBaseName = "geopackage-android"
-version = "6.7.5"
 
 android {
     namespace 'mil.nga.geopackage'
@@ -89,7 +88,6 @@ android {
     publishing {
         singleVariant("release")
     }
-
 }
 
 afterEvaluate {
@@ -107,7 +105,7 @@ afterEvaluate {
 
                 groupId = group
                 artifactId = archivesBaseName
-                version = version
+
                 pom {
                     name = 'GeoPackage Android'
                     packaging = 'aar'
@@ -135,34 +133,18 @@ afterEvaluate {
 
                     developers {
                         developer {
-                            id = 'bosborn'
-                            name = 'Brian Osborn'
-                            email = 'bosborn@caci.com'
-                            organizationUrl = 'https://www.caci.com/bit-systems'
+                            id = 'nruss11-om'
+                            name = 'Nathan Russell'
+                            email = 'nathan.russell@omnifederal.com'
+                            organizationUrl = 'https://omnifederal.com/'
                             timezone = 'UTC-07'
                         }
                     }
                 }
             }
         }
-        repositories {
-            maven {
-                def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                def user = project.hasProperty('ossrhUsername') ? ossrhUsername : ""
-                def pw = project.hasProperty('ossrhPassword') ? ossrhPassword : ""
-                credentials {
-                    username = user
-                    password = pw
-                }
-            }
-        }
     }
 
-    signing {
-        sign publishing.publications.maven
-    }
 }
 
 dependencies {
@@ -174,7 +156,7 @@ dependencies {
     }
     api 'ar.com.hjg:pngj:2.1.0'
     api 'mil.nga:tiff:3.0.0'
-    api 'mil.nga:sqlite-android:3450200'
+    api 'mil.nga:sqlite-android:3500400'
     javadocDeps 'com.j256.ormlite:ormlite-android:6.1'
     javadocDeps 'mil.nga.geopackage:geopackage-core:6.6.7'
     javadocDeps 'ar.com.hjg:pngj:2.1.0'

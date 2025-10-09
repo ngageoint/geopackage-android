@@ -12,10 +12,43 @@ buildscript {
     }
 }
 
+plugins {
+    id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+}
+
 allprojects {
+    group = "mil.nga.geopackage"
+    version = "6.7.5"
+
     repositories {
         google()
         mavenCentral()
         mavenLocal()
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
+
+            username = System.getenv("SONATYPE_USERNAME")
+            password = System.getenv("SONATYPE_PASSWORD")
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'signing' //apply signing plugin to all subprojects
+
+    afterEvaluate {
+        def signingKey = System.getenv("GPG_PRIVATE_KEY")
+        def signingPassword = System.getenv("GPG_PASSWORD")
+        if (signingKey != null && signingPassword != null) {
+            signing {
+                useInMemoryPgpKeys(signingKey, signingPassword)
+                sign publishing.publications
+            }
+        }
     }
 }
