@@ -6,30 +6,38 @@ on:
       - master
   pull_request:
 
+  #manual triggering
+  workflow_dispatch:
+
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
     - name: set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 17
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
     - name: Build with Gradle
       run: ./gradlew build -x lint
+
     - name: Copy Release Artifacts
       run: |
         mkdir geopackage-sdk/build/release
         cp geopackage-sdk/build/libs/*.jar geopackage-sdk/build/outputs/aar/*release.aar geopackage-sdk/build/release/
-        grep "version =" geopackage-sdk/build.gradle | sed 's/[a-z ="]//g' > VERSION
+        grep "version =" build.gradle | sed 's/[a-z ="]//g' > VERSION
         mv geopackage-sdk/build/release/*.aar geopackage-sdk/build/release/geopackage-android-$(cat VERSION).aar
+
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: geopackage-android
         path: geopackage-sdk/build/release
